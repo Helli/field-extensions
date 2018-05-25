@@ -9,42 +9,29 @@ begin
 
 section\<open>Quick test\<close>
 
-definition
-  R :: "real ring"
-  where "R = \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+abbreviation standard_ring :: "'a::{one,times,plus,zero} ring" ("\<S>")
+  where "standard_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
-lemma R_cring: "cring R"
-  by (unfold R_def) (auto intro!: cringI abelian_groupI comm_monoidI
+lemma \<S>_cring: "cring (\<S>::_::field ring)"
+  by (auto intro!: cringI abelian_groupI comm_monoidI
     left_minus distrib_right)
+
+lemma \<S>_field: "field (\<S>::_::field ring)"
+  apply (rule cring.cring_fieldI2)
+    apply (fact \<S>_cring) apply auto using dvd_field_iff
+  by (metis dvdE)
+
+definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<S>"
+definition real_field::"real ring" ("\<real>") where "\<real> = \<S>"
+definition complex_field::"complex ring" ("\<complex>") where "\<complex> = \<S>"
+
+lemma "field \<rat>" unfolding rat_field_def by (fact \<S>_field)
+lemma "field \<real>" unfolding real_field_def by (fact \<S>_field)
+lemma "field \<complex>" unfolding complex_field_def by (fact \<S>_field)
 
 lemma R_id_eval:
-  "UP_pre_univ_prop R R id"
-  by (fast intro: UP_pre_univ_propI R_cring id_ring_hom)
-
-lemma "field R"
-  apply (rule cring.cring_fieldI2)
-  apply (fact R_cring)
-  unfolding R_def apply auto using dvd_field_iff
-  by (metis dvdE)
-
-definition
-  C :: "complex ring"
-  where "C = \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
-
-lemma C_cring: "cring C"
-  by (unfold C_def) (auto intro!: cringI abelian_groupI comm_monoidI
-    left_minus distrib_right)
-
-lemma C_id_eval:
-  "UP_pre_univ_prop C C id"
-  by (fast intro: UP_pre_univ_propI C_cring id_ring_hom)
-
-lemma "field C"
-  apply (rule cring.cring_fieldI2)
-    apply (fact C_cring)
-  unfolding C_def apply auto using dvd_field_iff
-  by (metis dvdE)
-
+  "UP_pre_univ_prop \<real> \<real> id"
+  by (fast intro: UP_pre_univ_propI \<S>_cring id_ring_hom)
 
 section\<open>Observations\<close>
 
