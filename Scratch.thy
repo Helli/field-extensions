@@ -38,6 +38,20 @@ lemma \<K>_id_eval:
 definition standard_subring
   where "standard_subring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
+lemma
+  assumes "ring (\<S>::'a::{one,times,plus,zero} ring)"
+  assumes one_in_S: "1 \<in> S"
+  assumes zero_in_S: "0 \<in> S"
+  assumes closed_mult: "\<forall>a\<in>S. \<forall>b\<in>S. a*b \<in> S"
+  assumes closed_plus: "\<forall>a\<in>S. \<forall>b\<in>S. a+b \<in> S"
+  shows "ring (standard_subring (S::'a set))"
+  oops
+
+lemma
+  assumes "cring (\<S>::'a::{one,times,plus,zero} ring)"
+  (*todo*)
+  shows "cring (standard_subring (S::'a set))"
+
 
 section\<open>Observations\<close>
 
