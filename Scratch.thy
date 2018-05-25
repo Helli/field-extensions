@@ -7,25 +7,6 @@ theory Scratch imports
 "HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above *)
 begin
 
-term field
---\<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
-
-text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
-lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
-  by (auto simp: mult_of_simps)
-
-(* duplicate: *)
-value INTEG
-value "\<Z>"
-thm INTEG_def
-
-find_theorems field
-thm
-field_axioms_def
-QuotRing.maximalideal.quotient_is_field
-Ideal.field.all_ideals
-UnivPoly.INTEG.R.trivialideals_eq_field
-
 section\<open>Quick test\<close>
 
 definition
@@ -64,5 +45,26 @@ lemma "field C"
   unfolding C_def apply auto using dvd_field_iff
   by (metis dvdE)
 
+
+section\<open>Observations\<close>
+
+term field
+--\<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
+
+text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
+lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
+  by (auto simp: mult_of_simps)
+
+(* duplicate: *)
+value INTEG
+value "\<Z>"
+thm INTEG_def
+
+find_theorems field
+thm
+field_axioms_def
+QuotRing.maximalideal.quotient_is_field
+Ideal.field.all_ideals
+UnivPoly.INTEG.R.trivialideals_eq_field
 
 end
