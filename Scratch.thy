@@ -9,7 +9,7 @@ begin
 
 section\<open>Quick test\<close>
 
-abbreviation standard_ring :: "_::{one,times,plus,zero} ring" ("\<S>")
+abbreviation standard_ring ("\<S>")
   where "standard_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
 lemma \<S>_cring: "Ring.cring (\<S>::_::Fields.field ring)"
@@ -21,7 +21,7 @@ lemma \<S>_field: "Ring.field (\<S>::_::Fields.field ring)"
     apply (fact \<S>_cring) apply auto using dvd_field_iff
   by (metis dvdE)
 
-definition rat_field::"rat Ring.ring" ("\<rat>") where "\<rat> = \<S>"
+definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<S>"
 definition real_field::"real ring" ("\<real>") where "\<real> = \<S>"
 definition complex_field::"complex ring" ("\<complex>") where "\<complex> = \<S>"
 
@@ -34,6 +34,10 @@ abbreviation \<K>::"_::field ring" where "\<K> \<equiv> \<S>"
 lemma \<K>_id_eval:
   "UP_pre_univ_prop \<K> \<K> id"
   by (simp add: UP_pre_univ_propI \<S>_cring rat_field_def)
+
+definition standard_subring
+  where "standard_subring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+
 
 section\<open>Observations\<close>
 
