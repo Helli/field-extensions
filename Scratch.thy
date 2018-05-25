@@ -9,49 +9,49 @@ begin
 
 section\<open>Quick test\<close>
 
-abbreviation standard_ring ("\<S>")
-  where "standard_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+abbreviation univ_ring ("\<U>")
+  where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
-lemma \<S>_cring: "Ring.cring (\<S>::_::Fields.field ring)"
+lemma \<U>_cring: "Ring.cring (\<U>::_::Fields.field ring)"
   by (auto intro!: cringI abelian_groupI comm_monoidI
     left_minus distrib_right)
 
-lemma \<S>_field: "Ring.field (\<S>::_::Fields.field ring)"
+lemma \<U>_field: "Ring.field (\<U>::_::Fields.field ring)"
   apply (rule cring.cring_fieldI2)
-    apply (fact \<S>_cring) apply auto using dvd_field_iff
+    apply (fact \<U>_cring) apply auto using dvd_field_iff
   by (metis dvdE)
 
-definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<S>"
-definition real_field::"real ring" ("\<real>") where "\<real> = \<S>"
-definition complex_field::"complex ring" ("\<complex>") where "\<complex> = \<S>"
+definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<U>"
+definition real_field::"real ring" ("\<real>") where "\<real> = \<U>"
+definition complex_field::"complex ring" ("\<complex>") where "\<complex> = \<U>"
 
-lemma "field \<rat>" unfolding rat_field_def by (fact \<S>_field)
-lemma "field \<real>" unfolding real_field_def by (fact \<S>_field)
-lemma "field \<complex>" unfolding complex_field_def by (fact \<S>_field)
+lemma "field \<rat>" unfolding rat_field_def by (fact \<U>_field)
+lemma "field \<real>" unfolding real_field_def by (fact \<U>_field)
+lemma "field \<complex>" unfolding complex_field_def by (fact \<U>_field)
 
-abbreviation \<K>::"_::field ring" where "\<K> \<equiv> \<S>"
+abbreviation \<K>::"_::field ring" where "\<K> \<equiv> univ_ring"
 
 lemma \<K>_id_eval:
   "UP_pre_univ_prop \<K> \<K> id"
-  by (simp add: UP_pre_univ_propI \<S>_cring rat_field_def)
+  by (simp add: UP_pre_univ_propI \<U>_cring rat_field_def)
 
-definition standard_subring
-  where "standard_subring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+definition standard_ring
+  where "standard_ring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
 lemma
-  assumes "ring (\<S>::'a::{one,times,plus,zero} ring)"
+  assumes "ring (\<U>::'a::{one,times,plus,zero} ring)"
   assumes one_in_S: "1 \<in> S"
   assumes zero_in_S: "0 \<in> S"
   assumes closed_mult: "\<forall>a\<in>S. \<forall>b\<in>S. a*b \<in> S"
   assumes closed_plus: "\<forall>a\<in>S. \<forall>b\<in>S. a+b \<in> S"
-  shows "ring (standard_subring (S::'a set))"
+  shows "ring (standard_ring (S::'a set))"
   oops
 
 lemma
-  assumes "cring (\<S>::'a::{one,times,plus,zero} ring)"
+  assumes "cring (\<U>::'a::{one,times,plus,zero} ring)"
   (*todo*)
-  shows "cring (standard_subring (S::'a set))"
-
+  shows "cring (standard_ring (S::'a set))"
+  oops
 
 section\<open>Observations\<close>
 
