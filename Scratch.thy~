@@ -1,6 +1,6 @@
 theory Scratch imports
 "HOL-Algebra.Divisibility"         
-"HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
+"HOL-Algebra.IntRing"              (* Ideals and residue classes *)
 "HOL-Algebra.UnivPoly"             (* Polynomials *)
 "HOL-Algebra.More_Ring"            (* This imports Rings. *)
 "HOL-Algebra.Multiplicative_Group"
@@ -10,7 +10,7 @@ begin
 term field
 --\<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
 
-text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
+text\<open>The following does not need context field, as in @{theory Multiplicative_Group}\<close>
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
   by (auto simp: mult_of_simps)
 
