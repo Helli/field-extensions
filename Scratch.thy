@@ -9,16 +9,16 @@ begin
 
 section\<open>Quick test\<close>
 
-abbreviation univ_ring ("\<U>")
+definition univ_ring ("\<U>")
   where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
 
 lemma \<U>_cring: "Ring.cring (\<U>::_::Fields.field ring)"
   by (auto intro!: cringI abelian_groupI comm_monoidI
-    left_minus distrib_right)
+    left_minus distrib_right simp: univ_ring_def)
 
 lemma \<U>_field: "Ring.field (\<U>::_::Fields.field ring)"
   apply (rule cring.cring_fieldI2)
-    apply (fact \<U>_cring) apply auto using dvd_field_iff
+    apply (fact \<U>_cring) apply (auto simp: univ_ring_def) using dvd_field_iff
   by (metis dvdE)
 
 definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<U>"
@@ -33,7 +33,7 @@ abbreviation \<K>::"_::field ring" where "\<K> \<equiv> univ_ring"
 
 lemma \<K>_id_eval:
   "UP_pre_univ_prop \<K> \<K> id"
-  by (simp add: UP_pre_univ_propI \<U>_cring rat_field_def)
+  using UP_pre_univ_propI \<U>_cring id_ring_hom by blast
 
 definition standard_ring
   where "standard_ring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
