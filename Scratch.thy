@@ -10,7 +10,7 @@ begin
 section\<open>Quick test\<close>
 
 definition univ_ring ("\<U>")
-  where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+  where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma \<U>_cring: "Ring.cring (\<U>::_::Fields.field ring)"
   by (auto intro!: cringI abelian_groupI comm_monoidI
@@ -36,7 +36,7 @@ lemma \<K>_id_eval:
   using UP_pre_univ_propI \<U>_cring id_ring_hom by blast
 
 definition standard_ring
-  where "standard_ring A = \<lparr>carrier = A, mult = op *, one = 1, zero = 0, add = op +\<rparr>"
+  where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma
   assumes "ring (\<U>::'a::{one,times,plus,zero} ring)"
@@ -56,7 +56,7 @@ lemma
 section\<open>Observations\<close>
 
 term field
---\<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
+\<comment> \<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
 
 text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
