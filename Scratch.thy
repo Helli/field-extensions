@@ -21,13 +21,12 @@ lemma \<U>_field: "Ring.field (\<U>::_::Fields.field ring)"
     apply (fact \<U>_cring) apply (auto simp: univ_ring_def) using dvd_field_iff
   by (metis dvdE)
 
-definition rat_field::"rat ring" ("\<rat>") where "\<rat> = \<U>"
-definition real_field::"real ring" ("\<real>") where "\<real> = \<U>"
-definition complex_field::"complex ring" ("\<complex>") where "\<complex> = \<U>"
+definition rat_field::"rat ring" where "rat_field = \<U>"
+definition real_field::"real ring" where "real_field = \<U>"
+definition complex_field::"complex ring" where "complex_field = \<U>"
 
-lemma "field \<rat>" unfolding rat_field_def by (fact \<U>_field)
-lemma "field \<real>" unfolding real_field_def by (fact \<U>_field)
-lemma "field \<complex>" unfolding complex_field_def by (fact \<U>_field)
+lemma "field rat_field" "field real_field" "field complex_field"
+  unfolding rat_field_def real_field_def complex_field_def by (fact \<U>_field)+
 
 abbreviation \<K>::"_::field ring" where "\<K> \<equiv> univ_ring"
 

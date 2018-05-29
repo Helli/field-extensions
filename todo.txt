@@ -1,9 +1,5 @@
 the examples from the lecture notes are not that important
 
-avoid introducing too much syntax
-
-use development version of Isabelle
-
 use Hull.thy
 
 "grep -ri subring" returned no useful result
