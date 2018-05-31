@@ -1,5 +1,3 @@
 the examples from the lecture notes are not that important
 
 use Hull.thy
-
-"grep -ri subring" returned no useful result
