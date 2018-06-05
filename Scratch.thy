@@ -10,33 +10,34 @@ lemma easy: "of_int ` (\<int>::int set) \<subseteq> (\<rat>:: rat set)" by auto
 
 section \<open>Subrings\<close>
 
-lemma ring_card: "ring R \<Longrightarrow> card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
+context ring begin \<comment> \<open>\<triangleq> "Let @{term R} be a ring."\<close>
+
+lemma ring_card: "card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
   using not_less_eq_eq ring.ring_simprules(6) by fastforce
 
-lemma nonzero_ring_one: "ring R \<Longrightarrow> card (carrier R) \<noteq> 1 \<Longrightarrow> one R \<noteq> zero R"
-  using is_singleton_altdef is_singleton_def ring.one_genideal ring.zero_genideal by fastforce
+lemma nonzero_ring_one: "card (carrier R) \<noteq> 1 \<Longrightarrow> one R \<noteq> zero R"
+  using is_singleton_altdef is_singleton_def one_zeroD by blast
 
 definition subring where
-  "subring R1 R2 \<longleftrightarrow> ring R1 \<and> ring R2
-    \<and> carrier R1 \<subseteq> carrier R2
-    \<and> mult R1 = mult R2 \<comment> \<open>Do we need to relax this...\<close>
-    \<and> add R1 = add R2 \<comment> \<open>...and this?\<close>
-    \<and> one R1 = one R2
-    \<and> zero R1 = zero R2"
+  "subring S \<longleftrightarrow>
+    carrier S \<subseteq> carrier R \<and>
+    ring S \<and>
+    one R \<in> carrier S \<and>
+    (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier R. add S r1 r2 = add R r1 r2 \<and> mult S r1 r2 = mult R r1 r2)"
 
-lemma subring_altdef: "subring R1 R2 \<longleftrightarrow> ring R1 \<and> ring R2
-  \<and> carrier R1 \<subseteq> carrier R2
-  \<and> mult R1 = mult R2
-  \<and> add R1 = add R2
-  \<and> one R2 \<in> carrier R1"
-  by (smt monoid.l_one monoid.r_one ring.is_monoid ring.ring_simprules(15) ring.ring_simprules(18)
-      ring.ring_simprules(2) ring.ring_simprules(6) subring_def subset_iff)
+lemma "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
+  by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
+      ring.ring_simprules(2) singleton_iff subring_def)
 
-lemma "subring R1 R2 \<Longrightarrow> \<one> \<in> R1"
-(*todo introrule*)
-lemma "subring R1 R2 \<Longrightarrow> ring r2 \<Longrightarrow> ring R1"
-lemma "subring R1 R2 \<Longrightarrow> cring R1 \<Longrightarrow> cring R2"
+end
 
+context cring begin \<comment> \<open>\<triangleq> "Let @{term R} be a commutative ring."\<close>
+
+lemma subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def cring_def ring_def
+  by (simp add: comm_monoid.m_ac(2) comm_monoid_axioms monoid.monoid_comm_monoidI subset_eq)
+
+end
+thm ring.subring_def
 
 section \<open>quick test\<close>
 
