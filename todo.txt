@@ -1,3 +1,7 @@
+state field extension \<rat>/\<int>
+
+work on Prop 16.3.
+
 the examples from the lecture notes are not that important
 
 use Hull.thy

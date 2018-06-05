@@ -37,7 +37,24 @@ lemma subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def
   by (simp add: comm_monoid.m_ac(2) comm_monoid_axioms monoid.monoid_comm_monoidI subset_eq)
 
 end
-thm ring.subring_def
+
+context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
+
+definition subfield where
+  "subfield K \<longleftrightarrow> subring K \<and> field K"
+
+end
+
+locale field_extension =
+  fixes L (structure)
+  fixes K (structure) (* Which one is the implicit one in this case? *)
+  assumes L_extends_K: "field.subfield L K"
+begin
+
+term "(\<oplus>) a b"
+term "(\<oplus>) a b"
+term "carrier"
+end
 
 section \<open>quick test\<close>
 
