@@ -1,6 +1,6 @@
 state field extension \<rat>/\<int>
 
-work on Prop 16.3.
+work on Prop 16.3 if it is needed for the definition behind it
 
 the examples from the lecture notes are not that important
 
