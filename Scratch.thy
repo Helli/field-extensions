@@ -8,6 +8,9 @@ begin
 
 lemma easy: "of_int ` (\<int>::int set) \<subseteq> (\<rat>:: rat set)" by auto
 
+definition standard_ring
+  where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+
 section \<open>Subrings\<close>
 
 context ring begin \<comment> \<open>\<triangleq> "Let @{term R} be a ring."\<close>
@@ -23,9 +26,12 @@ definition subring where
     carrier S \<subseteq> carrier R \<and>
     ring S \<and>
     one R \<in> carrier S \<and>
-    (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier R. add S r1 r2 = add R r1 r2 \<and> mult S r1 r2 = mult R r1 r2)"
+    (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. add S r1 r2 = add R r1 r2 \<and> mult S r1 r2 = mult R r1 r2)"
 
-lemma "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
+lemma subring_refl: "subring R"
+  unfolding subring_def using local.ring_axioms by blast
+
+lemma nontrivial_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
   by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
       ring.ring_simprules(2) singleton_iff subring_def)
 
@@ -43,6 +49,9 @@ context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<
 definition subfield where
   "subfield K \<longleftrightarrow> subring K \<and> field K"
 
+lemma subfield_refl: "subfield R"
+  by (simp add: local.field_axioms subfield_def subring_refl)
+
 end
 
 locale field_extension =
@@ -55,6 +64,9 @@ term "(\<oplus>) a b"
 term "(\<oplus>) a b"
 term "carrier"
 end
+
+lemma f_e_refl: "field K \<Longrightarrow> field_extension K K"
+  by (simp add: field.subfield_refl field_extension.intro)
 
 section \<open>quick test\<close>
 
@@ -82,9 +94,6 @@ abbreviation \<K>::"_::field ring" where "\<K> \<equiv> univ_ring"
 lemma \<K>_id_eval:
   "UP_pre_univ_prop \<K> \<K> id"
   using UP_pre_univ_propI \<U>_cring id_ring_hom by blast
-
-definition standard_ring
-  where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma
   assumes "ring (\<U>::'a::{one,times,plus,zero} ring)"
