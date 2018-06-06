@@ -31,7 +31,7 @@ definition subring where
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
 
-lemma nontrivial_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
+lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
   by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
       ring.ring_simprules(2) singleton_iff subring_def)
 
