@@ -14,3 +14,5 @@ rsr.add :
   Group.comm_monoid
     "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
         one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
+
+^This error means that I have no way of seeing wheater field_extension is correct --> Ask Manuel

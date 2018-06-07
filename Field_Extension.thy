@@ -56,19 +56,23 @@ locale ideal = additive_subgroup I R + ring R for I and R (structure) +
     and I_r_closed: "\<lbrakk>a \<in> I; x \<in> carrier R\<rbrakk> \<Longrightarrow> a \<otimes> x \<in> I"
 \<close>\<close>
 
-locale field_extension =
-  fixes L (structure)
-  fixes K (structure) (* Which one is the implicit one in this case? *)
-  assumes L_extends_K: "field.subfield L K"
+locale field_extension = field L for L (structure) +
+  fixes K
+  assumes L_extends_K: "subfield K"
 begin
 
-term "(\<oplus>) a b"
-term "(\<oplus>) a b"
+lemma K_field: "field K"
+  using L_extends_K by (simp add: subfield_def)
+
+term "add K a b"
+term "add L a b"
 term "carrier"
 end
 
+thm field_extension.L_extends_K field.subfield_def
+
 lemma f_e_refl: "field K \<Longrightarrow> field_extension K K"
-  by (simp add: field.subfield_refl field_extension.intro)
+  by (simp add: field.subfield_refl field_extension_axioms_def field_extension_def)
 
 
 section\<open>Observations\<close>
