@@ -43,6 +43,8 @@ end
 context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
 
 definition subfield where
+  \<comment> \<open>Maybe remove this definition and put it in the assumption of field_extension...
+    (requires use of rewrite-clauses to avoid a name clash?)\<close>
   "subfield K \<longleftrightarrow> subring K \<and> field K"
 
 lemma subfield_refl: "subfield R"
@@ -50,29 +52,30 @@ lemma subfield_refl: "subfield R"
 
 end
 
-text\<open>\<^theory_text>\<open>
-locale ideal = additive_subgroup I R + ring R for I and R (structure) +
-  assumes I_l_closed: "\<lbrakk>a \<in> I; x \<in> carrier R\<rbrakk> \<Longrightarrow> x \<otimes> a \<in> I"
-    and I_r_closed: "\<lbrakk>a \<in> I; x \<in> carrier R\<rbrakk> \<Longrightarrow> a \<otimes> x \<in> I"
-\<close>\<close>
-
 locale field_extension = field L for L (structure) +
   fixes K
   assumes L_extends_K: "subfield K"
-begin
+begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
 
 lemma K_field: "field K"
   using L_extends_K by (simp add: subfield_def)
 
-term "add K a b"
-term "add L a b"
-term "carrier"
 end
 
-thm field_extension.L_extends_K field.subfield_def
+lemma (in field) f_e_refl : "field_extension R R"
+  by (simp add: field_extension.intro field_extension_axioms.intro local.field_axioms subfield_refl)
 
-lemma f_e_refl: "field K \<Longrightarrow> field_extension K K"
-  by (simp add: field.subfield_refl field_extension_axioms_def field_extension_def)
+lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield K"
+  by (simp add: field_extension_axioms_def field_extension_def local.field_axioms)
+
+context field_extension
+begin
+
+lemma "field K" oops
+lemma "field L" oops
+lemma "field.subfield L K" oops
+
+end
 
 
 section\<open>Observations\<close>
