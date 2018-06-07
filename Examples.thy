@@ -1,5 +1,5 @@
 section \<open>Quick Tests\<close>
-theory Examples imports Scratch
+theory Examples imports Field_Extension
 begin
 
 lemma easy: "of_int ` \<int> \<subseteq> \<rat>" by auto

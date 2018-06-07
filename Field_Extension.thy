@@ -1,4 +1,4 @@
-theory Scratch imports
+theory Field_Extension imports
 "HOL-Algebra.Divisibility"         
 "HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
 "HOL-Algebra.UnivPoly"             (* Polynomials *)
