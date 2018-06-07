@@ -39,12 +39,24 @@ lemma \<K>_id_eval:
   "UP_pre_univ_prop \<K> \<K> id"
   using UP_pre_univ_propI \<U>_cring id_ring_hom by blast
 
-find_theorems "Ring.ring" name: I
+lemma ring_standard_ring: "ring (standard_ring (range rat_of_int))" unfolding standard_ring_def
+  apply standard
+               apply auto
+      apply (metis of_int_add range_eqI)
+  unfolding Units_def apply auto
+     apply (metis add.left_neutral add_diff_cancel_right' add_uminus_conv_diff of_int_add)
+  using Ints_def apply auto[1]
+   apply (simp add: mult.commute ring_class.ring_distribs(1))
+  by (simp add: ring_class.ring_distribs(1))
+(*interpretation rsr: ring "standard_ring (range rat_of_int)" by (simp add: ring_standard_ring)*)
 
-term "\<Z>"
-term INTEG
 lemma "ring.subring (univ_ring :: rat ring) (standard_ring (range rat_of_int))"
   unfolding ring.subring_def[OF \<U>_ring]
   apply (auto simp add: univ_ring_def) unfolding standard_ring_def
+     apply (metis ring_standard_ring standard_ring_def)
+  by auto
+
+lemma f_r: (*rm*) "field K \<Longrightarrow> ring K"
+  by (simp add: cring.axioms(1) domain.axioms(1) field.axioms(1))
 
 end

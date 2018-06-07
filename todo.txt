@@ -5,3 +5,12 @@ work on Prop 16.3 if it is needed for the definition behind it
 the examples from the lecture notes are not that important
 
 use Hull.thy
+
+**Problems**
+
+Duplicate fact declaration "Examples.rsr.add.finprod_one" vs. "Examples.rsr.add.finprod_one"\<^here>
+The above error(s) occurred while activating locale instance
+rsr.add :
+  Group.comm_monoid
+    "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
+        one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
