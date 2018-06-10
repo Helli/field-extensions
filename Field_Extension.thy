@@ -7,6 +7,32 @@ theory Field_Extension imports
 begin
 
 
+section \<open>missing preliminaries?\<close>
+
+lemma (in comm_group) subgroup_group:
+  "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group \<lparr>carrier = A, mult=(\<otimes>), one=\<one>\<rparr>"
+  apply standard                                     
+        apply auto
+    apply (simp add: m_assoc subset_iff)
+   apply (meson m_comm subsetCE)
+  unfolding Units_def
+proof -
+fix x :: 'a
+assume a1: "x \<in> A"
+  assume a2: "A \<subseteq> carrier G"
+  assume "\<one> \<in> A"
+  assume a3: "\<forall>a1\<in>A. \<forall>a2\<in>A. a1 \<otimes> a2 \<in> A \<and> inv a1 \<in> A"
+  have "x \<in> carrier G"
+    using a2 a1 by blast
+then show "x \<in> {a \<in> carrier \<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>. \<exists>aa\<in>carrier \<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>. aa \<otimes>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> a = \<one>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> \<and> a \<otimes>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> aa = \<one>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub>}"
+  using a3 a1 by force
+qed
+
+lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. inv a1 \<otimes> a2 \<in> A\<rbrakk>
+  \<Longrightarrow> comm_group \<lparr>carrier = A, mult=(\<otimes>), one=\<one>\<rparr>"
+  by (metis (no_types, hide_lams) contra_subsetD inv_inv r_one subgroup_def subgroup_group subgroup_self)
+
+
 section \<open>Subrings\<close>
 
 context ring begin \<comment> \<open>\<triangleq> "Let @{term R} be a ring."\<close>
@@ -26,6 +52,26 @@ definition subring where
 
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
+
+definition subring_of :: "'a set \<Rightarrow> 'a ring" where
+  "subring_of A = \<lparr>carrier = A, mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>)\<rparr>"
+
+lemma subring_ofI: "\<lbrakk>A \<subseteq> carrier R; \<zero>\<in>A; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> \<ominus>r1\<oplus>r2\<in>A\<rbrakk>
+  \<Longrightarrow> subring (subring_of A)"
+  unfolding subring_def subring_of_def apply auto
+  apply (rule ringI)
+     apply auto
+     apply (rule abelian_groupI)
+          apply auto
+  apply (meson add.m_assoc contra_subsetD)
+      apply (meson add.m_comm contra_subsetD)
+  apply (metis Group.group_def add.subgroup_group' comm_group_def monoid.m_closed monoid.simps(1) partial_object.select_convs(1))
+        apply (cases "\<zero> = \<one>")
+         apply simp
+        apply (cases "-\<one> \<in> A")
+
+lemma "subring S \<Longrightarrow> subring (subring_of (carrier S))"
+  
 
 lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
   by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
