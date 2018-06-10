@@ -3,7 +3,7 @@ theory Field_Extension imports
 "HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
 "HOL-Algebra.UnivPoly"             (* Polynomials *)
 "HOL-Algebra.Multiplicative_Group"
-"HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above *)
+"HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
 begin
 
 
@@ -70,6 +70,11 @@ lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> su
 
 context field_extension
 begin
+
+thm hull_def
+definition ext_of_gen where
+  (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
+  "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
 
 lemma "field K" oops
 lemma "field L" oops
