@@ -9,6 +9,26 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+context subgroup
+begin
+
+lemma "\<Inter>_is_subgroup":
+  "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup (\<Inter>\<M>) G"
+  by (simp add: group.subgroups_Inter)
+
+proposition "\<Inter>_is_supergroup":
+  "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup H (G\<lparr>carrier:=\<Inter>\<M>\<rparr>)"
+  apply unfold_locales apply auto
+  by (metis "\<Inter>_is_subgroup" Collect_mem_eq Inter_greatest contra_subsetD empty_Collect_eq
+      group.subgroup_inv_equality subgroup_axioms subgroup_def)
+
+proposition generated_group:
+  "S \<subseteq> carrier G \<Longrightarrow> group G \<Longrightarrow> subgroup H (G\<lparr>carrier:=(\<lambda>M. subgroup M G \<and> H \<subseteq> M) hull S\<rparr>)"
+  unfolding hull_def apply (intro "\<Inter>_is_supergroup") apply auto
+  by (meson group.subgroup_self rcosets_carrier subgroup_in_rcosets)
+
+end
+
 lemma (in comm_group) subgroup_group:
   "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
   apply standard                                     
@@ -200,9 +220,7 @@ definition ext_of_gen where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
   "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
 
-lemma "field (L\<lparr>carrier:=K\<rparr>)" oops
-lemma "field L" oops
-lemma "field.subfield L (subring_of K)" oops
+lemma "field (subring_of K)" "field L" "field.subfield L (subring_of K)" oops
 
 end
 
