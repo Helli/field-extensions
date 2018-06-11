@@ -12,17 +12,13 @@ section \<open>missing preliminaries?\<close>
 context subgroup
 begin
 
-lemma "\<Inter>_is_subgroup":
-  "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup (\<Inter>\<M>) G"
-  by (simp add: group.subgroups_Inter)
-
-proposition "\<Inter>_is_supergroup":
+lemma "\<Inter>_is_supergroup":
   "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup H (G\<lparr>carrier:=\<Inter>\<M>\<rparr>)"
-  apply unfold_locales apply auto
-  by (metis "\<Inter>_is_subgroup" Collect_mem_eq Inter_greatest contra_subsetD empty_Collect_eq
-      group.subgroup_inv_equality subgroup_axioms subgroup_def)
+  apply unfold_locales apply auto using group.subgroups_Inter
+  by (metis (mono_tags) Collect_mem_eq Inf_greatest contra_subsetD empty_Collect_eq
+      group.subgroup_inv_equality subgroup.m_inv_closed subgroup_axioms)
 
-proposition generated_group:
+lemma generated_group:
   "S \<subseteq> carrier G \<Longrightarrow> group G \<Longrightarrow> subgroup H (G\<lparr>carrier:=(\<lambda>M. subgroup M G \<and> H \<subseteq> M) hull S\<rparr>)"
   unfolding hull_def apply (intro "\<Inter>_is_supergroup") apply auto
   by (meson group.subgroup_self rcosets_carrier subgroup_in_rcosets)
@@ -227,8 +223,8 @@ shows "subfield (subring_of S)"
 end
 
 locale field_extension = field L for L (structure) +
-  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit \<zero>, \<one> and the operations. This is done
-  for @{locale subgroup}\<close>
+  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit \<zero>, \<one> and the operations. @{locale
+    subgroup} does the same.\<close>
   assumes L_extends_K: "subfield (subring_of K)"
 begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
 
@@ -243,7 +239,8 @@ lemma (in field) f_e_refl : "field_extension R (carrier R)"
   using normalize_subfield subfield_refl subring_of_def by auto
 
 lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (subring_of K)"
-  using field_extension.L_extends_K field_extension.intro field_extension_axioms_def local.field_axioms by blast
+  using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
+    local.field_axioms by blast
 
 context field_extension
 begin
