@@ -200,9 +200,9 @@ definition ext_of_gen where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
   "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
 
-lemma "field K" oops
+lemma "field (L\<lparr>carrier:=K\<rparr>)" oops
 lemma "field L" oops
-lemma "field.subfield L K" oops
+lemma "field.subfield L (subring_of K)" oops
 
 end
 
