@@ -14,6 +14,7 @@ begin
 
 lemma "\<Inter>_is_supergroup":
   "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup H (G\<lparr>carrier:=\<Inter>\<M>\<rparr>)"
+\<comment> \<open>Cannot use @{thm group.subgroupI} because @{locale subgroup} does not extend @{locale group}\<close>
   apply unfold_locales apply auto using group.subgroups_Inter
   by (metis (mono_tags) Collect_mem_eq Inf_greatest contra_subsetD empty_Collect_eq
       group.subgroup_inv_equality subgroup.m_inv_closed subgroup_axioms)
@@ -74,6 +75,9 @@ lemma subring_refl: "subring R"
 
 definition subring_of where
   "subring_of A = (R\<lparr>carrier := A\<rparr>)"
+
+lemma subring_of_carrier[simp]: "carrier (subring_of A) = A"
+  unfolding subring_of_def by simp
 
 lemma subring_ofI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> (\<ominus>r1)\<oplus>r2\<in>A\<rbrakk>
   \<Longrightarrow> subring (subring_of A)"
@@ -144,6 +148,15 @@ lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<l
 lemma subringI:
   "subgroup S \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr> \<Longrightarrow> \<one>\<in>S \<Longrightarrow> \<forall>a\<in>S. \<forall>b\<in>S. a\<otimes>b\<in>S \<Longrightarrow> subring (subring_of S)"
   by (simp add: a_inv_def subgroup_def subring_ofI)
+
+lemma subring_imp_subgroup:
+  "subring S \<Longrightarrow> subgroup (carrier S) \<lparr>carrier = carrier R, mult = (\<oplus>), one = \<zero>\<rparr>"
+  unfolding subring_def apply unfold_locales apply auto
+  apply (metis ring.ring_simprules(1))
+  apply (metis add.transpose_inv local.ring_axioms rev_subsetD ring.ring_simprules(15)
+      ring.ring_simprules(2))
+  by (smt a_inv_def abelian_group.a_inv_closed add.transpose_inv local.ring_axioms
+    ring.ring_simprules(15) ring.ring_simprules(2) ring.ring_simprules(9) ring_def subsetCE)
 
 end
 
@@ -231,6 +244,25 @@ begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extensi
 lemma K_field: "field (subring_of K)"
   using L_extends_K by (simp add: subfield_def)
 
+lemma K_subring: "subring (subring_of K)"
+  using L_extends_K subfield_def by blast
+
+lemma K_subgroup: "subgroup K \<lparr>carrier=carrier L,mult=(\<oplus>),one=\<zero>\<rparr>"
+  using subring_imp_subgroup[of "subring_of K"] by (simp add: K_subring)
+
+lemma K_inv: "a \<in> K \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> inv a \<in> K"
+proof -
+  assume a1: "a \<noteq> \<zero>"
+assume a2: "a \<in> K"
+  obtain aa :: "'a \<Rightarrow> ('a, 'b) ring_scheme \<Rightarrow> 'a" where
+    "\<forall>x0 x1. (\<exists>v2. v2 \<in> carrier x1 \<and> x0 \<otimes>\<^bsub>x1\<^esub> v2 = \<one>\<^bsub>x1\<^esub>) = (aa x0 x1 \<in> carrier x1 \<and> x0 \<otimes>\<^bsub>x1\<^esub> aa x0 x1 = \<one>\<^bsub>x1\<^esub>)"
+    by moura
+  then have "aa a (subring_of K) \<in> carrier (subring_of K) \<and> a \<otimes>\<^bsub>subring_of K\<^esub> aa a (subring_of K) = \<one>\<^bsub>subring_of K\<^esub>"
+using a2 a1 by (metis (no_types) K_field L_extends_K field.field_has_inverse subfield_zero subring_of_carrier)
+  then show ?thesis
+    using a2 by (metis (no_types) K_subring L_extends_K comm_inv_char subfield_one subring_def subring_of_carrier subsetCE)
+qed
+
 end
 
 lemma (in field) f_e_refl : "field_extension R (carrier R)"
@@ -244,6 +276,16 @@ lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> su
 
 context field_extension
 begin
+
+proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
+  apply (unfold_locales)
+  apply (rule subfieldI)
+     apply (simp add: add.subgroups_Inter field_extension.K_subgroup)
+    apply (metis K_subring cInf_greatest contra_subsetD subring_def subring_of_carrier)
+  apply auto
+  apply (metis field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
+      ring_def subring_def subring_of_carrier)
+  by (simp add: field_extension.K_inv)
 
 thm hull_def
 definition ext_of_gen where
