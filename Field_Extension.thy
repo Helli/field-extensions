@@ -77,6 +77,10 @@ lemma subring_ofI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\
     apply (meson l_distr subsetCE)
     by (meson local.ring_axioms ring.ring_simprules(23) subsetCE)
 
+lemma subring_zero: "subring S \<Longrightarrow> zero S = \<zero>"
+  by (metis (full_types) l_zero local.add.right_cancel ring.ring_simprules(15)
+      ring.ring_simprules(2) subring_def subsetCE zero_closed)
+
 lemma normalize_subring: "subring S \<Longrightarrow> subring (subring_of (carrier S))"
   apply (rule subring_ofI)
   using subring_def apply blast
@@ -128,6 +132,9 @@ end
 
 context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
 
+lemma field_has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+  using Units_r_inv_ex field_Units by fastforce
+
 definition subfield where
   \<comment> \<open>Maybe remove this definition and put it in the assumption of field_extension...
     (requires use of rewrite-clauses to avoid a name clash?)\<close>
@@ -136,15 +143,39 @@ definition subfield where
 lemma subfield_refl: "subfield R"
   by (simp add: local.field_axioms subfield_def subring_refl)
 
+lemma subfield_zero: "subfield S \<Longrightarrow> zero S = \<zero>"
+  unfolding subfield_def using subring_zero by blast
+
+lemma subfield_one: "subfield S \<Longrightarrow> one S = \<one>"
+proof -
+  assume a1: "subfield S"
+  then have "carrier S \<subseteq> carrier R \<and> ring S \<and> \<one> \<in> carrier S \<and> (\<forall>a. a \<notin> carrier S \<or> (\<forall>aa. aa \<notin>
+    carrier S \<or> a \<oplus>\<^bsub>S\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>S\<^esub> aa = a \<otimes> aa))"
+    by (simp add: field.subfield_def local.field_axioms subring_def)
+  then show ?thesis
+    using a1 by (metis (no_types) cring.cring_simprules(12) cring.subring_cring field.subfield_def
+        is_cring local.field_axioms r_one ring.ring_simprules(6) subsetCE)
+qed
+
 lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (subring_of (carrier S))"
   unfolding subfield_def apply auto
    apply (simp add: normalize_subring)
+  unfolding subring_of_def
   apply (rule cring.cring_fieldI2)
     apply auto
-  apply (simp add: normalize_subring subring_cring)
-   apply (simp add: subring_of_def)
-  unfolding subring_def ring_def field_def field_axioms_def Units_def apply safe
-  sorry
+  using normalize_subring subring_cring subring_of_def apply auto[1]
+  unfolding subring_def apply auto
+proof goal_cases
+  case (1 a)
+  interpret sdf: field S
+    by (simp add: "1"(1))
+  have "a \<noteq> zero S" using sdf.subring_zero
+    by (simp add: "1"(3) "1"(4) "1"(6) "1"(7) sdf.ring_axioms subring_def subring_zero)
+  with sdf.field_has_inverse have "\<exists>b\<in>carrier S. mult S a b = one S"
+    using "1"(2) by blast
+  then show ?case
+    by (metis "1"(2) "1"(4) "1"(6) "1"(7) r_one ring.ring_simprules(12) sdf.one_closed sdf.ring_axioms subsetD)
+qed
 
 end
 
@@ -161,8 +192,7 @@ end
 lemma (in field) f_e_refl : "field_extension R (carrier R)"
   unfolding field_extension_def field_extension_axioms_def apply auto
   using local.field_axioms apply blast
-  unfolding subring_of_def
-  sledgehammer
+  using normalize_subfield subfield_refl subring_of_def by auto
 
 lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield K"
   by (simp add: field_extension_axioms_def field_extension_def local.field_axioms)
