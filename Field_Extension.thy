@@ -10,27 +10,21 @@ begin
 section \<open>missing preliminaries?\<close>
 
 lemma (in comm_group) subgroup_group:
-  "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group \<lparr>carrier = A, mult=(\<otimes>), one=\<one>\<rparr>"
+  "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
   apply standard                                     
         apply auto
     apply (simp add: m_assoc subset_iff)
    apply (meson m_comm subsetCE)
   unfolding Units_def
-proof -
-fix x :: 'a
-assume a1: "x \<in> A"
-  assume a2: "A \<subseteq> carrier G"
-  assume "\<one> \<in> A"
-  assume a3: "\<forall>a1\<in>A. \<forall>a2\<in>A. a1 \<otimes> a2 \<in> A \<and> inv a1 \<in> A"
-  have "x \<in> carrier G"
-    using a2 a1 by blast
-then show "x \<in> {a \<in> carrier \<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>. \<exists>aa\<in>carrier \<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>. aa \<otimes>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> a = \<one>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> \<and> a \<otimes>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub> aa = \<one>\<^bsub>\<lparr>carrier = A, mult = (\<otimes>), one = \<one>\<rparr>\<^esub>}"
-  using a3 a1 by force
+proof goal_cases
+  case (1 x)
+  then have "x \<in> carrier G" by blast
+  then show ?case using 1 by force
 qed
 
 lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. inv a1 \<otimes> a2 \<in> A\<rbrakk>
-  \<Longrightarrow> comm_group \<lparr>carrier = A, mult=(\<otimes>), one=\<one>\<rparr>"
-  by (metis (no_types, hide_lams) contra_subsetD inv_inv r_one subgroup_def subgroup_group subgroup_self)
+  \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
+  by (metis (full_types) contra_subsetD inv_inv r_one subgroup_def subgroup_group subgroup_self)
 
 lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
@@ -56,8 +50,8 @@ definition subring where
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
 
-definition subring_of :: "'a set \<Rightarrow> 'a ring" where
-  "subring_of A = \<lparr>carrier = A, mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>)\<rparr>"
+definition subring_of where
+  "subring_of A = (R\<lparr>carrier := A\<rparr>)"
 
 lemma subring_ofI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> (\<ominus>r1)\<oplus>r2\<in>A\<rbrakk>
   \<Longrightarrow> subring (subring_of A)"
@@ -180,7 +174,7 @@ qed
 end
 
 locale field_extension = field L for L (structure) +
-  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit the operations, \<zero> and \<one>. This is done
+  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit \<zero>, \<one> and the operations. This is done
   for @{locale subgroup}\<close>
   assumes L_extends_K: "subfield (subring_of K)"
 begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
