@@ -180,7 +180,8 @@ qed
 end
 
 locale field_extension = field L for L (structure) +
-  fixes K :: "'a set"
+  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit the operations, \<zero> and \<one>. This is done
+  for @{locale subgroup}\<close>
   assumes L_extends_K: "subfield (subring_of K)"
 begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
 
@@ -194,8 +195,8 @@ lemma (in field) f_e_refl : "field_extension R (carrier R)"
   using local.field_axioms apply blast
   using normalize_subfield subfield_refl subring_of_def by auto
 
-lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield K"
-  by (simp add: field_extension_axioms_def field_extension_def local.field_axioms)
+lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (subring_of K)"
+  using field_extension.L_extends_K field_extension.intro field_extension_axioms_def local.field_axioms by blast
 
 context field_extension
 begin
@@ -213,6 +214,16 @@ end
 
 
 section\<open>Observations\<close>
+
+text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
+locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close> with the
+  operations of \<open>G\<close>\<close>
+
+context subgroup begin
+lemma "subgroup H G" by (fact subgroup_axioms)
+lemma "group G" oops
+lemma "group (G\<lparr>carrier:=H\<rparr>)" oops
+end
 
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
