@@ -67,6 +67,12 @@ definition subring where
     one R \<in> carrier S \<and>
     (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. add S r1 r2 = add R r1 r2 \<and> mult S r1 r2 = mult R r1 r2)"
 
+lemma "subring S \<Longrightarrow> Units S \<subseteq> Units R"
+  unfolding Units_def apply auto
+  using subring_def apply blast
+  unfolding subring_def apply auto
+  by (metis (no_types, hide_lams) contra_subsetD r_one ring.ring_simprules(12) ring.ring_simprules(6))
+
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
 
@@ -135,6 +141,14 @@ lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring
   by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
       ring.ring_simprules(2) singleton_iff subring_def)
 
+lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<longleftrightarrow> card (carrier S) = 1"
+  by (metis card_1_singletonE contra_subsetD monoid.one_closed ring.nonzero_ring_one ring_def
+      singleton_iff subring_def subring_nontrivial subring_zero zero_closed)
+
+lemma subringI:
+  "subgroup S \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr> \<Longrightarrow> \<one>\<in>S \<Longrightarrow> \<forall>a\<in>S. \<forall>b\<in>S. a\<otimes>b\<in>S \<Longrightarrow> subring (subring_of S)"
+  by (simp add: a_inv_def subgroup_def subring_ofI)
+
 end
 
 context cring begin \<comment> \<open>\<triangleq> "Let @{term R} be a commutative ring."\<close>
@@ -190,6 +204,25 @@ proof goal_cases
   then show ?case
     by (metis "1"(2) "1"(4) "1"(6) "1"(7) r_one ring.ring_simprules(12) sdf.one_closed sdf.ring_axioms subsetD)
 qed
+
+lemma subfieldI: \<comment> \<open>Improvable?\<close>
+  assumes "subgroup S \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr>"
+  and "\<one>\<in>S"
+  and "\<forall>a\<in>S. \<forall>b\<in>S. a\<otimes>b\<in>S"
+  and "\<forall>a\<in>S. a\<noteq>\<zero> \<longrightarrow> inv a \<in> S"
+shows "subfield (subring_of S)"
+  unfolding subfield_def apply auto
+   apply (rule subringI) using assms apply auto[3]
+  apply (rule cring.cring_fieldI2[of "subring_of S"])
+    apply auto
+  apply (rule subring_cring)
+  using assms(1) assms(2) assms(3) subringI apply blast
+  using assms
+  apply (metis ring.ring_simprules(12) ring.ring_simprules(24) subringI subring_def subring_zero
+      zero_not_one) 
+  using assms unfolding subring_of_def apply auto
+  by (metis add.Units_eq add.is_group comm_inv_char field_has_inverse group.Units_eq
+      subgroup.mem_carrier)
 
 end
 

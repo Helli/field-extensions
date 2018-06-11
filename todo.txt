@@ -1,8 +1,8 @@
 abolish subring_of for clarity: use record-update syntax
 
-work on Prop 16.3 if it is needed for the definition behind it
-
 the examples from the lecture notes are not that important
+
+isabelle mkroot
 
 **Problems**
 
