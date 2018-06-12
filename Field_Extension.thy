@@ -158,6 +158,10 @@ lemma subring_imp_subgroup:
   by (smt a_inv_def abelian_group.a_inv_closed add.transpose_inv local.ring_axioms
     ring.ring_simprules(15) ring.ring_simprules(2) ring.ring_simprules(9) ring_def subsetCE)
 
+lemma intermediate_ring_1:
+  "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (subring_of M) \<Longrightarrow> subring (subring_of M)"
+  unfolding subring_def apply auto unfolding subring_of_def by auto
+
 end
 
 context cring begin \<comment> \<open>\<triangleq> "Let @{term R} be a commutative ring."\<close>
@@ -277,6 +281,10 @@ lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> su
 context field_extension
 begin
 
+lemma indermediate_field_1: "field (subring_of M) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
+  apply unfold_locales unfolding subfield_def apply auto unfolding field_def
+  using intermediate_ring_1 by (metis K_subring cring_def domain_def subring_of_carrier)
+
 proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales)
   apply (rule subfieldI)
@@ -286,12 +294,30 @@ proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. fiel
   apply (metis field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
       ring_def subring_def subring_of_carrier)
   by (simp add: field_extension.K_inv)
+(*
+thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
+proposition "16_3_actual":
+  "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (subring_of (\<Inter>\<M>)) K"
+proof goal_cases
+  case 1
+  then have "\<forall>M\<in>\<M>. field (subring_of M)"
+    by (simp add: field_extension.K_field)
+  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (subring_of M) (subring_of K)"
+    sledgehammer
+  unfolding field_extension_def field_extension_axioms_def apply auto
+   apply (metis "16_3_" empty_iff f_e_iff_subfield field_extension.K_field)
+  apply (rule field.subfieldI) apply auto
+      apply (metis "16_3_" equals0D f_e_iff_subfield field_extension.K_field)
+     apply (rule group.subgroupI) apply auto
+apply (metis "16_3_" abelian_group.a_group cring_def domain_def empty_iff f_e_iff_subfield field_def field_extension.K_field ring_def subring_of_carrier)
+       apply (metis K_subring all_not_in_conv cring_def is_cring ring.subring_def subring_of_carrier)
+  unfolding subfield_def using field_extension.K_subgroup[of _ K] sledgehammer
 
-thm hull_def
+  thm hull_def
 definition ext_of_gen where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
   "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
-
+*)
 lemma "field (subring_of K)" "field L" "field.subfield L (subring_of K)" oops
 
 end
