@@ -228,23 +228,28 @@ begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extensi
 lemma K_field: "field (L\<lparr>carrier:=K\<rparr>)"
   using L_extends_K by (simp add: subfield_def)
 
-lemma K_subring: "subring (abolished K)"
+lemma K_subring: "subring (L\<lparr>carrier:=K\<rparr>)"
   using L_extends_K subfield_def by blast
 
 lemma K_subgroup: "subgroup K \<lparr>carrier=carrier L,mult=(\<oplus>),one=\<zero>\<rparr>"
-  using subring_imp_subgroup[of "abolished K"] by (simp add: K_subring)
+  using subring_imp_subgroup[of "L\<lparr>carrier:=K\<rparr>"] by (simp add: K_subring)
+
+lemma sdfk[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+  by simp
 
 lemma K_inv: "a \<in> K \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> inv a \<in> K"
 proof -
   assume a1: "a \<noteq> \<zero>"
-assume a2: "a \<in> K"
-  obtain aa :: "'a \<Rightarrow> ('a, 'b) ring_scheme \<Rightarrow> 'a" where
-    "\<forall>x0 x1. (\<exists>v2. v2 \<in> carrier x1 \<and> x0 \<otimes>\<^bsub>x1\<^esub> v2 = \<one>\<^bsub>x1\<^esub>) = (aa x0 x1 \<in> carrier x1 \<and> x0 \<otimes>\<^bsub>x1\<^esub> aa x0 x1 = \<one>\<^bsub>x1\<^esub>)"
-    by moura
-  then have "aa a (abolished K) \<in> carrier (abolished K) \<and> a \<otimes>\<^bsub>abolished K\<^esub> aa a (abolished K) = \<one>\<^bsub>abolished K\<^esub>"
-using a2 a1 by (metis (no_types) K_field L_extends_K field.field_has_inverse subfield_zero abolished_carrier)
+  assume a2: "a \<in> K"
+  have f3: "carrier (L\<lparr>carrier := K\<rparr>) \<subseteq> carrier L \<and> ring (L\<lparr>carrier := K\<rparr>) \<and> \<one> \<in> carrier (L\<lparr>carrier
+    := K\<rparr>) \<and> (\<forall>a. a \<notin> carrier (L\<lparr>carrier := K\<rparr>) \<or> (\<forall>aa. aa \<notin> carrier (L\<lparr>carrier := K\<rparr>) \<or> a
+    \<oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<otimes> aa))"
+    by (metis (no_types) K_subring subring_def)
+  then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
+    by (simp add: subset_iff)
   then show ?thesis
-    using a2 by (metis (no_types) K_subring L_extends_K comm_inv_char subfield_one subring_def abolished_carrier subsetCE)
+    using f3 a2 a1 by (metis (no_types) K_field L_extends_K comm_inv_char field.field_has_inverse
+        field.subfield_one field.subfield_zero local.field_axioms sdfk)
 qed
 
 end
@@ -252,27 +257,27 @@ end
 lemma (in field) f_e_refl : "field_extension R (carrier R)"
   unfolding field_extension_def field_extension_axioms_def apply auto
   using local.field_axioms apply blast
-  using normalize_subfield subfield_refl abolished_def by auto
+  using normalize_subfield subfield_refl by auto
 
-lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (abolished K)"
+lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (R\<lparr>carrier:=K\<rparr>)"
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
 context field_extension
 begin
 
-lemma indermediate_field_1: "field (abolished M) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
+lemma indermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
   apply unfold_locales unfolding subfield_def apply auto unfolding field_def
-  using intermediate_ring_1 by (metis K_subring cring_def domain_def abolished_carrier)
+  using intermediate_ring_1 K_subring cring_def domain_def by (metis sdfk)
 
 proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales)
   apply (rule subfieldI)
      apply (simp add: add.subgroups_Inter field_extension.K_subgroup)
-    apply (metis K_subring cInf_greatest contra_subsetD subring_def abolished_carrier)
+    apply (metis K_subring cInf_greatest contra_subsetD sdfk subring_def)
   apply auto
-  apply (metis field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
-      ring_def subring_def abolished_carrier)
+  using field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
+      ring_def subring_def apply (metis (no_types, lifting) field_extension.sdfk)
   by (simp add: field_extension.K_inv)
 (*
 thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
@@ -298,7 +303,6 @@ definition ext_of_gen where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
   "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
 *)
-lemma "field (abolished K)" "field L" "field.subfield L (abolished K)" oops
 
 end
 
@@ -306,8 +310,7 @@ end
 section\<open>Observations\<close>
 
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
-locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close> with the
-  operations of \<open>G\<close>\<close>
+locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
 
 context subgroup begin
 lemma "subgroup H G" by (fact subgroup_axioms)
