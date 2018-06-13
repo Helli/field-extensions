@@ -73,7 +73,7 @@ lemma "subring S \<Longrightarrow> Units S \<subseteq> Units R"
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
 
-lemma abolishedI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> (\<ominus>r1)\<oplus>r2\<in>A\<rbrakk>
+lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> (\<ominus>r1)\<oplus>r2\<in>A\<rbrakk>
   \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
   unfolding subring_def apply auto
   apply (rule ringI)
@@ -96,7 +96,7 @@ lemma subring_zero: "subring S \<Longrightarrow> zero S = \<zero>"
       ring.ring_simprules(2) subring_def subsetCE zero_closed)
 
 lemma normalize_subring: "subring S \<Longrightarrow> subring (R\<lparr>carrier:=carrier S\<rparr>)"
-  apply (rule abolishedI)
+  apply (rule subring_fullI)
   using subring_def apply blast
   using subring_def apply blast
   unfolding subring_def ring_def
@@ -105,30 +105,31 @@ lemma normalize_subring: "subring S \<Longrightarrow> subring (R\<lparr>carrier:
   using abelian_group.contains_trivial[of S]
 proof -
   fix r1 :: 'a and r2 :: 'a
-  assume a1: "r1 \<in> carrier S"
-  assume a2: "r2 \<in> carrier S"
-  assume a3: "abelian_group S"
+  assume a1: "r2 \<in> carrier S"
+  assume a2: "abelian_group S"
+  assume a3: "r1 \<in> carrier S"
   assume a4: "carrier S \<subseteq> carrier R"
   assume a5: "Group.monoid S"
   assume a6: "ring_axioms S"
   assume a7: "\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. r1 \<oplus>\<^bsub>S\<^esub> r2 = r1 \<oplus> r2 \<and> r1 \<otimes>\<^bsub>S\<^esub> r2 = r1 \<otimes> r2"
-  have f8: "\<forall>A Aa a. \<not> A \<subseteq> Aa \<or> (a::'a) \<notin> A \<or> a \<in> Aa"
-    by (meson subsetCE)
+  have f8: "\<forall>a A Aa. (a::'a) \<notin> A \<or> \<not> A \<subseteq> Aa \<or> a \<in> Aa"
+    by blast
   then have f9: "r1 \<in> carrier R"
-    using a4 a1 by meson
-  have f10: "ring S"
-    using a6 a5 a3 ring.intro by auto
-    then have f11: "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier S"
-      using a1 by (metis ring.ring_simprules(3))
-    have f12: "\<zero>\<^bsub>S\<^esub> \<in> carrier R"
-    using f10 f8 a4 a3 a1 by (metis (full_types) \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in> carrier S; a2 \<in>
-        carrier S\<rbrakk> \<Longrightarrow> \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> ring.ring_simprules(16) ring.ring_simprules(3))
-      have "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier R"
-using f11 a4 by blast
+    using a4 a3 by presburger
+  then have f10: "\<ominus> r1 \<in> carrier R"
+    by simp
+  have f11: "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier S"
+    using a6 a5 a3 a2 by (simp add: ring.ring_simprules(3) ring_def)
+  have f12: "\<zero>\<^bsub>S\<^esub> \<in> carrier R"
+    using f8 a6 a5 a4 a2 a1 by (metis \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in> carrier S; a2 \<in> carrier S\<rbrakk> \<Longrightarrow>
+        \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> abelian_group.r_neg ring.ring_simprules(3) ring_def)
+  have "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier R"
+  using f11 f8 a4 by presburger
   then show "\<ominus> r1 \<oplus> r2 \<in> carrier S"
-    using f12 f10 f9 a7 a3 a2 a1 by (metis (no_types) \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in> carrier S; a2
-        \<in> carrier S\<rbrakk> \<Longrightarrow> \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> local.ring_axioms ring.ring_simprules(15)
-        ring.ring_simprules(16) ring.ring_simprules(17) ring.ring_simprules(3))
+    using f12 f10 f9 a7 a6 a5 a3 a2 a1 by (metis (full_types) \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in>
+        carrier S; a2 \<in> carrier S\<rbrakk> \<Longrightarrow> \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> abelian_group.axioms(1)
+        abelian_group.r_neg abelian_group.r_neg2 abelian_monoid.a_ac(2) local.ring_axioms
+        ring.ring_simprules(3) ring_def)
 qed
 
 lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
@@ -139,9 +140,10 @@ lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<l
   by (metis card_1_singletonE contra_subsetD monoid.one_closed ring.nonzero_ring_one ring_def
       singleton_iff subring_def subring_nontrivial subring_zero zero_closed)
 
-lemma subringI:
-  "subgroup A \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr> \<Longrightarrow> \<one>\<in>A \<Longrightarrow> \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
-  by (simp add: a_inv_def subgroup_def abolishedI)
+lemma subgroup_to_subring:
+  "\<lbrakk>subgroup A \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr>; \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
+    \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
+  by (simp add: a_inv_def subgroup_def subring_fullI)
 
 lemma subring_imp_subgroup:
   "subring S \<Longrightarrow> subgroup (carrier S) \<lparr>carrier = carrier R, mult = (\<oplus>), one = \<zero>\<rparr>"
@@ -208,11 +210,11 @@ lemma subfieldI: \<comment> \<open>Improvable?\<close>
   and "\<forall>a\<in>A. a\<noteq>\<zero> \<longrightarrow> inv a \<in> A"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
   unfolding subfield_def apply auto
-   apply (rule subringI) using assms apply auto[3]
+   apply (rule subgroup_to_subring) using assms apply auto[3]
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
   apply (rule subring_cring)
-  using assms(1) assms(2) assms(3) subringI apply blast
+  apply (fact subgroup_to_subring[OF assms(1-3)])
   using assms
   by (metis Units_one_closed Units_r_inv field_has_inverse partial_object.select_convs(1)
       subgroup.mem_carrier unit_factor)
@@ -234,7 +236,7 @@ lemma K_subring: "subring (L\<lparr>carrier:=K\<rparr>)"
 lemma K_subgroup: "subgroup K \<lparr>carrier=carrier L,mult=(\<oplus>),one=\<zero>\<rparr>"
   using subring_imp_subgroup[of "L\<lparr>carrier:=K\<rparr>"] by (simp add: K_subring)
 
-lemma sdfk[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+lemma carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
 
 lemma K_inv: "a \<in> K \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> inv a \<in> K"
@@ -247,9 +249,9 @@ proof -
     by (metis (no_types) K_subring subring_def)
   then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
     by (simp add: subset_iff)
-  then show ?thesis
-    using f3 a2 a1 by (metis (no_types) K_field L_extends_K comm_inv_char field.field_has_inverse
-        field.subfield_one field.subfield_zero local.field_axioms sdfk)
+  then show ?thesis using f3 a2 a1
+    by (metis (no_types, lifting) K_field L_extends_K carrier_K comm_inv_char
+        field.field_has_inverse field.subfield_one field.subfield_zero local.field_axioms)
 qed
 
 end
@@ -268,16 +270,16 @@ begin
 
 lemma indermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
   apply unfold_locales unfolding subfield_def apply auto unfolding field_def
-  using intermediate_ring_1 K_subring cring_def domain_def by (metis sdfk)
+  using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
 
 proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales)
   apply (rule subfieldI)
      apply (simp add: add.subgroups_Inter field_extension.K_subgroup)
-    apply (metis K_subring cInf_greatest contra_subsetD sdfk subring_def)
+    apply (metis K_subring cInf_greatest contra_subsetD carrier_K subring_def)
   apply auto
   using field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
-      ring_def subring_def apply (metis (no_types, lifting) field_extension.sdfk)
+      ring_def subring_def apply (metis (no_types, lifting) field_extension.carrier_K)
   by (simp add: field_extension.K_inv)
 (*
 thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
@@ -334,7 +336,6 @@ thm INTEG_def
 
 find_theorems field
 thm
-field_axioms_def
 QuotRing.maximalideal.quotient_is_field
 Ideal.field.all_ideals
 UnivPoly.INTEG.R.trivialideals_eq_field

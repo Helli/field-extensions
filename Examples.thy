@@ -82,4 +82,9 @@ lemma subfield_example: \<open>field.subfield real_field (standard_ring (range r
    apply (metis ring_standard_ring(2) standard_ring_def)
   by (metis f_r_o_r standard_ring_def)
 
+lemma f_e_example: "field_extension real_field (range real_of_rat)"
+  apply (simp add: field_extension_def field_extension_axioms_def)
+  using subfield_example field.normalize_subfield standard_ring_def
+  by (metis field_examples(2) partial_object.select_convs(1))
+
 end
