@@ -28,16 +28,8 @@ end
 
 lemma (in comm_group) subgroup_group:
   "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
-  apply standard                                     
-        apply auto
-    apply (simp add: m_assoc subset_iff)
-   apply (meson m_comm subsetCE)
-  unfolding Units_def
-proof goal_cases
-  case (1 x)
-  then have "x \<in> carrier G" by blast
-  then show ?case using 1 by force
-qed
+  by (metis all_not_in_conv comm_group_axioms comm_group_def subgroup.subgroup_is_group subgroupI
+      submonoid_def submonoid_is_comm_monoid)
 
 lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. inv a1 \<otimes> a2 \<in> A\<rbrakk>
   \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
@@ -46,6 +38,7 @@ lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>
 lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
     by simp
+
 
 section \<open>Subrings\<close>
 
@@ -141,18 +134,39 @@ lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<l
       singleton_iff subring_def subring_nontrivial subring_zero zero_closed)
 
 lemma subgroup_to_subring:
-  "\<lbrakk>subgroup A \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr>; \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
+  "\<lbrakk>subgroup A (add_monoid R); \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
     \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
-  by (simp add: a_inv_def subgroup_def subring_fullI)
+  by (simp add: add.subgroupE(1) add.subgroupE(3) add.subgroupE(4) subring_fullI)
+
+lemma subyada_to_subring:
+  "\<lbrakk>subgroup A (add_monoid R); submonoid A R\<rbrakk> \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
+  apply (rule subgroup_to_subring) apply auto
+  apply (simp add: submonoid.one_closed)
+  by (simp add: submonoidE(3))
 
 lemma subring_imp_subgroup:
-  "subring S \<Longrightarrow> subgroup (carrier S) \<lparr>carrier = carrier R, mult = (\<oplus>), one = \<zero>\<rparr>"
-  unfolding subring_def apply unfold_locales apply auto
+  "subring S \<Longrightarrow> subgroup (carrier S) (add_monoid R)"
+  unfolding subring_def apply auto apply (rule subgroup.intro) apply auto
   apply (metis ring.ring_simprules(1))
-  apply (metis add.transpose_inv local.ring_axioms rev_subsetD ring.ring_simprules(15)
-      ring.ring_simprules(2))
-  by (smt a_inv_def abelian_group.a_inv_closed add.transpose_inv local.ring_axioms
-    ring.ring_simprules(15) ring.ring_simprules(2) ring.ring_simprules(9) ring_def subsetCE)
+  apply (metis (no_types, hide_lams) add.r_cancel_one' ring.ring_simprules(15)
+      ring.ring_simprules(2) ring.ring_simprules(5) submonoid.intro submonoid.mem_carrier)
+proof -
+fix x :: 'a
+  assume a1: "carrier S \<subseteq> carrier R"
+  assume a2: "\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. r1 \<oplus>\<^bsub>S\<^esub> r2 = r1 \<oplus> r2 \<and> r1 \<otimes>\<^bsub>S\<^esub> r2 = r1 \<otimes> r2"
+  assume a3: "ring S"
+assume a4: "x \<in> carrier S"
+  have "\<forall>a. a \<in> carrier R \<or> a \<notin> carrier S"
+using a1 by (meson subsetCE)
+  then show "inv\<^bsub>add_monoid R\<^esub> x \<in> carrier S"
+using a4 a3 a2 by (metis (no_types) a_inv_def abelian_group.a_inv_closed add.r_cancel_one'
+    minus_equality ring.ring_simprules(15) ring.ring_simprules(2) ring.ring_simprules(9) ring_def)
+qed
+
+lemma subring_imp_submonoid:
+  "subring S \<Longrightarrow> submonoid (carrier S) R"
+  unfolding subring_def apply auto
+  by (metis ring.ring_simprules(5) submonoid.intro)
 
 lemma intermediate_ring_1:
   "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>) \<Longrightarrow> subring (R\<lparr>carrier:=M\<rparr>)"
@@ -204,20 +218,21 @@ lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carri
   by (metis (no_types, lifting) field.field_has_inverse subfield_def subfield_one subring_def subring_zero)
 
 lemma subfieldI: \<comment> \<open>Improvable?\<close>
-  assumes "subgroup A \<lparr>carrier=carrier R,mult=(\<oplus>),one=\<zero>\<rparr>"
-  and "\<one>\<in>A"
-  and "\<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A"
-  and "\<forall>a\<in>A. a\<noteq>\<zero> \<longrightarrow> inv a \<in> A"
+  assumes "subgroup A (add_monoid R)"
+  and "subgroup (A-{\<zero>}) R"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
-  unfolding subfield_def apply auto
-   apply (rule subgroup_to_subring) using assms apply auto[3]
+  unfolding subfield_def apply auto apply (rule subyada_to_subring)
+  apply (simp add: assms(1)) oops
+  apply (simp add: assms(2) subgroup.subgroup_is_submonoid)
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
-  apply (rule subring_cring)
-  apply (fact subgroup_to_subring[OF assms(1-3)])
-  using assms
-  by (metis Units_one_closed Units_r_inv field_has_inverse partial_object.select_convs(1)
-      subgroup.mem_carrier unit_factor)
+  apply (rule subring_cring) using subyada_to_subring
+  using assms(1) assms(2) subgroup_def subgroup_to_subring apply fastforce
+  using assms(2) Units_one_closed Units_r_inv field_has_inverse subgroup.mem_carrier unit_factor
+  by (metis subgroup.m_inv_closed)
+
+lemma subfield_imp_subgroup:
+  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) R"
 
 end
 
@@ -289,8 +304,10 @@ proof goal_cases
   case 1
   then have "\<forall>M\<in>\<M>. field (L\<lparr>carrier:=M\<rparr>)"
     by (simp add: field_extension.K_field)
-  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (L\<lparr>carrier:=M\<rparr>) (L\<lparr>carrier:=K\<rparr>)"
-  unfolding field_extension_def field_extension_axioms_def apply auto oops
+  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (L\<lparr>carrier:=M\<rparr>) (L\<lparr>carrier:=M\<rparr>\<lparr>carrier:=K\<rparr>)"
+    unfolding field_extension_def field_extension_axioms_def apply safe
+    apply (rule field.subfieldI) thm field.subfieldI
+    apply auto oops
 
   thm hull_def
 definition gen where
