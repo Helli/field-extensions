@@ -281,30 +281,21 @@ proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. fiel
   using field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
       ring_def subring_def apply (metis (no_types, lifting) field_extension.carrier_K)
   by (simp add: field_extension.K_inv)
-(*
+
 thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
 proposition "16_3_actual":
-  "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (abolished (\<Inter>\<M>)) K"
+  "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
-  then have "\<forall>M\<in>\<M>. field (abolished M)"
+  then have "\<forall>M\<in>\<M>. field (L\<lparr>carrier:=M\<rparr>)"
     by (simp add: field_extension.K_field)
-  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (abolished M) (abolished K)"
-    sledgehammer
-  unfolding field_extension_def field_extension_axioms_def apply auto
-   apply (metis "16_3_" empty_iff f_e_iff_subfield field_extension.K_field)
-  apply (rule field.subfieldI) apply auto
-      apply (metis "16_3_" equals0D f_e_iff_subfield field_extension.K_field)
-     apply (rule group.subgroupI) apply auto
-apply (metis "16_3_" abelian_group.a_group cring_def domain_def empty_iff f_e_iff_subfield field_def field_extension.K_field ring_def abolished_carrier)
-       apply (metis K_subring all_not_in_conv cring_def is_cring ring.subring_def abolished_carrier)
-  unfolding subfield_def using field_extension.K_subgroup[of _ K] sledgehammer
+  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (L\<lparr>carrier:=M\<rparr>) (L\<lparr>carrier:=K\<rparr>)"
+  unfolding field_extension_def field_extension_axioms_def apply auto oops
 
   thm hull_def
-definition ext_of_gen where
+definition gen where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
-  "S \<subseteq> carrier L \<Longrightarrow> ext_of_gen S = (\<lambda>M. carrier M) hull S"
-*)
+  "S \<subseteq> carrier L \<Longrightarrow> gen S = (\<lambda>M. carrier M) hull S"
 
 end
 
