@@ -221,13 +221,32 @@ lemma subfieldI: \<comment> \<open>Improvable?\<close>
   assumes "subgroup A (add_monoid R)"
   and "subgroup (A-{\<zero>}) R"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
-  unfolding subfield_def apply auto apply (rule subyada_to_subring)
-  apply (simp add: assms(1)) oops
-  apply (simp add: assms(2) subgroup.subgroup_is_submonoid)
+  unfolding subfield_def apply auto apply (rule subgroup_to_subring)
+  apply (simp add: assms(1)) apply auto
+  apply (meson Diff_subset assms(2) contra_subsetD subgroup.one_closed)
+subgoal proof -
+  fix a :: 'a and b :: 'a
+  assume a1: "b \<in> A"
+  assume a2: "a \<in> A"
+  have f3: "insert \<zero> (A - {\<zero>}) = A"
+    by (metis assms(1) insert_Diff monoid.simps(2) subgroup_def)
+  have f4: "b \<in> carrier R"
+    using a1 by (metis (no_types) assms(1) partial_object.select_convs(1) subgroup.mem_carrier)
+have f5: "a \<in> carrier R"
+  using a2 by (metis (no_types) assms(1) partial_object.select_convs(1) subgroup.mem_carrier)
+  have f6: "b \<in> insert \<zero> (A - {\<zero>})"
+using f3 a1 by presburger
+  have "a \<in> insert \<zero> (A - {\<zero>})"
+using a2 by blast
+  then have "a \<otimes> b \<in> insert \<zero> (A - {\<zero>})"
+    using f6 f5 f4 by (metis (no_types) assms(2) insert_iff integral_iff subgroup_def)
+  then show "a \<otimes> b \<in> A"
+    using f3 by blast
+qed
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
-  apply (rule subring_cring) using subyada_to_subring
-  using assms(1) assms(2) subgroup_def subgroup_to_subring apply fastforce
+  apply (rule subring_cring) apply (rule subyada_to_subring)
+  apply (simp add: assms(1)) sorry
   using assms(2) Units_one_closed Units_r_inv field_has_inverse subgroup.mem_carrier unit_factor
   by (metis subgroup.m_inv_closed)
 
