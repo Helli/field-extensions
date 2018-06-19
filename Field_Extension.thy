@@ -3,6 +3,7 @@ theory Field_Extension imports
 "HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
 "HOL-Algebra.UnivPoly"             (* Polynomials *)
 "HOL-Algebra.Multiplicative_Group"
+"HOL-Algebra.Group_Action"
 "HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
 begin
 
@@ -142,7 +143,7 @@ lemma subyada_to_subring:
   "\<lbrakk>subgroup A (add_monoid R); submonoid A R\<rbrakk> \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
   apply (rule subgroup_to_subring) apply auto
   apply (simp add: submonoid.one_closed)
-  by (simp add: submonoidE(3))
+  by (simp add: submonoid.m_closed)
 
 lemma subring_imp_subgroup:
   "subring S \<Longrightarrow> subgroup (carrier S) (add_monoid R)"
