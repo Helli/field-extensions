@@ -10,6 +10,14 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+lemma (in monoid) missing: "group (G\<lparr>carrier:=Units G\<rparr>)"
+  apply unfold_locales apply auto
+  apply (simp add: Units_closed m_assoc)
+  unfolding Units_def by auto
+
+lemma (in subgroup) one_in_carrier: "\<one> \<in> H"
+  by simp
+
 context subgroup
 begin
 
@@ -218,13 +226,19 @@ lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carri
   unfolding subring_def apply auto
   by (metis (no_types, lifting) field.field_has_inverse subfield_def subfield_one subring_def subring_zero)
 
+lemma group_nonzeros: "group (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
+  by (fact missing[unfolded field_Units])
+
+lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>) = \<one>"
+  by simp
+
 lemma subfieldI: \<comment> \<open>Improvable?\<close>
   assumes "subgroup A (add_monoid R)"
-  and "subgroup (A-{\<zero>}) R"
+  and "subgroup (A - {\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
   unfolding subfield_def apply auto apply (rule subgroup_to_subring)
-  apply (simp add: assms(1)) apply auto
-  apply (meson Diff_subset assms(2) contra_subsetD subgroup.one_closed)
+     apply (simp add: assms(1)) apply auto
+  using assms(2) subgroup.one_closed apply fastforce
 subgoal proof -
   fix a :: 'a and b :: 'a
   assume a1: "b \<in> A"
@@ -240,6 +254,8 @@ using f3 a1 by presburger
   have "a \<in> insert \<zero> (A - {\<zero>})"
 using a2 by blast
   then have "a \<otimes> b \<in> insert \<zero> (A - {\<zero>})"
+    apply (cases "a = 0" "b = 0")
+    
     using f6 f5 f4 by (metis (no_types) assms(2) insert_iff integral_iff subgroup_def)
   then show "a \<otimes> b \<in> A"
     using f3 by blast
@@ -247,12 +263,29 @@ qed
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
   apply (rule subring_cring) apply (rule subyada_to_subring)
-  apply (simp add: assms(1)) sorry
+  apply (simp add: assms(1))
+  apply (meson Diff_subset \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a \<otimes> b \<in> A\<close> add.subgroupE(1) assms(1) assms(2)
+    local.ring_axioms monoid_incl_imp_submonoid ring.is_monoid ring.subgroup_to_subring
+    subgroup.one_closed subring_def subsetCE)
   using assms(2) Units_one_closed Units_r_inv field_has_inverse subgroup.mem_carrier unit_factor
-  by (metis subgroup.m_inv_closed)
+proof -
+  fix a :: 'a
+  assume a1: "a \<noteq> \<zero>"
+  assume "a \<in> A"
+  then have f2: "a = \<zero> \<or> a \<in> A - {\<zero>}"
+    by simp
+  then have "a \<in> carrier R"
+    using a1 by (meson assms(2) subgroup.mem_carrier)
+  then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
+    using f2 a1 by (metis (no_types) Units_one_closed Units_r_inv assms(1) assms(2) field_has_inverse insert_Diff insert_iff monoid.simps(2) subgroup_def unit_factor)
+qed
+
+lemma \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<close>
+  using subfield_def subring_imp_subgroup by blast
 
 lemma subfield_imp_subgroup:
-  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) R"
+  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R-{0})" thm group.submonoid_subgroupI
+  apply (rule group.submonoid_subgroupI) apply intro_locales sledgehammer
 
 end
 
