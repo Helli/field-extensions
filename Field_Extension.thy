@@ -286,8 +286,12 @@ lemma \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<c
   using subfield_def subring_imp_subgroup by blast
 
 lemma subfield_imp_subgroup:
-  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R-{0})" thm group.submonoid_subgroupI
-  apply (rule group.submonoid_subgroupI) apply intro_locales sledgehammer
+  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
+  apply (drule normalize_subfield)
+  apply (rule group.subgroupI)
+      apply (simp add: group_nonzeros) unfolding subfield_def subring_def apply auto[]
+  sledgehammer
+  oops
 
 end
 
