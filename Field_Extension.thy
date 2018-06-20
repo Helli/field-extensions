@@ -282,7 +282,7 @@ proof goal_cases
   then show ?case by blast
 qed
 
-lemma \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<close>
+lemma subgroup_add: \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<close>
   using subfield_def subring_imp_subgroup by blast
 
 lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
@@ -290,6 +290,8 @@ lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
 
 lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq> \<zero>"
   using Units_inv_Units field_Units by auto
+
+lemmas maybe_useful = group.subgroup_inv_equality[OF group_nonzeros, simplified]
 
 lemma m_inv_inherit: "a \<in> carrier R-{\<zero>} \<Longrightarrow> m_inv (R\<lparr>carrier := carrier R -{\<zero>}\<rparr>) a = m_inv R a"
   unfolding m_inv_def by auto (metis r_null zero_not_one)
@@ -309,6 +311,11 @@ lemma subfield_imp_subgroup:
    apply (meson integral subsetCE)
   by (metis (no_types, lifting) comm_inv_char insertE insert_Diff m_inv_inherit set_rev_mp zero_closed)
 
+lemma subfield_sane: (*also a better def?*) \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
+  subgroup S (add_monoid R) \<and> subgroup (S-{\<zero>}) (R\<lparr>carrier := carrier R-{\<zero>}\<rparr>)\<close>
+  apply auto using subgroup_add apply force using subfield_imp_subgroup apply force
+  using subfieldI by blast
+
 end
 
 locale field_extension = field L for L (structure) +
@@ -323,8 +330,9 @@ lemma K_field: "field (L\<lparr>carrier:=K\<rparr>)"
 lemma K_subring: "subring (L\<lparr>carrier:=K\<rparr>)"
   using L_extends_K subfield_def by blast
 
-lemma K_subgroup: "subgroup K \<lparr>carrier=carrier L,mult=(\<oplus>),one=\<zero>\<rparr>"
-  using subring_imp_subgroup[of "L\<lparr>carrier:=K\<rparr>"] by (simp add: K_subring)
+lemmas K_subgroup =
+  L_extends_K[unfolded subfield_sane, THEN conjunct1]
+  L_extends_K[unfolded subfield_sane, THEN conjunct2]
 
 lemma carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
@@ -338,9 +346,9 @@ proof -
     \<oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<otimes> aa))"
     by (metis (no_types) K_subring subring_def)
   then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
-    by (simp add: subset_iff)
-  then show ?thesis using f3 a2 a1
-    by (metis (no_types, lifting) K_field L_extends_K carrier_K comm_inv_char
+    by (simp add: subset_eq)
+  then show ?thesis
+    using f3 a2 a1 by (metis (no_types) K_field L_extends_K carrier_K comm_inv_char
         field.field_has_inverse field.subfield_one field.subfield_zero local.field_axioms)
 qed
 
@@ -363,14 +371,14 @@ lemma indermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarro
   using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
 
 proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
-  apply (unfold_locales)
-  apply (rule subfieldI)
-     apply (simp add: add.subgroups_Inter field_extension.K_subgroup)
-    apply (metis K_subring cInf_greatest contra_subsetD carrier_K subring_def)
-  apply auto
-  using field.f_e_iff_subfield field.subfield_def field_extension_def monoid.m_closed
-      ring_def subring_def apply (metis (no_types, lifting) field_extension.carrier_K)
-  by (simp add: field_extension.K_inv)
+  apply (unfold_locales) apply (auto simp add: subfield_sane)
+   apply (metis add.subgroups_Inter equals0D field_extension.K_subgroup(1))
+proof goal_cases
+  case (1 x)
+  then have a: "\<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}" by auto
+  from 1 show ?case unfolding a using group.subgroups_Inter[OF group_nonzeros]
+    by (smt a empty_Collect_eq field.f_e_iff_subfield field_extension_def mem_Collect_eq subfield_sane)
+qed
 
 thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
 proposition "16_3_actual":
