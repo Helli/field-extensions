@@ -229,6 +229,7 @@ lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) =
 
 interpretation (*todo: useful? as global_interpretation? name needed? already in ring or even in monoid?*)
 fsdf: comm_group "mult_of R" by (fact units_comm_group[simplified])
+    \<comment> \<open>@{thm[source] group_mult_of_subgroup} exists, but does not give commutativity...\<close>
 
 lemma subfieldI: \<comment> \<open>Improvable?\<close>
   assumes "subgroup A (add_monoid R)"
