@@ -285,13 +285,29 @@ qed
 lemma \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<close>
   using subfield_def subring_imp_subgroup by blast
 
+lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
+  by (metis Diff_subset Units_m_closed Units_one_closed field_Units submonoid.intro)
+
+lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq> \<zero>"
+  using Units_inv_Units field_Units by auto
+
+lemma m_inv_inherit: "a \<in> carrier R-{\<zero>} \<Longrightarrow> m_inv (R\<lparr>carrier := carrier R -{\<zero>}\<rparr>) a = m_inv R a"
+  unfolding m_inv_def by auto (metis r_null zero_not_one)
+
 lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
   apply (drule normalize_subfield)
   apply (rule group.subgroupI)
       apply (simp add: group_nonzeros) unfolding subfield_def subring_def apply auto[]
-  sledgehammer
-  oops
+  apply simp
+    apply auto[1] apply simp
+  using field.field_has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
+      "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto[] defer
+    apply (metis Units_one_closed field_Units inv_nonzero m_inv_inherit subsetCE unit_factor)
+  apply auto[]
+    apply (metis (full_types) monoid_incl_imp_submonoid ring_def submonoid_def)
+   apply (meson integral subsetCE)
+  by (metis (no_types, lifting) comm_inv_char insertE insert_Diff m_inv_inherit set_rev_mp zero_closed)
 
 end
 
