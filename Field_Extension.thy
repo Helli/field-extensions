@@ -370,27 +370,48 @@ lemma indermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarro
   apply unfold_locales unfolding subfield_def apply auto unfolding field_def
   using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
 
+lemma trivial (*todo: put outside*):
+  "add_monoid (L\<lparr>carrier := A\<rparr>) = (add_monoid L)\<lparr>carrier := A\<rparr>"
+  "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
+  by auto
+
 proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales) apply (auto simp add: subfield_sane)
    apply (metis add.subgroups_Inter equals0D field_extension.K_subgroup(1))
 proof goal_cases
-  case (1 x)
-  then have a: "\<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}" by auto
-  from 1 show ?case unfolding a using group.subgroups_Inter[OF group_nonzeros]
-    by (smt a empty_Collect_eq field.f_e_iff_subfield field_extension_def mem_Collect_eq subfield_sane)
+  case (1 M)
+  then show ?case using group.subgroups_Inter[OF group_nonzeros]
+    by (smt equals0D field.f_e_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
+        trivial(2))
 qed
+
+corollary "16_3_actual_pre": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
+  by (simp add: "16_3_" field_extension.K_field)
 
 thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
 proposition "16_3_actual":
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
-  then have "\<forall>M\<in>\<M>. field (L\<lparr>carrier:=M\<rparr>)"
-    by (simp add: field_extension.K_field)
-  with "1"(2) have "\<forall>M\<in>\<M>. field.subfield (L\<lparr>carrier:=M\<rparr>) (L\<lparr>carrier:=M\<rparr>\<lparr>carrier:=K\<rparr>)"
-    unfolding field_extension_def field_extension_axioms_def apply safe
-    apply (rule field.subfieldI) thm field.subfieldI
-    apply auto oops
+  note to_subfield =
+    f_e_iff_subfield field.f_e_iff_subfield[OF "16_3_actual_pre"[OF 1]]
+    subfield_sane field.subfield_sane[OF "16_3_actual_pre"[OF 1]]
+  from 1 show ?case
+    unfolding to_subfield subfield_sane apply safe
+    apply (unfold trivial)
+     apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
+    using K_subgroup(1) apply blast
+    using add.is_group apply blast
+  proof goal_cases
+    case 1
+    then have a: "\<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}" by auto
+    show ?case unfolding a
+      thm "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
+      apply (rule "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified])
+      using 1 apply auto
+    using K_subgroup(2) group_nonzeros by blast+
+  qed
+qed
 
   thm hull_def
 definition gen where
