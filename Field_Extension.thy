@@ -1,8 +1,7 @@
 theory Field_Extension imports
 "HOL-Algebra.Divisibility"         
 "HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
-"HOL-Algebra.UnivPoly"             (* Polynomials *)
-"HOL-Algebra.Multiplicative_Group"
+"HOL-Algebra.Multiplicative_Group" (* Polynomials *)
 "HOL-Algebra.Group_Action"
 "HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
 begin
@@ -10,10 +9,14 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
-lemma (in monoid) missing: "group (G\<lparr>carrier:=Units G\<rparr>)"
-  apply unfold_locales apply auto
-  apply (simp add: Units_closed m_assoc)
-  unfolding Units_def by auto
+lemma (in field) unduplicate[simp]: "units_of R = mult_of R"
+  unfolding mult_of_def units_of_def by (simp add: field_Units)
+
+find_theorems units_of
+find_theorems mult_of
+thm units_of_mult Group.units_of_mult
+lemmas [simp] = mult_of_simps
+lemmas (in field) [simp] = units_of_inv[simplified] units_of_inv
 
 context subgroup
 begin
@@ -180,17 +183,13 @@ lemma intermediate_ring_1:
 
 end
 
-context cring begin \<comment> \<open>\<triangleq> "Let @{term R} be a commutative ring."\<close>
-
-lemma subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def cring_def ring_def
+lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def cring_def ring_def
   by (simp add: comm_monoid.m_ac(2) comm_monoid_axioms monoid.monoid_comm_monoidI subset_eq)
-
-end
 
 context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
 
-lemma field_has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
-  using Units_r_inv_ex field_Units by fastforce
+lemma has_inverse: "a \<in> carrier R - {\<zero>} \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+  by (simp add: Units_r_inv_ex field_Units)
 
 definition subfield where
   \<comment> \<open>Maybe remove this definition and put it in the assumption of field_extension...
@@ -210,8 +209,8 @@ proof -
     carrier S \<or> a \<oplus>\<^bsub>S\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>S\<^esub> aa = a \<otimes> aa))"
     by (simp add: field.subfield_def local.field_axioms subring_def)
   then show ?thesis
-    using a1 by (metis (no_types) cring.cring_simprules(12) cring.subring_cring field.subfield_def
-        is_cring local.field_axioms r_one ring.ring_simprules(6) subsetCE)
+    using a1 by (metis (no_types) cring.cring_simprules(6) field.subfield_def local.field_axioms
+        r_one ring.ring_simprules(12) set_rev_mp subring_cring)
 qed
 
 lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carrier:=carrier S\<rparr>)"
@@ -221,20 +220,19 @@ lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carri
     apply auto
   using normalize_subring subring_cring apply auto[1]
   unfolding subring_def apply auto
-  by (metis (no_types, lifting) field.field_has_inverse subfield_def subfield_one subring_def subring_zero)
+  by (metis (no_types, lifting) field.has_inverse[simplified] subfield_def subfield_one subring_def subring_zero)
 
-text \<open>The following maybe needs a definition similar to @{const add_monoid}\<close>
-lemma group_nonzeros: "group (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
-  by (fact missing[unfolded field_Units])
-
-lemmas subgroup_group = subgroup.subgroup_is_group[OF _ group_nonzeros, simplified]
+lemmas group_mult_of_subgroup = subgroup.subgroup_is_group[OF _ units_group, simplified]
 
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
 
+interpretation (*todo: useful? as global_interpretation? name needed? already in ring or even in monoid?*)
+fsdf: comm_group "mult_of R" by (fact units_comm_group[simplified])
+
 lemma subfieldI: \<comment> \<open>Improvable?\<close>
   assumes "subgroup A (add_monoid R)"
-  and "subgroup (A - {\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
+  and "subgroup (A - {\<zero>}) (mult_of R)"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
   unfolding subfield_def apply auto apply (rule subgroup_to_subring)
      apply (simp add: assms(1)) apply auto
@@ -257,9 +255,8 @@ using a2 by blast
     apply (cases "a = \<zero> \<or> b = \<zero>")
     apply safe
     apply (simp add: f4)+
-     apply (simp add: f5) using group_nonzeros subgroup.m_closed[OF assms(2)]
-      apply auto
-    using a1 by blast
+     apply (simp add: f5) using units_group subgroup.m_closed[OF assms(2)]
+    using a1 by auto
   then show "a \<otimes> b \<in> A"
     using f3 by blast
 qed
@@ -270,15 +267,14 @@ qed
   apply (unfold_locales)
   apply (simp add: add.subgroupE(1) assms(1))
   apply (auto simp add: \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a \<otimes> b \<in> A\<close>)
-  using assms(2) Units_one_closed Units_r_inv field_has_inverse unit_factor
-   apply (metis DiffD1 one_Units subgroup.one_closed)
+  using assms(2) subgroup.one_closed apply fastforce
 proof goal_cases
   case (1 a) then have f2: "a \<in> A - {\<zero>}"
     by simp
-  then have "a \<in> carrier (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
+  then have "a \<in> carrier (mult_of R)"
     using assms(2) subgroup.mem_carrier by fastforce
   then have "\<exists>aa\<in>A-{\<zero>}. a \<otimes> aa = \<one>"
-    using subgroup_group[OF assms(2)] 1 field_Units group.r_inv_ex by fastforce
+    using group_mult_of_subgroup[OF assms(2)] 1 field_Units group.r_inv_ex by fastforce
   then show ?case by blast
 qed
 
@@ -291,15 +287,12 @@ lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
 lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq> \<zero>"
   using Units_inv_Units field_Units by auto
 
-lemmas maybe_useful = group.subgroup_inv_equality[OF group_nonzeros, simplified]
-
-lemma m_inv_inherit: "a \<in> carrier R-{\<zero>} \<Longrightarrow> m_inv (R\<lparr>carrier := carrier R -{\<zero>}\<rparr>) a = m_inv R a"
-  unfolding m_inv_def by auto (metis r_null zero_not_one)
+lemmas maybe_useful[simp] = group.subgroup_inv_equality[OF units_group, simplified]
 
 lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
   apply (drule normalize_subfield)
-  apply (rule group.subgroupI)
+  apply (rule group.subgroupI) sledgehammer
       apply (simp add: group_nonzeros) unfolding subfield_def subring_def apply auto[]
   apply simp
     apply auto[1] apply simp
@@ -366,7 +359,7 @@ lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> su
 context field_extension
 begin
 
-lemma indermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
+lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
   apply unfold_locales unfolding subfield_def apply auto unfolding field_def
   using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
 
@@ -387,8 +380,11 @@ qed
 
 corollary "16_3_actual_pre": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
   by (simp add: "16_3_" field_extension.K_field)
-
-thm group.subgroups_Inter "subgroup.\<Inter>_is_supergroup" field_extension_axioms
+term units_of
+term Units
+thm group.subgroups_Inter
+  "subgroup.\<Inter>_is_supergroup"[of _ L]
+  "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
 proposition "16_3_actual":
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
