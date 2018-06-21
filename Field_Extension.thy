@@ -27,12 +27,11 @@ proof -
         submonoid_is_comm_monoid)
 qed
 
-lemma (in field) unduplicate[simp]: "units_of R = mult_of R"
+lemma (in field) deduplicate[simp]: "units_of R = mult_of R"
   unfolding mult_of_def units_of_def by (simp add: field_Units)
 
 find_theorems units_of
 find_theorems mult_of
-thm units_of_mult Group.units_of_mult
 lemmas [simp] = mult_of_simps
 lemmas (in field) [simp] = units_of_inv[simplified] units_of_inv
 
@@ -206,7 +205,7 @@ lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding 
 
 context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
 
-lemma has_inverse: "a \<in> carrier R - {\<zero>} \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
 
 definition subfield where
@@ -317,9 +316,8 @@ lemma subfield_imp_subgroup:
     apply auto[1] apply simp
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
-  using insertE insert_Diff set_rev_mp zero_closed
-     apply (smt carrier_mult_of fsdf.inv_closed fsdf.l_inv fsdf.monoid_axioms integral_iff
-      monoid.inv_unique mult_mult_of one_mult_of zero_not_one)
+  using set_rev_mp zero_closed
+  apply (metis (no_types, lifting) Units_one_closed comm_inv_char deduplicate unit_factor units_of_inv)
   apply (metis (no_types) carrier_mult_of fsdf.l_inv insertE insert_Diff l_null mult_mult_of
       one_mult_of subsetCE zero_closed zero_not_one)
   apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
@@ -363,10 +361,8 @@ proof -
   then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
     by (simp add: subset_eq)
   then show ?thesis
-    using f3 a2 a1 apply simp
-    by (smt field.field_Units field.unduplicate field_extension.L_extends_K field_extension_axioms
-        field_extension_def insert_Diff insert_iff monoid.simps(2) subfield_sane
-        subgroup.m_inv_closed subgroup.one_closed units_of_inv)
+    using f3 a2 a1
+    by (metis K_field L_extends_K carrier_K comm_inv_char f3 field.has_inverse subfield_one subfield_zero)
 qed
 
 end
