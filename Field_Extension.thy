@@ -9,6 +9,12 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+lemma (in field) comm_group_mult_of:
+  shows "comm_group (mult_of R)"
+  apply (rule group.group_comm_groupI groupI)
+  apply (fact field_mult_group)
+  by (auto simp: mult_of_simps m_comm)
+
 lemma (in subgroup) subgroup_is_comm_group [intro]:
   assumes "comm_group G"
   shows "comm_group (G\<lparr>carrier := H\<rparr>)"
@@ -305,14 +311,14 @@ lemmas maybe_useful[simp] = group.subgroup_inv_equality[OF units_group, simplifi
 lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
   apply (drule normalize_subfield)
-  apply (rule group.subgroupI) sledgehammer
-      apply (simp add: group_nonzeros) unfolding subfield_def subring_def apply auto[]
+  apply (rule group.subgroupI) thm units_group[unfolded units_of_def field_Units] group_mult_of_subgroup
+      apply (simp add: units_group[unfolded units_of_def field_Units]) unfolding subfield_def subring_def apply auto[]
   apply simp
     apply auto[1] apply simp
   using field.field_has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto[] defer
     apply (metis Units_one_closed field_Units inv_nonzero m_inv_inherit subsetCE unit_factor)
-  apply auto[]
+  apply auto[] oops
     apply (metis (full_types) monoid_incl_imp_submonoid ring_def submonoid_def)
    apply (meson integral subsetCE)
   by (metis (no_types, lifting) comm_inv_char insertE insert_Diff m_inv_inherit set_rev_mp zero_closed)
@@ -448,7 +454,7 @@ term field
 
 text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
-  by (auto simp: mult_of_simps)
+  by simp
 
 (* duplicate: *)
 value INTEG
