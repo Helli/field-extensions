@@ -393,15 +393,14 @@ proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. fiel
    apply (metis add.subgroups_Inter equals0D field_extension.K_subgroup(1))
 proof goal_cases
   case (1 M)
-  then show ?case using group.subgroups_Inter[OF group_nonzeros]
+  then show ?case using group.subgroups_Inter[OF field_mult_group]
     by (smt equals0D field.f_e_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
         trivial(2))
 qed
 
 corollary "16_3_actual_pre": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
   by (simp add: "16_3_" field_extension.K_field)
-term units_of
-term Units
+
 thm group.subgroups_Inter
   "subgroup.\<Inter>_is_supergroup"[of _ L]
   "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
@@ -410,18 +409,26 @@ proposition "16_3_actual":
 proof goal_cases
   case 1
   note to_subfield =
-    f_e_iff_subfield field.f_e_iff_subfield[OF "16_3_actual_pre"[OF 1]]
-    subfield_sane field.subfield_sane[OF "16_3_actual_pre"[OF 1]]
+    field.f_e_iff_subfield[OF "16_3_actual_pre"[OF 1]]
+    field.subfield_sane[OF "16_3_actual_pre"[OF 1]]
   from 1 show ?case
-    unfolding to_subfield subfield_sane apply safe
+    unfolding to_subfield apply safe
     apply (unfold trivial)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
     using K_subgroup(1) apply blast
     using add.is_group apply blast
+    using field_extension.K_subgroup(1) apply blast
   proof goal_cases
     case 1
-    then have a: "\<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}" by auto
-    show ?case unfolding a
+    have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
+      by simp
+    with 1 have a: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}| M . M \<in> \<M>}\<rparr>)"
+    proof -
+      have "{} \<noteq> \<M>"  using "1"(2) by blast
+      then show ?thesis
+        using \<open>mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)\<close> trivial(2) by presburger
+    qed
+    show ?case unfolding a sledgehammer
       thm "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
       apply (rule "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified])
       using 1 apply auto
