@@ -9,6 +9,18 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+lemma (in subgroup) subgroup_is_comm_group [intro]:
+  assumes "comm_group G"
+  shows "comm_group (G\<lparr>carrier := H\<rparr>)"
+proof -
+  interpret comm_group G by fact
+  have "Group.monoid (G\<lparr>carrier := H\<rparr>)"
+    by (simp add: group.is_monoid is_group subgroup_is_group)
+  then show ?thesis
+    by (simp add: comm_group.intro is_group subgroup_is_group subgroup_is_submonoid
+        submonoid_is_comm_monoid)
+qed
+
 lemma (in field) unduplicate[simp]: "units_of R = mult_of R"
   unfolding mult_of_def units_of_def by (simp add: field_Units)
 
@@ -222,7 +234,7 @@ lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carri
   unfolding subring_def apply auto
   by (metis (no_types, lifting) field.has_inverse[simplified] subfield_def subfield_one subring_def subring_zero)
 
-lemmas group_mult_of_subgroup = subgroup.subgroup_is_group[OF _ units_group, simplified]
+lemmas group_mult_of_subgroup = subgroup.subgroup_is_comm_group[OF _ units_comm_group, simplified]
 
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
@@ -275,7 +287,7 @@ proof goal_cases
   then have "a \<in> carrier (mult_of R)"
     using assms(2) subgroup.mem_carrier by fastforce
   then have "\<exists>aa\<in>A-{\<zero>}. a \<otimes> aa = \<one>"
-    using group_mult_of_subgroup[OF assms(2)] 1 field_Units group.r_inv_ex by fastforce
+    using assms(2) f2 fsdf.r_inv fsdf.subgroupE(3) by auto
   then show ?case by blast
 qed
 
