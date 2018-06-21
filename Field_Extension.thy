@@ -309,22 +309,25 @@ lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq>
 lemmas maybe_useful[simp] = group.subgroup_inv_equality[OF units_group, simplified]
 
 lemma subfield_imp_subgroup:
-  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (R\<lparr>carrier:=carrier R - {\<zero>}\<rparr>)"
+  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
   apply (drule normalize_subfield)
-  apply (rule group.subgroupI) thm units_group[unfolded units_of_def field_Units] group_mult_of_subgroup
-      apply (simp add: units_group[unfolded units_of_def field_Units]) unfolding subfield_def subring_def apply auto[]
+  apply (rule group.subgroupI)
+  apply (simp add: fsdf.is_group) unfolding subfield_def subring_def apply auto[]
   apply simp
     apply auto[1] apply simp
-  using field.field_has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
-      "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto[] defer
-    apply (metis Units_one_closed field_Units inv_nonzero m_inv_inherit subsetCE unit_factor)
-  apply auto[] oops
-    apply (metis (full_types) monoid_incl_imp_submonoid ring_def submonoid_def)
-   apply (meson integral subsetCE)
-  by (metis (no_types, lifting) comm_inv_char insertE insert_Diff m_inv_inherit set_rev_mp zero_closed)
+  using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
+      "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
+  using insertE insert_Diff set_rev_mp zero_closed
+     apply (smt carrier_mult_of fsdf.inv_closed fsdf.l_inv fsdf.monoid_axioms integral_iff
+      monoid.inv_unique mult_mult_of one_mult_of zero_not_one)
+  apply (metis (no_types) carrier_mult_of fsdf.l_inv insertE insert_Diff l_null mult_mult_of
+      one_mult_of subsetCE zero_closed zero_not_one)
+  apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
+  by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
+      submonoid.mem_carrier)
 
 lemma subfield_sane: (*also a better def?*) \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
-  subgroup S (add_monoid R) \<and> subgroup (S-{\<zero>}) (R\<lparr>carrier := carrier R-{\<zero>}\<rparr>)\<close>
+  subgroup S (add_monoid R) \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
   apply auto using subgroup_add apply force using subfield_imp_subgroup apply force
   using subfieldI by blast
 
@@ -360,8 +363,10 @@ proof -
   then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
     by (simp add: subset_eq)
   then show ?thesis
-    using f3 a2 a1 by (metis (no_types) K_field L_extends_K carrier_K comm_inv_char
-        field.field_has_inverse field.subfield_one field.subfield_zero local.field_axioms)
+    using f3 a2 a1 apply simp
+    by (smt field.field_Units field.unduplicate field_extension.L_extends_K field_extension_axioms
+        field_extension_def insert_Diff insert_iff monoid.simps(2) subfield_sane
+        subgroup.m_inv_closed subgroup.one_closed units_of_inv)
 qed
 
 end
