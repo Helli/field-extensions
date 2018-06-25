@@ -160,19 +160,20 @@ lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<l
       singleton_iff subring_def subring_nontrivial subring_zero zero_closed)
 
 lemma subgroup_to_subring:
-  "\<lbrakk>subgroup A (add_monoid R); \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
-    \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
-  by (simp add: add.subgroupE(1) add.subgroupE(3) add.subgroupE(4) subring_fullI)
+  "\<lbrakk>additive_subgroup A R; \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
+    \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)" using subring_fullI
+  by (simp add: additive_subgroup.a_closed additive_subgroup.a_inv_closed additive_subgroup.a_subset)
 
 lemma subyada_to_subring:
-  "\<lbrakk>subgroup A (add_monoid R); submonoid A R\<rbrakk> \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
+  "\<lbrakk>additive_subgroup A R; submonoid A R\<rbrakk> \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
   apply (rule subgroup_to_subring) apply auto
   apply (simp add: submonoid.one_closed)
   by (simp add: submonoid.m_closed)
 
 lemma subring_imp_subgroup:
-  "subring S \<Longrightarrow> subgroup (carrier S) (add_monoid R)"
-  unfolding subring_def apply auto apply (rule subgroup.intro) apply auto
+  "subring S \<Longrightarrow> additive_subgroup (carrier S) R"
+  apply (rule additive_subgroup.intro, rule subgroup.intro)
+     apply (auto simp: subring_def)
   apply (metis ring.ring_simprules(1))
   apply (metis (no_types, hide_lams) add.r_cancel_one' ring.ring_simprules(15)
       ring.ring_simprules(2) ring.ring_simprules(5) submonoid.intro submonoid.mem_carrier)
@@ -249,55 +250,53 @@ fsdf: comm_group "mult_of R" by (fact units_comm_group[simplified])
     \<comment> \<open>@{thm[source] group_mult_of_subgroup} exists, but does not give commutativity...\<close>
 
 lemma subfieldI: \<comment> \<open>Improvable?\<close>
-  assumes "subgroup A (add_monoid R)"
-  and "subgroup (A - {\<zero>}) (mult_of R)"
+  assumes "additive_subgroup A R"
+  and "subgroup (A-{\<zero>}) (mult_of R)"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
   unfolding subfield_def apply auto apply (rule subgroup_to_subring)
      apply (simp add: assms(1)) apply auto
   using assms(2) subgroup.one_closed apply fastforce
-subgoal proof -
-  fix a :: 'a and b :: 'a
+subgoal for a b
+proof -
   assume a1: "b \<in> A"
   assume a2: "a \<in> A"
   have f3: "insert \<zero> (A - {\<zero>}) = A"
-    by (metis assms(1) insert_Diff monoid.simps(2) subgroup_def)
-  have f4: "b \<in> carrier R"
-    using a1 by (metis (no_types) assms(1) partial_object.select_convs(1) subgroup.mem_carrier)
-have f5: "a \<in> carrier R"
-  using a2 by (metis (no_types) assms(1) partial_object.select_convs(1) subgroup.mem_carrier)
-  have f6: "b \<in> insert \<zero> (A - {\<zero>})"
-using f3 a1 by presburger
-  have "a \<in> insert \<zero> (A - {\<zero>})"
-using a2 by blast
-  then have "a \<otimes> b \<in> insert \<zero> (A - {\<zero>})"
-    apply (cases "a = \<zero> \<or> b = \<zero>")
-    apply safe
-    apply (simp add: f4)+
-     apply (simp add: f5) using units_group subgroup.m_closed[OF assms(2)]
-    using a1 by auto
-  then show "a \<otimes> b \<in> A"
-    using f3 by blast
-qed
+    by (metis additive_subgroup.a_subgroup assms(1) insert_Diff monoid.simps(2) subgroup_def)
+  have "(a \<otimes> b = \<zero>) = (a = \<zero> \<or> b = \<zero>)"
+    using a2 a1 by (meson additive_subgroup.a_subset assms(1) integral_iff set_rev_mp)
+  then show ?thesis
+    using f3 a2 a1 by (metis (no_types) assms(2) insertCI insertE mult_mult_of subgroup_def)
+qed 
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
   apply (rule subring_cring) apply (rule subyada_to_subring)
   apply (simp add: assms(1))
-  apply (unfold_locales)
-  apply (simp add: add.subgroupE(1) assms(1))
-  apply (auto simp add: \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a \<otimes> b \<in> A\<close>)
-  using assms(2) subgroup.one_closed apply fastforce
-proof goal_cases
-  case (1 a) then have f2: "a \<in> A - {\<zero>}"
-    by simp
-  then have "a \<in> carrier (mult_of R)"
-    using assms(2) subgroup.mem_carrier by fastforce
-  then have "\<exists>aa\<in>A-{\<zero>}. a \<otimes> aa = \<one>"
-    using assms(2) f2 fsdf.r_inv fsdf.subgroupE(3) by auto
-  then show ?case by blast
+  apply (metis (mono_tags, lifting) Diff_subset \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a \<otimes> b \<in> A\<close>
+    additive_subgroup.a_subset assms ring_axioms monoid_incl_imp_submonoid
+    one_mult_of ring.is_monoid ring.subgroup_to_subring ring.subring_def subgroup.one_closed
+    subsetCE)
+proof -
+  fix a :: 'a
+  assume a1: "a \<in> A"
+  assume a2: "a \<noteq> \<zero>"
+  have f3: "\<forall>Aa. a \<in> A - Aa \<or> a \<in> Aa"
+    using a1 by blast
+  then have f4: "a \<in> {\<zero>} \<or> inv\<^bsub>mult_of R\<^esub> a \<in> A"
+    by (metis (no_types) Diff_iff assms(2) subgroup_def)
+  have f5: "A - {\<zero>} \<subseteq> carrier (mult_of R)"
+    by (metis (no_types) assms(2) subgroup_def)
+  have f6: "\<forall>aa. a = aa \<or> a \<in> insert aa A - {aa}"
+using a1 by fastforce
+  have f7: "\<one>\<^bsub>mult_of R\<^esub> \<in> carrier (mult_of R)"
+    by blast
+  have "inv\<^bsub>mult_of R\<^esub> a \<in> carrier (mult_of R)"
+    using f5 f3 a2 by blast
+then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
+  using f7 f6 f5 f4 f3 a2 by (metis (no_types) Diff_iff contra_subsetD fsdf.inv_solve_left fsdf.r_one mult_mult_of one_mult_of)
 qed
 
-lemma subgroup_add: \<open>subfield S \<Longrightarrow> subgroup (carrier S) (add_monoid R)\<close>
-  using subfield_def subring_imp_subgroup by blast
+lemma subgroup_add: \<open>subfield S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
+  by (simp add: abelian_subgroupI3 is_abelian_group subfield_def subring_imp_subgroup)
 
 lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
   by (metis Diff_subset Units_m_closed Units_one_closed field_Units submonoid.intro)
@@ -325,8 +324,9 @@ lemma subfield_imp_subgroup:
       submonoid.mem_carrier)
 
 lemma subfield_sane: (*also a better def?*) \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
-  subgroup S (add_monoid R) \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
-  apply auto using subgroup_add apply force using subfield_imp_subgroup apply force
+  additive_subgroup S R \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
+  apply auto using subgroup_add abelian_subgroup_def apply force
+  using subfield_imp_subgroup apply force
   using subfieldI by blast
 
 end
@@ -390,7 +390,8 @@ lemma trivial (*todo: put outside*):
 
 lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales) apply (auto simp add: subfield_sane)
-   apply (metis add.subgroups_Inter equals0D field_extension.K_subgroup(1))
+  apply (metis add.subgroups_Inter additive_subgroup.a_subgroup additive_subgroupI equals0D
+      field_extension.K_subgroup(1))
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
@@ -414,12 +415,13 @@ proof goal_cases
     field.f_e_iff_subfield[OF "16_3_aux"[OF 1]]
     field.subfield_sane[OF "16_3_aux"[OF 1]]
   from 1 show ?case
-    unfolding to_subfield apply safe
+    unfolding to_subfield additive_subgroup_def apply safe
     apply (unfold trivial)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
-    using K_subgroup(1) apply blast
+    apply (simp add: additive_subgroup.a_subgroup field_extension.K_subgroup(1)
+        field_extension_axioms)
     using add.is_group apply blast
-    using field_extension.K_subgroup(1) apply blast
+    using additive_subgroup.a_subgroup field_extension.K_subgroup(1) apply blast
   proof goal_cases
     case 1
     have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
