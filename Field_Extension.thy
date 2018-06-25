@@ -388,7 +388,7 @@ lemma trivial (*todo: put outside*):
   "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
   by auto
 
-proposition "16_3_": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
+lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales) apply (auto simp add: subfield_sane)
    apply (metis add.subgroups_Inter equals0D field_extension.K_subgroup(1))
 proof goal_cases
@@ -398,8 +398,8 @@ proof goal_cases
         trivial(2))
 qed
 
-corollary "16_3_actual_pre": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
-  by (simp add: "16_3_" field_extension.K_field)
+corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
+  by (simp add: "\<Inter>_is_subfield" field_extension.K_field)
 
 lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
 
@@ -411,8 +411,8 @@ proposition "16_3_actual":
 proof goal_cases
   case 1
   note to_subfield =
-    field.f_e_iff_subfield[OF "16_3_actual_pre"[OF 1]]
-    field.subfield_sane[OF "16_3_actual_pre"[OF 1]]
+    field.f_e_iff_subfield[OF "16_3_aux"[OF 1]]
+    field.subfield_sane[OF "16_3_aux"[OF 1]]
   from 1 show ?case
     unfolding to_subfield apply safe
     apply (unfold trivial)
@@ -436,10 +436,14 @@ proof goal_cases
   qed
 qed
 
-  thm hull_def
-definition gen where
+term genideal \<comment> \<open>Use this naming? Or \<open>gen\<close> (set) and \<open>genfield\<close> (structure)?\<close> term cgenideal\<comment>\<open>does not fit\<close>
+definition genfield where
   (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
-  "S \<subseteq> carrier L \<Longrightarrow> gen S = (\<lambda>M. carrier M) hull S"
+  "S \<subseteq> carrier L \<Longrightarrow> genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
+
+thm genfield_def[unfolded hull_def] genfield_def[unfolded hull_def, simplified]
+lemma "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
+  unfolding genfield_def hull_def apply auto sledgehammer
 
 end
 
