@@ -401,6 +401,8 @@ qed
 corollary "16_3_actual_pre": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
   by (simp add: "16_3_" field_extension.K_field)
 
+lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
+
 thm group.subgroups_Inter
   "subgroup.\<Inter>_is_supergroup"[of _ L]
   "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
@@ -422,17 +424,15 @@ proof goal_cases
     case 1
     have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
       by simp
-    with 1 have a: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}| M . M \<in> \<M>}\<rparr>)"
-    proof -
-      have "{} \<noteq> \<M>"  using "1"(2) by blast
-      then show ?thesis
-        using \<open>mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)\<close> trivial(2) by presburger
-    qed
-    show ?case unfolding a sledgehammer
-      thm "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
-      apply (rule "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified])
-      using 1 apply auto
-    using K_subgroup(2) group_nonzeros by blast+
+    with \<open>\<M> \<noteq> {}\<close> have a: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}|M. M \<in> \<M>}\<rparr>)"
+      by (simp add: trivial(2))
+    have "mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>) = mult_of L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>"
+      using "1"(2) Diff_iff by blast
+    then show ?case unfolding a apply simp
+      apply (rule "subgroup.\<Inter>_is_supergroup")
+      using 1 apply auto using K_subgroup apply simp
+      using field_mult_group apply simp
+      using field_extension.K_subgroup(2) by blast
   qed
 qed
 
