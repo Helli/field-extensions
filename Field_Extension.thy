@@ -199,10 +199,21 @@ lemma intermediate_ring_1:
   "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>) \<Longrightarrow> subring (R\<lparr>carrier:=M\<rparr>)"
   unfolding subring_def by auto
 
+lemma subring_ring_hom_ring: "subring S \<Longrightarrow> ring_hom_ring S R id" apply intro_locales unfolding subring_def
+  subgoal using abelian_group.axioms(1) ring.is_abelian_group subring_def by blast
+  subgoal using abelian_group.axioms(2) ring_axioms ring.is_abelian_group subring_def by blast
+  subgoal using local.ring_axioms ring.is_monoid subring_def by blast
+  subgoal unfolding subring_def by (simp add: ring.axioms(3))
+  apply unfold_locales unfolding ring_hom_def apply auto
+  by (metis (no_types, lifting) r_one ring.ring_simprules(12) ring.ring_simprules(6) subsetCE)
+
 end
 
 lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def cring_def ring_def
   by (simp add: comm_monoid.m_ac(2) comm_monoid_axioms monoid.monoid_comm_monoidI subset_eq)
+
+lemma (in cring) subring_ring_hom_cring: "subring S \<Longrightarrow> ring_hom_cring S R id"
+  by (simp add: RingHom.ring_hom_cringI is_cring subring_cring subring_ring_hom_ring)
 
 context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
 
@@ -249,7 +260,7 @@ interpretation (*todo: useful? as global_interpretation? name needed? already in
 fsdf: comm_group "mult_of R" by (fact units_comm_group[simplified])
     \<comment> \<open>@{thm[source] group_mult_of_subgroup} exists, but does not give commutativity...\<close>
 
-lemma subfieldI: \<comment> \<open>Improvable?\<close>
+lemma subfieldI:
   assumes "additive_subgroup A R"
   and "subgroup (A-{\<zero>}) (mult_of R)"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
@@ -407,7 +418,7 @@ lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mu
 thm group.subgroups_Inter
   "subgroup.\<Inter>_is_supergroup"[of _ L]
   "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
-proposition "16_3_actual":
+proposition "16_3_"[intro]:
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
@@ -440,15 +451,87 @@ qed
 
 term genideal \<comment> \<open>Use this naming? Or \<open>gen\<close> (set) and \<open>genfield\<close> (structure)?\<close> term cgenideal\<comment>\<open>does not fit\<close>
 definition genfield where
-  (* K\<le>M\<le>L, the \<lambda>-term, must be a predicate about the \<^bold>s\<^bold>e\<^bold>t M *)
-  "S \<subseteq> carrier L \<Longrightarrow> genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
+  "genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
 
-thm genfield_def[unfolded hull_def] genfield_def[unfolded hull_def, simplified]
-lemma "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
-  unfolding genfield_def hull_def apply auto sledgehammer
+lemma f_e_genfield: "S \<subseteq> carrier L \<Longrightarrow> field_extension (L\<lparr>carrier := genfield S\<rparr>) K"
+  unfolding genfield_def hull_def
+  by (auto intro!: "16_3_" simp add: K_subgroup(1) additive_subgroup.a_subset f_e_refl)
+
+corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
+  using f_e_genfield field_extension_def by auto
+
+interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
+  by (simp add: K_subring subring_ring_hom_cring)
 
 end
 
+locale f_g_field_extension = field_extension +
+  assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+
+locale f_e_UP = UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id for L (structure) and K
+  + assumes f_e_L_K: "field_extension L K"
+begin
+
+interpretation f_e: field_extension L K
+  by (rule f_e_L_K)
+
+lemma Eval_x[simp]: "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
+
+lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" unfolding
+  Eval_monom[simplified] apply auto
+  by (meson S.r_one additive_subgroup.a_Hcarr f_e.K_subgroup(1))
+
+lemma simple_stuff[simp]:
+  "monom P \<zero>\<^bsub>L\<^esub> 0 = \<zero>"
+  "monom P \<one>\<^bsub>L\<^esub> 0 = \<one>"
+  using monom_zero monom_one by auto
+
+lemmas simpler_stuff =
+  monom_inj[simplified]
+  monom_closed[simplified]
+
+thm UP_ring.monom_inj
+
+find_theorems "(Quot)"
+
+proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
+  shows "field_extension.genfield L K {s} = \<comment> \<open>\<open>s\<close> is already fixed in the locale\<close>
+    {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+  unfolding field_extension.genfield_def[OF f_e_L_K] hull_def
+proof -
+  show "\<Inter>{t. (field_extension L t \<and> K \<subseteq> t) \<and> {s} \<subseteq> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
+    carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+    (is "\<Inter>?\<M> = ?L'")
+  proof -
+    interpret asdf: field_extension L ?L'
+      apply standard sorry
+    have "?L' \<in> ?\<M>" apply safe
+    proof goal_cases
+      case (2 x)
+      show ?case apply (rule exI[of _ "monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+        apply auto
+        using "2" additive_subgroup.a_Hcarr f_e.K_subgroup(1) apply fastforce
+        by (simp add: "2" simpler_stuff)
+    next
+      case (3 x)
+      show ?case apply (rule exI[of _ "monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+  apply auto
+        using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
+        apply (intro simpler_stuff(2))
+        by (metis cring_def domain_def f_e.subfield_one f_e_L_K field_def field_extension.K_field
+            field_extension.L_extends_K field_extension.carrier_K ring.ring_simprules(6))
+    qed (rule asdf.field_extension_axioms)
+    moreover {
+      fix M
+      assume "M \<in> ?\<M>"
+      then have "?L' \<subseteq> M" sorry
+    }
+    ultimately show ?thesis
+      by (meson cInf_eq_minimum)
+  qed
+qed
+
+end
 
 section\<open>Observations\<close>
 

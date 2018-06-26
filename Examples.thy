@@ -62,9 +62,6 @@ lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int)
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
 
-lemma f_r: (*rm*) "field K \<Longrightarrow> ring K"
-  by (simp add: cring.axioms(1) domain.axioms(1) field.axioms(1))
-
 lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
   apply standard
                    apply (auto simp: standard_ring_def)
