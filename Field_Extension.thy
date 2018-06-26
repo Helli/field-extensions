@@ -495,9 +495,9 @@ thm UP_ring.monom_inj
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
   shows "field_extension.genfield L K {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in the locale\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  unfolding field_extension.genfield_def[OF f_e_L_K] hull_def
+  unfolding field_extension.genfield_def[OF f_e_L_K] hull_def apply simp
 proof -
-  show "\<Inter>{t. (field_extension L t \<and> K \<subseteq> t) \<and> {s} \<subseteq> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
+  show "\<Inter>{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
     carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
     (is "\<Inter>?\<M> = ?L'")
   proof -
@@ -511,7 +511,7 @@ proof -
         using "2" additive_subgroup.a_Hcarr f_e.K_subgroup(1) apply fastforce
         by (simp add: "2" simpler_stuff)
     next
-      case (3 x)
+      case 3
       show ?case apply (rule exI[of _ "monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
   apply auto
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
