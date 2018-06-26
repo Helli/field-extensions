@@ -468,18 +468,14 @@ end
 locale f_g_field_extension = field_extension +
   assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
 
-locale f_e_UP = UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id for L (structure) and K
-  + assumes f_e_L_K: "field_extension L K"
+locale f_e_UP = UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension L K for L (structure) and K
 begin
-
-interpretation f_e: field_extension L K
-  by (rule f_e_L_K)
 
 lemma Eval_x[simp]: "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" unfolding
   Eval_monom[simplified] apply auto
-  by (meson S.r_one additive_subgroup.a_Hcarr f_e.K_subgroup(1))
+  by (meson K_subgroup(1) S.r_one additive_subgroup.a_Hcarr)
 
 lemma simple_stuff[simp]:
   "monom P \<zero>\<^bsub>L\<^esub> 0 = \<zero>"
@@ -495,7 +491,7 @@ thm UP_ring.monom_inj
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
   shows "field_extension.genfield L K {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in the locale\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  unfolding field_extension.genfield_def[OF f_e_L_K] hull_def apply simp
+  unfolding genfield_def hull_def apply simp
 proof -
   show "\<Inter>{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
     carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
@@ -508,7 +504,7 @@ proof -
       case (2 x)
       show ?case apply (rule exI[of _ "monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
         apply auto
-        using "2" additive_subgroup.a_Hcarr f_e.K_subgroup(1) apply fastforce
+        using "2" K_subgroup(1) additive_subgroup.a_Hcarr apply fastforce
         by (simp add: "2" simpler_stuff)
     next
       case 3
@@ -516,13 +512,19 @@ proof -
   apply auto
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
         apply (intro simpler_stuff(2))
-        by (metis cring_def domain_def f_e.subfield_one f_e_L_K field_def field_extension.K_field
-            field_extension.L_extends_K field_extension.carrier_K ring.ring_simprules(6))
+        using K_subring S.subring_def carrier_K by blast
     qed (rule asdf.field_extension_axioms)
     moreover {
       fix M
       assume "M \<in> ?\<M>"
-      then have "?L' \<subseteq> M" sorry
+      then have "?L' \<subseteq> M" apply auto
+      proof goal_cases
+        case (1 f g)
+        then have "field (L\<lparr>carrier := M\<rparr>)"
+          by (simp add: field_extension.K_field)
+        then have "Eval f \<in> M" "Eval g \<in> M" sorry
+        then show ?case sorry
+      qed
     }
     ultimately show ?thesis
       by (meson cInf_eq_minimum)
