@@ -455,7 +455,7 @@ definition genfield where
 
 lemma f_e_genfield: "S \<subseteq> carrier L \<Longrightarrow> field_extension (L\<lparr>carrier := genfield S\<rparr>) K"
   unfolding genfield_def hull_def
-  by (auto intro!: "16_3_" simp add: K_subgroup(1) additive_subgroup.a_subset f_e_refl)
+  by (auto simp add: K_subgroup(1) additive_subgroup.a_subset f_e_refl)
 
 corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
   using f_e_genfield field_extension_def by auto
@@ -539,7 +539,6 @@ text \<open>@{locale subgroup} was the inspiration to just use sets for the subs
 locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
 
 context subgroup begin
-lemma "subgroup H G" by (fact subgroup_axioms)
 lemma "group G" oops
 lemma "group (G\<lparr>carrier:=H\<rparr>)" oops
 end

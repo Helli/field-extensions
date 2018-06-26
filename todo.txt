@@ -1,5 +1,3 @@
-prove \<^bold>a\<^bold>c\<^bold>t\<^bold>u\<^bold>a\<^bold>l prosition 16_3: easier before or after the current fake?
-
 the examples from the lecture notes are not that important
 
 isabelle mkroot
