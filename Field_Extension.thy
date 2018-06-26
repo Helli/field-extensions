@@ -492,10 +492,8 @@ lemmas simpler_stuff =
 
 thm UP_ring.monom_inj
 
-find_theorems "(Quot)"
-
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
-  shows "field_extension.genfield L K {s} = \<comment> \<open>\<open>s\<close> is already fixed in the locale\<close>
+  shows "field_extension.genfield L K {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in the locale\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding field_extension.genfield_def[OF f_e_L_K] hull_def
 proof -
