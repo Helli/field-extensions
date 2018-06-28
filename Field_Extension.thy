@@ -30,8 +30,6 @@ qed
 lemma (in field) deduplicate[simp]: "units_of R = mult_of R"
   unfolding mult_of_def units_of_def by (simp add: field_Units)
 
-find_theorems units_of
-find_theorems mult_of
 lemmas [simp] = mult_of_simps
 lemmas (in field) [simp] = units_of_inv[simplified] units_of_inv
 
@@ -326,7 +324,7 @@ lemma subfield_imp_subgroup:
     apply auto[1] apply simp
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
-  using set_rev_mp zero_closed
+  using set_rev_mp
   apply (metis (no_types, lifting) Units_one_closed comm_inv_char deduplicate unit_factor units_of_inv)
   apply (metis (no_types) carrier_mult_of fsdf.l_inv insertE insert_Diff l_null mult_mult_of
       one_mult_of subsetCE zero_closed zero_not_one)
