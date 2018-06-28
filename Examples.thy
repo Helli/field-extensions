@@ -111,7 +111,7 @@ lemma f_e_example': "field_extension complex_field (range complex_of_real)"
   using subfield_example' field.normalize_subfield standard_ring_def
   by (metis field_examples(3) partial_object.select_convs(1))
 
-lemma "field_extension.genfield complex_field (range of_real) {\<i>} = UNIV"
+lemma genfield_\<i>_UNIV: "field_extension.genfield complex_field (range of_real) {\<i>} = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
@@ -149,5 +149,11 @@ proof -
       by metis
   qed
 qed
+
+corollary f_g_f_e_complex: \<open>f_g_field_extension complex_field (range complex_of_real)\<close>
+  unfolding f_g_field_extension_def f_g_field_extension_axioms_def apply auto
+  apply (simp add: f_e_example') using genfield_\<i>_UNIV
+  by (metis complex_field_def finite.emptyI finite.insertI partial_object.select_convs(1)
+      univ_ring_def)
 
 end

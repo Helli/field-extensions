@@ -631,8 +631,7 @@ end
 
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
-term field
-\<comment> \<open>field_simps are *not* available in general. Re-prove them? Collect them?\<close>
+text \<open>@{thm field_simps} are *not* available in general. Re-prove them? Collect them?\<close>
 
 text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
