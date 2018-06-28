@@ -13,3 +13,5 @@ rsr.add :
 
 ^This error means that I have no way of seeing whether field_extension is correct --> Ask Manuel
 Can the context-command use for-clauses to rename the variables? Or maybe rewrite-clauses are for that?
+
+How to simplify facts during interpretation or locale definition?

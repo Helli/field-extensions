@@ -387,6 +387,33 @@ lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> su
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
+lemma (in field) sum_of_fractions:
+      "n1 \<in> carrier R \<Longrightarrow>
+       n2 \<in> carrier R \<Longrightarrow>
+       d1 \<in> carrier R \<Longrightarrow>
+       d2 \<in> carrier R \<Longrightarrow>
+       d1 \<noteq> \<zero> \<Longrightarrow>
+       d2 \<noteq> \<zero> \<Longrightarrow>
+          n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes>inv (d1\<otimes>d2)"
+proof goal_cases
+  case 1
+  then have
+    "n1\<otimes>inv d1 = (n1\<otimes>d2)\<otimes>inv (d1\<otimes>d2)"
+    "n2\<otimes>inv d2 = (n2\<otimes>d1)\<otimes>inv (d1\<otimes>d2)"
+    by (smt comm_inv_char field.has_inverse local.field_axioms m_closed m_lcomm r_one)+
+  then show ?case
+    by (simp add: 1 field_Units integral_iff l_distr)
+qed
+
+corollary (in field) fraction_sumE[]:
+  assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
+  and "d1 \<noteq> \<zero>" "d2 \<noteq> \<zero>"
+obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otimes>inv d3"
+  and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
+  by (simp add: assms integral_iff sum_of_fractions)
+(*by (metis add.m_closed assms f_e_refl
+ field_extension.K_inv inv_one monoid.m_closed monoid.r_one monoid_axioms one_closed zero_not_one)*)
+
 context field_extension
 begin
 
@@ -488,6 +515,22 @@ lemmas simpler_stuff =
 
 thm UP_ring.monom_inj
 
+lemma wert:
+  assumes "p1 \<in> carrier P" "p2 \<in> carrier P"
+  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<oplus>\<^bsub>L\<^esub> Eval p2 = Eval p3"
+  using assms by (metis UP_a_closed hom_add)
+
+lemma wertwert:
+  assumes "p1 \<in> carrier P" "p2 \<in> carrier P"
+  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<otimes>\<^bsub>L\<^esub> Eval p2 = Eval p3"
+  using assms by (metis UP_mult_closed hom_mult)
+
+lemma wertwertwert:
+  assumes "p1 \<in> carrier P" "p2 \<in> carrier P" "p1 \<noteq> \<zero>" \<open>p2 \<noteq> \<zero>\<close>
+  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<otimes>\<^bsub>L\<^esub> Eval p2 = Eval p3" and "p3 \<noteq> \<zero>"
+  using assms by (metis (no_types, hide_lams) integral ring.hom_zero ring_hom_closed
+      ring_hom_cring.homh ring_hom_cring_axioms wertwert)
+
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
   shows "field_extension.genfield L K {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in the locale\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
@@ -497,8 +540,39 @@ proof -
     carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
     (is "\<Inter>?\<M> = ?L'")
   proof -
+    have in_field: "\<And>f. f \<in> carrier P \<Longrightarrow> Eval f \<in> carrier L" by simp
     interpret asdf: field_extension L ?L'
-      apply standard sorry
+      apply standard apply (rule subfieldI) apply standard
+             apply (smt S.comm_inv_char S.ring_axioms field.has_inverse local.field_axioms
+          mem_Collect_eq monoid.m_closed partial_object.select_convs(1) ring.hom_closed ring_def
+          subsetI)
+    proof goal_cases
+      case (1 x y)
+      then show ?case apply auto
+      proof goal_cases
+        case (1 n1 n2 d1 d2)
+        show ?case apply (rule exI[where x = "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
+          by (simp add: 1 integral_iff sum_of_fractions)
+      qed
+    next
+      case 2
+      then show ?case by force
+    next
+      case (3 x)
+      then show ?case sorry
+    next
+      case 4
+      then show ?case sorry
+    next
+      case (5 x y)
+      then show ?case sorry
+    next
+      case 6
+      then show ?case sorry
+    next
+      case (7 x)
+      then show ?case sorry
+    qed
     have "?L' \<in> ?\<M>" apply safe
     proof goal_cases
       case (2 x)
