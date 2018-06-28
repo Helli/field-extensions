@@ -500,6 +500,18 @@ begin
 
 lemma Eval_x[simp]: "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
+lemma Eval_sx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c\<otimes>\<^bsub>L\<^esub>s"
+proof goal_cases
+  case 1
+  then have "monom P c 1 = c \<odot> monom P \<one>\<^bsub>L\<^esub> 1"
+    using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
+    by (metis K_subgroup(1) L_extends_K S.r_one additive_subgroup.a_Hcarr carrier_K cring_def
+        domain_def field_def ring.ring_simprules(6) subfield_def subfield_one)
+  then show ?case
+    by (metis "1" Eval_smult Eval_x L_extends_K One_nat_def S.subring_def carrier_K id_apply
+        monom_closed subfield_def)
+qed
+
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" unfolding
   Eval_monom[simplified] apply auto
   by (meson K_subgroup(1) S.r_one additive_subgroup.a_Hcarr)
@@ -512,6 +524,7 @@ lemma simple_stuff[simp]:
 lemmas simpler_stuff =
   monom_inj[simplified]
   monom_closed[simplified]
+  monom_mult_smult[simplified]
 
 thm UP_ring.monom_inj
 
@@ -532,7 +545,7 @@ lemma wertwertwert:
       ring_hom_cring.homh ring_hom_cring_axioms wertwert)
 
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
-  shows "field_extension.genfield L K {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in the locale\<close>
+  shows "genfield {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding genfield_def hull_def apply simp
 proof -

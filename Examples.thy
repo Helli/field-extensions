@@ -40,6 +40,7 @@ lemma \<K>_id_eval:
 lemma ring_standard_ring:
   "ring (standard_ring (range rat_of_int))"
   "ring (standard_ring (range real_of_rat))"
+  "ring (standard_ring (range complex_of_real))"
   unfolding standard_ring_def
   apply standard
                apply auto
@@ -53,7 +54,11 @@ lemma ring_standard_ring:
      apply (smt of_rat_minus)
   using Rats_def apply auto[1]
   using ring_class.ring_distribs(2) apply blast
-  by (simp add: ring_class.ring_distribs(1))
+  apply (simp add: ring_class.ring_distribs(1))
+  using Reals_def apply auto[1]
+  apply (simp add: add_eq_0_iff)
+  using Reals_def apply auto[1]
+  by (simp_all add: ring_class.ring_distribs)
 (*interpretation r_s_r: ring "standard_ring (range rat_of_int)" by (simp add: ring_standard_ring)*)
 
 lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int))"
@@ -83,5 +88,70 @@ lemma f_e_example: "field_extension real_field (range real_of_rat)"
   apply (simp add: field_extension_def field_extension_axioms_def)
   using subfield_example field.normalize_subfield standard_ring_def
   by (metis field_examples(2) partial_object.select_convs(1))
+
+lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
+  apply standard
+                   apply (auto simp: standard_ring_def)
+  using Reals_def apply auto[1]
+  unfolding Units_def apply auto
+      apply (metis add_cancel_left_left add_diff_cancel_right' add_uminus_conv_diff of_real_minus)
+  using Reals_def of_real_mult apply auto[1]
+  apply (simp_all add: ring_class.ring_distribs)
+  by (metis divide_inverse divide_self_if mult.commute of_real_eq_1_iff of_real_mult)
+
+lemma subfield_example': \<open>field.subfield complex_field (standard_ring (range complex_of_real))\<close>
+  unfolding field.subfield_def[OF field_examples(3)]
+  apply (auto simp: complex_field_def ring.subring_def[OF \<U>_ring])
+       apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
+   apply (metis ring_standard_ring(3) standard_ring_def)
+  by (metis f_r_o_r' standard_ring_def)
+
+lemma f_e_example': "field_extension complex_field (range complex_of_real)"
+  apply (simp add: field_extension_def field_extension_axioms_def)
+  using subfield_example' field.normalize_subfield standard_ring_def
+  by (metis field_examples(3) partial_object.select_convs(1))
+
+lemma "field_extension.genfield complex_field (range of_real) {\<i>} = UNIV"
+proof -
+  define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
+  define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
+  interpret f_e_UP P \<i> Eval complex_field "(range of_real)"
+    unfolding f_e_UP_def apply (auto simp: f_e_example')
+    unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
+    unfolding UP_pre_univ_prop_def apply auto
+    unfolding ring_hom_cring_def apply auto
+    apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
+        partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
+       apply (simp add: \<U>_cring complex_field_def)
+    unfolding ring_hom_cring_axioms_def
+      apply (simp add: complex_field_def ring_hom_memI univ_ring_def)
+    unfolding UP_cring_def
+    apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
+        partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
+    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by auto
+  note a = "16_5_light"
+  show ?thesis unfolding a apply auto
+  proof goal_cases
+    case (1 x)
+    have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
+      unfolding complex_field_def univ_ring_def m_inv_def by simp
+    have "x =
+    (Eval
+      (monom P (complex_of_real (Im x))
+        1) \<oplus>\<^bsub>complex_field\<^esub>
+     complex_of_real
+      (Re x))" unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
+      unfolding complex_field_def univ_ring_def by (auto simp: add.commute complex_eq
+          mult.commute)
+    show ?case
+      apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
+      apply (rule exI[of _ "monom P 1 0"])
+      apply auto
+      unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
+       \<open>x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re
+          x)\<close> complex_field_def ring.simps(2) univ_ring_def
+      by metis
+  qed
+qed
 
 end
