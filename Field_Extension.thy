@@ -498,9 +498,10 @@ locale f_g_field_extension = field_extension +
 locale f_e_UP = UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension L K for L (structure) and K
 begin
 
-lemma Eval_x[simp]: "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
+lemma Eval_x[simp]: (*rm?*)
+  "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
-lemma Eval_sx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c\<otimes>\<^bsub>L\<^esub>s"
+lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c\<otimes>\<^bsub>L\<^esub>s"
 proof goal_cases
   case 1
   then have "monom P c 1 = c \<odot> monom P \<one>\<^bsub>L\<^esub> 1"

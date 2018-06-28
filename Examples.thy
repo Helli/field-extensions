@@ -115,7 +115,7 @@ lemma "field_extension.genfield complex_field (range of_real) {\<i>} = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
-  interpret f_e_UP P \<i> Eval complex_field "(range of_real)"
+  interpret f_e_UP P \<i> Eval complex_field "range of_real"
     unfolding f_e_UP_def apply (auto simp: f_e_example')
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto
