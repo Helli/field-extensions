@@ -403,14 +403,12 @@ proof goal_cases
     by (simp add: 1 field_Units integral_iff l_distr)
 qed
 
-corollary (in field) fraction_sumE[]:
+corollary (in field) fraction_sumE:
   assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
   and "d1 \<noteq> \<zero>" "d2 \<noteq> \<zero>"
 obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otimes>inv d3"
   and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
   by (simp add: assms integral_iff sum_of_fractions)
-(*by (metis add.m_closed assms f_e_refl
- field_extension.K_inv inv_one monoid.m_closed monoid.r_one monoid_axioms one_closed zero_not_one)*)
 
 context field_extension
 begin
