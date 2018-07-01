@@ -40,8 +40,8 @@ lemma "\<Inter>_is_supergroup":
   "group G \<Longrightarrow> \<M> \<noteq> {} \<Longrightarrow> \<forall>M\<in>\<M>. H \<subseteq> M \<and> subgroup M G \<Longrightarrow> subgroup H (G\<lparr>carrier:=\<Inter>\<M>\<rparr>)"
 \<comment> \<open>Cannot use @{thm group.subgroupI} because @{locale subgroup} does not extend @{locale group}\<close>
   apply unfold_locales apply auto using group.subgroups_Inter
-  by (metis (mono_tags) Collect_mem_eq Inf_greatest contra_subsetD empty_Collect_eq
-      group.subgroup_inv_equality subgroup.m_inv_closed subgroup_axioms)
+  by (metis (mono_tags) Collect_mem_eq Inf_greatest empty_Collect_eq group.subgroup_incl
+      subgroup.m_inv_closed subgroup_axioms)
 
 lemma generated_group:
   "S \<subseteq> carrier G \<Longrightarrow> group G \<Longrightarrow> subgroup H (G\<lparr>carrier:=(\<lambda>M. subgroup M G \<and> H \<subseteq> M) hull S\<rparr>)"
@@ -313,7 +313,7 @@ lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
 lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq> \<zero>"
   using Units_inv_Units field_Units by auto
 
-lemmas maybe_useful[simp] = group.subgroup_inv_equality[OF units_group, simplified]
+lemmas maybe_useful[simp] = group.m_inv_consistent[OF units_group, simplified]
 
 lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
@@ -398,7 +398,7 @@ proof goal_cases
   then have
     "n1\<otimes>inv d1 = (n1\<otimes>d2)\<otimes>inv (d1\<otimes>d2)"
     "n2\<otimes>inv d2 = (n2\<otimes>d1)\<otimes>inv (d1\<otimes>d2)"
-    by (smt comm_inv_char field.has_inverse local.field_axioms m_closed m_lcomm r_one)+
+    by (smt comm_inv_char has_inverse m_closed m_lcomm r_one)+
   then show ?case
     by (simp add: 1 field_Units integral_iff l_distr)
 qed
