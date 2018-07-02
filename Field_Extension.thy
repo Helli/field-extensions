@@ -641,10 +641,15 @@ proof -
       then have "?L' \<subseteq> M" apply auto
       proof goal_cases
         case (1 f g)
-        then have "field (L\<lparr>carrier := M\<rparr>)"
-          by (simp add: field_extension.K_field)
-        then have "Eval f \<in> M" "Eval g \<in> M" sorry
-        then show ?case sorry
+        then interpret asdfasdf: f_e_UP P s Eval "L\<lparr>carrier := M\<rparr>" K apply auto
+          subgoal unfolding f_e_UP_def apply auto using intermediate_field_1 sorry
+          using P_def apply linarith unfolding Eval_def eval_def apply (auto split: if_splits)
+          sorry
+        have "Eval f \<in> M" "Eval g \<in> M"
+          using "1"(4,5) asdfasdf.ring.hom_closed by auto
+        then show ?case
+          by (metis (no_types, lifting) "1"(1) "1"(6) S.subring_def field_extension.K_inv
+              field_extension.K_subring field_extension.carrier_K ring.ring_simprules(5))
       qed
     }
     ultimately show ?thesis
