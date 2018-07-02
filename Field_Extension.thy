@@ -556,9 +556,8 @@ proof -
     have in_field: "\<And>f. f \<in> carrier P \<Longrightarrow> Eval f \<in> carrier L" by simp
     interpret asdf: field_extension L ?L'
       apply standard apply (rule subfieldI) apply standard
-             apply (smt S.comm_inv_char S.ring_axioms field.has_inverse local.field_axioms
-          mem_Collect_eq monoid.m_closed partial_object.select_convs(1) ring.hom_closed ring_def
-          subsetI)
+      apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
+          partial_object.select_convs(1) ring.hom_closed subsetI)
     proof goal_cases
       case (1 x y)
       then show ?case apply auto
