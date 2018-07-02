@@ -310,8 +310,11 @@ lemma subgroup_add: \<open>subfield S \<Longrightarrow> abelian_subgroup (carrie
 lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
   by (metis Diff_subset Units_m_closed Units_one_closed field_Units submonoid.intro)
 
-lemma inv_nonzero: "a \<in> carrier R-{\<zero>} \<Longrightarrow> inv a \<noteq> \<zero>"
+lemma inv_nonzero (*rm*): "x \<in> carrier R-{\<zero>} \<Longrightarrow> inv x \<noteq> \<zero>"
   using Units_inv_Units field_Units by auto
+
+lemma inv_nonzero': "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
+  by (simp add: inv_nonzero local.field_axioms)
 
 lemmas maybe_useful[simp] = group.m_inv_consistent[OF units_group, simplified]
 
@@ -460,11 +463,11 @@ proof goal_cases
     case 1
     have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
       by simp
-    with \<open>\<M> \<noteq> {}\<close> have a: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}|M. M \<in> \<M>}\<rparr>)"
+    with \<open>\<M> \<noteq> {}\<close> have minus_swap: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}|M. M \<in> \<M>}\<rparr>)"
       by (simp add: trivial(2))
     have "mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>) = mult_of L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>"
       using "1"(2) Diff_iff by blast
-    then show ?case unfolding a apply simp
+    then show ?case unfolding minus_swap apply simp
       apply (rule "subgroup.\<Inter>_is_supergroup")
       using 1 apply auto using K_subgroup apply simp
       using field_mult_group apply simp
@@ -569,19 +572,53 @@ proof -
       then show ?case by force
     next
       case (3 x)
-      then show ?case sorry
+      have inv_simp: "inv\<^bsub>add_monoid L\<^esub> x = \<ominus>\<^bsub>L\<^esub> x"
+        by (simp add: a_inv_def)
+      from 3 show ?case apply (auto simp: inv_simp)
+      proof goal_cases
+        case (1 f g)
+        show ?case apply (rule exI[of _ "\<ominus>f"], rule exI[of _ "g"]) using 1 apply auto
+          by (metis S.comm_inv_char S.l_minus has_inverse in_field)
+      qed
     next
       case 4
-      then show ?case sorry
+      then show ?case apply auto
+        by (metis S.comm_inv_char S.m_closed has_inverse ring.hom_closed)
     next
       case (5 x y)
-      then show ?case sorry
+      then show ?case apply auto
+      proof goal_cases
+        case (1 f1 g1 f2 g2)
+        show ?case apply (rule exI[of _ "f1\<otimes>f2"], rule exI[of _ "g1\<otimes>g2"]) using 1 apply auto
+          apply (smt S.comm_inv_char S.l_one S.m_closed S.m_comm cring.cring_simprules(11)
+              domain.integral_iff domain_def field_def field_extension_axioms field_extension_def
+              has_inverse in_field)
+          using local.integral by blast
+      qed (metis S.comm_inv_char S.m_closed has_inverse local.integral ring.hom_closed)
     next
       case 6
-      then show ?case sorry
+      then show ?case by force
     next
       case (7 x)
-      then show ?case sorry
+      have [simp]: "x \<in> carrier L \<Longrightarrow> m_inv (mult_of L) x = m_inv L x"
+        using "7" m_inv_mult_of by auto
+      with 7 have [simp]: "m_inv (mult_of L) x = m_inv L x"
+        apply auto
+        by (metis S.comm_inv_char S.m_closed \<open>x \<in> carrier L \<Longrightarrow> inv\<^bsub>mult_of L\<^esub> x = inv\<^bsub>L\<^esub> x\<close>
+            has_inverse in_field)
+      from 7 show ?case apply auto
+      proof goal_cases
+        case (1 f g)
+        then have Eval_f_nonzero: "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>"
+          by (metis S.comm_inv_char S.semiring_axioms has_inverse in_field semiring.l_null)
+        show ?case apply (rule exI[of _ "g"], rule exI[of _ "f"]) using 1 Eval_f_nonzero
+          apply auto
+          by (smt S.comm_inv_char S.cring_fieldI2 S.l_one S.m_closed S.m_comm
+              cring.cring_simprules(11) domain_def field_def has_inverse in_field zero_not_one)
+        case 2 then show ?case
+          by (metis S.comm_inv_char S.semiring_axioms has_inverse ring.hom_closed semiring.r_null
+              semiring.semiring_simprules(3))
+      qed
     qed
     have "?L' \<in> ?\<M>" apply safe
     proof goal_cases
