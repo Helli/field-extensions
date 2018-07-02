@@ -57,7 +57,8 @@ lemma (in comm_group) subgroup_group:
 
 lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. inv a1 \<otimes> a2 \<in> A\<rbrakk>
   \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
-  by (metis (full_types) contra_subsetD inv_inv r_one subgroup_def subgroup_group subgroup_self)
+  by (metis (no_types, lifting) Units_def Units_eq Units_inv_inv r_one set_mp subgroup.m_inv_closed
+      subgroup_group subgroup_self)
 
 lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
@@ -94,7 +95,6 @@ lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r
   \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
   unfolding subring_def apply auto
   apply (rule ringI)
-     apply auto
      apply (rule abelian_groupI)
           apply auto
          apply (metis add.inv_closed local.minus_minus r_zero ring_simprules(9) subsetCE)

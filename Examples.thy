@@ -128,7 +128,7 @@ proof -
     unfolding UP_cring_def
     apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
         partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
-    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by auto
+    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by simp+
   note a = "16_5_light"
   show ?thesis unfolding a apply auto
   proof goal_cases
