@@ -196,6 +196,10 @@ lemma subring_imp_submonoid:
 lemma intermediate_ring_1:
   "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>) \<Longrightarrow> subring (R\<lparr>carrier:=M\<rparr>)"
   unfolding subring_def by auto
+lemma intermediate_ring_2:
+  "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>)
+    \<Longrightarrow> ring.subring (R\<lparr>carrier:=M\<rparr>) S"
+  unfolding subring_def ring.subring_def by auto
 
 lemma subring_ring_hom_ring: "subring S \<Longrightarrow> ring_hom_ring S R id" apply intro_locales unfolding subring_def
   subgoal using abelian_group.axioms(1) ring.is_abelian_group subring_def by blast
@@ -419,6 +423,10 @@ begin
 lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
   apply unfold_locales unfolding subfield_def apply auto unfolding field_def
   using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
+lemma intermediate_field_2:
+  "K \<subseteq> M \<Longrightarrow> field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> field_extension (L\<lparr>carrier:=M\<rparr>) K"
+  by (metis K_field K_subring carrier_K cring_def domain_def field.f_e_iff_subfield
+      field.normalize_subfield field.subfield_def field_def intermediate_ring_2)
 
 lemma trivial (*todo: put outside*):
   "add_monoid (L\<lparr>carrier := A\<rparr>) = (add_monoid L)\<lparr>carrier := A\<rparr>"
@@ -488,6 +496,9 @@ corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<l
 
 interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
   by (simp add: K_subring subring_ring_hom_cring)
+
+interpretation UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
+   by intro_locales
 
 end
 
@@ -582,7 +593,7 @@ proof -
     next
       case 4
       then show ?case apply auto
-        by (metis S.comm_inv_char S.m_closed has_inverse ring.hom_closed)
+        by (metis S.comm_inv_char S.m_closed has_inverse hom_closed)
     next
       case (5 x y)
       then show ?case apply auto
@@ -640,15 +651,38 @@ proof -
       then have "?L' \<subseteq> M" apply auto
       proof goal_cases
         case (1 f g)
-        then interpret asdfasdf: f_e_UP P s Eval "L\<lparr>carrier := M\<rparr>" K apply auto
-          subgoal unfolding f_e_UP_def apply auto using intermediate_field_1 sorry
-          using P_def apply linarith unfolding Eval_def eval_def apply (auto split: if_splits)
+        define P' where "P' = UP (L\<lparr>carrier := K\<rparr>)"
+        define Eval' where "Eval' = eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
+        from 1 interpret asdfasdf: f_e_UP P' s Eval' "L\<lparr>carrier := M\<rparr>" K
+          apply auto
+          subgoal unfolding f_e_UP_def apply auto
+            unfolding UP_univ_prop_def apply auto
+          proof goal_cases
+            case 1
+            note intermediate_field_2[of M]
+            then have tmp: "field_extension (L\<lparr>carrier := M\<rparr>) K" (*to-do: pull out one level*)
+              using 1 field_extension.K_field by blast
+            then show ?case
+              by (metis "1"(2) K_subring S.intermediate_ring_2 UP_pre_univ_prop_def carrier_K
+                  cring.subring_ring_hom_cring cring_def domain_def field_def field_extension_def
+                  is_UP_cring)
+          next
+            case 2
+            then show ?case
+              by (simp add: UP_univ_prop_axioms_def)
+          next
+            case 3
+            then show ?case
+              using f_e_iff_subfield intermediate_field_2 subfield_def by blast
+          qed
+          by (simp_all add: P'_def Eval'_def)
+        from 1 have "f \<in> carrier P'" "g \<in> carrier P'"
+          unfolding P'_def P_def by blast+
+        with 1 have "Eval' f \<in> M" (*"Eval' g \<in> M"*)
+          using field_extension.carrier_K by blast+
+        with 1 have "Eval f \<in> M" (*"Eval g \<in> M"*) unfolding Eval_def Eval'_def apply -
           sorry
-        have "Eval f \<in> M" "Eval g \<in> M"
-          using "1"(4,5) asdfasdf.ring.hom_closed by auto
-        then show ?case
-          by (metis (no_types, lifting) "1"(1) "1"(6) S.subring_def field_extension.K_inv
-              field_extension.K_subring field_extension.carrier_K ring.ring_simprules(5))
+        then show ?case sorry
       qed
     }
     ultimately show ?thesis
