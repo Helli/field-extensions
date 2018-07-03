@@ -497,7 +497,7 @@ corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<l
 interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
   by (simp add: K_subring subring_ring_hom_cring)
 
-interpretation UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
+interpretation f_e_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
 
 lemma pow_simp[simp]:
@@ -507,13 +507,34 @@ lemma pow_simp[simp]:
 term " eval"
 
 lemma "\<Oplus>_simp"[simp]:
-  assumes "\<And>i. v i \<in> K"
+  assumes "v ` A \<subseteq> K"
   shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto apply (induction A rule: infinite_finite_induct)
+  unfolding finsum_def apply auto using assms apply (induction A rule: infinite_finite_induct)
   apply (simp add: finprod_def)
    apply (simp add: finprod_def K_subgroup(1) additive_subgroup.zero_closed)
-  using comm_monoid.finprod_insert[of "add_monoid L", simplified] sledgehammer
-  apply (fold finprod_def)
+proof goal_cases
+  case (1 x F)
+  have a: "v \<in> F \<rightarrow> K"
+    using "1"(4) by blast
+  moreover have "K \<subseteq> carrier L"
+    by (simp add: K_subgroup(1) additive_subgroup.a_subset)
+  ultimately have b: "v \<in> F \<rightarrow> carrier L"
+    by fast
+  have d: "v x \<in> K"
+    using "1"(4) by blast
+  then have e: "v x \<in> carrier L"
+    using \<open>K \<subseteq> carrier L\<close> by blast
+  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)"
+    using emb.abelian_monoid_axioms by blast
+  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
+    by (simp add: abelian_monoid_def)
+  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ 1(1,2) b e, simplified]
+  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus> finprod (add_monoid L) v F"
+    using local.add.comm_monoid_axioms by blast
+  with 1 comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f 1(1,2) a d, simplified]
+  show ?case
+    by auto
+qed
 
 end
 
