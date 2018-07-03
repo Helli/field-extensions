@@ -500,6 +500,21 @@ interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
 interpretation UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
 
+lemma pow_simp[simp]:
+  fixes n :: nat
+  shows "x \<in> K \<Longrightarrow> x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
+  using emb.hom_pow by auto
+term " eval"
+
+lemma "\<Oplus>_simp"[simp]:
+  assumes "\<And>i. v i \<in> K"
+  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
+  unfolding finsum_def apply auto apply (induction A rule: infinite_finite_induct)
+  apply (simp add: finprod_def)
+   apply (simp add: finprod_def K_subgroup(1) additive_subgroup.zero_closed)
+  using comm_monoid.finprod_insert[of "add_monoid L", simplified] sledgehammer
+  apply (fold finprod_def)
+
 end
 
 locale f_g_field_extension = field_extension +
@@ -680,6 +695,13 @@ proof -
           unfolding P'_def P_def by blast+
         with 1 have "Eval' f \<in> M" (*"Eval' g \<in> M"*)
           using field_extension.carrier_K by blast+
+        have "S.subring (L\<lparr>carrier := M\<rparr>)"
+          by (simp add: "1"(1) field_extension.K_subring)
+        then have \<open>\<forall>p \<in> carrier P. eval (L\<lparr>carrier := K\<rparr>) L id s p \<in> M \<longrightarrow> eval (L\<lparr>carrier := K\<rparr>)
+          (L\<lparr>carrier := M\<rparr>) id s p \<in> M\<close> unfolding P_def apply auto
+          unfolding eval_def apply auto unfolding pow_d
+        have "P = UP (L\<lparr>carrier := K\<rparr>)"
+          by (simp add: P_def)
         with 1 have "Eval f \<in> M" (*"Eval g \<in> M"*) unfolding Eval_def Eval'_def apply -
           sorry
         then show ?case sorry
