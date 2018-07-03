@@ -504,7 +504,6 @@ lemma pow_simp[simp]:
   fixes n :: nat
   shows "x \<in> K \<Longrightarrow> x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
   using emb.hom_pow by auto
-term " eval"
 
 lemma "\<Oplus>_simp"[simp]:
   assumes "v ` A \<subseteq> K"
@@ -690,9 +689,8 @@ proof -
         define P' where "P' = UP (L\<lparr>carrier := K\<rparr>)"
         define Eval' where "Eval' = eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
         from 1 interpret asdfasdf: f_e_UP P' s Eval' "L\<lparr>carrier := M\<rparr>" K
-          apply auto
-          subgoal unfolding f_e_UP_def apply auto
-            unfolding UP_univ_prop_def apply auto
+            apply auto
+          subgoal unfolding f_e_UP_def UP_univ_prop_def apply auto
           proof goal_cases
             case 1
             note intermediate_field_2[of M]
@@ -712,20 +710,37 @@ proof -
               using f_e_iff_subfield intermediate_field_2 subfield_def by blast
           qed
           by (simp_all add: P'_def Eval'_def)
+        have M_mult_closed: "\<And>a b. a \<in> M \<Longrightarrow> b \<in> M \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M"
+          by (metis (no_types, lifting) "1"(1) S.subring_def field_extension.K_subring
+              field_extension.carrier_K ring.ring_simprules(5))
+        have "p \<in> carrier P \<Longrightarrow>
+          (\<lambda>i. coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
+          (is "?assms \<Longrightarrow> ?v ` ?A \<subseteq> M") for p
+        proof -
+          assume ?assms
+          {
+            fix i
+            assume "i \<in> ?A"
+            then have "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" "s [^]\<^bsub>L\<^esub> i \<in> M"
+              using "1"(2) P_def UP.coeff_closed \<open>p \<in> carrier P\<close> carrier_K apply blast
+              using "1"(3) S.nat_pow_consistent asdfasdf.S.nat_pow_closed by auto
+            then have "?v i \<in> M"
+              using \<open>\<And>b a. \<lbrakk>a \<in> M; b \<in> M\<rbrakk> \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M\<close> by blast
+          }
+          then show ?thesis by auto
+        qed
+        note * =
+          "field_extension.\<Oplus>_simp"[OF 1(1) this[OF \<open>f \<in> carrier P\<close>]]
+          "field_extension.\<Oplus>_simp"[OF 1(1) this[OF \<open>g \<in> carrier P\<close>]]
         from 1 have "f \<in> carrier P'" "g \<in> carrier P'"
           unfolding P'_def P_def by blast+
-        with 1 have "Eval' f \<in> M" (*"Eval' g \<in> M"*)
+        with 1 have "Eval' f \<in> M" "Eval' g \<in> M"
           using field_extension.carrier_K by blast+
-        have "S.subring (L\<lparr>carrier := M\<rparr>)"
-          by (simp add: "1"(1) field_extension.K_subring)
-        then have \<open>\<forall>p \<in> carrier P. eval (L\<lparr>carrier := K\<rparr>) L id s p \<in> M \<longrightarrow> eval (L\<lparr>carrier := K\<rparr>)
-          (L\<lparr>carrier := M\<rparr>) id s p \<in> M\<close> unfolding P_def apply auto
-          unfolding eval_def apply auto unfolding pow_d
-        have "P = UP (L\<lparr>carrier := K\<rparr>)"
-          by (simp add: P_def)
-        with 1 have "Eval f \<in> M" (*"Eval g \<in> M"*) unfolding Eval_def Eval'_def apply -
-          sorry
-        then show ?case sorry
+        then have "Eval f \<in> M" "Eval g \<in> M" unfolding Eval_def Eval'_def
+          unfolding eval_def by (auto simp: *
+              field_extension.pow_simp[OF 1(1,3)])
+        then show ?case apply (intro M_mult_closed) apply auto
+          by (simp add: "1"(1) "1"(6) field_extension.K_inv)
       qed
     }
     ultimately show ?thesis
