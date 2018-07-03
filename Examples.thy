@@ -129,8 +129,7 @@ proof -
     apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
         partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
     apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by simp+
-  note a = "16_5_light"
-  show ?thesis unfolding a apply auto
+  show ?thesis unfolding "16_5_light" apply auto
   proof goal_cases
     case (1 x)
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"

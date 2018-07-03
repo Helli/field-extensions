@@ -13,7 +13,7 @@ lemma (in field) comm_group_mult_of:
   shows "comm_group (mult_of R)"
   apply (rule group.group_comm_groupI groupI)
   apply (fact field_mult_group)
-  by (auto simp: mult_of_simps m_comm)
+  by (auto simp: m_comm)
 
 lemma (in subgroup) subgroup_is_comm_group [intro]:
   assumes "comm_group G"
@@ -30,7 +30,6 @@ qed
 lemma (in field) deduplicate[simp]: "units_of R = mult_of R"
   unfolding mult_of_def units_of_def by (simp add: field_Units)
 
-lemmas [simp] = mult_of_simps
 lemmas (in field) [simp] = units_of_inv[simplified] units_of_inv
 
 context subgroup
@@ -571,24 +570,6 @@ lemmas simpler_stuff =
   monom_inj[simplified]
   monom_closed[simplified]
   monom_mult_smult[simplified]
-
-thm UP_ring.monom_inj
-
-lemma wert:
-  assumes "p1 \<in> carrier P" "p2 \<in> carrier P"
-  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<oplus>\<^bsub>L\<^esub> Eval p2 = Eval p3"
-  using assms by (metis UP_a_closed hom_add)
-
-lemma wertwert:
-  assumes "p1 \<in> carrier P" "p2 \<in> carrier P"
-  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<otimes>\<^bsub>L\<^esub> Eval p2 = Eval p3"
-  using assms by (metis UP_mult_closed hom_mult)
-
-lemma wertwertwert:
-  assumes "p1 \<in> carrier P" "p2 \<in> carrier P" "p1 \<noteq> \<zero>" \<open>p2 \<noteq> \<zero>\<close>
-  obtains p3 where "p3 \<in> carrier P" and "Eval p1 \<otimes>\<^bsub>L\<^esub> Eval p2 = Eval p3" and "p3 \<noteq> \<zero>"
-  using assms by (metis (no_types, hide_lams) integral ring.hom_zero ring_hom_closed
-      ring_hom_cring.homh ring_hom_cring_axioms wertwert)
 
 proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
   shows "genfield {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
