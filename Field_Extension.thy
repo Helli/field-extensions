@@ -291,7 +291,7 @@ lemma subfield_imp_subgroup:
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
       submonoid.mem_carrier)
 
-lemma subfield_sane: (*also a better def?*) \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
+lemma subfield_altdef: \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
   additive_subgroup S R \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
   apply auto using subgroup_add abelian_subgroup_def apply force
   using subfield_imp_subgroup apply force
@@ -316,8 +316,8 @@ lemma K_subring: "subring (L\<lparr>carrier:=K\<rparr>)"
   using L_extends_K subfield_def by blast
 
 lemmas K_subgroup =
-  L_extends_K[unfolded subfield_sane, THEN conjunct1]
-  L_extends_K[unfolded subfield_sane, THEN conjunct2]
+  L_extends_K[unfolded subfield_altdef, THEN conjunct1]
+  L_extends_K[unfolded subfield_altdef, THEN conjunct2]
 
 lemma carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
@@ -348,30 +348,7 @@ lemma (in field) field_extension_iff_subfield: "field_extension R K \<longleftri
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
-lemma (in field) sum_of_fractions:
-      "n1 \<in> carrier R \<Longrightarrow>
-       n2 \<in> carrier R \<Longrightarrow>
-       d1 \<in> carrier R \<Longrightarrow>
-       d2 \<in> carrier R \<Longrightarrow>
-       d1 \<noteq> \<zero> \<Longrightarrow>
-       d2 \<noteq> \<zero> \<Longrightarrow>
-          n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes>inv (d1\<otimes>d2)"
-proof goal_cases
-  case 1
-  then have
-    "n1\<otimes>inv d1 = (n1\<otimes>d2)\<otimes>inv (d1\<otimes>d2)"
-    "n2\<otimes>inv d2 = (n2\<otimes>d1)\<otimes>inv (d1\<otimes>d2)"
-    by (smt comm_inv_char has_inverse m_closed m_lcomm r_one)+
-  then show ?case
-    by (simp add: 1 field_Units integral_iff l_distr)
-qed
-
-corollary (in field) fraction_sumE:
-  assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
-  and "d1 \<noteq> \<zero>" "d2 \<noteq> \<zero>"
-obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otimes>inv d3"
-  and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
-  by (simp add: assms integral_iff sum_of_fractions)
+subsection \<open>Intersections of intermediate fields\<close>
 
 context field_extension
 begin
@@ -385,13 +362,13 @@ lemma intermediate_field_2:
       field.normalize_subfield field.subfield_def field_def intermediate_ring_2)
 
 lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
-  apply (unfold_locales) apply (auto simp add: subfield_sane)
+  apply (unfold_locales) apply (auto simp add: subfield_altdef)
   apply (metis add.subgroups_Inter additive_subgroup.a_subgroup additive_subgroupI equals0D
       field_extension.K_subgroup(1))
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
-    by (smt equals0D field.field_extension_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
+    by (smt equals0D field.field_extension_iff_subfield local.field_axioms mem_Collect_eq subfield_altdef
         intersect_nonzeros)
 qed
 
@@ -400,16 +377,15 @@ corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. fie
 
 lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
 
-thm group.subgroups_Inter
-  "subgroup.\<Inter>_is_supergroup"[of _ L]
-  "subgroup.\<Inter>_is_supergroup"[of _ "L\<lparr>carrier := carrier L -{\<zero>}\<rparr>", simplified]
-proposition "16_3_"[intro]:
+text \<open>Proposition 16.3 of Prof. Gregor Kemper's lecture notes\<close>
+
+proposition intersection_of_intermediate_fields_is_field_extension[intro]:
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
   note to_subfield =
     field.field_extension_iff_subfield[OF "16_3_aux"[OF 1]]
-    field.subfield_sane[OF "16_3_aux"[OF 1]]
+    field.subfield_altdef[OF "16_3_aux"[OF 1]]
   from 1 show ?case
     unfolding to_subfield additive_subgroup_def apply safe
     apply (unfold add_monoid_update)
@@ -520,6 +496,31 @@ subsection \<open>finitely generated field extensions\<close>
 
 locale finitely_generated_field_extension = field_extension +
   assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+
+lemma (in field) sum_of_fractions:
+      "n1 \<in> carrier R \<Longrightarrow>
+       n2 \<in> carrier R \<Longrightarrow>
+       d1 \<in> carrier R \<Longrightarrow>
+       d2 \<in> carrier R \<Longrightarrow>
+       d1 \<noteq> \<zero> \<Longrightarrow>
+       d2 \<noteq> \<zero> \<Longrightarrow>
+          n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes>inv (d1\<otimes>d2)"
+proof goal_cases
+  case 1
+  then have
+    "n1\<otimes>inv d1 = (n1\<otimes>d2)\<otimes>inv (d1\<otimes>d2)"
+    "n2\<otimes>inv d2 = (n2\<otimes>d1)\<otimes>inv (d1\<otimes>d2)"
+    by (smt comm_inv_char has_inverse m_closed m_lcomm r_one)+
+  then show ?case
+    by (simp add: 1 field_Units integral_iff l_distr)
+qed
+
+corollary (in field) fraction_sumE:
+  assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
+  and "d1 \<noteq> \<zero>" "d2 \<noteq> \<zero>"
+obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otimes>inv d3"
+  and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
+  by (simp add: assms integral_iff sum_of_fractions)
 
 text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes (only for \<^prop>\<open>S = {s}\<close>)\<close>
 
