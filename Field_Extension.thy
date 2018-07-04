@@ -20,10 +20,17 @@ proof -
         submonoid_is_comm_monoid)
 qed
 
+lemma add_monoid_update[simp]: "add_monoid (L\<lparr>carrier := A\<rparr>) = (add_monoid L)\<lparr>carrier := A\<rparr>"
+  by simp
+
+lemma (in abelian_monoid) intersect_nonzeros:
+  "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
+  by auto
+
 lemma (in field) deduplicate[simp]: "units_of R = mult_of R"
   unfolding mult_of_def units_of_def by (simp add: field_Units)
 
-lemmas (in field) [simp] = units_of_inv[simplified] units_of_inv
+lemmas (in field) inv_simps[simp] = units_of_inv[simplified] units_of_inv
 
 context subgroup
 begin
@@ -377,11 +384,6 @@ lemma intermediate_field_2:
   by (metis K_field K_subring carrier_K cring_def domain_def field.field_extension_iff_subfield
       field.normalize_subfield field.subfield_def field_def intermediate_ring_2)
 
-lemma trivial (*todo: put outside*):
-  "add_monoid (L\<lparr>carrier := A\<rparr>) = (add_monoid L)\<lparr>carrier := A\<rparr>"
-  "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
-  by auto
-
 lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
   apply (unfold_locales) apply (auto simp add: subfield_sane)
   apply (metis add.subgroups_Inter additive_subgroup.a_subgroup additive_subgroupI equals0D
@@ -390,7 +392,7 @@ proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
     by (smt equals0D field.field_extension_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
-        trivial(2))
+        intersect_nonzeros)
 qed
 
 corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
@@ -410,7 +412,7 @@ proof goal_cases
     field.subfield_sane[OF "16_3_aux"[OF 1]]
   from 1 show ?case
     unfolding to_subfield additive_subgroup_def apply safe
-    apply (unfold trivial)
+    apply (unfold add_monoid_update)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
     apply (simp add: additive_subgroup.a_subgroup field_extension.K_subgroup(1)
         field_extension_axioms)
@@ -421,7 +423,7 @@ proof goal_cases
     have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
       by simp
     with \<open>\<M> \<noteq> {}\<close> have minus_swap: "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>}|M. M \<in> \<M>}\<rparr>)"
-      by (simp add: trivial(2))
+      by (simp add: intersect_nonzeros)
     have "mult_of (L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>) = mult_of L\<lparr>carrier := \<Inter>{M-{\<zero>} |M. M \<in> \<M>}\<rparr>"
       using "1"(2) Diff_iff by blast
     then show ?case unfolding minus_swap apply simp
@@ -696,5 +698,4 @@ lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mul
 
 value INTEG value "\<Z>" \<comment> \<open>duplicate constant\<close>
 
-unused_thms
 end
