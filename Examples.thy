@@ -115,8 +115,8 @@ lemma genfield_\<i>_UNIV: "field_extension.genfield complex_field (range complex
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
-  interpret f_e_UP P \<i> Eval complex_field "range of_real"
-    unfolding f_e_UP_def apply (auto simp: f_e_example')
+  interpret field_extension_with_UP P \<i> Eval complex_field "range of_real"
+    unfolding field_extension_with_UP_def apply (auto simp: f_e_example')
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto
     unfolding ring_hom_cring_def apply auto
@@ -129,7 +129,7 @@ proof -
     apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
         partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
     apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by simp+
-  show ?thesis unfolding "16_5_light" apply auto
+  show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
@@ -150,9 +150,9 @@ proof -
 qed
 
 corollary finitely_generated_field_extension_complex_over_real:
-  \<open>f_g_field_extension complex_field (range complex_of_real)\<close>
-  unfolding f_g_field_extension_def f_g_field_extension_axioms_def apply auto
-  apply (simp add: f_e_example') using genfield_\<i>_UNIV
+  \<open>finitely_generated_field_extension complex_field (range complex_of_real)\<close>
+  unfolding finitely_generated_field_extension_def finitely_generated_field_extension_axioms_def
+  apply (auto simp add: f_e_example') using genfield_\<i>_UNIV
   by (metis complex_field_def finite.emptyI finite.insertI partial_object.select_convs(1)
       univ_ring_def)
 

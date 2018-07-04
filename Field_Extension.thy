@@ -1,6 +1,5 @@
 theory Field_Extension imports
-"HOL-Algebra.Divisibility"         
-"HOL-Algebra.IntRing"              (* Ideals and residue classes? *)
+"HOL-Algebra.Divisibility"
 "HOL-Algebra.Multiplicative_Group" (* Polynomials *)
 "HOL-Algebra.Group_Action"
 "HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
@@ -48,16 +47,6 @@ lemma generated_group:
   by (meson group.subgroup_self rcosets_carrier subgroup_in_rcosets)
 
 end
-
-lemma (in comm_group) subgroup_group:
-  "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. a1\<otimes>a2\<in>A \<and> m_inv G a1\<in>A\<rbrakk> \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
-  by (metis all_not_in_conv comm_group_axioms comm_group_def subgroup.subgroup_is_group subgroupI
-      submonoid_def submonoid_is_comm_monoid)
-
-lemma (in comm_group) subgroup_group': "\<lbrakk>A \<subseteq> carrier G; \<one>\<in>A; \<forall>a1\<in>A.\<forall>a2\<in>A. inv a1 \<otimes> a2 \<in> A\<rbrakk>
-  \<Longrightarrow> comm_group (G\<lparr>carrier:=A\<rparr>)"
-  by (metis (no_types, lifting) Units_def Units_eq Units_inv_inv r_one set_mp subgroup.m_inv_closed
-      subgroup_group subgroup_self)
 
 lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
@@ -257,10 +246,6 @@ lemmas group_mult_of_subgroup = subgroup.subgroup_is_comm_group[OF _ units_comm_
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
 
-interpretation (*todo: useful? as global_interpretation? name needed? already in ring or even in monoid?*)
-fsdf: comm_group "mult_of R" by (fact units_comm_group[simplified])
-    \<comment> \<open>@{thm[source] group_mult_of_subgroup} exists, but does not give commutativity...\<close>
-
 lemma subfieldI:
   assumes "additive_subgroup A R"
   and "subgroup (A-{\<zero>}) (mult_of R)"
@@ -291,20 +276,10 @@ proof -
   fix a :: 'a
   assume a1: "a \<in> A"
   assume a2: "a \<noteq> \<zero>"
-  have f3: "\<forall>Aa. a \<in> A - Aa \<or> a \<in> Aa"
-    using a1 by blast
-  then have f4: "a \<in> {\<zero>} \<or> inv\<^bsub>mult_of R\<^esub> a \<in> A"
-    by (metis (no_types) Diff_iff assms(2) subgroup_def)
-  have f5: "A - {\<zero>} \<subseteq> carrier (mult_of R)"
-    by (metis (no_types) assms(2) subgroup_def)
-  have f6: "\<forall>aa. a = aa \<or> a \<in> insert aa A - {aa}"
-using a1 by fastforce
-  have f7: "\<one>\<^bsub>mult_of R\<^esub> \<in> carrier (mult_of R)"
-    by blast
-  have "inv\<^bsub>mult_of R\<^esub> a \<in> carrier (mult_of R)"
-    using f5 f3 a2 by blast
-then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
-  using f7 f6 f5 f4 f3 a2 by (metis (no_types) Diff_iff contra_subsetD fsdf.inv_solve_left fsdf.r_one mult_mult_of one_mult_of)
+  have "\<forall>a. (a \<in> {\<zero>} \<or> a \<in> Units R) \<or> a \<notin> A"
+    by (metis (no_types) Diff_iff assms(2) carrier_mult_of contra_subsetD local.field_Units subgroup_def)
+  then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
+    using a2 a1 by (metis (no_types) Diff_iff Units_r_inv assms(2) empty_iff field.deduplicate insert_iff local.field_axioms subgroup_def units_of_inv)
 qed
 
 lemma subgroup_add: \<open>subfield S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
@@ -325,15 +300,15 @@ lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
   apply (drule normalize_subfield)
   apply (rule group.subgroupI)
-  apply (simp add: fsdf.is_group) unfolding subfield_def subring_def apply auto[]
+  apply (simp add: field_mult_group) unfolding subfield_def subring_def apply auto[]
   apply simp
     apply auto[1] apply simp
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
   using set_rev_mp
-  apply (metis (no_types, lifting) Units_one_closed comm_inv_char deduplicate unit_factor units_of_inv)
-  apply (metis (no_types) carrier_mult_of fsdf.l_inv insertE insert_Diff l_null mult_mult_of
-      one_mult_of subsetCE zero_closed zero_not_one)
+  apply (metis (no_types, lifting) Units_one_closed comm_inv_char mult_of_is_Units unit_factor
+      units_of_inv)
+  apply (metis Units_one_closed inv_nonzero' mult_of_is_Units rev_subsetD unit_factor units_of_inv)
   apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
       submonoid.mem_carrier)
@@ -345,6 +320,9 @@ lemma subfield_sane: (*also a better def?*) \<open>subfield (R\<lparr>carrier :=
   using subfieldI by blast
 
 end
+
+
+section \<open>Field extensions\<close>
 
 locale field_extension = field L for L (structure) +
   fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit \<zero>, \<one> and the operations. @{locale
@@ -536,11 +514,12 @@ qed
 
 end
 
-locale f_g_field_extension = field_extension +
-  assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
-
-locale f_e_UP = UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension L K for L (structure) and K
+(*to-do: swap summands? remove qualifiers?*)
+locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id +
+  f_e?: field_extension L K for L (structure) and K
 begin
+text \<open>The locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over a field \<^term>\<open>K\<close>,
+  which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
 lemma Eval_x[simp]: (*rm?*)
   "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
@@ -571,8 +550,17 @@ lemmas simpler_stuff =
   monom_closed[simplified]
   monom_mult_smult[simplified]
 
-proposition "16_5_light" \<comment> \<open>only for singletons\<close>:
-  shows "genfield {s} = \<comment> \<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
+end
+
+subsection \<open>finitely generated field extensions\<close>
+
+locale finitely_generated_field_extension = field_extension +
+  assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+
+text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes (only for \<^prop>\<open>S = {s}\<close>)\<close>
+
+proposition (in field_extension_with_UP) genfield_singleton_explicit:
+  "genfield {s} =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding genfield_def hull_def apply simp
 proof -
@@ -669,9 +657,9 @@ proof -
         case (1 f g)
         define P' where "P' = UP (L\<lparr>carrier := K\<rparr>)"
         define Eval' where "Eval' = eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
-        from 1 interpret asdfasdf: f_e_UP P' s Eval' "L\<lparr>carrier := M\<rparr>" K
-            apply auto
-          subgoal unfolding f_e_UP_def UP_univ_prop_def apply auto
+        from 1 interpret M_over_K: field_extension_with_UP P' s Eval' "L\<lparr>carrier := M\<rparr>" K
+          unfolding P'_def Eval'_def apply auto
+          unfolding field_extension_with_UP_def UP_univ_prop_def apply auto
           proof goal_cases
             case 1
             note intermediate_field_2[of M]
@@ -690,10 +678,8 @@ proof -
             then show ?case
               using f_e_iff_subfield intermediate_field_2 subfield_def by blast
           qed
-          by (simp_all add: P'_def Eval'_def)
         have M_mult_closed: "\<And>a b. a \<in> M \<Longrightarrow> b \<in> M \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M"
-          by (metis (no_types, lifting) "1"(1) S.subring_def field_extension.K_subring
-              field_extension.carrier_K ring.ring_simprules(5))
+          using "1"(1) cring.cring_simprules(5) domain_def field_def field_extension.K_field by fastforce
         have "p \<in> carrier P \<Longrightarrow>
           (\<lambda>i. coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
           (is "?assms \<Longrightarrow> ?v ` ?A \<subseteq> M") for p
@@ -704,7 +690,7 @@ proof -
             assume "i \<in> ?A"
             then have "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" "s [^]\<^bsub>L\<^esub> i \<in> M"
               using "1"(2) P_def UP.coeff_closed \<open>p \<in> carrier P\<close> carrier_K apply blast
-              using "1"(3) S.nat_pow_consistent asdfasdf.S.nat_pow_closed by auto
+              using "1"(3) S.nat_pow_consistent M_over_K.S.nat_pow_closed by auto
             then have "?v i \<in> M"
               using \<open>\<And>b a. \<lbrakk>a \<in> M; b \<in> M\<rbrakk> \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M\<close> by blast
           }
@@ -729,8 +715,6 @@ proof -
   qed
 qed
 
-end
-
 section\<open>Observations\<close>
 
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
@@ -749,15 +733,8 @@ text\<open>The following is an easy generalisation of @{thm field.finite_mult_of
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
   by simp
 
-(* duplicate: *)
-value INTEG
-value "\<Z>"
-thm INTEG_def
+value INTEG value "\<Z>" \<comment> \<open>duplicate constant\<close>
 
-find_theorems field
-thm
-QuotRing.maximalideal.quotient_is_field
-Ideal.field.all_ideals
-UnivPoly.INTEG.R.trivialideals_eq_field
-
+unused_thms
+find_unused_assms
 end
