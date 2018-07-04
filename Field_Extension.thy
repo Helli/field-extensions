@@ -47,14 +47,14 @@ lemma (in abelian_group) contains_trivial:
     by simp
 
 
-section \<open>Subrings\<close>
+subsection \<open>Subrings\<close>
 
 context ring begin \<comment> \<open>\<triangleq> "Let @{term R} be a ring."\<close>
 
 lemma ring_card: "card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
   using not_less_eq_eq ring.ring_simprules(6) by fastforce
 
-lemma nonzero_ring_one: "card (carrier R) \<noteq> 1 \<Longrightarrow> one R \<noteq> zero R"
+lemma nonzero_ring_one (*rm*): "card (carrier R) \<noteq> 1 \<Longrightarrow> one R \<noteq> zero R"
   using is_singleton_altdef is_singleton_def one_zeroD by blast
 
 definition subring where
@@ -301,6 +301,7 @@ locale field_extension = field L for L (structure) +
   assumes L_extends_K: "subfield (L\<lparr>carrier:=K\<rparr>)"
 begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
 
+(* replace by interpretation K: field "L\<lparr>carrier:K\<rparr>" ? *)
 lemma K_field: "field (L\<lparr>carrier:=K\<rparr>)"
   using L_extends_K by (simp add: subfield_def)
 
@@ -331,12 +332,12 @@ qed
 
 end
 
-lemma (in field) f_e_refl : "field_extension R (carrier R)"
+lemma (in field) field_extension_refl : "field_extension R (carrier R)"
   unfolding field_extension_def field_extension_axioms_def apply auto
   using local.field_axioms apply blast
   using normalize_subfield subfield_refl by auto
 
-lemma (in field) f_e_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (R\<lparr>carrier:=K\<rparr>)"
+lemma (in field) field_extension_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (R\<lparr>carrier:=K\<rparr>)"
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
@@ -373,7 +374,7 @@ lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarro
   using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
 lemma intermediate_field_2:
   "K \<subseteq> M \<Longrightarrow> field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> field_extension (L\<lparr>carrier:=M\<rparr>) K"
-  by (metis K_field K_subring carrier_K cring_def domain_def field.f_e_iff_subfield
+  by (metis K_field K_subring carrier_K cring_def domain_def field.field_extension_iff_subfield
       field.normalize_subfield field.subfield_def field_def intermediate_ring_2)
 
 lemma trivial (*todo: put outside*):
@@ -388,7 +389,7 @@ lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
-    by (smt equals0D field.f_e_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
+    by (smt equals0D field.field_extension_iff_subfield local.field_axioms mem_Collect_eq subfield_sane
         trivial(2))
 qed
 
@@ -405,7 +406,7 @@ proposition "16_3_"[intro]:
 proof goal_cases
   case 1
   note to_subfield =
-    field.f_e_iff_subfield[OF "16_3_aux"[OF 1]]
+    field.field_extension_iff_subfield[OF "16_3_aux"[OF 1]]
     field.subfield_sane[OF "16_3_aux"[OF 1]]
   from 1 show ?case
     unfolding to_subfield additive_subgroup_def apply safe
@@ -435,17 +436,17 @@ term genideal \<comment> \<open>Use this naming? Or \<open>gen\<close> (set) and
 definition genfield where
   "genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
 
-lemma f_e_genfield: "S \<subseteq> carrier L \<Longrightarrow> field_extension (L\<lparr>carrier := genfield S\<rparr>) K"
+lemma field_extension_genfield: "S \<subseteq> carrier L \<Longrightarrow> field_extension (L\<lparr>carrier := genfield S\<rparr>) K"
   unfolding genfield_def hull_def
-  by (auto simp add: K_subgroup(1) additive_subgroup.a_subset f_e_refl)
+  by (auto simp add: K_subgroup(1) additive_subgroup.a_subset field_extension_refl)
 
 corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
-  using f_e_genfield field_extension_def by auto
+  using field_extension_genfield field_extension_def by auto
 
 interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
   by (simp add: K_subring subring_ring_hom_cring)
 
-interpretation f_e_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
+interpretation field_extension_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
 
 lemma pow_simp[simp]:
@@ -510,16 +511,6 @@ qed
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" unfolding
   Eval_monom[simplified] apply auto
   by (meson K_subgroup(1) S.r_one additive_subgroup.a_Hcarr)
-
-lemma simple_stuff[simp]:
-  "monom P \<zero>\<^bsub>L\<^esub> 0 = \<zero>"
-  "monom P \<one>\<^bsub>L\<^esub> 0 = \<one>"
-  using monom_zero monom_one by auto
-
-lemmas simpler_stuff =
-  monom_inj[simplified]
-  monom_closed[simplified]
-  monom_mult_smult[simplified]
 
 end
 
@@ -611,14 +602,13 @@ proof -
       show ?case apply (rule exI[of _ "monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
         apply auto
         using "2" K_subgroup(1) additive_subgroup.a_Hcarr apply fastforce
-        by (simp add: "2" simpler_stuff)
+        by (simp add: "2")
     next
       case 3
       show ?case apply (rule exI[of _ "monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
   apply auto
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
-        apply (intro simpler_stuff(2))
-        using K_subring S.subring_def carrier_K by blast
+        using R.one_closed by auto
     qed (fact L_over_L')
     moreover {
       fix M
@@ -634,7 +624,7 @@ proof -
           proof goal_cases
             case 1
             note intermediate_field_2[of M]
-            then have tmp: "field_extension (L\<lparr>carrier := M\<rparr>) K" (*to-do: pull out one level*)
+            then have "field_extension (L\<lparr>carrier := M\<rparr>) K" (*to-do: pull out one level*)
               using 1 field_extension.K_field by blast
             then show ?case
               by (metis "1"(2) K_subring S.intermediate_ring_2 UP_pre_univ_prop_def carrier_K
@@ -647,7 +637,7 @@ proof -
           next
             case 3
             then show ?case
-              using f_e_iff_subfield intermediate_field_2 subfield_def by blast
+              using field_extension_iff_subfield intermediate_field_2 subfield_def by blast
           qed
         have M_mult_closed: "\<And>a b. a \<in> M \<Longrightarrow> b \<in> M \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M"
           using "1"(1) cring.cring_simprules(5) domain_def field_def field_extension.K_field by fastforce

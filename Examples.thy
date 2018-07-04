@@ -1,4 +1,4 @@
-section \<open>Example instantiations\<close>
+subsection \<open>Example instantiations\<close>
 theory Examples imports Field_Extension
 begin
 
@@ -55,7 +55,7 @@ lemma ring_standard_ring:
   by (simp_all add: ring_class.ring_distribs)
 (*interpretation r_s_r: ring "standard_ring (range rat_of_int)" by (simp add: ring_standard_ring)*)
 
-subsection \<open>\<int> is a subring of \<rat>\<close>
+subsubsection \<open>\<int> is a subring of \<rat>\<close>
 
 lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int))"
   unfolding rat_field_def ring.subring_def[OF \<U>_ring]
@@ -63,7 +63,7 @@ lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int)
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
 
-subsection \<open>\<real> is a field extension of \<rat>\<close>
+subsubsection \<open>\<real> is a field extension of \<rat>\<close>
 
 lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
   apply standard
@@ -87,7 +87,7 @@ lemma field_extension_real_over_rat: "field_extension real_field (range real_of_
   using subfield_example field.normalize_subfield standard_ring_def
   by (metis field_examples(2) partial_object.select_convs(1))
 
-subsection\<open>\<complex> is a finitely generated field extension of \<real>\<close>
+subsubsection\<open>\<complex> is a finitely generated field extension of \<real>\<close>
 
 lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
   apply standard
@@ -106,7 +106,7 @@ lemma subfield_example': \<open>field.subfield complex_field (standard_ring (ran
    apply (metis ring_standard_ring(3) standard_ring_def)
   by (metis f_r_o_r' standard_ring_def)
 
-lemma f_e_example': "field_extension complex_field (range complex_of_real)"
+lemma field_extension_complex_over_real: "field_extension complex_field (range complex_of_real)"
   apply (simp add: field_extension_def field_extension_axioms_def)
   using subfield_example' field.normalize_subfield standard_ring_def
   by (metis field_examples(3) partial_object.select_convs(1))
@@ -116,7 +116,7 @@ proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
   interpret field_extension_with_UP P \<i> Eval complex_field "range of_real"
-    unfolding field_extension_with_UP_def apply (auto simp: f_e_example')
+    unfolding field_extension_with_UP_def apply (auto simp: field_extension_complex_over_real)
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto
     unfolding ring_hom_cring_def apply auto
@@ -152,7 +152,7 @@ qed
 corollary finitely_generated_field_extension_complex_over_real:
   \<open>finitely_generated_field_extension complex_field (range complex_of_real)\<close>
   unfolding finitely_generated_field_extension_def finitely_generated_field_extension_axioms_def
-  apply (auto simp add: f_e_example') using genfield_\<i>_UNIV
+  apply (auto simp add: field_extension_complex_over_real) using genfield_\<i>_UNIV
   by (metis complex_field_def finite.emptyI finite.insertI partial_object.select_convs(1)
       univ_ring_def)
 
