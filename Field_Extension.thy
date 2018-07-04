@@ -8,12 +8,6 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
-lemma (in field) comm_group_mult_of:
-  shows "comm_group (mult_of R)"
-  apply (rule group.group_comm_groupI groupI)
-  apply (fact field_mult_group)
-  by (auto simp: m_comm)
-
 lemma (in subgroup) subgroup_is_comm_group [intro]:
   assumes "comm_group G"
   shows "comm_group (G\<lparr>carrier := H\<rparr>)"
@@ -110,31 +104,16 @@ lemma normalize_subring: "subring S \<Longrightarrow> subring (R\<lparr>carrier:
   using abelian_group.contains_trivial[of S]
 proof -
   fix r1 :: 'a and r2 :: 'a
-  assume a1: "r2 \<in> carrier S"
-  assume a2: "abelian_group S"
-  assume a3: "r1 \<in> carrier S"
-  assume a4: "carrier S \<subseteq> carrier R"
-  assume a5: "Group.monoid S"
-  assume a6: "ring_axioms S"
-  assume a7: "\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. r1 \<oplus>\<^bsub>S\<^esub> r2 = r1 \<oplus> r2 \<and> r1 \<otimes>\<^bsub>S\<^esub> r2 = r1 \<otimes> r2"
-  have f8: "\<forall>a A Aa. (a::'a) \<notin> A \<or> \<not> A \<subseteq> Aa \<or> a \<in> Aa"
-    by blast
-  then have f9: "r1 \<in> carrier R"
-    using a4 a3 by presburger
-  then have f10: "\<ominus> r1 \<in> carrier R"
-    by simp
-  have f11: "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier S"
-    using a6 a5 a3 a2 by (simp add: ring.ring_simprules(3) ring_def)
-  have f12: "\<zero>\<^bsub>S\<^esub> \<in> carrier R"
-    using f8 a6 a5 a4 a2 a1 by (metis \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in> carrier S; a2 \<in> carrier S\<rbrakk> \<Longrightarrow>
-        \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> abelian_group.r_neg ring.ring_simprules(3) ring_def)
-  have "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier R"
-  using f11 f8 a4 by presburger
+  assume a1: "r1 \<in> carrier S"
+  assume a2: "r2 \<in> carrier S"
+  assume a3: "carrier S \<subseteq> carrier R"
+  assume a4: "abelian_group S"
+  assume a5: "\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. r1 \<oplus>\<^bsub>S\<^esub> r2 = r1 \<oplus> r2 \<and> r1 \<otimes>\<^bsub>S\<^esub> r2 = r1 \<otimes> r2"
+  assume a6: "\<And>a1 a2. \<lbrakk>abelian_group S; a1 \<in> carrier S; a2 \<in> carrier S\<rbrakk> \<Longrightarrow> \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S"
+  have "\<ominus>\<^bsub>S\<^esub> r1 \<in> carrier S"
+    using a4 a1 by (simp add: abelian_group.a_inv_closed)
   then show "\<ominus> r1 \<oplus> r2 \<in> carrier S"
-    using f12 f10 f9 a7 a6 a5 a3 a2 a1 by (metis (full_types) \<open>\<And>a2 a1. \<lbrakk>abelian_group S; a1 \<in>
-        carrier S; a2 \<in> carrier S\<rbrakk> \<Longrightarrow> \<ominus>\<^bsub>S\<^esub> a1 \<oplus>\<^bsub>S\<^esub> a2 \<in> carrier S\<close> abelian_group.axioms(1)
-        abelian_group.r_neg abelian_group.r_neg2 abelian_monoid.a_ac(2) local.ring_axioms
-        ring.ring_simprules(3) ring_def)
+    using a6 a5 a4 a3 a2 a1 by (metis (full_types) abelian_group.r_neg2 add.inv_closed add.m_lcomm r_neg2 subsetCE)
 qed
 
 lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
@@ -285,16 +264,8 @@ qed
 lemma subgroup_add: \<open>subfield S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
   by (simp add: abelian_subgroupI3 is_abelian_group subfield_def subring_imp_subgroup)
 
-lemma operation_ok (*rm*): \<open>submonoid (carrier R-{\<zero>}) R\<close>
-  by (metis Diff_subset Units_m_closed Units_one_closed field_Units submonoid.intro)
-
-lemma inv_nonzero (*rm*): "x \<in> carrier R-{\<zero>} \<Longrightarrow> inv x \<noteq> \<zero>"
-  using Units_inv_Units field_Units by auto
-
-lemma inv_nonzero': "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
-  by (simp add: inv_nonzero local.field_axioms)
-
-lemmas maybe_useful[simp] = group.m_inv_consistent[OF units_group, simplified]
+lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
+  using Units_inv_Units local.field_Units by simp
 
 lemma subfield_imp_subgroup:
   "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
@@ -308,7 +279,7 @@ lemma subfield_imp_subgroup:
   using set_rev_mp
   apply (metis (no_types, lifting) Units_one_closed comm_inv_char mult_of_is_Units unit_factor
       units_of_inv)
-  apply (metis Units_one_closed inv_nonzero' mult_of_is_Units rev_subsetD unit_factor units_of_inv)
+  apply (metis Units_one_closed inv_nonzero mult_of_is_Units rev_subsetD unit_factor units_of_inv)
   apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
       submonoid.mem_carrier)
@@ -569,7 +540,7 @@ proof -
     (is "\<Inter>?\<M> = ?L'")
   proof -
     have in_field: "\<And>f. f \<in> carrier P \<Longrightarrow> Eval f \<in> carrier L" by simp
-    interpret asdf: field_extension L ?L'
+    have L_over_L': "field_extension L ?L'"
       apply standard apply (rule subfieldI) apply standard
       apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
           partial_object.select_convs(1) ring.hom_closed subsetI)
@@ -648,7 +619,7 @@ proof -
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
         apply (intro simpler_stuff(2))
         using K_subring S.subring_def carrier_K by blast
-    qed (rule asdf.field_extension_axioms)
+    qed (fact L_over_L')
     moreover {
       fix M
       assume "M \<in> ?\<M>"
@@ -736,5 +707,4 @@ lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mul
 value INTEG value "\<Z>" \<comment> \<open>duplicate constant\<close>
 
 unused_thms
-find_unused_assms
 end
