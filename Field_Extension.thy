@@ -20,7 +20,7 @@ proof -
         submonoid_is_comm_monoid)
 qed
 
-lemma add_monoid_update[simp]: "add_monoid (L\<lparr>carrier := A\<rparr>) = (add_monoid L)\<lparr>carrier := A\<rparr>"
+lemma add_monoid_update[simp]: "add_monoid (R\<lparr>carrier := S\<rparr>) = add_monoid R \<lparr>carrier := S\<rparr>"
   by simp
 
 lemma (in abelian_monoid) intersect_nonzeros:
@@ -679,7 +679,7 @@ proof -
   qed
 qed
 
-section\<open>Observations\<close>
+section \<open>Observations\<close>
 
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
 locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
