@@ -5,7 +5,6 @@ theory Field_Extension imports
 "HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
 begin
 
-
 section \<open>missing preliminaries?\<close>
 
 lemma (in subgroup) subgroup_is_comm_group [intro]:
@@ -56,7 +55,7 @@ lemma (in abelian_group) contains_trivial:
 
 subsection \<open>Subrings\<close>
 
-context ring begin \<comment> \<open>\<triangleq> "Let @{term R} be a ring."\<close>
+context ring begin \<comment> \<open>"Let @{term R} be a ring."\<close>
 
 lemma ring_card: "card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
   using not_less_eq_eq ring.ring_simprules(6) by fastforce
@@ -191,13 +190,13 @@ lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding 
 lemma (in cring) subring_ring_hom_cring: "subring S \<Longrightarrow> ring_hom_cring S R id"
   by (simp add: RingHom.ring_hom_cringI is_cring subring_cring subring_ring_hom_ring)
 
-context field begin \<comment> \<open>\<triangleq> "Let @{term R} be a field."\<close>
+context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
 
 definition subfield where
-  \<comment> \<open>Maybe remove this definition and put it in the assumption of field_extension...
+  \<comment> \<open>Maybe remove this definition and put it in the assumption of \<open>field_extension\<close>...
     (requires use of rewrite-clauses to avoid a name clash?)\<close>
   "subfield K \<longleftrightarrow> subring K \<and> field K"
 
@@ -303,10 +302,10 @@ end
 section \<open>Field extensions\<close>
 
 locale field_extension = field L for L (structure) +
-  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit \<zero>, \<one> and the operations. @{locale
-    subgroup} does the same.\<close>
+  fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit @{term \<zero>}, @{term \<one>} and the
+ operations. @{locale subgroup} does the same.\<close>
   assumes L_extends_K: "subfield (L\<lparr>carrier:=K\<rparr>)"
-begin \<comment> \<open>\<triangleq> "Let @{term L}/@{term K} be a field extension."\<close>
+begin \<comment> \<open>"Let @{term L}/@{term K} be a field extension."\<close>
 
 (* replace by interpretation K: field "L\<lparr>carrier:K\<rparr>" ? *)
 lemma K_field: "field (L\<lparr>carrier:=K\<rparr>)"
@@ -410,7 +409,6 @@ proof goal_cases
   qed
 qed
 
-term genideal \<comment> \<open>Use this naming? Or \<open>gen\<close> (set) and \<open>genfield\<close> (structure)?\<close> term cgenideal\<comment>\<open>does not fit\<close>
 definition genfield where
   "genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
 
@@ -679,7 +677,7 @@ proof -
   qed
 qed
 
-section\<open>Observations\<close>
+section\<open>Observations\<close>(* rm *)
 
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
 locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
@@ -689,6 +687,7 @@ lemma "group G" oops
 lemma "group (G\<lparr>carrier:=H\<rparr>)" oops
 end
 
+thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
 text \<open>@{thm field_simps} are *not* available in general. Re-prove them? Collect them?\<close>

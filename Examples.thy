@@ -53,9 +53,8 @@ lemma ring_standard_ring:
   apply (simp add: add_eq_0_iff)
   using Reals_def apply auto[1]
   by (simp_all add: ring_class.ring_distribs)
-(*interpretation r_s_r: ring "standard_ring (range rat_of_int)" by (simp add: ring_standard_ring)*)
 
-subsubsection \<open>\<int> is a subring of \<rat>\<close>
+text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
 lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int))"
   unfolding rat_field_def ring.subring_def[OF \<U>_ring]
@@ -63,7 +62,7 @@ lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int)
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
 
-subsubsection \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>\<close>
+text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
 
 lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
   apply standard
@@ -87,7 +86,7 @@ lemma field_extension_real_over_rat: "field_extension real_field (range real_of_
   using subfield_example field.normalize_subfield standard_ring_def
   by (metis field_examples(2) partial_object.select_convs(1))
 
-subsubsection\<open>\<complex> is a finitely generated field extension of \<real>\<close>
+text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
 lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
   apply standard
