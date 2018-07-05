@@ -63,7 +63,7 @@ lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int)
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
 
-subsubsection \<open>\<real> is a field extension of \<rat>\<close>
+subsubsection \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>\<close>
 
 lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
   apply standard
