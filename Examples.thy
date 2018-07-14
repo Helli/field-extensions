@@ -5,31 +5,26 @@ begin
 definition standard_ring
   where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
-definition univ_ring ("\<U>")
+definition univ_ring
   where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
 
-lemma \<U>_ring: "Ring.ring (\<U>::_::Rings.ring_1 ring)"
+lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
   unfolding univ_ring_def
   apply (intro ringI abelian_groupI monoidI)
   apply (auto simp: ring_distribs mult.assoc)
   using ab_group_add_class.ab_left_minus apply blast
   done
 
-lemma \<U>_cring: "Ring.cring (\<U>::_::Fields.field ring)"
-  by (auto intro!: cringI abelian_groupI comm_monoidI
-    left_minus distrib_right simp: univ_ring_def)
+lemma field_univ_ring: "Ring.field (univ_ring::_::Fields.field ring)"
+  apply unfold_locales apply (auto intro: right_inverse simp: univ_ring_def Units_def field_simps)
+  by (metis ab_group_add_class.ab_left_minus add.commute)
 
-lemma \<U>_field: "Ring.field (\<U>::_::Fields.field ring)"
-  apply (rule cring.cring_fieldI2)
-    apply (fact \<U>_cring) apply (auto simp: univ_ring_def) using dvd_field_iff
-  by (metis dvdE)
-
-definition rat_field :: "rat ring" where "rat_field = \<U>"
-definition real_field :: "real ring" where "real_field = \<U>"
-definition complex_field :: "complex ring" where "complex_field = \<U>"
+definition rat_field :: "rat ring" where "rat_field = univ_ring"
+definition real_field :: "real ring" where "real_field = univ_ring"
+definition complex_field :: "complex ring" where "complex_field = univ_ring"
 
 lemma field_examples: "field rat_field" "field real_field" "field complex_field"
-  unfolding rat_field_def real_field_def complex_field_def by (fact \<U>_field)+
+  unfolding rat_field_def real_field_def complex_field_def by (fact field_univ_ring)+
 
 lemma ring_standard_ring:
   "ring (standard_ring (range rat_of_int))"
@@ -57,7 +52,7 @@ lemma ring_standard_ring:
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
 lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int))"
-  unfolding rat_field_def ring.subring_def[OF \<U>_ring]
+  unfolding rat_field_def ring.subring_def[OF ring_univ_ring]
   apply (auto simp add: univ_ring_def) unfolding standard_ring_def
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
@@ -76,7 +71,7 @@ lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
 
 lemma subfield_example: \<open>field.subfield real_field (standard_ring (range real_of_rat))\<close>
   unfolding field.subfield_def[OF field_examples(2)]
-  apply (auto simp: real_field_def ring.subring_def[OF \<U>_ring])
+  apply (auto simp: real_field_def ring.subring_def[OF ring_univ_ring])
        apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
    apply (metis ring_standard_ring(2) standard_ring_def)
   by (metis f_r_o_r standard_ring_def)
@@ -100,7 +95,7 @@ lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
 
 lemma subfield_example': \<open>field.subfield complex_field (standard_ring (range complex_of_real))\<close>
   unfolding field.subfield_def[OF field_examples(3)]
-  apply (auto simp: complex_field_def ring.subring_def[OF \<U>_ring])
+  apply (auto simp: complex_field_def ring.subring_def[OF ring_univ_ring])
        apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
    apply (metis ring_standard_ring(3) standard_ring_def)
   by (metis f_r_o_r' standard_ring_def)
@@ -119,14 +114,14 @@ proof -
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto
     unfolding ring_hom_cring_def apply auto
-    apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
-        partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
-       apply (simp add: \<U>_cring complex_field_def)
+    apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
+        partial_object.update_convs(1) standard_ring_def univ_ring_def)
+    using fieldE(1) field_examples(3) apply blast
     unfolding ring_hom_cring_axioms_def
       apply (simp add: complex_field_def ring_hom_memI univ_ring_def)
     unfolding UP_cring_def
-    apply (metis \<U>_cring \<U>_field complex_field_def cring.subring_cring field.subfield_def
-        partial_object.update_convs(1) standard_ring_def subfield_example' univ_ring_def)
+    apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
+        partial_object.update_convs(1) standard_ring_def univ_ring_def)
     apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by simp+
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
