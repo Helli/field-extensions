@@ -6,7 +6,7 @@ definition standard_ring
   where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
-  where "univ_ring \<equiv> \<lparr>carrier = UNIV, mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
+  where "univ_ring = \<lparr>carrier = UNIV, mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
   unfolding univ_ring_def

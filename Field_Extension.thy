@@ -79,7 +79,7 @@ lemma "subring S \<Longrightarrow> Units S \<subseteq> Units R"
 lemma subring_refl: "subring R"
   unfolding subring_def using local.ring_axioms by blast
 
-lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> (\<ominus>r1)\<oplus>r2\<in>A\<rbrakk>
+lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> \<ominus>r1\<oplus>r2\<in>A\<rbrakk>
   \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
   unfolding subring_def apply auto
   apply (rule ringI)
@@ -253,10 +253,9 @@ qed
     apply auto
   apply (rule subring_cring) apply (rule subyada_to_subring)
   apply (simp add: assms(1))
-  apply (metis (mono_tags, lifting) Diff_subset \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a \<otimes> b \<in> A\<close>
-    additive_subgroup.a_subset assms ring_axioms monoid_incl_imp_submonoid
-    one_mult_of ring.is_monoid ring.subgroup_to_subring ring.subring_def subgroup.one_closed
-    subsetCE)
+  apply (metis (mono_tags, lifting) Diff_subset \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a\<otimes>b \<in> A\<close>
+    additive_subgroup.a_subset assms ring_axioms monoid_incl_imp_submonoid one_mult_of
+    ring.is_monoid ring.subgroup_to_subring ring.subring_def subgroup.one_closed subsetCE)
 proof -
   fix a :: 'a
   assume a1: "a \<in> A"
@@ -338,7 +337,7 @@ qed
 
 end
 
-lemma (in field) field_extension_refl : "field_extension R (carrier R)"
+lemma (in field) field_extension_refl: "field_extension R (carrier R)"
   unfolding field_extension_def field_extension_axioms_def apply auto
   using local.field_axioms apply blast
   using normalize_subfield subfield_refl by auto
@@ -376,7 +375,7 @@ corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. fie
 
 lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
 
-text \<open>Proposition 16.3 of Prof. Gregor Kemper's lecture notes\<close>
+text \<open>Proposition 16.3 of Prof. Gregor Kemper's lecture notes @{cite Algebra1}.\<close>
 
 proposition intersection_of_intermediate_fields_is_field_extension[intro]:
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
@@ -466,8 +465,8 @@ end
 locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id +
   f_e?: field_extension L K for L (structure) and K
 begin
-text \<open>The locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over a field \<^term>\<open>K\<close>,
-  which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
+\<comment> \<open>The locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
+  \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
 lemma Eval_x[simp]: (*rm?*)
   "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
@@ -490,7 +489,7 @@ lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" 
 
 end
 
-subsection \<open>finitely generated field extensions\<close>
+subsection \<open>Finitely generated field extensions\<close>
 
 locale finitely_generated_field_extension = field_extension +
   assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
@@ -520,7 +519,8 @@ obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otime
   and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
   by (simp add: assms integral_iff sum_of_fractions)
 
-text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes (only for \<^prop>\<open>S = {s}\<close>)\<close>
+text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes @{cite Algebra1} (only for \<^prop>\<open>S
+  = {s}\<close>).\<close>
 
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
   "genfield {s} =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
@@ -678,7 +678,7 @@ proof -
 qed
 
 
-section \<open>Observations\<close> (*rm*)
+section \<open>Observations (*rm*)\<close>
 
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
 locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
@@ -691,12 +691,12 @@ end
 thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
-text \<open>@{thm field_simps} are *not* available in general. Re-prove them? Collect them?\<close>
+text \<open>@{thm[source] field_simps} are *not* available in general. Re-prove them?\<close>
 
 text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
 lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
   by simp
 
-value INTEG value "\<Z>" \<comment> \<open>duplicate constant\<close>
+value INTEG value "\<Z>" \<comment> \<open>duplicate definition\<close>
 
 end
