@@ -642,21 +642,16 @@ proof -
           qed
         have M_mult_closed: "\<And>a b. a \<in> M \<Longrightarrow> b \<in> M \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M"
           using "1"(1) cring.cring_simprules(5) domain_def field_def field_extension.K_field by fastforce
-        have "p \<in> carrier P \<Longrightarrow>
-          (\<lambda>i. coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
-          (is "?assms \<Longrightarrow> ?v ` ?A \<subseteq> M") for p
-        proof -
-          assume ?assms
-          {
-            fix i
-            assume "i \<in> ?A"
-            then have "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" "s [^]\<^bsub>L\<^esub> i \<in> M"
-              using "1"(2) P_def UP.coeff_closed \<open>p \<in> carrier P\<close> carrier_K apply blast
-              using "1"(3) S.nat_pow_consistent M_over_K.S.nat_pow_closed by auto
-            then have "?v i \<in> M"
-              using \<open>\<And>b a. \<lbrakk>a \<in> M; b \<in> M\<rbrakk> \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M\<close> by blast
-          }
-          then show ?thesis by auto
+        have "(\<lambda>i. coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
+          if "p \<in> carrier P" for p
+        proof auto
+          fix i
+          assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
+          then have "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
+            using "1"(2) P_def UP.coeff_closed that carrier_K apply blast
+            using "1"(3) S.nat_pow_consistent M_over_K.S.nat_pow_closed by auto
+          then show "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
+            by (simp add: M_mult_closed)
         qed
         note * =
           "field_extension.\<Oplus>_simp"[OF 1(1) this[OF \<open>f \<in> carrier P\<close>]]
