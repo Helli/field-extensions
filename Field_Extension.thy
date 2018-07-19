@@ -465,7 +465,7 @@ end
 locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id +
   f_e?: field_extension L K for L (structure) and K
 begin
-\<comment> \<open>The locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
+txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
 lemma Eval_x[simp]: (*rm?*)
