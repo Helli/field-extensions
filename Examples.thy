@@ -3,10 +3,10 @@ theory Examples imports Field_Extension
 begin
 
 definition standard_ring
-  where "standard_ring A = \<lparr>carrier = A, mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+  where "standard_ring A = \<lparr>carrier = A, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
-  where "univ_ring = \<lparr>carrier = UNIV, mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
+  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
   unfolding univ_ring_def
@@ -128,17 +128,17 @@ proof -
     case (1 x)
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
       unfolding complex_field_def univ_ring_def m_inv_def by simp
-    have "x = (Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x))"
+    have "x = (Eval (UnivPoly.monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x))"
       unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
       unfolding complex_field_def univ_ring_def by (auto simp: add.commute complex_eq
           mult.commute)
     show ?case
-      apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
-      apply (rule exI[of _ "monom P 1 0"])
+      apply (rule exI[of _ "UnivPoly.monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> UnivPoly.monom P (Re x) 0"])
+      apply (rule exI[of _ "UnivPoly.monom P 1 0"])
       apply auto
       unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
-       \<open>x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re
-          x)\<close> complex_field_def ring.simps(2) univ_ring_def
+        \<open>x = Eval (UnivPoly.monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
+        complex_field_def ring.simps(2) univ_ring_def
       by metis
   qed
 qed

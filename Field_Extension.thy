@@ -1,8 +1,5 @@
 theory Field_Extension imports
-"HOL-Algebra.Divisibility"
-"HOL-Algebra.Multiplicative_Group" (* Polynomials *)
-"HOL-Algebra.Group_Action"
-"HOL-Number_Theory.Residues"       (* \<int>/p\<int> and all(?) of the above. rm? *)
+"HOL-Algebra.Algebra"
 begin
 
 section \<open>missing preliminaries?\<close>
@@ -68,7 +65,7 @@ definition subring where
     carrier S \<subseteq> carrier R \<and>
     ring S \<and>
     one R \<in> carrier S \<and>
-    (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. add S r1 r2 = add R r1 r2 \<and> mult S r1 r2 = mult R r1 r2)"
+    (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. add S r1 r2 = add R r1 r2 \<and> monoid.mult S r1 r2 = monoid.mult R r1 r2)"
 
 lemma "subring S \<Longrightarrow> Units S \<subseteq> Units R"
   unfolding Units_def apply auto
@@ -469,12 +466,12 @@ txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of 
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
 lemma Eval_x[simp]: (*rm?*)
-  "Eval (monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
+  "Eval (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
-lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c\<otimes>\<^bsub>L\<^esub>s"
+lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (UnivPoly.monom P c 1) = c\<otimes>\<^bsub>L\<^esub>s"
 proof goal_cases
   case 1
-  then have "monom P c 1 = c \<odot> monom P \<one>\<^bsub>L\<^esub> 1"
+  then have "UnivPoly.monom P c 1 = c \<odot> UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"
     using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
     by (metis K_subgroup(1) L_extends_K S.r_one additive_subgroup.a_Hcarr carrier_K cring_def
         domain_def field_def ring.ring_simprules(6) subfield_def subfield_one)
@@ -483,7 +480,7 @@ proof goal_cases
         monom_closed subfield_def)
 qed
 
-lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (monom P x 0) = x" unfolding
+lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (UnivPoly.monom P x 0) = x" unfolding
   Eval_monom[simplified] apply auto
   by (meson K_subgroup(1) S.r_one additive_subgroup.a_Hcarr)
 
@@ -600,13 +597,13 @@ proof -
     have "?L' \<in> ?\<M>" apply safe
     proof goal_cases
       case (2 x)
-      show ?case apply (rule exI[of _ "monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+      show ?case apply (rule exI[of _ "UnivPoly.monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
         apply auto
         using "2" K_subgroup(1) additive_subgroup.a_Hcarr apply fastforce
         by (simp add: "2")
     next
       case 3
-      show ?case apply (rule exI[of _ "monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+      show ?case apply (rule exI[of _ "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
   apply auto
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
         using R.one_closed by auto
@@ -618,7 +615,7 @@ proof -
       proof goal_cases
         case (1 f g)
         define P' where "P' = UP (L\<lparr>carrier := K\<rparr>)"
-        define Eval' where "Eval' = eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
+        define Eval' where "Eval' = UnivPoly.eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
         from 1 interpret M_over_K: field_extension_with_UP P' s Eval' "L\<lparr>carrier := M\<rparr>" K
           unfolding P'_def Eval'_def apply auto
           unfolding field_extension_with_UP_def UP_univ_prop_def apply auto
@@ -642,15 +639,15 @@ proof -
           qed
         have M_mult_closed: "\<And>a b. a \<in> M \<Longrightarrow> b \<in> M \<Longrightarrow> a \<otimes>\<^bsub>L\<^esub> b \<in> M"
           using "1"(1) cring.cring_simprules(5) domain_def field_def field_extension.K_field by fastforce
-        have "(\<lambda>i. coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
+        have "(\<lambda>i. UnivPoly.coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
           if "p \<in> carrier P" for p
         proof auto
           fix i
           assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
-          then have "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
+          then have "UnivPoly.coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
             using "1"(2) P_def UP.coeff_closed that carrier_K apply blast
             using "1"(3) S.nat_pow_consistent M_over_K.S.nat_pow_closed by auto
-          then show "coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
+          then show "UnivPoly.coeff (UP (L\<lparr>carrier := K\<rparr>)) p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
             by (simp add: M_mult_closed)
         qed
         note * =
