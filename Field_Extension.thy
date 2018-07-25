@@ -1,5 +1,5 @@
 theory Field_Extension imports
-"HOL-Algebra.Algebra"
+"HOL-Algebra.Algebra"  (* rm? *)
 "VectorSpace_by_HoldenLee/VectorSpace"
 begin
 
@@ -665,6 +665,13 @@ proof -
       by (meson cInf_eq_minimum)
   qed
 qed
+
+subsection \<open>Polynomial Divisibility\<close>
+text \<open>Keep an eye out whether I need something from @{url
+  "https://github.com/DeVilhena-Paulo/GaloisCVC4/blob/master/Polynomial_Divisibility.thy"}\<close>
+
+subsection \<open>Degree of a field extension\<close>
+text \<open>Todo: Start with the definitions 16.11 and proposition 16.14\<close>
 
 
 section \<open>Observations (*rm*)\<close>
