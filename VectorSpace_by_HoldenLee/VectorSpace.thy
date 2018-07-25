@@ -41,10 +41,6 @@ We introduce some abbreviations, to match convention.*}
 abbreviation (in vectorspace) vs::"'c set \<Rightarrow> ('a, 'c, 'd) module_scheme"
   where "vs W \<equiv> V\<lparr>carrier :=W\<rparr>"
 
-lemma (in vectorspace) carrier_vs_is_self [simp]:
-  "carrier (vs W) = W"
-  by auto
-
 lemma (in vectorspace) subspace_is_vs:
   fixes W::"'c set"
   assumes 0: "subspace K W V"
@@ -90,8 +86,6 @@ abbreviation imT:: "'e set"
 
 abbreviation kerT:: "'c set"
   where "kerT \<equiv> mod_hom.ker"
-
-lemmas T0_is_0[simp] = f0_is_0
 
 lemma kerT_is_subspace: "subspace K ker V"
 proof - 
@@ -243,7 +237,7 @@ proof -
   from h1 h2 h3 have 1: "w\<in>carrier V" by auto
   from h3 1 have 2: "(inv\<^bsub>K\<^esub> a )\<odot>\<^bsub>V\<^esub>(a \<odot>\<^bsub>V\<^esub> v) =(inv\<^bsub>K\<^esub> a )\<odot>\<^bsub>V\<^esub>w" by auto
   from h1 h4 have 3: "inv\<^bsub>K\<^esub> a\<in>carrier K" by auto
-  interpret g: group "(units_group K)" by (rule units_form_group)
+  interpret g: group "(units_of K)" by (rule units_group)
   have f: "field K"..
   from f h1 h4 have 4: "a\<in>Units K" 
     by (unfold field_def field_axioms_def, simp)
@@ -333,7 +327,7 @@ proof -
     from a a31 nz3 singleton show ?thesis 
       apply (unfold span_def, auto) 
       apply (rule_tac x="?b" in exI)
-      apply (rule_tac x="A\<inter>S" in exI) 
+      apply (rule_tac x="A\<inter>S" in exI)
       by (auto intro!: m_closed)
   qed
   have a2: "v\<in> (span S) \<Longrightarrow> lin_dep ?T"
@@ -1104,7 +1098,7 @@ contradiction. Hence $T$ is injective on $C$ and $T(C)$ is linearly independent.
         apply (intro lc_in_ker[where ?D1="{v,w}" and ?d1="\<lambda>x. if x=v then \<one>\<^bsub>K\<^esub> else \<ominus>\<^bsub>K\<^esub>\<one>\<^bsub>K\<^esub>"
           and ?v1="v"])
             by (auto simp add: V.module.lincomb_def hom_sum ring_subset_carrier 
-              W.module.smult_minus_1 r_neg T_im)
+              W.module.smult_minus_1 r_neg)
     qed
     from this Cfin show "card C = card ?C'"
       by (metis card_image) 
@@ -1207,4 +1201,3 @@ theorem (in linear_map) rank_nullity:
 
 
 end
-

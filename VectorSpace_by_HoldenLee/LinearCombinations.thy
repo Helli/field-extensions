@@ -417,7 +417,7 @@ lemma f0_is_0[simp]: "f \<zero>\<^bsub>M\<^esub>=\<zero>\<^bsub>N\<^esub>"
 proof -
   have 1: "f \<zero>\<^bsub>M\<^esub> = f (\<zero>\<^bsub>R\<^esub> \<odot>\<^bsub>M\<^esub> \<zero>\<^bsub>M\<^esub>)" by simp
   have 2: "f (\<zero>\<^bsub>R\<^esub> \<odot>\<^bsub>M\<^esub> \<zero>\<^bsub>M\<^esub>) = \<zero>\<^bsub>N\<^esub>"
-    using M.M.zero_closed N.lmult_0 R.zero_closed f_im f_smult by presburger
+    using M.M.zero_closed N.smult_l_null R.zero_closed f_im f_smult by presburger
   from 1 2 show ?thesis by auto
 qed
 
@@ -436,8 +436,8 @@ proof -
 qed
 
 lemma im_is_submodule: "submodule R im N"
-proof - 
-  have 1: "im \<subseteq> carrier N" by (auto simp add: im_def image_def mod_hom_def module_hom_def f_im) 
+proof -
+  have 1: "im \<subseteq> carrier N" by (auto simp add: im_def image_def mod_hom_def module_hom_def)
   have 2: "\<And>w1 w2.\<lbrakk>w1 \<in> im; w2 \<in> im\<rbrakk> \<Longrightarrow> w1 \<oplus>\<^bsub>N\<^esub> w2 \<in> im" (*it can't auto convert \<And> and w/ o*)
   proof -
     fix w1 w2

@@ -17,28 +17,6 @@ proof -
   from h1 h2 1 show ?thesis by auto
 qed
 
-text {* Multiplication by 0 in $R$ gives 0. (Note that this fact encompasses smult-l-null 
-as this is for module while that is for algebra, so smult-l-null is redundant.)*}
-(*Add to Module. *)
-lemma (in module) lmult_0 [simp]:
-  assumes 1: "m\<in>carrier M"
-  shows "\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m=\<zero>\<^bsub>M\<^esub>"
-proof - 
-  from 1 have 0: "\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m\<in>carrier M" by simp
-  from 1 have 2: "\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m = (\<zero>\<^bsub>R\<^esub> \<oplus>\<^bsub>R\<^esub> \<zero>\<^bsub>R\<^esub>) \<odot>\<^bsub>M\<^esub> m" by simp
-  from 1 have 3: "(\<zero>\<^bsub>R\<^esub> \<oplus>\<^bsub>R\<^esub> \<zero>\<^bsub>R\<^esub>) \<odot>\<^bsub>M\<^esub> m=(\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m) \<oplus>\<^bsub>M\<^esub> (\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m)"  using [[simp_trace, simp_trace_depth_limit=3]]
-    by (simp add: smult_l_distr del: R.add.r_one R.add.l_one)
-  from 2 3 have 4: "\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m =(\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m) \<oplus>\<^bsub>M\<^esub> (\<zero>\<^bsub>R\<^esub>\<odot>\<^bsub>M\<^esub> m)" by auto
-  from 0 4 show ?thesis
-    using M.l_neg M.r_neg1 by fastforce
-qed
-
-text {* Multiplication by 0 in $M$ gives 0. *} (*Add to Module.*)
-lemma (in module) rmult_0 [simp]:
-  assumes 0: "r\<in>carrier R"
-  shows "r\<odot>\<^bsub>M\<^esub> \<zero>\<^bsub>M\<^esub>=\<zero>\<^bsub>M\<^esub>"
-by (metis M.zero_closed R.zero_closed assms lmult_0 r_null smult_assoc1)
-
 text {*Multiplication by $-1$ is the same as negation. May be useful as a simp rule. *}
 (*Add to module.*)
 lemma (in module) smult_minus_1:
@@ -93,31 +71,5 @@ text {*Use as simp rule. To show $a-b=0$, it suffices to show $a=b$. *}(*Add to 
 lemma (in abelian_group) minus_other_side [simp]:
   "\<lbrakk>a\<in>carrier G; b\<in>carrier G\<rbrakk> \<Longrightarrow> (a\<ominus>\<^bsub>G\<^esub>b = \<zero>\<^bsub>G\<^esub>) = (a=b)"
   by (metis a_minus_def add.inv_closed add.m_comm r_neg r_neg2)
-
-subsection {*Units group*}
-text {*Define the units group $R^{\times}$ and show it is actually a group.*}(* Add to Ring.*)
-definition units_group::"('a,'b) ring_scheme \<Rightarrow> 'a monoid"
-  where "units_group R = \<lparr>carrier = Units R, mult = (\<lambda>x y. x\<otimes>\<^bsub>R\<^esub> y), one = \<one>\<^bsub>R\<^esub>\<rparr>"
-
-text {*The units form a group. *}(*Add to Ring.*)
-lemma (in ring) units_form_group: "group (units_group R)"
-  apply (intro groupI)
-  apply (unfold units_group_def, auto)
-  apply (intro m_assoc) 
-  apply auto
-  apply (unfold Units_def) 
-  apply auto
-  done
-
-text {*The units of a @{text "cring"} form a commutative group.*}(* Add to Ring.*)
-lemma (in cring) units_form_cgroup: "comm_group (units_group R)"
-  apply (intro comm_groupI)
-  apply (unfold units_group_def) apply auto
-  apply (intro m_assoc) apply auto
-  apply (unfold Units_def) apply auto
-  apply (rule m_comm) apply auto
-  done
-
-
 
 end
