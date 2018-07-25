@@ -1,5 +1,6 @@
 theory Field_Extension imports
 "HOL-Algebra.Algebra"
+"VectorSpace_by_HoldenLee/VectorSpace"
 begin
 
 section \<open>missing preliminaries?\<close>
@@ -555,10 +556,6 @@ proof -
           by (metis S.comm_inv_char S.l_minus has_inverse in_field)
       qed
     next
-      case 4
-      then show ?case apply auto
-        by (metis S.comm_inv_char S.m_closed has_inverse hom_closed)
-    next
       case (5 x y)
       then show ?case apply auto
       proof goal_cases
@@ -593,7 +590,7 @@ proof -
           by (metis S.comm_inv_char S.semiring_axioms has_inverse ring.hom_closed semiring.r_null
               semiring.semiring_simprules(3))
       qed
-    qed
+    qed auto
     have "?L' \<in> ?\<M>" apply safe
     proof goal_cases
       case (2 x)

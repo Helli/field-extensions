@@ -1,7 +1,7 @@
 session Field_Extensions = "HOL-Algebra" +
   options [document = pdf, document_output = "output"]
-  sessions  (* rm *)
-    "HOL-Number_Theory"
+  theories [document = false]  (* rm *)
+    "VectorSpace_by_HoldenLee/VectorSpace"
   theories
     Examples
   document_files
