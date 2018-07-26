@@ -328,7 +328,7 @@ proof -
       apply (unfold span_def, auto) 
       apply (rule_tac x="?b" in exI)
       apply (rule_tac x="A\<inter>S" in exI)
-      by (auto intro!: m_closed)
+      by blast
   qed
   have a2: "v\<in> (span S) \<Longrightarrow> lin_dep ?T"
   proof - 
