@@ -521,7 +521,7 @@ text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes @{cite Algeb
   = {s}\<close>).\<close>
 
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
-  "genfield {s} =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
+  "genfield {s} =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding genfield_def hull_def apply simp
 proof -
