@@ -315,7 +315,7 @@ lemmas K_subgroup =
   L_extends_K[unfolded subfield_altdef, THEN conjunct1]
   L_extends_K[unfolded subfield_altdef, THEN conjunct2]
 
-lemma carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+lemma (in -) carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
 
 lemma K_inv: "a \<in> K \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> inv a \<in> K"
@@ -460,8 +460,8 @@ qed
 end
 
 (*to-do: swap summands? remove qualifiers?*)
-locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id +
-  f_e?: field_extension L K for L (structure) and K
+locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + L?:field L(*rm?*) +
+  sf?: subfield K L for L (structure) and K
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
@@ -474,16 +474,13 @@ proof goal_cases
   case 1
   then have "UnivPoly.monom P c 1 = c \<odot> UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"
     using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
-    by (metis K_subgroup(1) L_extends_K S.r_one additive_subgroup.a_Hcarr carrier_K cring_def
-        domain_def field_def ring.ring_simprules(6) subfield_def subfield_one)
-  then show ?case
-    by (metis "1" Eval_smult Eval_x L_extends_K One_nat_def S.subring_def carrier_K id_apply
-        monom_closed subfield_def)
+    done
+  then show ?case using "1" Eval_smult Eval_x subfield_axioms One_nat_def id_apply monom_closed
+      carrier_K by (metis sf.one_closed)
 qed
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (UnivPoly.monom P x 0) = x" unfolding
-  Eval_monom[simplified] apply auto
-  by (meson K_subgroup(1) S.r_one additive_subgroup.a_Hcarr)
+  Eval_monom[simplified] by auto
 
 end
 
@@ -517,13 +514,83 @@ obtains n3 d3 where "n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = n3 \<otime
   and "n3 \<in> carrier R" and "d3 \<in> carrier R" and "d3 \<noteq> \<zero>"
   by (simp add: assms integral_iff sum_of_fractions)
 
+lemma (in field) inv_of_fraction[simp]:
+  assumes "a \<in> carrier R" "b \<in> carrier R"
+  and "a \<noteq> \<zero>" "b \<noteq> \<zero>"
+shows "inv (a \<otimes>inv b) = b \<otimes>inv a"
+proof -
+  from assms have "(a \<otimes>inv b) \<otimes> (b \<otimes>inv a) = \<one>"
+  proof -
+    have "\<forall>a aa ab. ((a \<otimes> ab \<otimes> aa = ab \<otimes> (a \<otimes> aa) \<or> aa \<notin> carrier R) \<or> a \<notin> carrier R) \<or> ab \<notin> carrier R"
+      using m_assoc m_comm by force
+    then have "(a \<otimes> (b \<otimes> inv a \<otimes> inv b) = \<one> \<and> b \<otimes> inv a \<in> carrier R) \<and> inv b \<in> carrier R"
+      by (metis (no_types) Diff_iff Units_inv_closed Units_one_closed Units_r_inv assms empty_iff
+          insert_iff inv_one local.field_Units m_assoc m_closed)
+    then show ?thesis
+      by (metis (no_types) assms(1) m_assoc m_comm)
+  qed
+  then show ?thesis
+    by (simp add: assms comm_inv_char)
+qed
+
 text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes @{cite Algebra1} (only for \<^prop>\<open>S
   = {s}\<close>).\<close>
 
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
-  "genfield {s} =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
+  "generate_field L (insert s K) =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  unfolding genfield_def hull_def apply simp
+  apply auto
+proof goal_cases
+  case (1 x)
+  then show ?case
+  proof (induction rule: generate_field.induct)
+    case one
+    then show ?case
+      by force
+  next
+    case incl
+  then show ?case apply auto
+    apply (metis Eval_x S.inv_one S.r_one UP_one_closed carrier_K indet_img_carrier monom_closed
+        ring.hom_one sf.one_closed sub_one_not_zero)
+    by (metis Eval_constant S.inv_one S.r_one UP_one_closed carrier_K monom_closed ring.hom_closed
+        ring.hom_one sub_one_not_zero)
+  next
+  case (a_inv h)
+    then show ?case
+      by (metis P.add.inv_closed S.l_minus inverse_exists ring.hom_a_inv ring.hom_closed)
+  next
+    case (m_inv h)
+    then obtain f g where *:
+      "h = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
+    with \<open>h \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
+    with * show ?case by auto
+  next
+    case (eng_add h1 h2)
+    then show ?case apply auto
+    proof goal_cases
+      case (1 n1 n2 d1 d2)
+      show ?case apply (rule exI[of _ "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
+        by (simp_all add: "1" sum_of_fractions integral_iff)
+    qed
+  next
+    case (eng_mult h1 h2)
+    then show ?case apply auto
+    proof goal_cases
+      case (1 n1 n2 d1 d2)
+      show ?case apply (rule exI[of _ "n1\<otimes>n2"], rule exI[of _ "d1\<otimes>d2"])
+        using 1 apply auto
+        apply (smt S.inv_one S.m_assoc S.m_closed S.m_comm S.one_closed S.r_one inv_nonzero
+            inv_of_fraction inverse_exists ring.hom_closed sub_one_not_zero)
+        using L.integral by blast
+    qed
+  qed
+next
+  case (2 f g)
+  then have "Eval f \<in> generate_field L (insert s K)" sorry
+  then show ?case sorry
+qed
+
+(*
 proof -
   show "\<Inter>{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
     carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
@@ -665,6 +732,7 @@ proof -
       by (meson cInf_eq_minimum)
   qed
 qed
+*)
 
 subsection \<open>Polynomial Divisibility\<close>
 text \<open>Keep an eye out whether I need something from @{url

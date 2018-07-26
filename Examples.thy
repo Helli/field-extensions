@@ -69,8 +69,10 @@ lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
   apply (simp_all add: ring_class.ring_distribs)
   by (metis mult.commute nonzero_mult_div_cancel_left of_rat_eq_1_iff of_rat_mult times_divide_eq_right)
 
-lemma subfield_example: \<open>field.subfield real_field (standard_ring (range real_of_rat))\<close>
-  unfolding field.subfield_def[OF field_examples(2)]
+lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
+  apply (rule field.subfieldI'[OF field_examples(2)])
+  apply (rule ring.subringI) apply (auto simp add: real_field_def ring_univ_ring) sledgehammer
+  apply (simp_all add: univ_ring_def)+ sledgehammer
   apply (auto simp: real_field_def ring.subring_def[OF ring_univ_ring])
        apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
    apply (metis ring_standard_ring(2) standard_ring_def)
@@ -105,7 +107,7 @@ lemma field_extension_complex_over_real: "field_extension complex_field (range c
   using subfield_example' field.normalize_subfield standard_ring_def
   by (metis field_examples(3) partial_object.select_convs(1))
 
-lemma genfield_\<i>_UNIV: "field_extension.genfield complex_field (range complex_of_real) {\<i>} = UNIV"
+lemma genfield_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
@@ -143,11 +145,13 @@ proof -
   qed
 qed
 
+(*
 corollary finitely_generated_field_extension_complex_over_real:
   \<open>finitely_generated_field_extension complex_field (range complex_of_real)\<close>
   unfolding finitely_generated_field_extension_def finitely_generated_field_extension_axioms_def
   apply (auto simp add: field_extension_complex_over_real) using genfield_\<i>_UNIV
   by (metis complex_field_def finite.emptyI finite.insertI partial_object.select_convs(1)
       univ_ring_def)
+*)
 
 end

@@ -1,3 +1,5 @@
+check Examples.thy, adjust finitely_generated_field_extension
+
 check whether examples still work with this:
 locale field_extension = field L + K?: field "L\<lparr>carrier := K\<rparr>" for L (structure) and K +
   assumes "K \<subseteq> carrier L"
