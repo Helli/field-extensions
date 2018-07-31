@@ -459,7 +459,7 @@ qed
 
 end
 
-(*to-do: swap summands? remove qualifiers?*)
+(*to-do: swap summands!? remove qualifiers?*)
 locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id +
   f_e?: field_extension L K for L (structure) and K
 begin
@@ -525,15 +525,13 @@ proposition (in field_extension_with_UP) genfield_singleton_explicit:
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding genfield_def hull_def apply simp
 proof -
-  show "\<Inter>{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
-    carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-    (is "\<Inter>?\<M> = ?L'")
-  proof -
-    have in_field: "\<And>f. f \<in> carrier P \<Longrightarrow> Eval f \<in> carrier L" by simp
-    have L_over_L': "field_extension L ?L'"
-      apply standard apply (rule subfieldI) apply standard
-      apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
-          partial_object.select_convs(1) ring.hom_closed subsetI)
+  (* to-do: replace by define? *)
+  let ?L' = "{Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+  and ?\<M> = "{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t}"
+  have L_over_L': "field_extension L ?L'"
+    apply standard apply (rule subfieldI) apply standard
+           apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
+        partial_object.select_convs(1) ring.hom_closed subsetI)
     proof goal_cases
       case (1 x y)
       then show ?case apply auto
@@ -552,18 +550,19 @@ proof -
       from 3 show ?case apply (auto simp: inv_simp)
       proof goal_cases
         case (1 f g)
-        show ?case apply (rule exI[where x = "\<ominus>f"], rule exI[where x = "g"]) using 1 apply auto
-          by (metis S.comm_inv_char S.l_minus has_inverse in_field)
+        show ?case apply (rule exI[where x = "\<ominus>f"], rule exI[where x = "g"])
+          using 1 by (auto simp add: S.l_minus)
       qed
     next
       case (5 x y)
       then show ?case apply auto
       proof goal_cases
         case (1 f1 g1 f2 g2)
-        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply auto
+        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
+            auto
           apply (smt S.comm_inv_char S.l_one S.m_closed S.m_comm cring.cring_simprules(11)
               domain.integral_iff domain_def field_def field_extension_axioms field_extension_def
-              has_inverse in_field)
+              has_inverse hom_closed)
           using local.integral by blast
       qed (metis S.comm_inv_char S.m_closed has_inverse local.integral ring.hom_closed)
     next
@@ -576,16 +575,16 @@ proof -
       with 7 have [simp]: "m_inv (mult_of L) x = m_inv L x"
         apply auto
         by (metis S.comm_inv_char S.m_closed \<open>x \<in> carrier L \<Longrightarrow> inv\<^bsub>mult_of L\<^esub> x = inv\<^bsub>L\<^esub> x\<close>
-            has_inverse in_field)
+            has_inverse hom_closed)
       from 7 show ?case apply auto
       proof goal_cases
         case (1 f g)
         then have Eval_f_nonzero: "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>"
-          by (metis S.comm_inv_char S.semiring_axioms has_inverse in_field semiring.l_null)
+          by (metis S.comm_inv_char S.semiring_axioms has_inverse hom_closed semiring.l_null)
         show ?case apply (rule exI[where x = "g"], rule exI[where x = "f"]) using 1 Eval_f_nonzero
           apply auto
           by (smt S.comm_inv_char S.cring_fieldI2 S.l_one S.m_closed S.m_comm
-              cring.cring_simprules(11) domain_def field_def has_inverse in_field zero_not_one)
+              cring.cring_simprules(11) domain_def field_def has_inverse hom_closed zero_not_one)
         case 2 then show ?case
           by (metis S.comm_inv_char S.semiring_axioms has_inverse ring.hom_closed semiring.r_null
               semiring.semiring_simprules(3))
@@ -661,10 +660,9 @@ proof -
           by (simp add: "1"(1) "1"(6) field_extension.K_inv)
       qed
     }
-    ultimately show ?thesis
+    ultimately show "\<Inter>?\<M> = ?L'"
       by (meson cInf_eq_minimum)
   qed
-qed
 
 subsection \<open>Polynomial Divisibility\<close>
 text \<open>Keep an eye out whether I need something from @{url
