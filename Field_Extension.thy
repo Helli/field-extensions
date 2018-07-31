@@ -539,7 +539,7 @@ proof -
       then show ?case apply auto
       proof goal_cases
         case (1 n1 n2 d1 d2)
-        show ?case apply (rule exI[where x = "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
+        show ?case apply (rule exI[where x = "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[where x = "d1\<otimes>d2"])
           by (simp add: 1 integral_iff sum_of_fractions)
       qed
     next
@@ -552,7 +552,7 @@ proof -
       from 3 show ?case apply (auto simp: inv_simp)
       proof goal_cases
         case (1 f g)
-        show ?case apply (rule exI[of _ "\<ominus>f"], rule exI[of _ "g"]) using 1 apply auto
+        show ?case apply (rule exI[where x = "\<ominus>f"], rule exI[where x = "g"]) using 1 apply auto
           by (metis S.comm_inv_char S.l_minus has_inverse in_field)
       qed
     next
@@ -560,7 +560,7 @@ proof -
       then show ?case apply auto
       proof goal_cases
         case (1 f1 g1 f2 g2)
-        show ?case apply (rule exI[of _ "f1\<otimes>f2"], rule exI[of _ "g1\<otimes>g2"]) using 1 apply auto
+        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply auto
           apply (smt S.comm_inv_char S.l_one S.m_closed S.m_comm cring.cring_simprules(11)
               domain.integral_iff domain_def field_def field_extension_axioms field_extension_def
               has_inverse in_field)
@@ -582,7 +582,7 @@ proof -
         case (1 f g)
         then have Eval_f_nonzero: "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>"
           by (metis S.comm_inv_char S.semiring_axioms has_inverse in_field semiring.l_null)
-        show ?case apply (rule exI[of _ "g"], rule exI[of _ "f"]) using 1 Eval_f_nonzero
+        show ?case apply (rule exI[where x = "g"], rule exI[where x = "f"]) using 1 Eval_f_nonzero
           apply auto
           by (smt S.comm_inv_char S.cring_fieldI2 S.l_one S.m_closed S.m_comm
               cring.cring_simprules(11) domain_def field_def has_inverse in_field zero_not_one)
@@ -594,13 +594,13 @@ proof -
     have "?L' \<in> ?\<M>" apply safe
     proof goal_cases
       case (2 x)
-      show ?case apply (rule exI[of _ "UnivPoly.monom P x 0"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+      show ?case apply (rule exI[where x = "UnivPoly.monom P x 0"]) apply (rule exI[where x = "\<one>"]) apply safe
         apply auto
         using "2" K_subgroup(1) additive_subgroup.a_Hcarr apply fastforce
         by (simp add: "2")
     next
       case 3
-      show ?case apply (rule exI[of _ "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[of _ \<open>\<one>\<close>]) apply safe
+      show ?case apply (rule exI[where x = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"]) apply (rule exI[where x = "\<one>"]) apply safe
   apply auto
         using Eval_x One_nat_def S.r_one indet_img_carrier apply presburger
         using R.one_closed by auto
