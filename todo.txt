@@ -1,5 +1,11 @@
 check Examples.thy, adjust finitely_generated_field_extension
 
+combinig the two branches:
+make lists for both branches: good/bad
+remove sorry in for-prof-kemper
+merge (via cherry-pick?)
+make everything build again
+
 check whether examples still work with this:
 locale field_extension = field L + K?: field "L\<lparr>carrier := K\<rparr>" for L (structure) and K +
   assumes "K \<subseteq> carrier L"
@@ -24,7 +30,6 @@ rsr.add :
     "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
         one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
 
-^This error means that I have no way of seeing whether field_extension is correct
 Can the context-command use for-clauses to rename the variables? Or maybe rewrite-clauses are for that?
 
 How to simplify facts during interpretation or locale definition?
