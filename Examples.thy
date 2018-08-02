@@ -67,21 +67,39 @@ lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
       apply (smt of_rat_minus)
   using Rats_def apply auto[1]
   apply (simp_all add: ring_class.ring_distribs)
-  by (metis mult.commute nonzero_mult_div_cancel_left of_rat_eq_1_iff of_rat_mult times_divide_eq_right)
+  by (metis mult.commute nonzero_mult_div_cancel_left of_rat_eq_1_iff of_rat_mult
+      times_divide_eq_right)
+
+lemma inv_standard_ring:
+  fixes x::"_::ring"
+  shows "inv\<^bsub>\<lparr>carrier = UNIV, monoid.mult = (+), one = 0\<rparr>\<^esub> x = - x"
+  unfolding m_inv_def apply auto
+  using add.inverse_unique add_eq_0_iff eq_neg_iff_add_eq_0 by fastforce
 
 lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
-  apply (rule field.subfieldI'[OF field_examples(2)])
-  apply (rule ring.subringI) apply (auto simp add: real_field_def ring_univ_ring) sledgehammer
-  apply (simp_all add: univ_ring_def)+ sledgehammer
-  apply (auto simp: real_field_def ring.subring_def[OF ring_univ_ring])
-       apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
-   apply (metis ring_standard_ring(2) standard_ring_def)
-  by (metis f_r_o_r standard_ring_def)
+  apply unfold_locales apply (auto simp: real_field_def univ_ring_def)
+  using Rats_add Rats_def apply blast
+  apply (metis Rats_def Rats_minus_iff Rats_of_rat inv_standard_ring)
+  using Rats_def apply auto[1] using Rats_def
+  apply (metis (mono_tags, hide_lams) monoid.Units_closed partial_object.select_convs(1) ring_def
+      ring_standard_ring(2) standard_ring_def)
+  apply (simp add: Units_def)+
+  by (metis mult.commute nonzero_of_rat_inverse of_rat_eq_0_iff right_inverse)
 
 lemma field_extension_real_over_rat: "field_extension real_field (range real_of_rat)"
-  apply (simp add: field_extension_def field_extension_axioms_def)
-  using subfield_example field.normalize_subfield standard_ring_def
-  by (metis field_examples(2) partial_object.select_convs(1))
+  apply (simp add: field_extension_def field_extension_axioms_def field_examples)
+proof -
+  have f1: "ring \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+    by (metis (no_types) ring_standard_ring(2) standard_ring_def)
+  have f2: "real_field = \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+    using real_field_def univ_ring_def by auto
+  have "ring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1::real, zero = 0, add = (+)\<rparr>"
+    by (metis ring_univ_ring univ_ring_def)
+  then have "ring.subring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+    using f1 by (simp add: ring.subring_def)
+  then show "field.subfield real_field (real_field\<lparr>carrier := range real_of_rat\<rparr>)"
+    using f2 by (metis f_r_o_r field.subfield_def field_examples(2) partial_object.update_convs(1) standard_ring_def)
+qed
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
@@ -95,24 +113,26 @@ lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
   apply (simp_all add: ring_class.ring_distribs)
   by (metis divide_inverse divide_self_if mult.commute of_real_eq_1_iff of_real_mult)
 
-lemma subfield_example': \<open>field.subfield complex_field (standard_ring (range complex_of_real))\<close>
-  unfolding field.subfield_def[OF field_examples(3)]
-  apply (auto simp: complex_field_def ring.subring_def[OF ring_univ_ring])
-       apply (simp_all add: univ_ring_def ring_standard_ring(2) standard_ring_def)
-   apply (metis ring_standard_ring(3) standard_ring_def)
-  by (metis f_r_o_r' standard_ring_def)
+lemma subfield_example': "subfield (range complex_of_real) complex_field"
+  unfolding complex_field_def univ_ring_def apply unfold_locales apply auto
+  apply (metis of_real_add rangeI)
+  apply (simp add: inv_standard_ring)
+  apply (metis of_real_mult range_eqI)
+  apply (simp add: Units_def)+
+  by (metis Groups.mult_ac(2) of_real_eq_0_iff of_real_inverse right_inverse)
 
+(* deprecated?
 lemma field_extension_complex_over_real: "field_extension complex_field (range complex_of_real)"
   apply (simp add: field_extension_def field_extension_axioms_def)
   using subfield_example' field.normalize_subfield standard_ring_def
-  by (metis field_examples(3) partial_object.select_convs(1))
+*)
 
 lemma genfield_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
   interpret field_extension_with_UP P \<i> Eval complex_field "range of_real"
-    unfolding field_extension_with_UP_def apply (auto simp: field_extension_complex_over_real)
+    unfolding field_extension_with_UP_def apply auto
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto
     unfolding ring_hom_cring_def apply auto
@@ -124,7 +144,9 @@ proof -
     unfolding UP_cring_def
     apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
         partial_object.update_convs(1) standard_ring_def univ_ring_def)
-    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def by simp+
+    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def
+    apply (simp add: field_examples(3))
+    using subfield_example' by simp auto
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)

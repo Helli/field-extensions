@@ -6,11 +6,6 @@ remove sorry in for-prof-kemper
 merge (via cherry-pick?)
 make everything build again
 
-check whether examples still work with this:
-locale field_extension = field L + K?: field "L\<lparr>carrier := K\<rparr>" for L (structure) and K +
-  assumes "K \<subseteq> carrier L"
-(* no need for a subring-definition at all *)
-
 the examples from the lecture notes are not that important
 
 If Examples.thy gets too messy:
