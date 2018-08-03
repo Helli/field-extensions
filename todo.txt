@@ -4,6 +4,16 @@ remove sorry in for-prof-kemper
 merge (via cherry-pick?)
 make everything build again
 
+for-prof-kemper:
++quite smooth proof of the last proposition? But this does not work (maybe with lemma? to-do) for
+generate field, which I want to use...
++4 lemma*s which enhance the setup of field_extension: L_assoc...one_is_neutral. Do they even make
+sense with the new locale-definition? to-do
+-not yet ported to Subrings.subfield!
+master
++comment in last proposition statement is still there
+-a commented-out proof after the last propostion, needs cleanup via C+F "(*"
+
 the examples from the lecture notes are not that important
 
 If Examples.thy gets too messy:
