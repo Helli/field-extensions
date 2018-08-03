@@ -1,5 +1,3 @@
-check Examples.thy, adjust finitely_generated_field_extension
-
 combinig the two branches:
 make lists for both branches: good/bad
 remove sorry in for-prof-kemper

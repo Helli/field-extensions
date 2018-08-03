@@ -298,7 +298,7 @@ end
 
 section \<open>Field extensions\<close>
 
-locale field_extension = field L for L (structure) +
+locale (*deprecated*) field_extension = field L for L (structure) +
   fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit @{term \<zero>}, @{term \<one>} and the
  operations. @{locale subgroup} does the same.\<close>
   assumes L_extends_K: "subfield (L\<lparr>carrier:=K\<rparr>)"

@@ -486,6 +486,12 @@ characterizations see below.*}
 definition (in vectorspace) dim:: "nat"
   where "dim = (LEAST n. (\<exists> A. ((finite A) \<and> (card A = n) \<and> (A \<subseteq> carrier V) \<and> (gen_set A))))"
 
+lemma (in vectorspace) dim_of_fin_dim: "fin_dim \<Longrightarrow> dim > 0" oops
+
+\<comment> \<open>to-do: add @{term \<open>if fin_dim then current_dim else 0\<close>} to the definition. "using the pragmatic tradition
+ \<open>\<infinity> = 0\<close>". Adapting to another notion of cardinality (ecard / enat) should not be too
+difficult.\<close>
+
 text {*A @{text "basis"} is a linearly independent generating set.*}
 definition (in vectorspace) basis:: "'c set \<Rightarrow> bool"
   where "basis A = ((lin_indpt A) \<and> (gen_set A)\<and> (A\<subseteq>carrier V))"
