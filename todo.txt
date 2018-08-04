@@ -5,9 +5,8 @@ merge (via cherry-pick?)
 make everything build again
 
 for-prof-kemper:
-+quite smooth proof of the last proposition? It can be ported to generate_field (use lemma generate_field_min_subfield2)
-+4 lemma*s which enhance the setup of field_extension: L_assoc...one_is_neutral. Do they even make
-sense with the new locale-definition? to-do
++quite smooth proof of the last proposition? It can be ported to generate_field (use lemma
+generate_field_min_subfield2)
 -not yet ported to Subrings.subfield!
 master
 +comment in last proposition statement is still there

@@ -466,6 +466,10 @@ begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
+(* rm these two? *)
+lemmas L_assoc = R.m_assoc[simplified]
+lemmas one_is_neutral[simp] = R.l_one[simplified] R.r_one[simplified]
+
 lemma Eval_x[simp]: (*rm?*)
   "Eval (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
