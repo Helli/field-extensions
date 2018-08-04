@@ -590,6 +590,7 @@ next
   then show ?case sorry
 qed
 
+thm ring_hom_cring.hom_finsum
 (*
 proof -
   show "\<Inter>{t. field_extension L t \<and> K \<subseteq> t \<and> s \<in> t} = {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in>
