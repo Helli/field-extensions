@@ -1,5 +1,4 @@
 combinig the two branches:
-make lists for both branches: good/bad
 remove sorry in for-prof-kemper
 merge (via cherry-pick?)
 make everything build again
@@ -11,6 +10,8 @@ generate_field_min_subfield2)
 master
 +comment in last proposition statement is still there
 -a commented-out proof after the last propostion, needs cleanup via C+F "(*"
+
+rename field.subfield so that I can leave it at the top without conflict
 
 the examples from the lecture notes are not that important
 
