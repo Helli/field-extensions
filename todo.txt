@@ -1,5 +1,7 @@
 combinig the two branches:
-remove sorry in for-prof-kemper
+the sorry-part in the current for-prof-kemper is "M \<in> ?\<M> ==> Eval \<equiv> UnivPoly.eval (L\<lparr>carrier := K\<rparr>)
+(L\<lparr>carrier := M\<rparr>) id s", maybe a sensible thing to prove anyway (or the symmetric variant?), try it
+in the new setup"
 merge (via cherry-pick?)
 make everything build again
 
