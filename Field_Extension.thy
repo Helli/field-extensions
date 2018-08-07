@@ -3,6 +3,9 @@ theory Field_Extension imports
 "VectorSpace_by_HoldenLee/VectorSpace"
 begin
 
+locale subfield = subfield K L for K L
+  \<comment> \<open>only for renaming. rm.\<close>
+
 section \<open>missing preliminaries?\<close>
 
 lemma (in subgroup) subgroup_is_comm_group [intro]:
@@ -422,41 +425,6 @@ interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
 interpretation field_extension_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
 
-lemma pow_simp[simp]:
-  fixes n :: nat
-  shows "x \<in> K \<Longrightarrow> x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
-  using emb.hom_pow by auto
-
-lemma "\<Oplus>_simp"[simp]:
-  assumes "v ` A \<subseteq> K"
-  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto using assms apply (induction A rule: infinite_finite_induct)
-  apply (simp add: finprod_def)
-   apply (simp add: finprod_def K_subgroup(1) additive_subgroup.zero_closed)
-proof goal_cases
-  case (1 x F)
-  have a: "v \<in> F \<rightarrow> K"
-    using "1"(4) by blast
-  moreover have "K \<subseteq> carrier L"
-    by (simp add: K_subgroup(1) additive_subgroup.a_subset)
-  ultimately have b: "v \<in> F \<rightarrow> carrier L"
-    by fast
-  have d: "v x \<in> K"
-    using "1"(4) by blast
-  then have e: "v x \<in> carrier L"
-    using \<open>K \<subseteq> carrier L\<close> by blast
-  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)"
-    using emb.abelian_monoid_axioms by blast
-  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
-    by (simp add: abelian_monoid_def)
-  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ 1(1,2) b e, simplified]
-  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus> finprod (add_monoid L) v F"
-    using local.add.comm_monoid_axioms by blast
-  with 1 comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f 1(1,2) a d, simplified]
-  show ?case
-    by auto
-qed
-
 end
 
 (*to-do: swap summands? remove qualifiers?*)
@@ -539,6 +507,79 @@ qed
 
 text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes @{cite Algebra1} (only for \<^prop>\<open>S
   = {s}\<close>).\<close>
+
+lemma (in subfield) finsum_simp [simp]:
+  assumes \<open>ring L\<close>
+  assumes "v ` A \<subseteq> K"
+  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
+  unfolding finsum_def apply auto using assms
+proof (induction A rule: infinite_finite_induct)
+  case (infinite A)
+  then show ?case
+    by (simp add: finprod_def)
+next
+  case empty
+  have "\<zero>\<^bsub>L\<^esub> \<in> K"
+    by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
+  then show ?case
+      by (simp add: finprod_def)
+next
+  case (insert x F)
+  have a: "v \<in> F \<rightarrow> K"
+    using insert.prems(2) by auto
+  moreover have "K \<subseteq> carrier L"
+    by (simp add: subset)
+  ultimately have b: "v \<in> F \<rightarrow> carrier L"
+    by fast
+  have d: "v x \<in> K"
+    using insert.prems(2) by auto
+  then have e: "v x \<in> carrier L"
+    using \<open>K \<subseteq> carrier L\<close> by blast
+  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)" using assms(1)
+    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
+  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>\<^bsub>L\<^esub>), one = \<zero>\<^bsub>L\<^esub>, \<dots> = undefined::'b\<rparr>"
+    by (simp add: abelian_monoid_def)
+  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ insert.hyps b e, simplified]
+  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus>\<^bsub>L\<^esub> finprod (add_monoid L) v F"
+    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
+  with comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
+  show ?case
+    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
+qed
+
+lemma pow_simp[simp]:
+  fixes n :: nat
+  shows "x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
+  unfolding nat_pow_def by simp
+
+lemma (in field_extension_with_UP) intermediate_field_eval: (* inline? *)
+  assumes "Field_Extension.subfield M L"
+  assumes "K \<subseteq> M"
+  assumes "s \<in> M"
+  shows "Eval = UnivPoly.eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
+  unfolding Eval_def eval_def apply auto apply (fold P_def)
+proof goal_cases
+  case 1
+  have "field (L\<lparr>carrier:=M\<rparr>)"
+    using Field_Extension.subfield_def S.subfield_iff(2) assms(1) by blast
+  have "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
+    if "p \<in> carrier P" for p
+  proof auto
+    fix i
+    assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
+    then have "UnivPoly.coeff P p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
+      using assms coeff_closed that apply auto
+      apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
+            simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
+      apply (simp add: cring_def domain_def field_def ring.is_monoid)
+      done
+    then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
+      using Field_Extension.subfield_def S.subring_props(6) assms(1) by blast
+  qed
+  from subfield.finsum_simp[OF assms(1) _ this]
+  show ?case
+    using S.ring_axioms by auto
+qed
 
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
   "generate_field L (insert s K) =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
