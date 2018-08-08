@@ -581,69 +581,21 @@ proof goal_cases
     using S.ring_axioms by auto
 qed
 
+lemma (in field_extension_with_UP) insert_s_K: "insert s K \<subseteq> carrier L"
+  by (simp add: subset)
+
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
   "generate_field L (insert s K) =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  apply auto
-proof goal_cases
-  case (1 x)
-  then show ?case
-  proof (induction rule: generate_field.induct)
-    case one
-    then show ?case
-      by force
-  next
-    case incl
-  then show ?case apply auto
-    apply (metis Eval_x S.inv_one S.r_one UP_one_closed carrier_K indet_img_carrier monom_closed
-        ring.hom_one sf.one_closed sub_one_not_zero)
-    by (metis Eval_constant S.inv_one S.r_one UP_one_closed carrier_K monom_closed ring.hom_closed
-        ring.hom_one sub_one_not_zero)
-  next
-  case (a_inv h)
-    then show ?case
-      by (metis P.add.inv_closed S.l_minus inverse_exists ring.hom_a_inv ring.hom_closed)
-  next
-    case (m_inv h)
-    then obtain f g where *:
-      "h = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
-    with \<open>h \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
-    with * show ?case by auto
-  next
-    case (eng_add h1 h2)
-    then show ?case apply auto
-    proof goal_cases
-      case (1 n1 n2 d1 d2)
-      show ?case apply (rule exI[of _ "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
-        by (simp_all add: "1" sum_of_fractions integral_iff)
-    qed
-  next
-    case (eng_mult h1 h2)
-    then show ?case apply auto
-    proof goal_cases
-      case (1 n1 n2 d1 d2)
-      show ?case apply (rule exI[of _ "n1\<otimes>n2"], rule exI[of _ "d1\<otimes>d2"])
-        using 1 apply auto
-        apply (smt S.inv_one S.m_assoc S.m_closed S.m_comm S.one_closed S.r_one inv_nonzero
-            inv_of_fraction inverse_exists ring.hom_closed sub_one_not_zero)
-        using L.integral by blast
-    qed
-  qed
-next
-  case (2 f g)
-  then have "Eval f \<in> generate_field L (insert s K)" sorry
-  then show ?case sorry
-qed
-
-thm ring_hom_cring.hom_finsum
-(*
+  unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
 proof -
   (* to-do: replace by define? *)
   let ?L' = "{Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  and ?\<M> = "{M. field_extension L M \<and> K \<subseteq> M \<and> s \<in> M}"
+  and ?\<M> = "{M. Subrings.subfield M L \<and> s \<in> M \<and> K \<subseteq> M}"
   have "?L' \<in> ?\<M>"
   proof auto
-    show "field_extension L ?L'"
+    show "Subrings.subfield ?L' L"
+      find_theorems "_ \<Longrightarrow> Subrings.subfield _ L" thm ring.subfieldI'
     apply standard apply (rule subfieldI) apply standard
            apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
         partial_object.select_convs(1) ring.hom_closed subsetI)
@@ -749,7 +701,60 @@ proof -
   }
   ultimately show "\<Inter>?\<M> = ?L'"
     by (meson cInf_eq_minimum)
+      qed
+    proof goal_cases
+  case (1 x)
+  then show ?case
+  proof (induction rule: generate_field.induct)
+    case one
+    then show ?case
+      by force
+  next
+    case incl
+  then show ?case apply auto
+    apply (metis Eval_x S.inv_one S.r_one UP_one_closed carrier_K indet_img_carrier monom_closed
+        ring.hom_one sf.one_closed sub_one_not_zero)
+    by (metis Eval_constant S.inv_one S.r_one UP_one_closed carrier_K monom_closed ring.hom_closed
+        ring.hom_one sub_one_not_zero)
+  next
+  case (a_inv h)
+    then show ?case
+      by (metis P.add.inv_closed S.l_minus inverse_exists ring.hom_a_inv ring.hom_closed)
+  next
+    case (m_inv h)
+    then obtain f g where *:
+      "h = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
+    with \<open>h \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
+    with * show ?case by auto
+  next
+    case (eng_add h1 h2)
+    then show ?case apply auto
+    proof goal_cases
+      case (1 n1 n2 d1 d2)
+      show ?case apply (rule exI[of _ "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
+        by (simp_all add: "1" sum_of_fractions integral_iff)
+    qed
+  next
+    case (eng_mult h1 h2)
+    then show ?case apply auto
+    proof goal_cases
+      case (1 n1 n2 d1 d2)
+      show ?case apply (rule exI[of _ "n1\<otimes>n2"], rule exI[of _ "d1\<otimes>d2"])
+        using 1 apply auto
+        apply (smt S.inv_one S.m_assoc S.m_closed S.m_comm S.one_closed S.r_one inv_nonzero
+            inv_of_fraction inverse_exists ring.hom_closed sub_one_not_zero)
+        using L.integral by blast
+    qed
+  qed
+next
+  case (2 f g)
+  then have "Eval f \<in> generate_field L (insert s K)" sorry
+  then show ?case sorry
 qed
+
+thm ring_hom_cring.hom_finsum
+(*
+
 *)
 
 thm K_subgroup(1) additive_subgroup

@@ -1,5 +1,4 @@
 combinig the two branches:
-merge
 make everything build again
 
 for-prof-kemper:
@@ -7,7 +6,7 @@ for-prof-kemper:
 generate_field_min_subfield2)
 -not yet ported to Subrings.subfield!
 master
-+"induction rule: generate_field.induct)" because this gives case names
++"induction rule: generate_field.induct" because this gives case names
 +comment in last proposition statement is still there
 -a commented-out proof after the last propostion, needs cleanup via C+F "(*"
 
