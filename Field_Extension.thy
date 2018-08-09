@@ -191,6 +191,31 @@ lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding 
 lemma (in cring) subring_ring_hom_cring: "subring S \<Longrightarrow> ring_hom_cring S R id"
   by (simp add: RingHom.ring_hom_cringI is_cring subring_cring subring_ring_hom_ring)
 
+lemma (in cring) Subring_cring: "Subrings.subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
+  using cring.subcringI' is_cring local.ring_axioms ring.subcring_iff subringE(1) by blast
+
+lemma (in cring) Subring_ring_hom_cring:
+  "Subrings.subring S R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=S\<rparr>) R id"
+  by (metis subringE(1) subringE(3) subringE(5) subringE(6) subringE(7) subring_fullI subring_ring_hom_cring)
+
+lemma (in ring) subring_m_inv:
+  assumes "Subrings.subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
+  shows "inv k \<in> Units (R\<lparr>carrier:=K\<rparr>)" and "k \<otimes> inv k = \<one>" and "inv k \<otimes> k = \<one>"
+proof -
+  have K: "submonoid K R"
+    by (simp add: assms(1) subring.axioms(2))
+  have monoid: "monoid (R \<lparr> carrier := K \<rparr>)"
+    by (simp add: K monoid_axioms submonoid.submonoid_is_monoid)
+
+  from assms(2) have unit_of_R: "k \<in> Units R"
+    using assms(2) unfolding Units_def by auto (meson K submonoid.mem_carrier)+
+  have "inv\<^bsub>(R \<lparr> carrier := K \<rparr>)\<^esub> k \<in> Units (R \<lparr> carrier := K \<rparr>)"
+    by (simp add: assms(2) monoid monoid.Units_inv_Units)
+  thus "inv k \<in> Units (R \<lparr> carrier := K \<rparr>)" and "k \<otimes> inv k = \<one>" and "inv k \<otimes> k = \<one>"
+    using Units_l_inv[OF unit_of_R] Units_r_inv[OF unit_of_R]
+    using monoid.m_inv_monoid_consistent[OF monoid_axioms assms(2) K] by auto
+qed
+
 context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
@@ -232,7 +257,7 @@ lemmas group_mult_of_subgroup = subgroup.subgroup_is_comm_group[OF _ units_comm_
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
 
-lemma subfieldI:
+lemma subfieldI_old:
   assumes "additive_subgroup A R"
   and "subgroup (A-{\<zero>}) (mult_of R)"
 shows "subfield (R\<lparr>carrier:=A\<rparr>)"
@@ -304,7 +329,7 @@ lemma subfield_altdef: \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longlef
   additive_subgroup S R \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
   apply auto using subgroup_add abelian_subgroup_def apply force
   using subfield_imp_subgroup apply force
-  using subfieldI by blast
+  using subfieldI_old by blast
 
 end
 
@@ -568,8 +593,7 @@ lemma (in field_extension_with_UP) intermediate_field_eval: (* inline? *)
   assumes "s \<in> M"
   shows "Eval = UnivPoly.eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
-proof goal_cases
-  case 1
+proof -
   have "field (L\<lparr>carrier:=M\<rparr>)"
     using Field_Extension.subfield_def S.subfield_iff(2) assms(1) by blast
   have "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
@@ -588,7 +612,8 @@ proof goal_cases
       by (meson Field_Extension.subfield_def Subrings.subfield.axioms(1) assms(1) subdomainE(6))
   qed
   from subfield.finsum_simp[OF assms(1) _ this]
-  show ?case
+  show "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i)
+    = (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
     using S.ring_axioms by auto
 qed
 
@@ -606,161 +631,94 @@ proof -
   have "?L' \<in> ?\<M>"
   proof auto
     show "Subrings.subfield ?L' L"
-      find_theorems "_ \<Longrightarrow> Subrings.subfield _ L" thm ring.subfieldI'
-    apply standard apply (rule subfieldI) apply standard
-           apply (smt S.comm_inv_char S.m_closed has_inverse mem_Collect_eq
-        partial_object.select_convs(1) ring.hom_closed subsetI)
-    proof goal_cases
-      case (1 x y)
-      then show ?case apply auto
+      apply (rule subfieldI')
+    proof (rule S.subringI)
+      fix h
+      assume "h \<in> ?L'"
+      then show "\<ominus>\<^bsub>L\<^esub> h \<in> ?L'"
+        by (smt P.add.inv_closed S.l_minus inverse_exists mem_Collect_eq ring.hom_a_inv
+            ring.hom_closed)
+    next
+      fix h1 h2
+      assume "h1 \<in> ?L'" "h2 \<in> ?L'"
+      then show "h1 \<otimes>\<^bsub>L\<^esub>h2 \<in> ?L'"
+        apply auto
       proof goal_cases
-        case (1 n1 n2 d1 d2)
-        show ?case apply (rule exI[where x = "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[where x = "d1\<otimes>d2"])
+        case (1 f1 f2 g1 g2)
+        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
+            auto
+          apply (smt L.integral S.m_comm S.one_closed S.ring_axioms inv_nonzero inv_of_fraction
+              inverse_exists monoid.l_one ring.hom_closed ring.ring_simprules(11)
+              ring.ring_simprules(5) ring_def sub_one_not_zero)
+          using local.integral by blast
+      qed
+      from \<open>h1 \<in> ?L'\<close> \<open>h2 \<in> ?L'\<close> show "h1 \<oplus>\<^bsub>L\<^esub>h2 \<in> ?L'"
+        apply auto
+      proof goal_cases
+        case (1 f1 f2 g1 g2)
+        show ?case apply (rule exI[where x = "f1\<otimes>g2\<oplus>f2\<otimes>g1"], rule exI[where x = "g1\<otimes>g2"])
           by (simp add: 1 integral_iff sum_of_fractions)
       qed
     next
-      case 2
-      then show ?case by force
-    next
-      case (3 x)
-      have inv_simp: "inv\<^bsub>add_monoid L\<^esub> x = \<ominus>\<^bsub>L\<^esub> x"
-        by (simp add: a_inv_def)
-      from 3 show ?case apply (auto simp: inv_simp)
-      proof goal_cases
-        case (1 f g)
-        show ?case apply (rule exI[where x = "\<ominus>f"], rule exI[where x = "g"])
-          using 1 by (auto simp add: S.l_minus)
-      qed
-    next
-      case (5 x y)
-      then show ?case apply auto
-      proof goal_cases
-        case (1 f1 g1 f2 g2)
-        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
-            auto
-          apply (smt S.comm_inv_char S.l_one S.m_closed S.m_comm cring.cring_simprules(11)
-              domain.integral_iff domain_def field_def field_extension_axioms field_extension_def
-              has_inverse hom_closed)
-          using local.integral by blast
-      qed (metis S.comm_inv_char S.m_closed has_inverse local.integral ring.hom_closed)
-    next
-      case 6
-      then show ?case by force
-    next
-      case (7 x)
-      have [simp]: "x \<in> carrier L \<Longrightarrow> m_inv (mult_of L) x = m_inv L x"
-        using "7" m_inv_mult_of by auto
-      with 7 have [simp]: "m_inv (mult_of L) x = m_inv L x"
-        apply auto oops
-        by (metis S.comm_inv_char S.m_closed \<open>x \<in> carrier L \<Longrightarrow> inv\<^bsub>mult_of L\<^esub> x = inv\<^bsub>L\<^esub> x\<close>
-            has_inverse hom_closed)
-      from 7 show ?case apply auto
-      proof goal_cases
-        case (1 f g)
-        then have Eval_f_nonzero: "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>"
-          by (metis S.comm_inv_char S.semiring_axioms has_inverse hom_closed semiring.l_null)
-        show ?case apply (rule exI[where x = "g"], rule exI[where x = "f"]) using 1 Eval_f_nonzero
-          apply auto
-          by (smt S.comm_inv_char S.cring_fieldI2 S.l_one S.m_closed S.m_comm
-              cring.cring_simprules(11) domain_def field_def has_inverse hom_closed zero_not_one)
-        case 2 then show ?case
-          by (metis S.comm_inv_char S.semiring_axioms has_inverse ring.hom_closed semiring.r_null
-              semiring.semiring_simprules(3))
-      qed
-    qed auto
+      fix k
+      assume "k \<in> ?L' - {\<zero>\<^bsub>L\<^esub>}"
+      then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use integral_iff in auto)
+    qed force+
+  next
+    show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
+      apply (rule exI[where x = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
+      by (auto simp del: One_nat_def)
   next
     fix \<alpha>
     assume "\<alpha> \<in> K"
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       apply (rule exI[where x = "UnivPoly.monom P \<alpha> 0"], rule exI[where x = "\<one>"])
-      using K_subgroup(1) \<open>\<alpha> \<in> K\<close> additive_subgroup.a_Hcarr by fastforce
-  next
-    show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
-      by (auto simp del: One_nat_def)
+      by (simp add: \<open>\<alpha> \<in> K\<close>)
   qed
   then have "?L' \<in> ?\<M>".
 
   moreover {
     fix M
     assume "M \<in> ?\<M>"
-    then have L_over_M: "field_extension L M" by auto
+    then have L_over_M: "Subrings.subfield M L" by auto
     have *: "K \<subseteq> M" and **: "s \<in> M"
       using \<open>M \<in> ?\<M>\<close> by auto
+    interpret field_M: field "(L\<lparr>carrier:=M\<rparr>)"
+      by (simp add: L_over_M S.subfield_iff(2))
     have "?L' \<subseteq> M"
     proof auto
       fix f g
       assume "f \<in> carrier P" "g \<in> carrier P"
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
+      have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
       interpret M_over_K: UP_univ_prop "L\<lparr>carrier:=K\<rparr>" "L\<lparr>carrier:=M\<rparr>" id
-        unfolding UP_univ_prop_def UP_univ_prop_axioms_def UP_pre_univ_prop_def
-          apply (auto simp: P_def)
-        apply (metis "*" K_subring L_over_M carrier_K cring.subring_ring_hom_cring cring_def
-            domain_def field_def field_extension.K_field field_extension_def
-            ring.intermediate_ring_2)
-        apply (simp add: is_UP_cring)
-         apply (simp add: "**")
-        sorry
+          apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port @{thm
+          field_extension.intermediate_field_2} to the new setup?\<close>
+        unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
+        unfolding double_update
+        apply (intro cring.Subring_ring_hom_cring) apply auto
+        apply (simp add: field_M.is_cring)
+           apply (intro ring.ring_incl_imp_subring) apply auto
+        apply (simp add: field_M.ring_axioms)
+        using * apply blast
+        apply (simp add: R.ring_axioms)
+        apply (fact is_UP_cring)
+         apply (simp add: "**" UP_univ_prop_axioms_def)
+        unfolding Eval_def apply (rule eq_reflection)
+        apply (intro field_extension_with_UP.intermediate_field_eval)
+        by (simp_all add: field_extension_with_UP_axioms Field_Extension.subfield_def L_over_M * **)
       from \<open>f \<in> carrier P\<close> have "Eval f \<in> M"
         using M_over_K.hom_closed by simp
       from \<open>g \<in> carrier P\<close> have "Eval g \<in> M"
         using M_over_K.hom_closed by simp
-      with \<open>Eval g \<noteq> \<zero>\<^bsub>L\<^esub>\<close> show "Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<in> M "
-        by (metis (no_types, lifting) L_over_M S.subring_def \<open>Eval f \<in> M\<close> field_extension.K_inv
-            field_extension.K_subring field_extension.carrier_K monoid.m_closed ring_def)
+      with \<open>Eval g \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "inv\<^bsub>L\<^esub> Eval g \<in> M"
+        using L_over_M S.subfield_m_inv(1) by auto
+      with \<open>Eval f \<in> M\<close> show "Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<in> M"
+        using field_M.m_closed[simplified] by simp
     qed
   }
   ultimately show "\<Inter>?\<M> = ?L'"
     by (meson cInf_eq_minimum)
-      qed
-    proof goal_cases
-  case (1 x)
-  then show ?case
-  proof (induction rule: generate_field.induct)
-    case one
-    then show ?case
-      by force
-  next
-    case incl
-  then show ?case apply auto
-    apply (metis Eval_x S.inv_one S.r_one UP_one_closed carrier_K indet_img_carrier monom_closed
-        ring.hom_one sf.one_closed sub_one_not_zero)
-    by (metis Eval_constant S.inv_one S.r_one UP_one_closed carrier_K monom_closed ring.hom_closed
-        ring.hom_one sub_one_not_zero)
-  next
-  case (a_inv h)
-    then show ?case
-      by (metis P.add.inv_closed S.l_minus inverse_exists ring.hom_a_inv ring.hom_closed)
-  next
-    case (m_inv h)
-    then obtain f g where *:
-      "h = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
-    with \<open>h \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "Eval f \<noteq> \<zero>\<^bsub>L\<^esub>" by auto
-    with * show ?case by auto
-  next
-    case (eng_add h1 h2)
-    then show ?case apply auto
-    proof goal_cases
-      case (1 n1 n2 d1 d2)
-      show ?case apply (rule exI[of _ "n1\<otimes>d2\<oplus>n2\<otimes>d1"], rule exI[of _ "d1\<otimes>d2"])
-        by (simp_all add: "1" sum_of_fractions integral_iff)
-    qed
-  next
-    case (eng_mult h1 h2)
-    then show ?case apply auto
-    proof goal_cases
-      case (1 n1 n2 d1 d2)
-      show ?case apply (rule exI[of _ "n1\<otimes>n2"], rule exI[of _ "d1\<otimes>d2"])
-        using 1 apply auto
-        apply (smt S.inv_one S.m_assoc S.m_closed S.m_comm S.one_closed S.r_one inv_nonzero
-            inv_of_fraction inverse_exists ring.hom_closed sub_one_not_zero)
-        using L.integral by blast
-    qed
-  qed
-next
-  case (2 f g)
-  then have "Eval f \<in> generate_field L (insert s K)" sorry
-  then show ?case sorry
 qed
 
 thm ring_hom_cring.hom_finsum

@@ -10,7 +10,7 @@ master
 +comment in last proposition statement is still there
 -a commented-out proof after the last propostion, needs cleanup via C+F "(*"
 
-rename field.subfield so that I can leave it at the top without conflict
+rename my subfield and my subring (and their lemmas) so that I can leave it at the top without conflict
 
 the examples from the lecture notes are not that important
 
