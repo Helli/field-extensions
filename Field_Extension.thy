@@ -282,10 +282,20 @@ lemma subfield_imp_subgroup:
     apply auto[1] apply simp
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
-  using set_rev_mp
-  apply (metis (no_types, lifting) Units_one_closed comm_inv_char mult_of_is_Units unit_factor
-      units_of_inv)
-  apply (metis Units_one_closed inv_nonzero mult_of_is_Units rev_subsetD unit_factor units_of_inv)
+  using set_rev_mp  Units_one_closed comm_inv_char mult_of_is_Units units_of_inv
+  apply (metis (no_types, lifting) insert_Diff insert_iff local.field_Units zero_closed)
+subgoal
+proof -
+  fix a :: 'a
+  assume a1: "a \<in> carrier S"
+  assume a2: "carrier S \<subseteq> carrier R"
+assume a3: "a \<noteq> \<zero>"
+  assume a4: "inv\<^bsub>mult_of R\<^esub> a = \<zero>"
+  have "a \<in> carrier R"
+  using a2 a1 by auto
+  then show False
+    using a4 a3 by (metis (no_types) carrier_mult_of insert_Diff insert_iff local.field_Units m_inv_mult_of monoid.Units_r_inv monoid_axioms r_null zero_closed zero_not_one)
+qed
   apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
       submonoid.mem_carrier)
@@ -574,7 +584,8 @@ proof goal_cases
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
-      using Field_Extension.subfield_def S.subring_props(6) assms(1) by blast
+      using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
+      by (meson Field_Extension.subfield_def Subrings.subfield.axioms(1) assms(1) subdomainE(6))
   qed
   from subfield.finsum_simp[OF assms(1) _ this]
   show ?case
@@ -640,7 +651,7 @@ proof -
       have [simp]: "x \<in> carrier L \<Longrightarrow> m_inv (mult_of L) x = m_inv L x"
         using "7" m_inv_mult_of by auto
       with 7 have [simp]: "m_inv (mult_of L) x = m_inv L x"
-        apply auto
+        apply auto oops
         by (metis S.comm_inv_char S.m_closed \<open>x \<in> carrier L \<Longrightarrow> inv\<^bsub>mult_of L\<^esub> x = inv\<^bsub>L\<^esub> x\<close>
             has_inverse hom_closed)
       from 7 show ?case apply auto
