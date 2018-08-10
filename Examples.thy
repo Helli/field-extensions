@@ -51,8 +51,8 @@ lemma ring_standard_ring:
 
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
-lemma subring_example: "ring.subring rat_field (standard_ring (range rat_of_int))"
-  unfolding rat_field_def ring.subring_def[OF ring_univ_ring]
+lemma old_sr_example: "ring.old_sr rat_field (standard_ring (range rat_of_int))"
+  unfolding rat_field_def ring.old_sr_def[OF ring_univ_ring]
   apply (auto simp add: univ_ring_def) unfolding standard_ring_def
      apply (metis ring_standard_ring(1) standard_ring_def)
   by auto
@@ -95,10 +95,10 @@ proof -
     using real_field_def univ_ring_def by auto
   have "ring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1::real, zero = 0, add = (+)\<rparr>"
     by (metis ring_univ_ring univ_ring_def)
-  then have "ring.subring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
-    using f1 by (simp add: ring.subring_def)
-  then show "field.subfield real_field (real_field\<lparr>carrier := range real_of_rat\<rparr>)"
-    using f2 by (metis f_r_o_r field.subfield_def field_examples(2) partial_object.update_convs(1) standard_ring_def)
+  then have "ring.old_sr \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+    using f1 by (simp add: ring.old_sr_def)
+  then show "field.old_sf real_field (real_field\<lparr>carrier := range real_of_rat\<rparr>)"
+    using f2 by (metis f_r_o_r field.old_sf_def field_examples(2) partial_object.update_convs(1) standard_ring_def)
 qed
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>

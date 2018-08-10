@@ -1,5 +1,3 @@
-rename my subfield and my subring (and their lemmas) so that I can leave it at the top without conflict
-
 the examples from the lecture notes are not that important
 
 If Examples.thy gets too messy:

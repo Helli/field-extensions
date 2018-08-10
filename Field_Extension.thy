@@ -67,25 +67,25 @@ lemma ring_card: "card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
 lemma nonzero_ring_one (*rm*): "card (carrier R) \<noteq> 1 \<Longrightarrow> one R \<noteq> zero R"
   using is_singleton_altdef is_singleton_def one_zeroD by blast
 
-definition subring where
-  "subring S \<longleftrightarrow>
+definition old_sr where
+  "old_sr S \<longleftrightarrow>
     carrier S \<subseteq> carrier R \<and>
     ring S \<and>
     one R \<in> carrier S \<and>
     (\<forall>r1\<in>carrier S. \<forall>r2\<in>carrier S. add S r1 r2 = add R r1 r2 \<and> monoid.mult S r1 r2 = monoid.mult R r1 r2)"
 
-lemma "subring S \<Longrightarrow> Units S \<subseteq> Units R"
+lemma "old_sr S \<Longrightarrow> Units S \<subseteq> Units R"
   unfolding Units_def apply auto
-  using subring_def apply blast
-  unfolding subring_def apply auto
+  using old_sr_def apply blast
+  unfolding old_sr_def apply auto
   by (metis (no_types, hide_lams) contra_subsetD r_one ring.ring_simprules(12) ring.ring_simprules(6))
 
-lemma subring_refl: "subring R"
-  unfolding subring_def using local.ring_axioms by blast
+lemma old_sr_refl: "old_sr R"
+  unfolding old_sr_def using local.ring_axioms by blast
 
-lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> \<ominus>r1\<oplus>r2\<in>A\<rbrakk>
-  \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
-  unfolding subring_def apply auto
+lemma old_sr_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> \<ominus>r1\<oplus>r2\<in>A\<rbrakk>
+  \<Longrightarrow> old_sr (R\<lparr>carrier:=A\<rparr>)"
+  unfolding old_sr_def apply auto
   apply (rule ringI)
      apply (rule abelian_groupI)
           apply auto
@@ -100,15 +100,15 @@ lemma subring_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r
     apply (meson l_distr subsetCE)
     by (meson local.ring_axioms ring.ring_simprules(23) subsetCE)
 
-lemma subring_zero: "subring S \<Longrightarrow> zero S = \<zero>"
+lemma old_sr_zero: "old_sr S \<Longrightarrow> zero S = \<zero>"
   by (metis (full_types) l_zero local.add.right_cancel ring.ring_simprules(15)
-      ring.ring_simprules(2) subring_def subsetCE zero_closed)
+      ring.ring_simprules(2) old_sr_def subsetCE zero_closed)
 
-lemma normalize_subring: "subring S \<Longrightarrow> subring (R\<lparr>carrier:=carrier S\<rparr>)"
-  apply (rule subring_fullI)
-  using subring_def apply blast
-  using subring_def apply blast
-  unfolding subring_def ring_def
+lemma normalize_old_sr: "old_sr S \<Longrightarrow> old_sr (R\<lparr>carrier:=carrier S\<rparr>)"
+  apply (rule old_sr_fullI)
+  using old_sr_def apply blast
+  using old_sr_def apply blast
+  unfolding old_sr_def ring_def
     apply auto
    apply (metis monoid.m_closed)
   using abelian_group.contains_trivial[of S]
@@ -126,29 +126,29 @@ proof -
     using a6 a5 a4 a3 a2 a1 by (metis (full_types) abelian_group.r_neg2 add.inv_closed add.m_lcomm r_neg2 subsetCE)
 qed
 
-lemma subring_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> subring S \<Longrightarrow> card (carrier S) \<noteq> 1"
+lemma old_sr_nontrivial: "card (carrier R) \<noteq> 1 \<Longrightarrow> old_sr S \<Longrightarrow> card (carrier S) \<noteq> 1"
   by (metis add.r_cancel_one' card_1_singletonE nonzero_ring_one one_closed ring.ring_simprules(15)
-      ring.ring_simprules(2) singleton_iff subring_def)
+      ring.ring_simprules(2) singleton_iff old_sr_def)
 
-lemma subring_trivial_iff: "subring S \<Longrightarrow> card (carrier R) = 1 \<longleftrightarrow> card (carrier S) = 1"
+lemma old_sr_trivial_iff: "old_sr S \<Longrightarrow> card (carrier R) = 1 \<longleftrightarrow> card (carrier S) = 1"
   by (metis card_1_singletonE contra_subsetD monoid.one_closed ring.nonzero_ring_one ring_def
-      singleton_iff subring_def subring_nontrivial subring_zero zero_closed)
+      singleton_iff old_sr_def old_sr_nontrivial old_sr_zero zero_closed)
 
-lemma subgroup_to_subring:
+lemma subgroup_to_old_sr:
   "\<lbrakk>additive_subgroup A R; \<one>\<in>A; \<forall>a\<in>A. \<forall>b\<in>A. a\<otimes>b\<in>A\<rbrakk>
-    \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)" using subring_fullI
+    \<Longrightarrow> old_sr (R\<lparr>carrier:=A\<rparr>)" using old_sr_fullI
   by (simp add: additive_subgroup.a_closed additive_subgroup.a_inv_closed additive_subgroup.a_subset)
 
-lemma subyada_to_subring:
-  "\<lbrakk>additive_subgroup A R; submonoid A R\<rbrakk> \<Longrightarrow> subring (R\<lparr>carrier:=A\<rparr>)"
-  apply (rule subgroup_to_subring) apply auto
+lemma subyada_to_old_sr:
+  "\<lbrakk>additive_subgroup A R; submonoid A R\<rbrakk> \<Longrightarrow> old_sr (R\<lparr>carrier:=A\<rparr>)"
+  apply (rule subgroup_to_old_sr) apply auto
   apply (simp add: submonoid.one_closed)
   by (simp add: submonoid.m_closed)
 
-lemma subring_imp_subgroup:
-  "subring S \<Longrightarrow> additive_subgroup (carrier S) R"
+lemma old_sr_imp_subgroup:
+  "old_sr S \<Longrightarrow> additive_subgroup (carrier S) R"
   apply (rule additive_subgroup.intro, rule subgroup.intro)
-     apply (auto simp: subring_def)
+     apply (auto simp: old_sr_def)
   apply (metis ring.ring_simprules(1))
   apply (metis (no_types, hide_lams) add.r_cancel_one' ring.ring_simprules(15)
       ring.ring_simprules(2) ring.ring_simprules(5) submonoid.intro submonoid.mem_carrier)
@@ -165,41 +165,41 @@ using a4 a3 a2 by (metis (no_types) a_inv_def abelian_group.a_inv_closed add.r_c
     minus_equality ring.ring_simprules(15) ring.ring_simprules(2) ring.ring_simprules(9) ring_def)
 qed
 
-lemma subring_imp_submonoid:
-  "subring S \<Longrightarrow> submonoid (carrier S) R"
-  unfolding subring_def apply auto
+lemma old_sr_imp_submonoid:
+  "old_sr S \<Longrightarrow> submonoid (carrier S) R"
+  unfolding old_sr_def apply auto
   by (metis ring.ring_simprules(5) submonoid.intro)
 
 lemma intermediate_ring_1:
-  "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>) \<Longrightarrow> subring (R\<lparr>carrier:=M\<rparr>)"
-  unfolding subring_def by auto
+  "old_sr S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> M \<subseteq> carrier R \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>) \<Longrightarrow> old_sr (R\<lparr>carrier:=M\<rparr>)"
+  unfolding old_sr_def by auto
 lemma intermediate_ring_2:
-  "subring S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>)
-    \<Longrightarrow> ring.subring (R\<lparr>carrier:=M\<rparr>) S"
-  unfolding subring_def ring.subring_def by auto
+  "old_sr S \<Longrightarrow> carrier S \<subseteq> M \<Longrightarrow> ring (R\<lparr>carrier:=M\<rparr>)
+    \<Longrightarrow> ring.old_sr (R\<lparr>carrier:=M\<rparr>) S"
+  unfolding old_sr_def ring.old_sr_def by auto
 
-lemma subring_ring_hom_ring: "subring S \<Longrightarrow> ring_hom_ring S R id" apply intro_locales unfolding subring_def
-  subgoal using abelian_group.axioms(1) ring.is_abelian_group subring_def by blast
-  subgoal using abelian_group.axioms(2) ring_axioms ring.is_abelian_group subring_def by blast
-  subgoal using local.ring_axioms ring.is_monoid subring_def by blast
-  subgoal unfolding subring_def by (simp add: ring.axioms(3))
+lemma old_sr_ring_hom_ring: "old_sr S \<Longrightarrow> ring_hom_ring S R id" apply intro_locales unfolding old_sr_def
+  subgoal using abelian_group.axioms(1) ring.is_abelian_group old_sr_def by blast
+  subgoal using abelian_group.axioms(2) ring_axioms ring.is_abelian_group old_sr_def by blast
+  subgoal using local.ring_axioms ring.is_monoid old_sr_def by blast
+  subgoal unfolding old_sr_def by (simp add: ring.axioms(3))
   apply unfold_locales unfolding ring_hom_def apply auto
   by (metis (no_types, lifting) r_one ring.ring_simprules(12) ring.ring_simprules(6) subsetCE)
 
 end
 
-lemma (in cring) subring_cring: "subring S \<Longrightarrow> cring S" unfolding subring_def cring_def ring_def
+lemma (in cring) old_sr_cring: "old_sr S \<Longrightarrow> cring S" unfolding old_sr_def cring_def ring_def
   by (simp add: comm_monoid.m_ac(2) comm_monoid_axioms monoid.monoid_comm_monoidI subset_eq)
 
-lemma (in cring) subring_ring_hom_cring: "subring S \<Longrightarrow> ring_hom_cring S R id"
-  by (simp add: RingHom.ring_hom_cringI is_cring subring_cring subring_ring_hom_ring)
+lemma (in cring) old_sr_ring_hom_cring: "old_sr S \<Longrightarrow> ring_hom_cring S R id"
+  by (simp add: RingHom.ring_hom_cringI is_cring old_sr_cring old_sr_ring_hom_ring)
 
 lemma (in cring) Subring_cring: "Subrings.subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
   using cring.subcringI' is_cring local.ring_axioms ring.subcring_iff subringE(1) by blast
 
 lemma (in subring) cring_ring_hom_cring:
   "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
-  by (simp add: cring.axioms(1) cring.subring_ring_hom_cring ring.subring_fullI subringE(5) subringE(7) subring_axioms subset)
+  by (simp add: cring.axioms(1) cring.old_sr_ring_hom_cring ring.old_sr_fullI subringE(5) subringE(7) subring_axioms subset)
 
 lemma (in ring) subring_m_inv:
   assumes "Subrings.subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
@@ -224,47 +224,47 @@ context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
 
-definition subfield where
+definition old_sf where
   \<comment> \<open>Maybe remove this definition and put it in the assumption of \<open>field_extension\<close>...
     (requires use of rewrite-clauses to avoid a name clash?)\<close>
-  "subfield K \<longleftrightarrow> subring K \<and> field K"
+  "old_sf K \<longleftrightarrow> old_sr K \<and> field K"
 
-lemma subfield_refl: "subfield R"
-  by (simp add: local.field_axioms subfield_def subring_refl)
+lemma old_sf_refl: "old_sf R"
+  by (simp add: local.field_axioms old_sf_def old_sr_refl)
 
-lemma subfield_zero: "subfield S \<Longrightarrow> zero S = \<zero>"
-  unfolding subfield_def using subring_zero by blast
+lemma old_sf_zero: "old_sf S \<Longrightarrow> zero S = \<zero>"
+  unfolding old_sf_def using old_sr_zero by blast
 
-lemma subfield_one: "subfield S \<Longrightarrow> one S = \<one>"
+lemma old_sf_one: "old_sf S \<Longrightarrow> one S = \<one>"
 proof -
-  assume a1: "subfield S"
+  assume a1: "old_sf S"
   then have "carrier S \<subseteq> carrier R \<and> ring S \<and> \<one> \<in> carrier S \<and> (\<forall>a. a \<notin> carrier S \<or> (\<forall>aa. aa \<notin>
     carrier S \<or> a \<oplus>\<^bsub>S\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>S\<^esub> aa = a \<otimes> aa))"
-    by (simp add: field.subfield_def local.field_axioms subring_def)
+    by (simp add: field.old_sf_def local.field_axioms old_sr_def)
   then show ?thesis
-    using a1 by (metis (no_types) cring.cring_simprules(6) field.subfield_def local.field_axioms
-        r_one ring.ring_simprules(12) set_rev_mp subring_cring)
+    using a1 by (metis (no_types) cring.cring_simprules(6) field.old_sf_def local.field_axioms
+        r_one ring.ring_simprules(12) set_rev_mp old_sr_cring)
 qed
 
-lemma normalize_subfield: "subfield S \<Longrightarrow> subfield (R\<lparr>carrier:=carrier S\<rparr>)"
-  unfolding subfield_def apply auto
-   apply (simp add: normalize_subring)
+lemma normalize_old_sf: "old_sf S \<Longrightarrow> old_sf (R\<lparr>carrier:=carrier S\<rparr>)"
+  unfolding old_sf_def apply auto
+   apply (simp add: normalize_old_sr)
   apply (rule cring.cring_fieldI2)
     apply auto
-  using normalize_subring subring_cring apply auto[1]
-  unfolding subring_def apply auto
-  by (metis (no_types, lifting) field.has_inverse[simplified] subfield_def subfield_one subring_def subring_zero)
+  using normalize_old_sr old_sr_cring apply auto[1]
+  unfolding old_sr_def apply auto
+  by (metis (no_types, lifting) field.has_inverse[simplified] old_sf_def old_sf_one old_sr_def old_sr_zero)
 
 lemmas group_mult_of_subgroup = subgroup.subgroup_is_comm_group[OF _ units_comm_group, simplified]
 
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
 
-lemma subfieldI_old:
+lemma old_sfI:
   assumes "additive_subgroup A R"
   and "subgroup (A-{\<zero>}) (mult_of R)"
-shows "subfield (R\<lparr>carrier:=A\<rparr>)"
-  unfolding subfield_def apply auto apply (rule subgroup_to_subring)
+shows "old_sf (R\<lparr>carrier:=A\<rparr>)"
+  unfolding old_sf_def apply auto apply (rule subgroup_to_old_sr)
      apply (simp add: assms(1)) apply auto
   using assms(2) subgroup.one_closed apply fastforce
 subgoal for a b
@@ -280,11 +280,11 @@ proof -
 qed 
   apply (rule cring.cring_fieldI2[of "R\<lparr>carrier:=A\<rparr>"])
     apply auto
-  apply (rule subring_cring) apply (rule subyada_to_subring)
+  apply (rule old_sr_cring) apply (rule subyada_to_old_sr)
   apply (simp add: assms(1))
   apply (metis (mono_tags, lifting) Diff_subset \<open>\<And>b a. \<lbrakk>a \<in> A; b \<in> A\<rbrakk> \<Longrightarrow> a\<otimes>b \<in> A\<close>
     additive_subgroup.a_subset assms ring_axioms monoid_incl_imp_submonoid one_mult_of
-    ring.is_monoid ring.subgroup_to_subring ring.subring_def subgroup.one_closed subsetCE)
+    ring.is_monoid ring.subgroup_to_old_sr ring.old_sr_def subgroup.one_closed subsetCE)
 proof -
   fix a :: 'a
   assume a1: "a \<in> A"
@@ -295,17 +295,17 @@ proof -
     using a2 a1 by (metis (no_types) Diff_iff Units_r_inv assms(2) empty_iff field.deduplicate insert_iff local.field_axioms subgroup_def units_of_inv)
 qed
 
-lemma subgroup_add: \<open>subfield S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
-  by (simp add: abelian_subgroupI3 is_abelian_group subfield_def subring_imp_subgroup)
+lemma subgroup_add: \<open>old_sf S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
+  by (simp add: abelian_subgroupI3 is_abelian_group old_sf_def old_sr_imp_subgroup)
 
 lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
   using Units_inv_Units local.field_Units by simp
 
-lemma subfield_imp_subgroup:
-  "subfield S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
-  apply (drule normalize_subfield)
+lemma old_sf_imp_subgroup:
+  "old_sf S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
+  apply (drule normalize_old_sf)
   apply (rule group.subgroupI)
-  apply (simp add: field_mult_group) unfolding subfield_def subring_def apply auto[]
+  apply (simp add: field_mult_group) unfolding old_sf_def old_sr_def apply auto[]
   apply simp
     apply auto[1] apply simp
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
@@ -328,11 +328,11 @@ qed
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
       submonoid.mem_carrier)
 
-lemma subfield_altdef: \<open>subfield (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
+lemma old_sf_altdef: \<open>old_sf (R\<lparr>carrier := S\<rparr>) \<longleftrightarrow>
   additive_subgroup S R \<and> subgroup (S-{\<zero>}) (mult_of R)\<close>
   apply auto using subgroup_add abelian_subgroup_def apply force
-  using subfield_imp_subgroup apply force
-  using subfieldI_old by blast
+  using old_sf_imp_subgroup apply force
+  using old_sfI by blast
 
 end
 
@@ -342,19 +342,19 @@ section \<open>Field extensions\<close>
 locale (*deprecated*) field_extension = field L for L (structure) +
   fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit @{term \<zero>}, @{term \<one>} and the
  operations. @{locale subgroup} does the same.\<close>
-  assumes L_extends_K: "subfield (L\<lparr>carrier:=K\<rparr>)"
+  assumes L_extends_K: "old_sf (L\<lparr>carrier:=K\<rparr>)"
 begin \<comment> \<open>"Let @{term L}/@{term K} be a field extension."\<close>
 
 (* replace by interpretation K: field "L\<lparr>carrier:K\<rparr>" ? *)
 lemma K_field: "field (L\<lparr>carrier:=K\<rparr>)"
-  using L_extends_K by (simp add: subfield_def)
+  using L_extends_K by (simp add: old_sf_def)
 
-lemma K_subring: "subring (L\<lparr>carrier:=K\<rparr>)"
-  using L_extends_K subfield_def by blast
+lemma K_old_sr: "old_sr (L\<lparr>carrier:=K\<rparr>)"
+  using L_extends_K old_sf_def by blast
 
 lemmas K_subgroup =
-  L_extends_K[unfolded subfield_altdef, THEN conjunct1]
-  L_extends_K[unfolded subfield_altdef, THEN conjunct2]
+  L_extends_K[unfolded old_sf_altdef, THEN conjunct1]
+  L_extends_K[unfolded old_sf_altdef, THEN conjunct2]
 
 lemma (in -) carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
@@ -366,12 +366,12 @@ proof -
   have f3: "carrier (L\<lparr>carrier := K\<rparr>) \<subseteq> carrier L \<and> ring (L\<lparr>carrier := K\<rparr>) \<and> \<one> \<in> carrier (L\<lparr>carrier
     := K\<rparr>) \<and> (\<forall>a. a \<notin> carrier (L\<lparr>carrier := K\<rparr>) \<or> (\<forall>aa. aa \<notin> carrier (L\<lparr>carrier := K\<rparr>) \<or> a
     \<oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> aa = a \<otimes> aa))"
-    by (metis (no_types) K_subring subring_def)
+    by (metis (no_types) K_old_sr old_sr_def)
   then have "\<forall>a. a \<notin> K \<or> a \<in> carrier L"
     by (simp add: subset_eq)
   then show ?thesis
     using f3 a2 a1
-    by (metis K_field L_extends_K carrier_K comm_inv_char f3 field.has_inverse subfield_one subfield_zero)
+    by (metis K_field L_extends_K carrier_K comm_inv_char f3 field.has_inverse old_sf_one old_sf_zero)
 qed
 
 end
@@ -379,9 +379,9 @@ end
 lemma (in field) field_extension_refl: "field_extension R (carrier R)"
   unfolding field_extension_def field_extension_axioms_def apply auto
   using local.field_axioms apply blast
-  using normalize_subfield subfield_refl by auto
+  using normalize_old_sf old_sf_refl by auto
 
-lemma (in field) field_extension_iff_subfield: "field_extension R K \<longleftrightarrow> subfield (R\<lparr>carrier:=K\<rparr>)"
+lemma (in field) field_extension_iff_old_sf: "field_extension R K \<longleftrightarrow> old_sf (R\<lparr>carrier:=K\<rparr>)"
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
@@ -431,26 +431,26 @@ context field_extension
 begin
 
 lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
-  apply unfold_locales unfolding subfield_def apply auto unfolding field_def
-  using intermediate_ring_1 K_subring cring_def domain_def by (metis carrier_K)
+  apply unfold_locales unfolding old_sf_def apply auto unfolding field_def
+  using intermediate_ring_1 K_old_sr cring_def domain_def by (metis carrier_K)
 lemma intermediate_field_2:
   "K \<subseteq> M \<Longrightarrow> field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> field_extension (L\<lparr>carrier:=M\<rparr>) K"
-  by (metis K_field K_subring carrier_K cring_def domain_def field.field_extension_iff_subfield
-      field.normalize_subfield field.subfield_def field_def intermediate_ring_2)
+  by (metis K_field K_old_sr carrier_K cring_def domain_def field.field_extension_iff_old_sf
+      field.normalize_old_sf field.old_sf_def field_def intermediate_ring_2)
 
-lemma "\<Inter>_is_subfield": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
-  apply (unfold_locales) apply (auto simp add: subfield_altdef)
+lemma "\<Inter>_is_old_sf": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
+  apply (unfold_locales) apply (auto simp add: old_sf_altdef)
   apply (metis add.subgroups_Inter additive_subgroup.a_subgroup additive_subgroupI equals0D
       field_extension.K_subgroup(1))
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
-    by (smt equals0D field.field_extension_iff_subfield local.field_axioms mem_Collect_eq subfield_altdef
+    by (smt equals0D field.field_extension_iff_old_sf local.field_axioms mem_Collect_eq old_sf_altdef
         intersect_nonzeros)
 qed
 
 corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
-  by (simp add: "\<Inter>_is_subfield" field_extension.K_field)
+  by (simp add: "\<Inter>_is_old_sf" field_extension.K_field)
 
 lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
 
@@ -460,11 +460,11 @@ proposition intersection_of_intermediate_fields_is_field_extension[intro]:
   "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
-  note to_subfield =
-    field.field_extension_iff_subfield[OF "16_3_aux"[OF 1]]
-    field.subfield_altdef[OF "16_3_aux"[OF 1]]
+  note to_old_sf =
+    field.field_extension_iff_old_sf[OF "16_3_aux"[OF 1]]
+    field.old_sf_altdef[OF "16_3_aux"[OF 1]]
   from 1 show ?case
-    unfolding to_subfield additive_subgroup_def apply safe
+    unfolding to_old_sf additive_subgroup_def apply safe
     apply (unfold add_monoid_update)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
     apply (simp add: additive_subgroup.a_subgroup field_extension.K_subgroup(1)
@@ -498,7 +498,7 @@ corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<l
   using field_extension_genfield field_extension_def by auto
 
 interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
-  by (simp add: K_subring subring_ring_hom_cring)
+  by (simp add: K_old_sr old_sr_ring_hom_cring)
 
 interpretation field_extension_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
@@ -507,7 +507,7 @@ end
 
 (*to-do: swap summands? remove qualifiers?*)
 locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + L?:field L(*rm?*) +
-  sf?: subfield K L for L (structure) and K
+  subf'd?: subfield K L for L (structure) and K
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
@@ -526,7 +526,7 @@ proof goal_cases
     using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
     done
   then show ?case using "1" Eval_smult Eval_x subfield_axioms One_nat_def id_apply monom_closed
-      carrier_K by (metis sf.one_closed)
+      carrier_K by (metis one_closed)
 qed
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (UnivPoly.monom P x 0) = x" unfolding
