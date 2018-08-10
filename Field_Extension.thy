@@ -197,9 +197,9 @@ lemma (in cring) subring_ring_hom_cring: "subring S \<Longrightarrow> ring_hom_c
 lemma (in cring) Subring_cring: "Subrings.subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
   using cring.subcringI' is_cring local.ring_axioms ring.subcring_iff subringE(1) by blast
 
-lemma (in cring) Subring_ring_hom_cring:
-  "Subrings.subring S R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=S\<rparr>) R id"
-  by (metis subringE(1) subringE(3) subringE(5) subringE(6) subringE(7) subring_fullI subring_ring_hom_cring)
+lemma (in subring) cring_ring_hom_cring:
+  "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
+  by (simp add: cring.axioms(1) cring.subring_ring_hom_cring ring.subring_fullI subringE(5) subringE(7) subring_axioms subset)
 
 lemma (in ring) subring_m_inv:
   assumes "Subrings.subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
@@ -548,45 +548,6 @@ qed
 text \<open>Proposition 16.5 of Prof. Gregor Kemper's lecture notes @{cite Algebra1} (only for \<^prop>\<open>S
   = {s}\<close>).\<close>
 
-lemma (in subfield) finsum_simp [simp]:
-  assumes \<open>ring L\<close>
-  assumes "v ` A \<subseteq> K"
-  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto using assms
-proof (induction A rule: infinite_finite_induct)
-  case (infinite A)
-  then show ?case
-    by (simp add: finprod_def)
-next
-  case empty
-  have "\<zero>\<^bsub>L\<^esub> \<in> K"
-    by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
-  then show ?case
-      by (simp add: finprod_def)
-next
-  case (insert x F)
-  have a: "v \<in> F \<rightarrow> K"
-    using insert.prems(2) by auto
-  moreover have "K \<subseteq> carrier L"
-    by (simp add: subset)
-  ultimately have b: "v \<in> F \<rightarrow> carrier L"
-    by fast
-  have d: "v x \<in> K"
-    using insert.prems(2) by auto
-  then have e: "v x \<in> carrier L"
-    using \<open>K \<subseteq> carrier L\<close> by blast
-  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)" using assms(1)
-    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
-  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>\<^bsub>L\<^esub>), one = \<zero>\<^bsub>L\<^esub>, \<dots> = undefined::'b\<rparr>"
-    by (simp add: abelian_monoid_def)
-  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ insert.hyps b e, simplified]
-  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus>\<^bsub>L\<^esub> finprod (add_monoid L) v F"
-    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
-  with comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
-  show ?case
-    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
-qed
-
 lemma pow_simp[simp]:
   fixes n :: nat
   shows "x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
@@ -601,7 +562,7 @@ lemma (in field_extension_with_UP) intermediate_field_eval: (* inline? *)
 proof -
   have "field (L\<lparr>carrier:=M\<rparr>)"
     using Field_Extension.subfield_def S.subfield_iff(2) assms(1) by blast
-  have "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) ` {..deg (L\<lparr>carrier := K\<rparr>) p} \<subseteq> M"
+  have a: "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) \<in> {..deg (L\<lparr>carrier := K\<rparr>) p} \<rightarrow> M"
     if "p \<in> carrier P" for p
   proof auto
     fix i
@@ -616,17 +577,23 @@ proof -
       using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       by (meson Field_Extension.subfield_def Subrings.subfield.axioms(1) assms(1) subdomainE(6))
   qed
-  from subfield.finsum_simp[OF assms(1) _ this]
-  show "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i)
-    = (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
-    using S.ring_axioms by auto
+  have "f \<in> A \<rightarrow> M \<Longrightarrow> finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" for f and A
+    apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
+    apply (intro subring.cring_ring_hom_cring) using assms(1) Subrings.subfieldE(1)
+    using Field_Extension.subfield_def apply blast
+    apply (simp add: S.is_cring) apply assumption done
+  from a[THEN this] show
+    "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) =
+    (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
+    by fastforce
 qed
 
 lemma (in field_extension_with_UP) insert_s_K: "insert s K \<subseteq> carrier L"
+  \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
   by (simp add: subset)
 
 proposition (in field_extension_with_UP) genfield_singleton_explicit:
-  "generate_field L (insert s K) =   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
+  "generate_field L (insert s K) =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
 proof -
@@ -701,12 +668,12 @@ proof -
           field_extension.intermediate_field_2} to the new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
         unfolding double_update
-        apply (intro cring.Subring_ring_hom_cring) apply auto
-        apply (simp add: field_M.is_cring)
+        apply (intro subring.cring_ring_hom_cring) apply auto
            apply (intro ring.ring_incl_imp_subring) apply auto
         apply (simp add: field_M.ring_axioms)
         using * apply blast
         apply (simp add: R.ring_axioms)
+        apply (simp add: field_M.is_cring)
         apply (fact is_UP_cring)
          apply (simp add: "**" UP_univ_prop_axioms_def)
         unfolding Eval_def apply (rule eq_reflection)
@@ -725,8 +692,6 @@ proof -
   ultimately show "\<Inter>?\<M> = ?L'"
     by (meson cInf_eq_minimum)
 qed
-
-thm ring_hom_cring.hom_finsum
 
 
 subsection \<open>Polynomial Divisibility\<close>

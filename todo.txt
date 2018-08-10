@@ -1,12 +1,3 @@
-for-prof-kemper:
-+quite smooth proof of the last proposition? It can be ported to generate_field (use lemma
-generate_field_min_subfield2)
--not yet ported to Subrings.subfield!
-master
-+"induction rule: generate_field.induct" because this gives case names
-+comment in last proposition statement is still there
--a commented-out proof after the last propostion, needs cleanup via C+F "(*"
-
 rename my subfield and my subring (and their lemmas) so that I can leave it at the top without conflict
 
 the examples from the lecture notes are not that important
