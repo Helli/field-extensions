@@ -1,6 +1,3 @@
-combinig the two branches:
-make everything build again
-
 for-prof-kemper:
 +quite smooth proof of the last proposition? It can be ported to generate_field (use lemma
 generate_field_min_subfield2)

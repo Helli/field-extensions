@@ -23,6 +23,9 @@ qed
 lemma add_monoid_update[simp]: "add_monoid (R\<lparr>carrier := S\<rparr>) = add_monoid R \<lparr>carrier := S\<rparr>"
   by simp
 
+lemma (in Subrings.subfield) additive_subgroup: "additive_subgroup K R"
+  by (simp add: additive_subgroupI is_subgroup)
+
 lemma (in abelian_monoid) intersect_nonzeros:
   "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
   by auto
@@ -382,6 +385,7 @@ lemma (in field) field_extension_iff_subfield: "field_extension R K \<longleftri
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
+
 subsection \<open>Intersections of intermediate fields\<close>
 
 context field_extension
@@ -490,6 +494,7 @@ lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (UnivPoly.monom P x
   Eval_monom[simplified] by auto
 
 end
+
 
 subsection \<open>Finitely generated field extensions\<close>
 
@@ -692,7 +697,7 @@ proof -
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
       interpret M_over_K: UP_univ_prop "L\<lparr>carrier:=K\<rparr>" "L\<lparr>carrier:=M\<rparr>" id
-          apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port @{thm
+          apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port @{thm [source]
           field_extension.intermediate_field_2} to the new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
         unfolding double_update
@@ -722,16 +727,12 @@ proof -
 qed
 
 thm ring_hom_cring.hom_finsum
-(*
-
-*)
-
-thm K_subgroup(1) additive_subgroup
 
 
 subsection \<open>Polynomial Divisibility\<close>
 text \<open>Keep an eye out whether I need something from @{url
   "https://github.com/DeVilhena-Paulo/GaloisCVC4/blob/master/Polynomial_Divisibility.thy"}\<close>
+
 
 subsection \<open>Degree of a field extension\<close>
 text \<open>Todo: Start with the definitions 16.11 and proposition 16.14\<close>
