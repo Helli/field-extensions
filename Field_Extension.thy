@@ -385,6 +385,45 @@ lemma (in field) field_extension_iff_subfield: "field_extension R K \<longleftri
   using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
     local.field_axioms by blast
 
+lemma (in subfield) finsum_simp: (* unused *)
+  assumes \<open>ring L\<close>
+  assumes "v ` A \<subseteq> K"
+  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
+  unfolding finsum_def apply auto using assms
+proof (induction A rule: infinite_finite_induct)
+  case (infinite A)
+  then show ?case
+    by (simp add: finprod_def)
+next
+  case empty
+  have "\<zero>\<^bsub>L\<^esub> \<in> K"
+    by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
+  then show ?case
+      by (simp add: finprod_def)
+next
+  case (insert x F)
+  have a: "v \<in> F \<rightarrow> K"
+    using insert.prems(2) by auto
+  moreover have "K \<subseteq> carrier L"
+    by (simp add: subset)
+  ultimately have b: "v \<in> F \<rightarrow> carrier L"
+    by fast
+  have d: "v x \<in> K"
+    using insert.prems(2) by auto
+  then have e: "v x \<in> carrier L"
+    using \<open>K \<subseteq> carrier L\<close> by blast
+  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)" using assms(1)
+    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
+  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>\<^bsub>L\<^esub>), one = \<zero>\<^bsub>L\<^esub>, \<dots> = undefined::'b\<rparr>"
+    by (simp add: abelian_monoid_def)
+  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ insert.hyps b e, simplified]
+  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus>\<^bsub>L\<^esub> finprod (add_monoid L) v F"
+    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
+  with comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
+  show ?case
+    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
+qed
+
 
 subsection \<open>Intersections of intermediate fields\<close>
 
