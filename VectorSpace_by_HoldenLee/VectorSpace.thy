@@ -890,9 +890,9 @@ proof -
     from b1 have A_li: "lin_indpt A"
     proof -
       let ?z="\<lambda> x. (if (x\<in>A) then \<zero>\<^bsub>K\<^esub> else undefined)" 
-      from A_fin AinC have zero: "?Q ?z \<zero>\<^bsub>V\<^esub>" 
+      from A_fin AinC have zero: "?Q ?z \<zero>\<^bsub>V\<^esub>"
         by (unfold PiE_def extensional_def lincomb_def, auto simp add: ring_subset_carrier)
-        (*uses finsum_all0*)
+          \<comment> \<open>uses @{thm[source] finsum_all0}\<close>
       from A_fin AinC show ?thesis 
       proof (rule finite_lin_indpt2)
         fix a

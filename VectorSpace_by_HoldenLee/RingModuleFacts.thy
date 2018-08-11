@@ -41,13 +41,13 @@ text{*-1 is not 0*}
 lemma (in field) neg_1_not_0 [simp]: "\<ominus>\<^bsub>R\<^esub> \<one>\<^bsub>R\<^esub> \<noteq> \<zero>\<^bsub>R\<^esub>"
 by (metis minus_minus minus_zero one_closed zero_not_one) 
 
-text {* Note smult-assoc1 is the wrong way around for simplification.
-This is the reverse of smult-assoc1. *}(*Add to Module. *)
+text {* Note @{thm[source] module.smult_assoc1} is the wrong way around for simplification.
+This is the reverse of @{thm[source] module.smult_assoc1}. *}(*Add to Module. *)
 lemma (in module) smult_assoc_simp:
-"[| a \<in> carrier R; b \<in> carrier R; x \<in> carrier M |] ==>
+"\<lbrakk> a \<in> carrier R; b \<in> carrier R; x \<in> carrier M \<rbrakk> \<Longrightarrow>
       a \<odot>\<^bsub>M\<^esub> (b \<odot>\<^bsub>M\<^esub> x) = (a \<otimes> b) \<odot>\<^bsub>M\<^esub> x "
-by (auto simp add: smult_assoc1)
-  
+by (fact smult_assoc1[symmetric])
+
 (* Add to Ring? *)
 lemmas (in abelian_group) show_r_zero= add.l_cancel_one
 lemmas (in abelian_group) show_l_zero= add.r_cancel_one

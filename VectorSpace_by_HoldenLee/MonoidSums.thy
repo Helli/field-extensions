@@ -99,20 +99,13 @@ proof -
   from 3 6 show ?thesis by auto
 qed
 
-lemma (in comm_monoid) finprod_all1[simp]:
-  assumes all1:" \<And>a. a\<in>A\<Longrightarrow>f a = \<one>\<^bsub>G\<^esub>"
-  shows "(\<Otimes>\<^bsub>G\<^esub> a\<in>A. f a) = \<one>\<^bsub>G\<^esub>"
-(*  "[| \<And>a. a\<in>A\<Longrightarrow>f a = \<one>\<^bsub>G\<^esub> |] ==> (\<Otimes>\<^bsub>G\<^esub> a\<in>A. f a) = \<one>\<^bsub>G\<^esub>" won't work with proof - *)
-proof - 
-  from assms show ?thesis
-    by (simp cong: finprod_cong)
-qed
+lemmas (in comm_monoid)[simp] = finprod_one_eqI
 
 context abelian_monoid
 begin
 lemmas summands_equal = add.factors_equal
 lemmas extend_sum = add.extend_prod
-lemmas finsum_all0 = add.finprod_all1
+lemmas finsum_all0 = add.finprod_one_eqI
 end
 
 end
