@@ -86,8 +86,8 @@ lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
   apply (simp add: Units_def)+
   by (metis mult.commute nonzero_of_rat_inverse of_rat_eq_0_iff right_inverse)
 
-lemma field_extension_real_over_rat: "field_extension real_field (range real_of_rat)"
-  apply (simp add: field_extension_def field_extension_axioms_def field_examples)
+lemma old_fe_real_over_rat: "old_fe real_field (range real_of_rat)"
+  apply (simp add: old_fe_def old_fe_axioms_def field_examples)
 proof -
   have f1: "ring \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
     by (metis (no_types) ring_standard_ring(2) standard_ring_def)
@@ -120,12 +120,6 @@ lemma subfield_example': "subfield (range complex_of_real) complex_field"
   apply (metis of_real_mult range_eqI)
   apply (simp add: Units_def)+
   by (metis Groups.mult_ac(2) of_real_eq_0_iff of_real_inverse right_inverse)
-
-(* deprecated?
-lemma field_extension_complex_over_real: "field_extension complex_field (range complex_of_real)"
-  apply (simp add: field_extension_def field_extension_axioms_def)
-  using subfield_example' field.normalize_subfield standard_ring_def
-*)
 
 lemma genfield_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -

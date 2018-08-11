@@ -239,8 +239,6 @@ lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Lon
   by (simp add: Units_r_inv_ex field_Units)
 
 definition old_sf where
-  \<comment> \<open>Maybe remove this definition and put it in the assumption of \<open>field_extension\<close>...
-    (requires use of rewrite-clauses to avoid a name clash?)\<close>
   "old_sf K \<longleftrightarrow> old_sr K \<and> field K"
 
 lemma old_sf_refl: "old_sf R"
@@ -353,7 +351,7 @@ end
 
 section \<open>Field extensions\<close>
 
-locale (*deprecated*) field_extension = field L for L (structure) +
+locale old_fe = field L for L (structure) +
   fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit @{term \<zero>}, @{term \<one>} and the
  operations. @{locale subgroup} does the same.\<close>
   assumes L_extends_K: "old_sf (L\<lparr>carrier:=K\<rparr>)"
@@ -390,13 +388,13 @@ qed
 
 end
 
-lemma (in field) field_extension_refl: "field_extension R (carrier R)"
-  unfolding field_extension_def field_extension_axioms_def apply auto
+lemma (in field) old_fe_refl: "old_fe R (carrier R)"
+  unfolding old_fe_def old_fe_axioms_def apply auto
   using local.field_axioms apply blast
   using normalize_old_sf old_sf_refl by auto
 
-lemma (in field) field_extension_iff_old_sf: "field_extension R K \<longleftrightarrow> old_sf (R\<lparr>carrier:=K\<rparr>)"
-  using field_extension.L_extends_K field_extension.intro field_extension_axioms_def
+lemma (in field) old_fe_iff_old_sf: "old_fe R K \<longleftrightarrow> old_sf (R\<lparr>carrier:=K\<rparr>)"
+  using old_fe.L_extends_K old_fe.intro old_fe_axioms_def
     local.field_axioms by blast
 
 lemma (in subfield) finsum_simp: (* unused *)
@@ -441,50 +439,50 @@ qed
 
 subsection \<open>Intersections of intermediate fields\<close>
 
-context field_extension
+context old_fe
 begin
 
-lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> field_extension L M"
+lemma intermediate_field_1: "field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> K \<subseteq> M \<Longrightarrow> M \<subseteq> carrier L \<Longrightarrow> old_fe L M"
   apply unfold_locales unfolding old_sf_def apply auto unfolding field_def
   using intermediate_ring_1 K_old_sr cring_def domain_def by (metis carrier_K)
 lemma intermediate_field_2:
-  "K \<subseteq> M \<Longrightarrow> field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> field_extension (L\<lparr>carrier:=M\<rparr>) K"
-  by (metis K_field K_old_sr carrier_K cring_def domain_def field.field_extension_iff_old_sf
+  "K \<subseteq> M \<Longrightarrow> field (L\<lparr>carrier:=M\<rparr>) \<Longrightarrow> old_fe (L\<lparr>carrier:=M\<rparr>) K"
+  by (metis K_field K_old_sr carrier_K cring_def domain_def field.old_fe_iff_old_sf
       field.normalize_old_sf field.old_sf_def field_def intermediate_ring_2)
 
-lemma "\<Inter>_is_old_sf": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension L (\<Inter>\<M>)"
+lemma "\<Inter>_is_old_sf": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. old_fe L M \<and> M \<supseteq> K \<Longrightarrow> old_fe L (\<Inter>\<M>)"
   apply (unfold_locales) apply (auto simp add: old_sf_altdef)
   apply (metis add.subgroups_Inter additive_subgroup.a_subgroup additive_subgroupI equals0D
-      field_extension.K_subgroup(1))
+      old_fe.K_subgroup(1))
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
-    by (smt equals0D field.field_extension_iff_old_sf local.field_axioms mem_Collect_eq old_sf_altdef
+    by (smt equals0D field.old_fe_iff_old_sf local.field_axioms mem_Collect_eq old_sf_altdef
         intersect_nonzeros)
 qed
 
-corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
-  by (simp add: "\<Inter>_is_old_sf" field_extension.K_field)
+corollary "16_3_aux": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. old_fe L M \<and> M \<supseteq> K \<Longrightarrow> field (L\<lparr>carrier := \<Inter>\<M>\<rparr>)"
+  by (simp add: "\<Inter>_is_old_sf" old_fe.K_field)
 
 lemma (in field) mult_of_update[intro]: "\<zero> \<notin> S \<Longrightarrow> mult_of (R\<lparr>carrier := S\<rparr>) = mult_of R\<lparr>carrier := S\<rparr>" by simp
 
 text \<open>Proposition 16.3 of Prof. Gregor Kemper's lecture notes @{cite Algebra1}.\<close>
 
-proposition intersection_of_intermediate_fields_is_field_extension[intro]:
-  "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. field_extension L M \<and> M \<supseteq> K \<Longrightarrow> field_extension (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
+proposition intersection_of_intermediate_fields_is_old_fe[intro]:
+  "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M>. old_fe L M \<and> M \<supseteq> K \<Longrightarrow> old_fe (L\<lparr>carrier:=\<Inter>\<M>\<rparr>) K"
 proof goal_cases
   case 1
   note to_old_sf =
-    field.field_extension_iff_old_sf[OF "16_3_aux"[OF 1]]
+    field.old_fe_iff_old_sf[OF "16_3_aux"[OF 1]]
     field.old_sf_altdef[OF "16_3_aux"[OF 1]]
   from 1 show ?case
     unfolding to_old_sf additive_subgroup_def apply safe
     apply (unfold add_monoid_update)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
-    apply (simp add: additive_subgroup.a_subgroup field_extension.K_subgroup(1)
-        field_extension_axioms)
+    apply (simp add: additive_subgroup.a_subgroup old_fe.K_subgroup(1)
+        old_fe_axioms)
     using add.is_group apply blast
-    using additive_subgroup.a_subgroup field_extension.K_subgroup(1) apply blast
+    using additive_subgroup.a_subgroup old_fe.K_subgroup(1) apply blast
   proof goal_cases
     case 1
     have "mult_of (L\<lparr>carrier := \<Inter>\<M>\<rparr>) = mult_of (L\<lparr>carrier := \<Inter>\<M> - {\<zero>}\<rparr>)"
@@ -497,24 +495,24 @@ proof goal_cases
       apply (rule "subgroup.\<Inter>_is_supergroup")
       using 1 apply auto using K_subgroup apply simp
       using field_mult_group apply simp
-      using field_extension.K_subgroup(2) by blast
+      using old_fe.K_subgroup(2) by blast
   qed
 qed
 
 definition genfield where
-  "genfield S = (\<lambda>M. field_extension L M \<and> M \<supseteq> K) hull S"
+  "genfield S = (\<lambda>M. old_fe L M \<and> M \<supseteq> K) hull S"
 
-lemma field_extension_genfield: "S \<subseteq> carrier L \<Longrightarrow> field_extension (L\<lparr>carrier := genfield S\<rparr>) K"
+lemma old_fe_genfield: "S \<subseteq> carrier L \<Longrightarrow> old_fe (L\<lparr>carrier := genfield S\<rparr>) K"
   unfolding genfield_def hull_def
-  by (auto simp add: K_subgroup(1) additive_subgroup.a_subset field_extension_refl)
+  by (auto simp add: K_subgroup(1) additive_subgroup.a_subset old_fe_refl)
 
 corollary field_genfield: "S \<subseteq> carrier L \<Longrightarrow> field (L\<lparr>carrier := genfield S\<rparr>)"
-  using field_extension_genfield field_extension_def by auto
+  using old_fe_genfield old_fe_def by auto
 
 interpretation emb: ring_hom_cring "(L\<lparr>carrier:=K\<rparr>)" L id
   by (simp add: K_old_sr old_sr_ring_hom_cring)
 
-interpretation field_extension_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
+interpretation old_fe_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id "UP (L\<lparr>carrier := K\<rparr>)"
    by intro_locales
 
 end
@@ -551,7 +549,7 @@ end
 
 subsection \<open>Finitely generated field extensions\<close>
 
-locale finitely_generated_field_extension = field_extension +
+locale finitely_generated_field_extension = old_fe +
   assumes "\<exists>S. carrier L = genfield S \<and> finite S" \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
 
 lemma (in field) sum_of_fractions:
@@ -717,7 +715,7 @@ proof -
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
       interpret M_over_K: UP_univ_prop "L\<lparr>carrier:=K\<rparr>" "L\<lparr>carrier:=M\<rparr>" id
           apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port @{thm [source]
-          field_extension.intermediate_field_2} to the new setup?\<close>
+          old_fe.intermediate_field_2} to the new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
         unfolding double_update
         apply (intro subring.cring_ring_hom_cring) apply auto
