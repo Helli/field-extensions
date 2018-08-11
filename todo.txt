@@ -1,9 +1,5 @@
 the examples from the lecture notes are not that important
 
-If Examples.thy gets too messy:
-  maybe prove that complex_of_real etc. are epimorphisms? Then the field-property should translate
-  to their image.
-
 **Questions**
 
 Why are the current locales (e.g. subgroup) so conservative in importing other locales? Are there
