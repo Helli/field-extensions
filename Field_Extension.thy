@@ -44,10 +44,9 @@ lemma (in abelian_monoid) intersect_nonzeros:
   "\<M> \<noteq> {} \<Longrightarrow> \<Inter>\<M> - {\<zero>} = \<Inter>{M - {\<zero>}| M . M \<in> \<M>}"
   by auto
 
-lemma (in field) deduplicate[simp]: "units_of R = mult_of R"
-  unfolding mult_of_def units_of_def by (simp add: field_Units)
-
-lemmas (in field) inv_simps[simp] = units_of_inv[simplified] units_of_inv
+lemmas (in field)
+  [simp] = mult_of_is_Units[symmetric] \<comment> \<open>avoid the duplicate constant\<close> and
+  [simp] = units_of_inv
 
 context subgroup
 begin
@@ -304,7 +303,7 @@ proof -
   have "\<forall>a. (a \<in> {\<zero>} \<or> a \<in> Units R) \<or> a \<notin> A"
     by (metis (no_types) Diff_iff assms(2) carrier_mult_of contra_subsetD local.field_Units subgroup_def)
   then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
-    using a2 a1 by (metis (no_types) Diff_iff Units_r_inv assms(2) empty_iff field.deduplicate insert_iff local.field_axioms subgroup_def units_of_inv)
+    using a2 a1 by (metis (no_types) Diff_iff Units_r_inv assms(2) empty_iff mult_of_is_Units insert_iff subgroup_def units_of_inv)
 qed
 
 lemma subgroup_add: \<open>old_sf S \<Longrightarrow> abelian_subgroup (carrier S) R\<close>
