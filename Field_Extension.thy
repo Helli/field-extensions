@@ -607,14 +607,14 @@ lemma pow_simp[simp]:
   unfolding nat_pow_def by simp
 
 lemma (in field_extension_with_UP) intermediate_field_eval: (* inline? *)
-  assumes "Field_Extension.subfield M L"
+  assumes "subfield M L"
   assumes "K \<subseteq> M"
   assumes "s \<in> M"
   shows "Eval = UnivPoly.eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
 proof -
   have "field (L\<lparr>carrier:=M\<rparr>)"
-    using Field_Extension.subfield_def S.subfield_iff(2) assms(1) by blast
+    using subfield_def S.subfield_iff(2) assms(1) by blast
   have a: "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) \<in> {..deg (L\<lparr>carrier := K\<rparr>) p} \<rightarrow> M"
     if "p \<in> carrier P" for p
   proof auto
@@ -627,12 +627,12 @@ proof -
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
-      using assms(1) by (simp add: Field_Extension.subfield_def Subrings.subfield.axioms(1) subdomainE(6))
+      using assms(1) by (simp add: subfield_def Subrings.subfield.axioms(1) subdomainE(6))
   qed
   have "f \<in> A \<rightarrow> M \<Longrightarrow> finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" for f and A
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
     apply (intro subring.cring_ring_hom_cring) using assms(1) subfieldE(1)
-    using Field_Extension.subfield_def apply blast
+    using subfield_def apply blast
     apply (simp add: S.is_cring) apply assumption done
   from a[THEN this] show
     "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) =
