@@ -139,8 +139,7 @@ proof -
     apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
         partial_object.update_convs(1) standard_ring_def univ_ring_def)
     apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def
-    apply (simp add: field_examples(3))
-    using subfield_example' by simp auto
+    by (simp_all add: field_examples(3) field_extension_def subfield_example')
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)

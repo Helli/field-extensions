@@ -8,6 +8,8 @@ section \<open>convenient locale setup\<close>
 locale subfield = subfield K L for K L
   \<comment> \<open>only for renaming. rm.\<close>
 
+locale field_extension = subf'd?: subfield K L + superf'd?: field L for L K
+
 lemmas
   subfield_intro = Subrings.subfield.intro[folded subfield_def]
 lemmas (in field)
@@ -516,9 +518,10 @@ interpretation old_fe_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id 
 
 end
 
-(*to-do: swap summands? remove qualifiers?*)
-locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + L?:field L(*rm?*) +
-  subf'd?: subfield K L for L (structure) and K
+(*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
+as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
+locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension L K
+  for L (structure) and K
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
@@ -668,10 +671,9 @@ proof -
         case (1 f1 f2 g1 g2)
         show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
             auto
-          apply (smt L.integral S.m_comm S.one_closed S.ring_axioms inv_nonzero inv_of_fraction
-              inverse_exists monoid.l_one ring.hom_closed ring.ring_simprules(11)
-              ring.ring_simprules(5) ring_def sub_one_not_zero)
-          using local.integral by blast
+          apply (smt S.comm_inv_char S.m_lcomm S.one_closed S.r_null S.r_one S.ring_axioms
+              inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
+          using integral by blast
       qed
       from \<open>h1 \<in> ?L'\<close> \<open>h2 \<in> ?L'\<close> show "h1 \<oplus>\<^bsub>L\<^esub>h2 \<in> ?L'"
         apply auto
