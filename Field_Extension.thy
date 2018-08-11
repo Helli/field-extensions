@@ -1,10 +1,24 @@
 theory Field_Extension imports
-"HOL-Algebra.Algebra"  (* rm? *)
+"HOL-Algebra.Algebra"  (* reduce? *)
 "VectorSpace_by_HoldenLee/VectorSpace"
 begin
 
+section \<open>convenient locale setup\<close>
+
 locale subfield = subfield K L for K L
   \<comment> \<open>only for renaming. rm.\<close>
+
+lemmas
+  subfield_intro = Subrings.subfield.intro[folded subfield_def]
+lemmas (in field)
+  generate_fieldE = generate_fieldE[folded subfield_def] and
+  subfieldI' = subfieldI'[folded subfield_def] and
+  generate_field_min_subfield2 = generate_field_min_subfield2[folded subfield_def]
+lemmas (in ring)
+  subfield_iff = subfield_iff[folded subfield_def] and
+  subfieldI = subfieldI[folded subfield_def] and
+  subfield_m_inv = subfield_m_inv[folded subfield_def]
+
 
 section \<open>missing preliminaries?\<close>
 
@@ -13,7 +27,7 @@ lemma (in subgroup) subgroup_is_comm_group [intro]:
   shows "comm_group (G\<lparr>carrier := H\<rparr>)"
 proof -
   interpret comm_group G by fact
-  have "Group.monoid (G\<lparr>carrier := H\<rparr>)"
+  have "monoid (G\<lparr>carrier := H\<rparr>)"
     by (simp add: group.is_monoid is_group subgroup_is_group)
   then show ?thesis
     by (simp add: comm_group.intro is_group subgroup_is_group subgroup_is_submonoid
@@ -23,7 +37,7 @@ qed
 lemma add_monoid_update[simp]: "add_monoid (R\<lparr>carrier := S\<rparr>) = add_monoid R \<lparr>carrier := S\<rparr>"
   by simp
 
-lemma (in Subrings.subfield) additive_subgroup: "additive_subgroup K R"
+lemma (in subfield) additive_subgroup: "additive_subgroup K L"
   by (simp add: additive_subgroupI is_subgroup)
 
 lemma (in abelian_monoid) intersect_nonzeros:
@@ -194,7 +208,7 @@ lemma (in cring) old_sr_cring: "old_sr S \<Longrightarrow> cring S" unfolding ol
 lemma (in cring) old_sr_ring_hom_cring: "old_sr S \<Longrightarrow> ring_hom_cring S R id"
   by (simp add: RingHom.ring_hom_cringI is_cring old_sr_cring old_sr_ring_hom_ring)
 
-lemma (in cring) Subring_cring: "Subrings.subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
+lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
   using cring.subcringI' is_cring local.ring_axioms ring.subcring_iff subringE(1) by blast
 
 lemma (in subring) cring_ring_hom_cring:
@@ -202,7 +216,7 @@ lemma (in subring) cring_ring_hom_cring:
   by (simp add: cring.axioms(1) cring.old_sr_ring_hom_cring ring.old_sr_fullI subringE(5) subringE(7) subring_axioms subset)
 
 lemma (in ring) subring_m_inv:
-  assumes "Subrings.subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
+  assumes "subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
   shows "inv k \<in> Units (R\<lparr>carrier:=K\<rparr>)" and "k \<otimes> inv k = \<one>" and "inv k \<otimes> k = \<one>"
 proof -
   have K: "submonoid K R"
@@ -613,12 +627,11 @@ proof -
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
-      using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
-      by (meson Field_Extension.subfield_def Subrings.subfield.axioms(1) assms(1) subdomainE(6))
+      using assms(1) by (simp add: Field_Extension.subfield_def Subrings.subfield.axioms(1) subdomainE(6))
   qed
   have "f \<in> A \<rightarrow> M \<Longrightarrow> finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" for f and A
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
-    apply (intro subring.cring_ring_hom_cring) using assms(1) Subrings.subfieldE(1)
+    apply (intro subring.cring_ring_hom_cring) using assms(1) subfieldE(1)
     using Field_Extension.subfield_def apply blast
     apply (simp add: S.is_cring) apply assumption done
   from a[THEN this] show
@@ -638,10 +651,10 @@ proposition (in field_extension_with_UP) genfield_singleton_explicit:
 proof -
   (* to-do: replace by define? *)
   let ?L' = "{Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  and ?\<M> = "{M. Subrings.subfield M L \<and> s \<in> M \<and> K \<subseteq> M}"
+  and ?\<M> = "{M. subfield M L \<and> s \<in> M \<and> K \<subseteq> M}"
   have "?L' \<in> ?\<M>"
   proof auto
-    show "Subrings.subfield ?L' L"
+    show "subfield ?L' L"
       apply (rule subfieldI')
     proof (rule S.subringI)
       fix h
@@ -691,7 +704,7 @@ proof -
   moreover {
     fix M
     assume "M \<in> ?\<M>"
-    then have L_over_M: "Subrings.subfield M L" by auto
+    then have L_over_M: "subfield M L" by auto
     have *: "K \<subseteq> M" and **: "s \<in> M"
       using \<open>M \<in> ?\<M>\<close> by auto
     interpret field_M: field "(L\<lparr>carrier:=M\<rparr>)"
@@ -717,7 +730,7 @@ proof -
          apply (simp add: "**" UP_univ_prop_axioms_def)
         unfolding Eval_def apply (rule eq_reflection)
         apply (intro field_extension_with_UP.intermediate_field_eval)
-        by (simp_all add: field_extension_with_UP_axioms Field_Extension.subfield_def L_over_M * **)
+        by (simp_all add: field_extension_with_UP_axioms L_over_M * **)
       from \<open>f \<in> carrier P\<close> have "Eval f \<in> M"
         using M_over_K.hom_closed by simp
       from \<open>g \<in> carrier P\<close> have "Eval g \<in> M"
@@ -756,10 +769,6 @@ thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
 text \<open>@{thm[source] field_simps} are *not* available in general. Re-prove them?\<close>
-
-text\<open>The following is an easy generalisation of @{thm field.finite_mult_of}\<close>
-lemma finite_mult_of: "finite (carrier R) \<Longrightarrow> finite (carrier (mult_of R))"
-  by simp
 
 value INTEG value "\<Z>" \<comment> \<open>duplicate definition\<close>
 
