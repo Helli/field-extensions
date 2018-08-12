@@ -758,10 +758,12 @@ text \<open>Todo: proposition 16.14\<close>
 
 hide_const (open) degree
 
+abbreviation "vs_of K \<equiv> \<comment> \<open>\<open>K\<close> extended with \<open>(\<otimes>\<^bsub>K\<^esub>)\<close> as \<^const>\<open>smult\<close>\<close>
+  \<lparr>carrier = carrier K, monoid.mult = (\<otimes>\<^bsub>K\<^esub>), one = \<one>\<^bsub>K\<^esub>, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
+
 context field_extension begin
 
-lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>)
-(\<lparr>carrier = carrier L, monoid.mult = monoid.mult L, one = one L, zero = zero L, add = add L, smult = monoid.mult L\<rparr>)"
+lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
   apply (rule vs_criteria) apply auto
        apply (simp add: subfield_axioms subfield_iff(2))
       apply (simp add: add.m_comm)
@@ -770,20 +772,18 @@ lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>)
    apply (simp add: l_distr)
   by (simp add: semiring.semiring_simprules(13) semiring_axioms)
 
-interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>"
-"\<lparr>carrier = carrier L, monoid.mult = monoid.mult L, one = one L, zero = zero L, add = add L, smult = monoid.mult L\<rparr>"
+interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
   by (fact vectorspace_satisfied)
 
 abbreviation "fin \<equiv> vecs.fin_dim"
 
 definition degree where
   "degree \<equiv> if fin then vecs.dim else 0"
- \<comment> \<open>using the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting to another notion of cardinality
+ \<comment> \<open>This uses the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting it to another notion of cardinality
  (ecard / enat) should not be too difficult.\<close>
 
 lemma fin_dim_nonzero: "fin \<Longrightarrow> vecs.dim > 0"
-  apply (rule vecs.dim_greater_0)
-  using one_zeroI by auto
+  by (rule vecs.dim_greater_0) (auto dest: one_zeroI)
 
 corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> fin"
   by (simp add: degree_def fin_dim_nonzero)
@@ -793,8 +793,7 @@ end
 locale finite_field_extension = field_extension +
   assumes fin
 
-lemma (in field) field_is_vecs_over_itself:
-"vectorspace R \<lparr>carrier = carrier R, monoid.mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>), smult = (\<otimes>)\<rparr>"
+lemma (in field) field_is_vecs_over_itself: "vectorspace R (vs_of R)"
   by (fact field_extension.vectorspace_satisfied[OF field_extension_refl, simplified])
 
 lemma (in field) trivial_degree[simp]: "field_extension.degree R (carrier R) = 1"
@@ -805,8 +804,7 @@ proof -
   interpret asdfasdffe: field_extension R "carrier R"
     by (fact field_extension_refl)
 *)
-  interpret vecs: vectorspace R "\<lparr>carrier = carrier R, monoid.mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>),
-    smult = (\<otimes>)\<rparr>" by (fact field_is_vecs_over_itself)
+  interpret vecs: vectorspace R "vs_of R" by (fact field_is_vecs_over_itself)
   let ?A = "{\<one>}"
   have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> vecs.gen_set ?A"
   proof auto
