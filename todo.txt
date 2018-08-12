@@ -13,6 +13,4 @@ rsr.add :
     "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
         one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
 
-Can the context-command use for-clauses to rename the variables? Or maybe rewrite-clauses are for that?
-
 How to simplify facts during interpretation or locale definition?

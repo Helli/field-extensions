@@ -820,6 +820,32 @@ proof -
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
 
+sublocale field_extension < vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
+  by (fact vectorspace_satisfied)
+
+proposition
+  assumes "field_extension L K"
+  assumes "field_extension M (carrier L)"
+  shows degree_multiplicative:
+    "field_extension.degree M K = field_extension.degree M (carrier L) * field_extension.degree L K"
+  oops
+
+lemma
+  assumes "field_extension (M\<lparr>carrier:=L\<rparr>) K"
+  assumes "field_extension M L"
+  assumes "\<not>field_extension.fin (M\<lparr>carrier:=L\<rparr>) K"
+  shows enclosing_extension_infinite:
+    "\<not>field_extension.fin M K"
+proof
+  assume "field_extension.fin M K"
+  have 1: "carrier L \<subseteq> carrier M"
+    by (meson Field_Extension.subfield_def assms(2) field_extension_def subfieldE(3))
+  have 2: "field_extension.fin L K"
+  proof -
+    have "vs_of L = (vs_of M)\<lparr>carrier:=carrier L\<rparr>" apply auto sledgehamm
+qed
+
+
 
 section \<open>Observations (*rm*)\<close>
 
