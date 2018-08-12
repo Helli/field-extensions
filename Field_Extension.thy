@@ -811,7 +811,7 @@ proof -
   have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> vecs.gen_set ?A"
   proof auto
     show "x \<in> vecs.span {\<one>}" if "x \<in> carrier R" for x
-      unfolding vecs.span_def apply auto apply (rule exI[of _ \<open>\<lambda>v. if v = \<one> then x else \<zero>\<close>])
+      unfolding vecs.span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
       by (rule exI[of _ ?A]) (auto simp: that vecs.lincomb_def)
   qed (metis (mono_tags, lifting) empty_subsetI insert_subset module.span_is_subset2 one_closed
         partial_object.select_convs(1) subsetCE vecs.module_axioms)
