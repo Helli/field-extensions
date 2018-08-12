@@ -486,12 +486,6 @@ characterizations see below.*}
 definition (in vectorspace) dim:: "nat"
   where "dim = (LEAST n. (\<exists> A. ((finite A) \<and> (card A = n) \<and> (A \<subseteq> carrier V) \<and> (gen_set A))))"
 
-lemma (in vectorspace) dim_of_fin_dim: "fin_dim \<Longrightarrow> dim > 0" oops
-
-\<comment> \<open>to-do: add @{term \<open>if fin_dim then current_dim else 0\<close>} to the definition. "using the pragmatic tradition
- \<open>\<infinity> = 0\<close>". Adapting to another notion of cardinality (ecard / enat) should not be too
-difficult.\<close>
-
 text {*A @{text "basis"} is a linearly independent generating set.*}
 definition (in vectorspace) basis:: "'c set \<Rightarrow> bool"
   where "basis A = ((lin_indpt A) \<and> (gen_set A)\<and> (A\<subseteq>carrier V))"
@@ -1204,6 +1198,24 @@ theorem (in linear_map) rank_nullity:
   assumes fd: "V.fin_dim"
   shows "(vectorspace.dim K (W.vs imT)) + (vectorspace.dim K (V.vs kerT)) = V.dim"       
   by (rule rank_nullity_main[OF fd])
+
+lemma (in vectorspace) dim_greater_0:
+  assumes fin_dim
+  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
+  shows "dim > 0"
+proof (rule ccontr, simp)
+  assume "dim = 0"
+  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
+    using assms basis_def dim_basis finite_basis_exists by auto
+  then have "gen_set {}"
+    by force
+  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
+    using assms(2) by blast
+  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
+    unfolding span_def by auto
+  then show False unfolding lincomb_def
+    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
+qed
 
 
 end

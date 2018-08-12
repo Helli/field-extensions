@@ -437,6 +437,9 @@ next
     by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
 qed
 
+lemma (in field) field_extension_refl: "field_extension R (carrier R)"
+  by (simp add: field_extension.intro local.field_axioms subfield_iff(1))
+
 
 subsection \<open>Intersections of intermediate fields\<close>
 
@@ -751,7 +754,73 @@ text \<open>Keep an eye out whether I need something from @{url
 
 
 subsection \<open>Degree of a field extension\<close>
-text \<open>Todo: Start with the definitions 16.11 and proposition 16.14\<close>
+text \<open>Todo: proposition 16.14\<close>
+
+hide_const (open) degree
+
+context field_extension begin
+
+lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>)
+(\<lparr>carrier = carrier L, monoid.mult = monoid.mult L, one = one L, zero = zero L, add = add L, smult = monoid.mult L\<rparr>)"
+  apply (rule vs_criteria) apply auto
+       apply (simp add: subfield_axioms subfield_iff(2))
+      apply (simp add: add.m_comm)
+     apply (simp add: add.m_assoc)
+    apply (simp add: m_assoc)
+   apply (simp add: l_distr)
+  by (simp add: semiring.semiring_simprules(13) semiring_axioms)
+
+interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>"
+"\<lparr>carrier = carrier L, monoid.mult = monoid.mult L, one = one L, zero = zero L, add = add L, smult = monoid.mult L\<rparr>"
+  by (fact vectorspace_satisfied)
+
+abbreviation "fin \<equiv> vecs.fin_dim"
+
+definition degree where
+  "degree \<equiv> if fin then vecs.dim else 0"
+ \<comment> \<open>using the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting to another notion of cardinality
+ (ecard / enat) should not be too difficult.\<close>
+
+lemma fin_dim_nonzero: "fin \<Longrightarrow> vecs.dim > 0"
+  apply (rule vecs.dim_greater_0)
+  using one_zeroI by auto
+
+corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> fin"
+  by (simp add: degree_def fin_dim_nonzero)
+
+end
+
+locale finite_field_extension = field_extension +
+  assumes fin
+
+lemma (in field) field_is_vecs_over_itself:
+"vectorspace R \<lparr>carrier = carrier R, monoid.mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>), smult = (\<otimes>)\<rparr>"
+  by (fact field_extension.vectorspace_satisfied[OF field_extension_refl, simplified])
+
+lemma (in field) trivial_degree[simp]: "field_extension.degree R (carrier R) = 1"
+proof -
+(* to-do: can this\<down> provide "vecs." lemmas and definitions? Probably if I use sublocale for vecs,
+ but do I want/need this? Only when \<^bold>n\<^bold>o\<^bold>t working in field_extension...
+
+  interpret asdfasdffe: field_extension R "carrier R"
+    by (fact field_extension_refl)
+*)
+  interpret vecs: vectorspace R "\<lparr>carrier = carrier R, monoid.mult = (\<otimes>), one = \<one>, zero = \<zero>, add = (\<oplus>),
+    smult = (\<otimes>)\<rparr>" by (fact field_is_vecs_over_itself)
+  let ?A = "{\<one>}"
+  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> vecs.gen_set ?A"
+  proof auto
+    show "x \<in> vecs.span {\<one>}" if "x \<in> carrier R" for x
+      unfolding vecs.span_def apply auto apply (rule exI[of _ \<open>\<lambda>v. if v = \<one> then x else \<zero>\<close>])
+      by (rule exI[of _ ?A]) (auto simp: that vecs.lincomb_def)
+  qed (metis (mono_tags, lifting) empty_subsetI insert_subset module.span_is_subset2 one_closed
+        partial_object.select_convs(1) subsetCE vecs.module_axioms)
+  then have vecs.fin_dim "vecs.dim \<le> 1"
+    using vecs.fin_dim_def apply force
+    using A_generates_R vecs.gen_ge_dim by force
+  then show ?thesis unfolding field_extension.degree_def[OF field_extension_refl]
+    using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
+qed
 
 
 section \<open>Observations (*rm*)\<close>
