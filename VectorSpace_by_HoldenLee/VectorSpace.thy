@@ -29,11 +29,11 @@ a module record. To get W as a vectorspace, write vs W.*}
 locale subspace =
   fixes K and W and V (structure)
   assumes vs: "vectorspace K V"
-      and submod: "submodule K W V"
+      and submod: "submodule W K V"
 
 
 lemma (in vectorspace) is_module[simp]:
-  "subspace K W V\<Longrightarrow>submodule K W V"
+  "subspace K W V\<Longrightarrow>submodule W K V"
 by (unfold subspace_def, auto)
 
 text {*We introduce some basic facts and definitions copied from module.
@@ -183,7 +183,7 @@ lemma (in vectorspace) sum_is_subspace:
   assumes h1: "subspace K W1 V" and h2: "subspace K W2 V"
   shows "subspace K (subspace_sum W1 W2) V"
 proof -
-  from h1 h2 have mod: "submodule K (submodule_sum W1 W2) V" 
+  from h1 h2 have mod: "submodule (submodule_sum W1 W2) K V"
     by ( intro sum_is_submodule, unfold subspace_def, auto)
   from mod h1 h2 show ?thesis 
     by (unfold subspace_def, auto)
@@ -223,7 +223,7 @@ lemma (in vectorspace) span_is_subspace:
   shows "subspace K (span S) V"
 proof -
   have 0: "vectorspace K V"..
-  from h2 have 1: "submodule K (span S) V" by (rule span_is_submodule)
+  from h2 have 1: "submodule (span S) K V" by (rule span_is_submodule)
   from 0 1 show ?thesis by (unfold subspace_def mod_hom_def linear_map_def, auto)
 qed
 
@@ -361,7 +361,7 @@ proof -
   from inC inspan have dir1: "span A \<subseteq> span (A\<union>{v})" by (intro span_is_monotone, auto)
 
   from inC have inown: "A\<subseteq>span A" by (rule in_own_span)
-  from inC have subm: "submodule K (span A) V" by (rule span_is_submodule)
+  from inC have subm: "submodule (span A) K V" by (rule span_is_submodule)
   from inown inspan subm have dir2: "span (A \<union> {v}) \<subseteq> span A" by (intro span_is_subset, auto) 
 
   from dir1 dir2 show ?thesis by auto
@@ -1216,6 +1216,10 @@ proof (rule ccontr, simp)
   then show False unfolding lincomb_def
     using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
 qed
+
+text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} are ever used:\<close>
+find_theorems name: "subspace."
+find_theorems name: "submodule."
 
 
 end

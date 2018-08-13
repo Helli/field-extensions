@@ -31,11 +31,11 @@ proof -
   from h1 h2 have 2: "abelian_group (direct_sum M1 M2)" 
     apply (intro abelian_groupI, auto)
          apply (unfold direct_sum_def, auto)
-       by (auto simp add: v1.a_ac v2.a_ac)
+       by (auto simp: v1.a_ac v2.a_ac)
   from h1 h2 assms have 3: "module_axioms R (direct_sum M1 M2)"
     apply (unfold module_axioms_def, auto)
         apply (unfold direct_sum_def, auto)
-         by (auto simp add: v1.smult_l_distr v2.smult_l_distr v1.smult_r_distr v2.smult_r_distr
+         by (auto simp: v1.smult_l_distr v2.smult_l_distr v1.smult_r_distr v2.smult_r_distr
       v1.smult_assoc1 v2.smult_assoc1)
   from 1 2 3  show ?thesis by (unfold module_def, auto)
 qed
@@ -76,7 +76,7 @@ text {*For submodules $M_1,M_2\subseteq M$, the map $M_1\oplus M_2\to M$ given b
 m_1+m_2$ is linear.*}
 lemma (in module) sum_map_hom: 
   fixes M1 M2
-  assumes h1: "submodule R M1 M" and h2: "submodule R M2 M"
+  assumes h1: "submodule M1 R M" and h2: "submodule M2 R M"
   shows "mod_hom R (direct_sum (md M1) (md M2)) M (\<lambda> v. (fst v) \<oplus>\<^bsub>M\<^esub> (snd v))"
 proof - 
   have 0: "module R M"..
@@ -88,15 +88,15 @@ proof -
     apply (unfold mod_hom_def mod_hom_axioms_def module_hom_def, auto)
        apply (rule direct_sum_is_module, auto)
       apply (unfold direct_sum_def, auto)
-      apply (unfold submodule_def, auto)
-     by (auto simp add: a_ac smult_r_distr ring_subset_carrier) 
+      using submoduleE apply auto
+     by (auto simp: a_ac smult_r_distr ring_subset_carrier)
       (*key is a_ac, permutative rewrite rule*)
 qed
 
 lemma (in module) sum_is_submodule:
   fixes N1 N2
-  assumes h1: "submodule R N1 M" and h2: "submodule R N2 M"
-  shows "submodule R (submodule_sum N1 N2) M"
+  assumes h1: "submodule N1 R M" and h2: "submodule N2 R M"
+  shows "submodule (submodule_sum N1 N2) R M"
 proof -
   from h1 h2 interpret l: mod_hom R "(direct_sum (md N1) (md N2))" M "(\<lambda> v. (fst v) \<oplus>\<^bsub>M\<^esub> (snd v))" 
     by (rule sum_map_hom)
@@ -104,13 +104,13 @@ proof -
     apply (unfold l.im_def submodule_sum_def)
     apply (unfold direct_sum_def, auto)
     by (unfold image_def, auto)
-  have 2: "submodule R (l.im) M" by (rule l.im_is_submodule)
+  have 2: "submodule (l.im) R M" by (rule l.im_is_submodule)
   from 1 2 show ?thesis by auto
 qed
 
 lemma (in module) in_sum:
   fixes N1 N2
-  assumes h1: "submodule R N1 M" and h2: "submodule R N2 M"
+  assumes h1: "submodule N1 R M" and h2: "submodule N2 R M"
   shows "N1 \<subseteq> submodule_sum N1 N2"
 proof -
   from h1 h2 show ?thesis
@@ -119,12 +119,12 @@ proof -
     apply (rename_tac v)
     apply (rule_tac x="v" in bexI)
      apply (rule_tac x="\<zero>\<^bsub>M\<^esub>" in bexI)
-      by (unfold submodule_def, auto)
+    using submoduleE by (auto simp: ring_subset_carrier M.add.one_in_subset)
 qed
 
 lemma (in module) msum_comm:
   fixes N1 N2
-  assumes h1: "submodule R N1 M" and h2: "submodule R N2 M"
+  assumes h1: "submodule N1 R M" and h2: "submodule N2 R M"
   shows "(submodule_sum N1 N2) = (submodule_sum N2 N1)"
 proof - 
   (*have 0: "module R M"..*)
@@ -132,7 +132,7 @@ proof -
     apply (unfold submodule_sum_def image_def, auto)
      apply (unfold submodule_def)
      apply (rename_tac v w)
-     by (metis (full_types) M.add.m_comm subsetD)+
+    using M.add.m_comm M.add.subgroupE(1) by blast+
     (* Alternatively, apply (rule_tac x="w" in bexI, rule_tac x="v" in bexI,
       auto simp add: ring_subset_carrier M.a_ac)+ *)
 qed
@@ -141,7 +141,7 @@ text {*If $M_1,M_2\subseteq M$ are submodules, then $M_1+M_2$ is the minimal sub
 both $M_1\subseteq M$ and $M_2\subseteq M$.*}
 lemma (in module) sum_is_minimal:
   fixes N N1 N2
-  assumes h1: "submodule R N1 M" and h2: "submodule R N2 M" and h3: "submodule R N M"
+  assumes h1: "submodule N1 R M" and h2: "submodule N2 R M" and h3: "submodule N R M"
   shows "(submodule_sum N1 N2) \<subseteq> N \<longleftrightarrow> N1 \<subseteq> N \<and> N2 \<subseteq> N"
 proof - 
   have 1: "(submodule_sum N1 N2) \<subseteq> N \<Longrightarrow> N1 \<subseteq> N \<and> N2 \<subseteq> N"
@@ -162,7 +162,7 @@ proof -
       by (unfold submodule_sum_def image_def, auto)
     from 19 21 22 23 h3 have "v \<in> N" 
       apply (unfold submodule_def, auto)
-      by (metis (poly_guards_query)  contra_subsetD)
+      using submoduleE(5) by blast
 (*how is an obtain goal rep'd?*) 
     }
     thus ?thesis
@@ -178,13 +178,13 @@ lemma (in module) span_union_is_sum:
   shows "span (A\<union> B) = submodule_sum (span A) (span B)"
 proof-
   let ?AplusB="submodule_sum (span A) (span B)"
-  from  h2 have s0: "submodule R (span A) M" by (rule span_is_submodule)
-  from  h3 have s1: "submodule R (span B) M" by (rule span_is_submodule)
-  from s0 have s0_1: "(span A)\<subseteq>carrier M" by (unfold submodule_def, auto)
-  from s1 have s1_1: "(span B)\<subseteq>carrier M" by (unfold submodule_def, auto)
+  from  h2 have s0: "submodule (span A) R M" by (rule span_is_submodule)
+  from  h3 have s1: "submodule (span B) R M" by (rule span_is_submodule)
+  from s0 have s0_1: "(span A)\<subseteq>carrier M" by (simp add: h2 span_is_subset2)
+  from s1 have s1_1: "(span B)\<subseteq>carrier M" by (simp add: submoduleE(1))
   from h2 h3 have 1: "A\<union>B\<subseteq>carrier M" by auto
-  from  1 have 2: "submodule R (span (A\<union>B)) M" by (rule span_is_submodule)
-  from s0 s1 have 3: "submodule R ?AplusB M" by (rule sum_is_submodule)
+  from  1 have 2: "submodule (span (A\<union>B)) R M" by (rule span_is_submodule)
+  from s0 s1 have 3: "submodule ?AplusB R M" by (rule sum_is_submodule)
   have c1: "span (A\<union>B) \<subseteq> ?AplusB"
 (*span(A\<union>B) \<subseteq> span(A) + span(B) *)
   proof -
@@ -205,7 +205,7 @@ proof-
     have 12: "B\<subseteq>A\<union>B" by auto
     from  11 have 21:"span A \<subseteq>span (A\<union>B)" by (rule span_is_monotone)
     from  12 have 22:"span B \<subseteq>span (A\<union>B)" by (rule span_is_monotone)
-    from s0 s1 2 21 22 show ?thesis by (auto simp add: sum_is_minimal)
+    from s0 s1 2 21 22 show ?thesis by (simp add: sum_is_minimal)
   qed
   from c1 c2 show ?thesis by auto
 qed

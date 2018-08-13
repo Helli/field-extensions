@@ -323,6 +323,7 @@ qed
 
 text {*A submodule is $N\subseteq M$ that is closed under addition and scalar multiplication, and
 contains 0 (so is not empty).*}
+\<^cancel>\<open>
 locale submodule =
   fixes R and N and M (structure)
   assumes module: "module R M" 
@@ -330,6 +331,7 @@ locale submodule =
     and m_closed [intro, simp]: "\<lbrakk>v \<in> N; w \<in> N\<rbrakk> \<Longrightarrow> v \<oplus> w \<in> N"
     and zero_closed [simp]: "\<zero> \<in> N" (*prevents N from being the empty set*)
     and smult_closed [intro, simp]: "\<lbrakk>c \<in> carrier R; v \<in> N\<rbrakk> \<Longrightarrow> c\<odot>v \<in> N"
+\<close> \<comment> \<open>replaced by @{locale Module.submodule} (which does not assume @{locale module}!)\<close>
 
 abbreviation (in module) md::"'c set \<Rightarrow> ('a, 'c, 'd) module_scheme"
   where "md N \<equiv> M\<lparr>carrier :=N\<rparr>"
@@ -340,28 +342,9 @@ lemma (in module) carrier_vs_is_self [simp]:
 
 lemma (in module) submodule_is_module:
   fixes N::"'c set"
-  assumes 0: "submodule R N M"
+  assumes 0: "submodule N R M"
   shows "module R (md N)"
-proof  (unfold module_def, auto)
-  show 1: "cring R"..
-next
-  from assms show 2: "abelian_group (md N)" 
-    apply (unfold submodule_def)
-    apply (intro abelian_groupI, auto)
-      apply (metis (no_types, hide_lams) M.add.m_assoc contra_subsetD)
-     apply (metis (no_types, hide_lams) M.add.m_comm contra_subsetD)
-    apply (rename_tac v)
-    txt {*The inverse of $v$ under addition is $-v$*}
-    apply (rule_tac x="\<ominus>\<^bsub>M\<^esub>v" in bexI)
-     apply (metis M.l_neg contra_subsetD)
-    by (metis R.add.inv_closed one_closed smult_minus_1 subset_iff)
-next
-  from assms show 3: "module_axioms R (md N)"
-    apply (unfold module_axioms_def submodule_def, auto)
-      apply (metis (no_types, hide_lams) smult_l_distr contra_subsetD)
-     apply (metis (no_types, hide_lams) smult_r_distr contra_subsetD)
-    by (metis (no_types, hide_lams) smult_assoc1 contra_subsetD)
-qed
+  by (simp add: assms module_axioms submodule.submodule_is_module)
 
 text {*$N_1+N_2=\{x+y | x\in N_1,y\in N_2\}$ *}
 definition (in module) submodule_sum:: "['c set, 'c set] \<Rightarrow> 'c set"
@@ -427,15 +410,11 @@ lemma f_neg [simp]: "v \<in> carrier M\<Longrightarrow>f (\<ominus>\<^bsub>M\<^e
 lemma f_minus [simp]: "\<lbrakk>v\<in>carrier M; w\<in>carrier M\<rbrakk>\<Longrightarrow>f (v\<ominus>\<^bsub>M\<^esub>w) = f v \<ominus>\<^bsub>N\<^esub> f w"
   by (simp add: a_minus_def)
 
-lemma ker_is_submodule: "submodule R ker M"
-proof - 
-  have 0: "mod_hom R M N f"..
-  from 0 have 1: "module R M" by (unfold mod_hom_def, auto)
-  show ?thesis
-    by  (rule submodule.intro, auto simp add: ker_def, rule 1) (*rmult_0*)
-qed
+lemma ker_is_submodule: "submodule ker R M"
+  apply unfold_locales apply (auto simp: ker_def)
+    by (metis N.M.add.inv_one a_inv_def f_neg)
 
-lemma im_is_submodule: "submodule R im N"
+lemma im_is_submodule: "submodule im R N"
 proof -
   have 1: "im \<subseteq> carrier N" by (auto simp add: im_def image_def mod_hom_def module_hom_def)
   have 2: "\<And>w1 w2.\<lbrakk>w1 \<in> im; w2 \<in> im\<rbrakk> \<Longrightarrow> w1 \<oplus>\<^bsub>N\<^esub> w2 \<in> im" (*it can't auto convert \<And> and w/ o*)
@@ -464,7 +443,8 @@ proof -
     from 11 have 12: "\<exists>v1\<in>carrier M.  c\<odot>\<^bsub>N\<^esub> w=f v1" by metis 
     from 12 show "?thesis c w" by (unfold im_def image_def, auto) (*sensitive to ordering*)
   qed
-  from 1 2 3 4 show ?thesis by (unfold_locales, auto)
+  from 1 2 3 4 show ?thesis apply unfold_locales apply auto
+    by (smt M.M.add.l_inv_ex M.M.minus_equality a_inv_def f_neg im_def image_def mem_Collect_eq)
 qed
 
 lemma (in mod_hom) f_ker:
@@ -624,15 +604,15 @@ text {*The union of nested submodules is a submodule. We will use this to show t
 set is a submodule.*}
 lemma (in module) nested_union_vs: 
   fixes I N N'
-  assumes subm: "\<And>i. i\<in>I\<Longrightarrow> submodule R (N i) M"
+  assumes subm: "\<And>i. i\<in>I\<Longrightarrow> submodule (N i) R M"
     and max_exists: "\<And>i j. i\<in>I\<Longrightarrow>j\<in>I\<Longrightarrow> (\<exists>k. k\<in>I \<and> N i\<subseteq>N k \<and> N j \<subseteq>N k)" 
     and uni: "N'=(\<Union> i\<in>I. N i)"
     and ne: "I\<noteq>{}"
-  shows "submodule R N' M"
+  shows "submodule N' R M"
 proof -
   have 1: "module R M"..
   from subm have all_in: "\<And>i. i\<in>I \<Longrightarrow> N i \<subseteq> carrier M"
-    by (unfold submodule_def, auto)
+    by (simp add: submoduleE(1))
   from uni all_in have 2: "\<And>x. x \<in> N' \<Longrightarrow> x \<in> carrier M"
     by auto
   from uni have 3: "\<And>v w. v \<in> N' \<Longrightarrow> w \<in> N' \<Longrightarrow> v \<oplus>\<^bsub>M\<^esub> w \<in> N'"
@@ -642,18 +622,18 @@ proof -
     from uni v w obtain i j where i: "i\<in>I\<and> v\<in> N i" and j: "j\<in>I\<and> w\<in> N j" by auto
     from max_exists i j obtain k where k: "k\<in>I \<and> N i \<subseteq> N k \<and> N j \<subseteq> N k" by presburger
     from v w i j k have v2: "v\<in>N k" and w2: "w\<in> N k" by auto
-    from v2 w2 k subm[of k] have vw: "v \<oplus>\<^bsub>M\<^esub> w \<in> N k" apply (unfold submodule_def) by auto
+    from v2 w2 k subm[of k] have vw: "v \<oplus>\<^bsub>M\<^esub> w \<in> N k" using submoduleE(5) by blast
     from k vw uni show "?thesis v w"  by auto
   qed
   have 4: "\<zero>\<^bsub>M\<^esub> \<in> N'"
-  proof - 
+  proof -
     from ne obtain i where i: "i\<in>I" by auto
-    from i subm have zi: "\<zero>\<^bsub>M\<^esub>\<in>N i" by (unfold submodule_def, auto)
+    from i subm have zi: "\<zero>\<^bsub>M\<^esub>\<in>N i" by (simp add: M.add.one_in_subset all_in submoduleE)
     from i zi uni show ?thesis by auto
   qed
   from uni subm have 5: "\<And>c v. c \<in> carrier R \<Longrightarrow> v \<in> N' \<Longrightarrow> c \<odot>\<^bsub>M\<^esub> v \<in> N'"
-    by (unfold submodule_def, auto)
-  from 1 2 3 4 5 show ?thesis by (unfold submodule_def, auto)
+    using submodule.smult_closed by fastforce
+  from 1 2 3 4 5 show ?thesis by (simp add: smult_minus_1_back submoduleI subsetI)
 qed
 
 lemma (in module) span_is_monotone:
@@ -669,16 +649,16 @@ qed
 lemma (in module) span_is_submodule:
   fixes S
   assumes  h2: "S\<subseteq>carrier M"
-  shows "submodule R (span S) M"
+  shows "submodule (span S) R M"
 proof (cases "S={}")
   case True
   moreover have "module R M"..
-  ultimately show ?thesis apply (unfold submodule_def span_def lincomb_def, auto) done
-next 
+  ultimately show ?thesis by (auto intro: submoduleI simp: span_def lincomb_def M.minus_equality)
+next
   case False
   show ?thesis
   proof (rule nested_union_vs[where ?I="{F. F\<subseteq>S \<and> finite F}" and ?N="\<lambda>F. span F" and ?N'="span S"])
-    show " \<And>F. F \<in> {F. F \<subseteq> S \<and> finite F} \<Longrightarrow> submodule R (span F) M"
+    show " \<And>F. F \<in> {F. F \<subseteq> S \<and> finite F} \<Longrightarrow> submodule (span F) R M"
     proof - 
       fix F
       assume F: "F \<in> {F. F \<subseteq> S \<and> finite F}"
@@ -693,9 +673,9 @@ next
         apply (unfold image_def, auto)
         apply (rule_tac x="restrict a F" in bexI)
          by (auto intro!: lincomb_cong)
-      from 1 show "submodule R (span F) M" by (metis mh.im_is_submodule)
+      from 1 show "submodule (span F) R M" by (metis mh.im_is_submodule)
     qed
-  next 
+  next
     show "\<And>i j. i \<in> {F. F \<subseteq> S \<and> finite F} \<Longrightarrow>
            j \<in> {F. F \<subseteq> S \<and> finite F} \<Longrightarrow>
            \<exists>k. k \<in> {F. F \<subseteq> S \<and> finite F} \<and> span i \<subseteq> span k \<and> span j \<subseteq> span k"
@@ -722,21 +702,25 @@ This lemma requires a somewhat annoying lemma foldD-not-depend. Then we show tha
 linear independence, span do not depend on the ambient module.*}
 lemma (in module) finsum_not_depend:
   fixes a A N
-  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule R N M" and h4: "f:A\<rightarrow>N"
+  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule N R M" and h4: "f:A\<rightarrow>N"
   shows "(\<Oplus>\<^bsub>(md N)\<^esub> v\<in>A. f v) = (\<Oplus>\<^bsub>M\<^esub> v\<in>A. f v)"
 proof -
   from h1 h2 h3 h4 show ?thesis
     apply (unfold finsum_def finprod_def)
     apply simp
     apply (intro foldD_not_depend[where ?B="A"])
-         apply (unfold submodule_def LCD_def, auto)
-    apply (meson M.add.m_lcomm PiE subsetCE)+
-    done
+         apply (auto dest: submoduleE)
+    unfolding LCD_def apply auto
+    apply (meson M.add.m_lcomm PiE contra_subsetD submoduleE(1))
+    using submoduleE(5) apply blast
+    apply (meson M.add.m_lcomm Pi_iff contra_subsetD submoduleE(1))
+    using submoduleE(1) apply force
+    by (simp add: M.add.one_in_subset submoduleE(1) submoduleE(2) submoduleE(5) submoduleE(6))
 qed
 
 lemma (in module) lincomb_not_depend:
   fixes a A N
-  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule R N M" and h4: "a:A\<rightarrow>carrier R"
+  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule N R M" and h4: "a:A\<rightarrow>carrier R"
   shows "lincomb a A = module.lincomb (md N) a A"
 proof - 
   from h3 interpret N: module R "(md N)" by (rule submodule_is_module)
@@ -750,12 +734,12 @@ qed
 
 lemma (in module) span_li_not_depend:
   fixes S N
-  assumes h2: "S\<subseteq>N" and  h3: "submodule R N M"
+  assumes h2: "S\<subseteq>N" and  h3: "submodule N R M"
   shows "module.span R (md N) S = module.span R M S"
     and "module.lin_dep R (md N) S = module.lin_dep R M S"
 proof -
   from h3 interpret w: module R "(md N)" by (rule submodule_is_module)
-  from h2 have 1:"submodule R (module.span R (md N) S) (md N)" 
+  from h2 have 1:"submodule (module.span R (md N) S) R (md N)"
     by (intro w.span_is_submodule, simp)
   have 3: "\<And>a A. (finite A \<and> A\<subseteq>S \<and> a \<in> A \<rightarrow> carrier R \<Longrightarrow> 
     module.lincomb M a A = module.lincomb (md N) a A)"
@@ -772,22 +756,22 @@ proof -
   have zeros: "\<zero>\<^bsub>md N\<^esub>=\<zero>\<^bsub>M\<^esub>" by auto
   from assms 3 show 5: "module.lin_dep R (md N) S = module.lin_dep R M S"
     apply (unfold lin_dep_def w.lin_dep_def)
-    apply (subst zeros) 
+    apply (subst zeros)
     by metis
 qed
 
 lemma (in module) span_is_subset: 
   fixes S N
-  assumes h2: "S\<subseteq>N" and  h3: "submodule R N M"
+  assumes h2: "S\<subseteq>N" and  h3: "submodule N R M"
   shows "span S \<subseteq> N"
 proof -  
   from h3 interpret w: module R "(md N)" by (rule submodule_is_module)
-  from h2 have 1:"submodule R (module.span R (md N) S) (md N)" 
+  from h2 have 1:"submodule (module.span R (md N) S) R (md N)"
     by (intro w.span_is_submodule, simp)
   from assms have 4: "module.span R (md N) S = module.span R M S"
      by (rule span_li_not_depend)
-  from 1 4 have 5: "submodule R (module.span R M S) (md N)" by auto
-  from 5 show ?thesis by (unfold submodule_def, simp)
+  from 1 4 have 5: "submodule (module.span R M S) R (md N)" by auto
+  from 5 show ?thesis using w.submoduleE(1) by auto
 qed
 
 
@@ -796,8 +780,7 @@ lemma (in module) span_is_subset2:
   assumes h2: "S\<subseteq>carrier M"
   shows "span S \<subseteq> carrier M"
 proof - 
-  have 0: "module R M"..
-  from 0 have h3: "submodule R (carrier M) M" by (unfold submodule_def, auto)
+  have h3: "submodule (carrier M) R M" by (fact carrier_is_submodule)
   from h2 h3 show ?thesis by (rule span_is_subset)
 qed
 
@@ -842,18 +825,16 @@ qed
 
 lemma (in mod_hom) hom_sum:
   fixes A B g
-  assumes h2: "A\<subseteq>carrier M" and h3: "g:A\<rightarrow>carrier M"
+  assumes "A\<subseteq>carrier M" and "g:A\<rightarrow>carrier M"
   shows "f (\<Oplus>\<^bsub>M\<^esub> a\<in>A. g a) = (\<Oplus>\<^bsub>N\<^esub> a\<in>A. f (g a))"
-proof -   
-  from h2 h3 show ?thesis
-  proof (induct A rule: infinite_finite_induct) (*doesn't work on outside?*)
-    case (insert a A)
-    then have "(\<Oplus>\<^bsub>N\<^esub>a\<in>insert a A. f (g a)) = f (g a) \<oplus>\<^bsub>N\<^esub> (\<Oplus>\<^bsub>N\<^esub>a\<in>A. f (g a))"  
-      by (intro finsum_insert, auto)
-    with insert.prems insert.hyps show ?case
-      by simp
-  qed auto
-qed
+  using assms
+proof (induct A rule: infinite_finite_induct)
+  case (insert a A)
+  then have "(\<Oplus>\<^bsub>N\<^esub>a\<in>insert a A. f (g a)) = f (g a) \<oplus>\<^bsub>N\<^esub> (\<Oplus>\<^bsub>N\<^esub>a\<in>A. f (g a))"
+    by (intro finsum_insert, auto)
+  with insert.prems insert.hyps show ?case
+    by simp
+qed auto
 
 
 end
