@@ -831,20 +831,32 @@ proposition
   oops
 
 lemma
-  assumes "field_extension (M\<lparr>carrier:=L\<rparr>) K"
+  assumes "field_extension (M\<lparr>carrier:=L\<rparr>) K" (* could be replaced by subfield (with swapped arguments) *)
   assumes "field_extension M L"
   assumes "\<not>field_extension.fin (M\<lparr>carrier:=L\<rparr>) K"
   shows enclosing_extension_infinite:
     "\<not>field_extension.fin M K"
 proof
-  assume "field_extension.fin M K"
-  have 1: "carrier L \<subseteq> carrier M"
-    by (meson Field_Extension.subfield_def assms(2) field_extension_def subfieldE(3))
-  have 2: "field_extension.fin L K"
-  proof -
-    have "vs_of L = (vs_of M)\<lparr>carrier:=carrier L\<rparr>" apply auto sledgehamm
-qed
-
+  interpret enclosing: field_extension M K
+    apply (rule field_extension.intro) apply (rule ring.subfield_iff(1))
+    using assms(2) cring_def domain_def field_def field_extension_def apply blast
+    subgoal proof -
+      have "field (M\<lparr>carrier:=L,carrier:=K\<rparr>)"
+        using Field_Extension.ring.subfield_iff(2) assms(1) cring_def domain_def field_def
+          field_extension_def by blast
+      then show ?thesis by simp
+    qed
+    apply (metis (full_types) Field_Extension.subfield_def assms(1) assms(2) carrier_K
+        dual_order.trans field_extension_def subfieldE(3))
+    using assms(2) field_extension.axioms(2) by blast
+  note a = subspace.intro[OF enclosing.vectorspace_satisfied, of L]
+  have "subspace (M\<lparr>carrier := K\<rparr>) L (vs_of M)" apply (rule a)
+    apply unfold_locales
+    using Field_Extension.subfield_def assms(2) field_extension_def subfieldE(3) apply fastforce
+    apply auto
+    apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1))
+      apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1))
+    oops
 
 
 section \<open>Observations (*rm*)\<close>
