@@ -632,11 +632,10 @@ proof -
     then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
       using assms(1) by (simp add: subfield_def Subrings.subfield.axioms(1) subdomainE(6))
   qed
-  have "f \<in> A \<rightarrow> M \<Longrightarrow> finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" for f and A
+  have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
-    apply (intro subring.cring_ring_hom_cring) using assms(1) subfieldE(1)
-    using subfield_def apply blast
-    apply (simp add: S.is_cring) apply assumption done
+    by (intro subring.cring_ring_hom_cring)
+      (simp_all add: Field_Extension.subfield.axioms assms(1) subfieldE(1) S.is_cring that)
   from a[THEN this] show
     "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) =
     (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
