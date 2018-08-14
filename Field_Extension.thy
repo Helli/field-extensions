@@ -556,7 +556,13 @@ subsection \<open>Finitely generated field extensions\<close>
 
 locale finitely_generated_field_extension = field_extension +
   assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
-    \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+(*    \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+or add one of these:
+begin
+definition "S \<equiv> THE S. finite S \<and> generate_field L (S \<union> K) = carrier L"
+definition "S \<equiv> SOME S. finite S \<and> generate_field L (S \<union> K) = carrier L"
+end
+*)
 
 lemma (in field) sum_of_fractions:
       "n1 \<in> carrier R \<Longrightarrow>
