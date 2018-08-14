@@ -556,11 +556,12 @@ subsection \<open>Finitely generated field extensions\<close>
 
 locale finitely_generated_field_extension = field_extension +
   assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
-(*    \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
-or add one of these:
+(*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>?\<close>
+or simply add one of these:
 begin
 definition "S \<equiv> THE S. finite S \<and> generate_field L (S \<union> K) = carrier L"
 definition "S \<equiv> SOME S. finite S \<and> generate_field L (S \<union> K) = carrier L"
+What is the difference?
 end
 *)
 
