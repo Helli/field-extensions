@@ -121,7 +121,7 @@ lemma subfield_example': "subfield (range complex_of_real) complex_field"
   apply (simp add: Units_def)+
   by (metis Groups.mult_ac(2) of_real_eq_0_iff of_real_inverse right_inverse)
 
-lemma genfield_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
+lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
@@ -160,13 +160,11 @@ proof -
   qed
 qed
 
-(*
 corollary finitely_generated_field_extension_complex_over_real:
-  \<open>finitely_generated_field_extension complex_field (range complex_of_real)\<close>
+  "finitely_generated_field_extension complex_field (range complex_of_real)"
   unfolding finitely_generated_field_extension_def finitely_generated_field_extension_axioms_def
-  apply (auto simp add: field_extension_complex_over_real) using genfield_\<i>_UNIV
-  by (metis complex_field_def finite.emptyI finite.insertI partial_object.select_convs(1)
-      univ_ring_def)
-*)
+  by (simp add: field_examples(3) field_extension_def subfield_example')
+    (metis Un_commute Un_insert_left complex_field_def finite.emptyI finite.insertI
+      generate_field_\<i>_UNIV partial_object.select_convs(1) sup_bot.right_neutral univ_ring_def)
 
 end
