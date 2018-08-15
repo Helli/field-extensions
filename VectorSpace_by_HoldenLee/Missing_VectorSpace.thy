@@ -833,5 +833,19 @@ shows "dim \<le> 1"
 by (metis One_nat_def assms(1) assms(2) bot.extremum card.empty card.insert empty_iff finite.intros(1)
 finite.intros(2) insert_subset vectorspace.gen_ge_dim vectorspace_axioms)
 
+lemma (in vectorspace) corollary_5_14:
+  assumes fin_dim
+  assumes "S \<subseteq> carrier V" "lin_indpt S"
+  shows "\<exists>B. S \<subseteq> B \<and> basis B"
+proof -
+  from \<open>fin_dim\<close> have "finite M \<and> card M \<le> dim" if "M \<subseteq> carrier V" "lin_indpt M" for M
+    using that by (simp add: li_le_dim)
+  note useful = maximal_exists[OF this]
+  have "\<exists>B. finite B \<and> maximal B (\<lambda>M. S \<subseteq> M \<and> M \<subseteq> carrier V \<and> lin_indpt M)"
+    apply (rule useful) using assms apply auto done
+  then show ?thesis
+    by (smt max_li_is_basis maximal_def set_rev_mp subsetI)
+qed
+
 
 end
