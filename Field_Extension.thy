@@ -831,44 +831,40 @@ sublocale field_extension < vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
   by (fact vectorspace_satisfied)
 
 proposition degree_multiplicative:
-  assumes "subfield K (M\<lparr>carrier:=L\<rparr>)"
-  assumes "field_extension M L"
+  assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
+proof -
+  have "\<not>field_extension.fin M K" if "\<not>field_extension.fin (M\<lparr>carrier:=L\<rparr>) K"
+  proof
+    have "K \<subseteq> L"
+      using Field_Extension.subfield_def assms(1) subfieldE(3) by force
+    then have "K \<subseteq> carrier M"
+      by (meson assms(2) order.trans subfieldE(3))
+    then have "field_extension M K"
+      by (metis (no_types, lifting) Field_Extension.field.generate_fieldE(1)
+          Field_Extension.subfield.axioms \<open>K \<subseteq> L\<close> assms(1-3) field.generate_fieldI
+          field.generate_field_is_field field.subfield_gen_equality field_extension.intro
+          monoid.surjective partial_object.update_convs(1) subfieldE(3) subset_refl)
+    then interpret enclosing: vectorspace "M\<lparr>carrier:=K\<rparr>" "vs_of M"
+      by (simp add: field_extension.vectorspace_satisfied)
+    have subspace: "subspace (M\<lparr>carrier := K\<rparr>) L (vs_of M)"
+      unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
+      apply (rule enclosing.module.module_incl_imp_submodule)
+      apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1)
+          subfieldE(3))
+      subgoal proof -
+      from assms have "field_extension (M\<lparr>carrier:=L\<rparr>) K"
+        using subfield.intro Subrings.ring.subfield_iff(2) cring_def domain_def field_def
+          field_extension.intro by blast
+      note field_extension.vectorspace_satisfied[OF this]
+      then show ?thesis by (auto simp: vectorspace_def)
+    qed done
+    assume enclosing.fin_dim
+    with that show False
+      using subspace.corollary_5_16[OF subspace] by simp
+  qed
   oops
-
-lemma easy_part:
-  assumes "subfield K (M\<lparr>carrier:=L\<rparr>)"
-  assumes "field_extension M L"
-  assumes "\<not>field_extension.fin (M\<lparr>carrier:=L\<rparr>) K"
-  shows enclosing_extension_infinite:
-    "\<not>field_extension.fin M K"
-proof
-  have "K \<subseteq> L"
-    using Field_Extension.subfield_def assms(1) subfieldE(3) by force
-  then have "K \<subseteq> carrier M"
-    by (meson additive_subgroup.a_subset assms(2) field_extension_def order_trans subfield.additive_subgroup)
-  then have "field_extension M K"
-    by (smt Field_Extension.ring.subfield_iff(1) assms(1) assms(2) cring.axioms(1) domain_def
-        field_def field_extension.vectorspace_satisfied field_extension_def monoid.surjective
-        partial_object.update_convs(1) vectorspace_def)
-  then interpret enclosing: vectorspace "M\<lparr>carrier:=K\<rparr>" "vs_of M"
-    by (simp add: field_extension.vectorspace_satisfied)
-  have subspace: "subspace (M\<lparr>carrier := K\<rparr>) L (vs_of M)"
-    unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
-    apply (rule enclosing.module.module_incl_imp_submodule)
-    apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1)
-        subfieldE(3))
-    subgoal proof -
-    from assms have "field_extension (M\<lparr>carrier:=L\<rparr>) K"
-      using ring.subfield_iff(2) cring.axioms(1) domain_def field_def field_extension_def by blast
-    note field_extension.vectorspace_satisfied[OF this]
-    then show ?thesis by (auto simp: vectorspace_def)
-  qed done
-  assume enclosing.fin_dim
-  with assms(3) show False
-    using subspace.corollary_5_16[OF subspace] by simp
-qed
 
 
 section \<open>Observations (*rm*)\<close>
