@@ -1,6 +1,6 @@
 theory Field_Extension imports
 "HOL-Algebra.Algebra"  (* reduce? *)
-"VectorSpace_by_HoldenLee/VectorSpace"
+"VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
 section \<open>convenient locale setup\<close>
