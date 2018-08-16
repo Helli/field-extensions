@@ -783,6 +783,7 @@ interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
   by (fact vectorspace_satisfied)
 
 abbreviation "fin \<equiv> vecs.fin_dim"
+\<comment> \<open>Prop. 14.16 would look much better if I also had an abbreviation for infinite degree\<close>
 
 definition degree where
   "degree \<equiv> if fin then vecs.dim else 0"
@@ -827,15 +828,14 @@ proof -
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
 
-sublocale field_extension < vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
-  by (fact vectorspace_satisfied)
-
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
 proof -
-  have "\<not>field_extension.fin M K" if "\<not>field_extension.fin (M\<lparr>carrier:=L\<rparr>) K"
+  let ?L = "M\<lparr>carrier:=L\<rparr>" and ?K = "M\<lparr>carrier:=K\<rparr>"
+
+  have "\<not>field_extension.fin M K" if "\<not>field_extension.fin ?L K"
   proof
     have "K \<subseteq> L"
       using Field_Extension.subfield_def assms(1) subfieldE(3) by force
@@ -846,15 +846,15 @@ proof -
           Field_Extension.subfield.axioms \<open>K \<subseteq> L\<close> assms(1-3) field.generate_fieldI
           field.generate_field_is_field field.subfield_gen_equality field_extension.intro
           monoid.surjective partial_object.update_convs(1) subfieldE(3) subset_refl)
-    then interpret enclosing: vectorspace "M\<lparr>carrier:=K\<rparr>" "vs_of M"
+    then interpret enclosing: vectorspace ?K "vs_of M"
       by (simp add: field_extension.vectorspace_satisfied)
-    have subspace: "subspace (M\<lparr>carrier := K\<rparr>) L (vs_of M)"
+    have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
       apply (rule enclosing.module.module_incl_imp_submodule)
       apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1)
           subfieldE(3))
       subgoal proof -
-      from assms have "field_extension (M\<lparr>carrier:=L\<rparr>) K"
+      from assms have "field_extension ?L K"
         using subfield.intro Subrings.ring.subfield_iff(2) cring_def domain_def field_def
           field_extension.intro by blast
       note field_extension.vectorspace_satisfied[OF this]
@@ -864,7 +864,25 @@ proof -
     with that show False
       using subspace.corollary_5_16[OF subspace] by simp
   qed
-  oops
+
+  moreover have "\<not>field_extension.fin M K" if "\<not>field_extension.fin M L"
+    sorry
+
+  moreover {
+    assume "field_extension.fin M L" "field_extension.fin ?L K"
+    have "field_extension.degree M K =
+      vectorspace.dim ?L (vs_of M) *
+      vectorspace.dim ?K (vs_of ?L)"
+      sorry
+  }
+
+  ultimately
+  show ?thesis
+    by (smt ring.subfield_iff(1) Subrings.ring.subfield_iff(2) assms cring.axioms(1) domain_def
+        dual_order.trans field_def field_extension.degree_def field_extension.intro
+        monoid.surjective mult.commute mult_zero_left partial_object.select_convs(1)
+        partial_object.update_convs(1) subfieldE(3))
+qed
 
 
 section \<open>Observations (*rm*)\<close>
