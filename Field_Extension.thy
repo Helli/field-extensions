@@ -828,6 +828,57 @@ proof -
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
 
+lemma (in subspace)
+  assumes "f \<in> A \<rightarrow> W"
+  shows "(\<Oplus>\<^bsub>vectorspace.vs V W\<^esub>v\<in>A. f v) = (\<Oplus>v\<in>A. f v)"
+  unfolding finsum_def apply auto using assms
+proof (induction A rule: infinite_finite_induct)
+  case (infinite A)
+  then show ?case
+    by (simp add: finprod_def)
+next
+  case empty
+  then show ?case
+    by (metis Module.module_def abelian_group.a_comm_group additive_subgroup.intro
+        additive_subgroup.zero_closed comm_group_def comm_monoid.finprod_empty finprod_def
+        foldD_empty monoid.simps(2) partial_object.select_convs(1) submod submodule.axioms(1)
+        vectorspace.axioms(1) vs)
+next
+  case (insert x F)
+  note assms
+  moreover have "W \<subseteq> carrier V"
+    using module.submoduleE(1) submod vectorspace.axioms(1) vs by blast
+  ultimately have b: "f \<in> F \<rightarrow> carrier V"
+    using insert.prems by auto
+  have d: "f x \<in> W"
+    using insert.prems(2) by auto
+  then have e: "v x \<in> carrier L"
+    using \<open>K \<subseteq> carrier L\<close> by blast
+  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)" using assms(1)
+    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
+  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>\<^bsub>L\<^esub>), one = \<zero>\<^bsub>L\<^esub>, \<dots> = undefined::'b\<rparr>"
+    by (simp add: abelian_monoid_def)
+  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ insert.hyps b e, simplified]
+  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus>\<^bsub>L\<^esub> finprod (add_monoid L) v F"
+    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
+  with comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
+  show ?case
+    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
+qed
+
+
+
+thm module.span_is_monotone
+lemma (in subspace)
+  shows "module.span K (vectorspace.vs V W) S \<subseteq> module.span K V S"
+proof -
+  interpret a: vectorspace K V
+    by (fact vs)
+  interpret b: module K "a.vs W"
+    by (simp add: a.submodule_is_module submod)
+  show ?thesis unfolding a.span_def b.span_def
+    unfolding a.lincomb_def b.lincomb_def apply auto
+
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
   shows
@@ -835,18 +886,19 @@ proposition degree_multiplicative:
 proof -
   let ?L = "M\<lparr>carrier:=L\<rparr>" and ?K = "M\<lparr>carrier:=K\<rparr>"
 
+  have "K \<subseteq> L"
+    using Field_Extension.subfield_def assms(1) subfieldE(3) by force
+  then have "K \<subseteq> carrier M"
+    by (meson assms(2) order.trans subfieldE(3))
+  then have M_over_K: "field_extension M K"
+    by (metis (no_types, lifting) field.generate_fieldE(1) subfield.axioms \<open>K \<subseteq> L\<close> assms(1-3)
+        field.generate_fieldI field.generate_field_is_field field.subfield_gen_equality
+        field_extension.intro monoid.surjective partial_object.update_convs(1) subfieldE(3)
+        subset_refl)
+
   have "\<not>field_extension.fin M K" if "\<not>field_extension.fin ?L K"
   proof
-    have "K \<subseteq> L"
-      using Field_Extension.subfield_def assms(1) subfieldE(3) by force
-    then have "K \<subseteq> carrier M"
-      by (meson assms(2) order.trans subfieldE(3))
-    then have "field_extension M K"
-      by (metis (no_types, lifting) Field_Extension.field.generate_fieldE(1)
-          Field_Extension.subfield.axioms \<open>K \<subseteq> L\<close> assms(1-3) field.generate_fieldI
-          field.generate_field_is_field field.subfield_gen_equality field_extension.intro
-          monoid.surjective partial_object.update_convs(1) subfieldE(3) subset_refl)
-    then interpret enclosing: vectorspace ?K "vs_of M"
+    from M_over_K interpret enclosing: vectorspace ?K "vs_of M"
       by (simp add: field_extension.vectorspace_satisfied)
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
@@ -866,7 +918,32 @@ proof -
   qed
 
   moreover have "\<not>field_extension.fin M K" if "\<not>field_extension.fin M L"
-    sorry
+  proof
+    interpret a: module ?L "vs_of M"
+      by (simp add: subfield_def assms(2-3) field_extension.vectorspace_satisfied field_extension_def vectorspace.axioms(1))
+    from that have "\<nexists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M"
+      using subfield_def assms(2-3) field_extension.vectorspace_satisfied
+        field_extension_def vectorspace.fin_dim_def[of ?L "vs_of M", simplified] by blast
+    note 1 = this[unfolded a.span_def a.lincomb_def, simplified]
+    interpret b: module ?K "vs_of M"
+      by (simp add: M_over_K field_extension.vectorspace_satisfied vectorspace.axioms(1))
+    assume "field_extension.fin M K"
+    then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> b.span B = carrier M"
+      using M_over_K field_extension.vectorspace_satisfied vectorspace.fin_dim_def by fastforce
+    note 2 = this[unfolded b.span_def b.lincomb_def, simplified]
+    then obtain B where "finite B \<and>
+      B \<subseteq> carrier M \<and>
+      {\<Oplus>\<^bsub>vs_of M\<^esub>v\<in>A. a v \<otimes>\<^bsub>M\<^esub> v |a A.
+       finite A \<and> A \<subseteq> B \<and> a \<in> A \<rightarrow> K} =
+      carrier M" ..
+      then have "finite B \<and>
+      B \<subseteq> carrier M \<and>
+      {\<Oplus>\<^bsub>vs_of M\<^esub>v\<in>A. a v \<otimes>\<^bsub>M\<^esub> v |a A.
+       finite A \<and> A \<subseteq> B \<and> a \<in> A \<rightarrow> L} =
+      carrier M" find_theorems module.span
+    from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f A
+      using that by auto
+    with 1 2 show False
 
   moreover {
     assume "field_extension.fin M L" "field_extension.fin ?L K"
