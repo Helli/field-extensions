@@ -828,6 +828,10 @@ proof -
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
 
+lemma (in module) id_module_hom: "id \<in> module_hom R M M"
+  unfolding module_hom_def by simp
+find_theorems mod_hom finsum
+
 lemma (in subspace)
   assumes "f \<in> A \<rightarrow> W"
   shows "(\<Oplus>\<^bsub>vectorspace.vs V W\<^esub>v\<in>A. f v) = (\<Oplus>v\<in>A. f v)"
