@@ -756,7 +756,11 @@ qed
 
 
 subsection \<open>Polynomial Divisibility\<close>
-text \<open>Keep an eye out whether I need something from @{url
+
+text \<open>use something along the lines of\<close>
+definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
+
+text \<open>keep an eye out whether I need something from @{url
   "https://github.com/DeVilhena-Paulo/GaloisCVC4/blob/master/Polynomial_Divisibility.thy"}\<close>
 
 
