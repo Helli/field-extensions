@@ -40,10 +40,10 @@ proof -
   from 1 2 3  show ?thesis by (unfold module_def, auto)
 qed
 
-definition inj1:: "('a,'b) module \<Rightarrow> ('a, 'c) module \<Rightarrow>('b\<Rightarrow>('b\<times>'c))"
+definition inj1
   where "inj1 M1 M2 = (\<lambda>v. (v, \<zero>\<^bsub>M2\<^esub>))"
 
-definition inj2:: "('a,'b) module \<Rightarrow> ('a, 'c) module \<Rightarrow>('c\<Rightarrow>('b\<times>'c))"
+definition inj2
   where "inj2 M1 M2 = (\<lambda>v. (\<zero>\<^bsub>M1\<^esub>, v))"
 
 lemma inj1_hom:
