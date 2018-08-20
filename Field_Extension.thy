@@ -827,7 +827,7 @@ proof -
         partial_object.select_convs(1) subsetCE vecs.module_axioms)
   then have vecs.fin_dim "vecs.dim \<le> 1"
     using vecs.fin_dim_def apply force
-    using A_generates_R vecs.gen_ge_dim by force
+    using A_generates_R vecs.dim_le1I by auto
   then show ?thesis unfolding field_extension.degree_def[OF field_extension_refl]
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
@@ -877,7 +877,7 @@ proof -
   proof
     interpret a: module ?L "vs_of M"
       by (simp add: subfield_def assms(2-3) field_extension.vectorspace_satisfied field_extension_def vectorspace.axioms(1))
-    from that have "\<nexists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M"
+    from that have "\<not>(\<exists>\<comment>\<open>Avoid latex dependency\<close>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
       using subfield_def assms(2-3) field_extension.vectorspace_satisfied
         field_extension_def vectorspace.fin_dim_def[of ?L "vs_of M", simplified] by blast
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
