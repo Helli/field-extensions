@@ -835,6 +835,30 @@ qed
 lemma (in module) id_module_hom: "id \<in> module_hom R M M"
   unfolding module_hom_def by simp
 
+find_theorems mod_hom bij
+find_theorems linear_map bij
+term a_kernel
+term kernel
+term "linear_map.kerT"
+find_theorems direct_sum vectorspace.dim
+
+term bij_betw
+
+lemma (in linear_map) mod_iso_preserves_dim:
+  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
+  assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  shows "V.dim = W.dim"
+  using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
+
+lemma direct_sum_dim:
+  assumes "vectorspace K V" "vectorspace K W"
+  assumes "vectorspace.fin_dim K V" "vectorspace.fin_dim K W"
+  shows "vectorspace.fin_dim K (direct_sum V W)"
+    and "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
+  using assms sledgehammer
+proof -
+  obtain Bv where Bv: "finite Bv" "Bv \<subseteq> carrier V" "gen_set Bv"
+
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
   shows

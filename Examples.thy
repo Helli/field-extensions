@@ -167,19 +167,4 @@ corollary finitely_generated_field_extension_complex_over_real:
     (metis Un_commute Un_insert_left complex_field_def finite.emptyI finite.insertI
       generate_field_\<i>_UNIV partial_object.select_convs(1) sup_bot.right_neutral univ_ring_def)
 
-find_theorems mod_hom bij
-find_theorems linear_map bij
-term a_kernel
-term kernel
-term "linear_map.kerT"
-find_theorems direct_sum vectorspace.dim
-
-term bij_betw
-
-lemma (in linear_map) mod_iso_preserves_dim:
-  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
-  assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
-  shows "V.dim = W.dim"
-  using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
-
 end

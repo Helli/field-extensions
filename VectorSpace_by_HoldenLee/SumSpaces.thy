@@ -210,9 +210,4 @@ proof-
   from c1 c2 show ?thesis by auto
 qed
 
-text \<open>The multiplication fields of the module group are not used:\<close>
-lemma module_sanitise: "module R M \<longleftrightarrow> module R (M\<lparr>mult:=undefined,one:=undefined\<rparr>)"
-  unfolding module_def module_axioms_def abelian_group_def abelian_group_axioms_def
-    abelian_monoid_def comm_monoid_def by simp
-
 end
