@@ -1,4 +1,5 @@
-"The dimension of V \<oplus> W is equal to the sum of the dimensions of V and W"
+clarify which stuff was added to the VectorSpace theories. remove oops- and thm-commands from the
+repository
 
 the examples from the lecture notes are not that important
 

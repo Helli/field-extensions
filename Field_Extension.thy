@@ -835,7 +835,6 @@ qed
 lemma (in module) id_module_hom: "id \<in> module_hom R M M"
   unfolding module_hom_def by simp
 
-find_theorems mod_hom bij
 find_theorems linear_map bij
 term a_kernel
 term kernel
@@ -843,21 +842,128 @@ term "linear_map.kerT"
 find_theorems direct_sum vectorspace.dim
 
 term bij_betw
+lemma (in linear_map) emb_image_dim:
+  assumes "inj_on T (carrier V)" \<comment> \<open>A module-monomorphism\<close>
+  assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  shows "V.dim = vectorspace.dim K (vs imT)"
+  using assms inj_imp_dim_ker0 rank_nullity by linarith
 
-lemma (in linear_map) mod_iso_preserves_dim:
+lemma (in linear_map) iso_preserves_dim: (* rm *)
   assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
   assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
   shows "V.dim = W.dim"
   using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
 
+lemma (in vectorspace) zero_not_in_basis:
+  "basis B \<Longrightarrow> \<zero>\<^bsub>V\<^esub> \<notin> B"
+  by (simp add: basis_def vs_zero_lin_dep)
+
 lemma direct_sum_dim:
-  assumes "vectorspace K V" "vectorspace K W"
-  assumes "vectorspace.fin_dim K V" "vectorspace.fin_dim K W"
+  assumes "vectorspace K V" "vectorspace.fin_dim K V"
+  assumes "vectorspace K W" "vectorspace.fin_dim K W"
   shows "vectorspace.fin_dim K (direct_sum V W)"
     and "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
-  using assms sledgehammer
 proof -
-  obtain Bv where Bv: "finite Bv" "Bv \<subseteq> carrier V" "gen_set Bv"
+  from assms obtain Bv Bw where
+    Bv: "finite Bv" "vectorspace.basis K V Bv" and
+    Bw: "finite Bw" "vectorspace.basis K W Bw"
+    using vectorspace.finite_basis_exists (* blast loops, even though suggested by sledgehammer oO *)
+    by metis
+  oops
+
+lemma direct_sum_dim: \<comment> \<open>cannot use @{thm[source] linear_map.rank_nullity} directly because the
+ sum's dimension is not yet shown to be finite...\<close>
+  assumes "vectorspace K V" "vectorspace.fin_dim K V"
+  assumes "vectorspace K W" "vectorspace.fin_dim K W"
+  shows "vectorspace.fin_dim K (direct_sum V W)"
+    and "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
+proof -
+  interpret ds: vectorspace K "direct_sum V W"
+    by (simp add: assms(1) assms(3) direct_sum_is_vs)
+
+  from assms obtain Bv Bw where
+    Bv: "finite Bv" "Bv \<subseteq> carrier V" "module.gen_set K V Bv" and
+    Bw: "finite Bw" "Bw \<subseteq> carrier W" "module.gen_set K W Bw"
+    by (meson vectorspace.fin_dim_def)
+  let ?B = "Bv \<times> {\<zero>\<^bsub>W\<^esub>} \<union> {\<zero>\<^bsub>V\<^esub>} \<times> Bw"
+  from Bv(1) Bw(1) have "finite ?B"
+    by simp
+  moreover have "?B \<subseteq> carrier (direct_sum V W)"
+    unfolding direct_sum_def using assms(1,3) Bv(2) Bw(2) by auto (meson vectorspace.span_closed
+        vectorspace.span_zero)+
+  moreover have "module.gen_set K (direct_sum V W) ?B"
+    apply auto using calculation(2) ds.span_closed apply blast
+  proof goal_cases
+    case (1 a b)
+    then have "a \<in> carrier V" "b \<in> carrier W"
+      by (simp_all add: direct_sum_def)
+    then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
+      and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
+      by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
+    then show ?case sorry
+  qed
+  ultimately show fin_dim: "ds.fin_dim" unfolding ds.fin_dim_def
+    by meson
+txt \<open>I had planned to adapt the proof above to also show that @{term ?B} is minimal, but it turned
+ out to tiresome. Instead, I can now use @{thm[source] linear_map.rank_nullity} once again:\<close>
+
+\<comment> \<open>embed\<close>
+thm linear_map.emb_image_dim[OF _ _ assms(2), of "direct_sum V W" "inj1 V W"]
+  have lin1: "linear_map K V (direct_sum V W) (inj1 V W)"
+    and lin2: "linear_map K W (direct_sum V W) (inj2 V W)"
+    by (simp_all add: assms(1-4) inj1_linear inj2_linear)
+  moreover have "inj_on (inj1 V W) (carrier V)"
+    and "inj_on (inj2 V W) (carrier W)"
+    by (simp_all add: inj1_def inj2_def inj_on_def)
+  moreover have emb1: "inj1 V W ` carrier V = carrier V \<times> {\<zero>\<^bsub>W\<^esub>}"
+    and emb2: "inj2 V W ` carrier W = {\<zero>\<^bsub>V\<^esub>} \<times> carrier W"
+    unfolding inj1_def inj2_def by blast+
+  ultimately
+  have "vectorspace.dim K V = vectorspace.dim K (ds.vs (mod_hom.im V (inj1 V W)))"
+    and "vectorspace.dim K W = vectorspace.dim K (ds.vs (mod_hom.im W (inj2 V W)))"
+    by (simp_all add: assms(2,4) linear_map.emb_image_dim)
+  then have propagate_dims: "vectorspace.dim K V = vectorspace.dim K (ds.vs (carrier V \<times> {\<zero>\<^bsub>W\<^esub>}))"
+    "vectorspace.dim K W = vectorspace.dim K (ds.vs ({\<zero>\<^bsub>V\<^esub>} \<times> carrier W))" apply auto
+    apply (metis emb1 lin1 linear_map_def mod_hom.im_def)
+    apply (metis emb2 lin2 linear_map_def mod_hom.im_def)
+    done
+
+  have "ds.dim = vectorspace.dim K (ds.vs (carrier V \<times> {\<zero>\<^bsub>W\<^esub>})) + vectorspace.dim K (ds.vs ({\<zero>\<^bsub>V\<^esub>} \<times> carrier W))"
+  proof -
+    let ?T = "\<lambda>(v,w). (v,\<zero>\<^bsub>W\<^esub>)"
+    interpret T: linear_map K "direct_sum V W" "direct_sum V W" ?T
+      apply unfold_locales unfolding module_hom_def apply auto
+      unfolding direct_sum_def apply auto
+      using Module.module_def abelian_groupE(2) assms(3) vectorspace.axioms(1) apply blast
+      apply (metis Module.module_def abelian_group_def abelian_monoid.r_zero
+          abelian_monoid.zero_closed assms(3) vectorspace.axioms(1))
+      by (metis (no_types, hide_lams) Module.module_def abelian_group.r_neg1 abelian_group_def
+          abelian_monoid.r_zero abelian_monoid.zero_closed assms(3) module.smult_closed
+          module.smult_r_distr vectorspace_def)
+    have mod_hom_T: "mod_hom K (direct_sum V W) (direct_sum V W) ?T" by intro_locales
+    have ker_is_V: "T.ker = {\<zero>\<^bsub>V\<^esub>} \<times> carrier W" unfolding T.ker_def
+      unfolding mod_hom.ker_def[OF mod_hom_T] direct_sum_def apply auto
+      using Module.module_def abelian_groupE(2) assms(1) vectorspace.axioms(1) by blast
+    have "T.im = carrier V \<times> {\<zero>\<^bsub>W\<^esub>}" unfolding T.im_def mod_hom.im_def[OF mod_hom_T]
+      unfolding direct_sum_def apply auto
+    proof -
+      fix a :: 'c
+      assume a1: "a \<in> carrier V"
+      have f2: "(fst \<zero>\<^bsub>direct_sum V W\<^esub>, \<zero>\<^bsub>W\<^esub>) = \<zero>\<^bsub>direct_sum V W\<^esub>"
+        by (metis (no_types) T.f0_is_0 split_def)
+      have "carrier V \<times> carrier W = carrier (direct_sum V W)"
+        by (simp add: direct_sum_def)
+      then have "\<zero>\<^bsub>W\<^esub> \<in> carrier W"
+        using f2 by (metis (no_types) ds.M.zero_closed mem_Sigma_iff)
+      then show "(a, \<zero>\<^bsub>W\<^esub>) \<in> (\<lambda>(c, e). (c, \<zero>\<^bsub>W\<^esub>)) ` (carrier V \<times> carrier W)"
+        using a1 by auto
+    qed
+    with fin_dim ker_is_V show ?thesis
+      using T.rank_nullity by auto
+  qed
+  with propagate_dims show "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
+    by simp
+qed (* to-do: use \<^sub> *)
 
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
