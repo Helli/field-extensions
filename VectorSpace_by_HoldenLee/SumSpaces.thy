@@ -14,8 +14,8 @@ text {* We define the direct sum $M_1\oplus M_2$ of 2 vector spaces as the set $
 componentwise addition and scalar multiplication.*}
 definition direct_sum:: "('a,'b, 'd) module_scheme \<Rightarrow> ('a, 'c, 'e) module_scheme \<Rightarrow>('a, ('b\<times>'c)) module" (*(infixl "(\<oplus>)" 50)*)
   where  "direct_sum M1 M2 = \<lparr>carrier = carrier M1 \<times> carrier M2, 
-                  mult = (\<lambda> v w. (\<zero>\<^bsub>M1\<^esub>, \<zero>\<^bsub>M2\<^esub>)),
-                  one =  (\<zero>\<^bsub>M1\<^esub>, \<zero>\<^bsub>M2\<^esub>),
+                  mult = undefined,
+                  one = undefined,
                   zero = (\<zero>\<^bsub>M1\<^esub>, \<zero>\<^bsub>M2\<^esub>),
                   add = (\<lambda> v w. (fst v \<oplus>\<^bsub>M1\<^esub> fst w, snd v \<oplus>\<^bsub>M2\<^esub> snd w)),
                   smult = (\<lambda> c v. (c \<odot>\<^bsub>M1\<^esub> fst v, c \<odot>\<^bsub>M2\<^esub> snd v))\<rparr>"
@@ -209,5 +209,10 @@ proof-
   qed
   from c1 c2 show ?thesis by auto
 qed
+
+text \<open>The multiplication fields of the module group are not used:\<close>
+lemma module_sanitise: "module R M \<longleftrightarrow> module R (M\<lparr>mult:=undefined,one:=undefined\<rparr>)"
+  unfolding module_def module_axioms_def abelian_group_def abelian_group_axioms_def
+    abelian_monoid_def comm_monoid_def by simp
 
 end
