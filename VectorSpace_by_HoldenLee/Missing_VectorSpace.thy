@@ -673,7 +673,7 @@ qed
 
 lemma surj_imp_imT_carrier:
 assumes surj: "T` (carrier V) = carrier W"
-shows "(imT) = carrier W"
+shows "imT = carrier W"
 by (simp add: surj im_def) 
 
 lemma dim_eq:

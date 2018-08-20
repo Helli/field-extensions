@@ -176,4 +176,10 @@ find_theorems direct_sum vectorspace.dim
 
 term bij_betw
 
+lemma (in linear_map) mod_iso_preserves_dim:
+  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
+  assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  shows "V.dim = W.dim"
+  using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses \<^theory>\<open>Draft.Missing_VectorSpace\<close>\<close>
+
 end
