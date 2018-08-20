@@ -1,3 +1,5 @@
+"The dimension of V \<oplus> W is equal to the sum of the dimensions of V and W"
+
 the examples from the lecture notes are not that important
 
 **Questions**
@@ -13,4 +15,4 @@ rsr.add :
     "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
         one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
 
-How to simplify facts during interpretation or locale definition?
+How to simplify facts during interpretation or locale definition? Via "notes" clauses I think.
