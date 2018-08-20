@@ -56,7 +56,7 @@ proof -
   from h1 h2 show ?thesis
     apply (unfold mod_hom_def module_hom_def mod_hom_axioms_def inj1_def, auto)
        apply (rule direct_sum_is_module, auto)
-      by (unfold direct_sum_def, auto)
+    by (unfold direct_sum_def, auto)
 qed
 
 lemma inj2_hom:
@@ -69,8 +69,16 @@ proof -
   from h1 h2 show ?thesis
     apply (unfold mod_hom_def module_hom_def mod_hom_axioms_def inj2_def, auto)
        apply (rule direct_sum_is_module, auto)
-      by (unfold direct_sum_def, auto)
+    by (unfold direct_sum_def, auto)
 qed
+
+lemma
+  assumes h1: "module R M1" and h2: "module R M2"
+  shows inj1_ker: "mod_hom.ker M1 (direct_sum M1 M2) (inj1 M1 M2) = {\<zero>\<^bsub>M1\<^esub>}"
+    and inj2_ker: "mod_hom.ker M2 (direct_sum M1 M2) (inj2 M1 M2) = {\<zero>\<^bsub>M2\<^esub>}"
+  unfolding mod_hom.ker_def[OF inj1_hom[OF h1 h2]] mod_hom.ker_def[OF inj2_hom[OF h1 h2]]
+  unfolding inj1_def inj2_def direct_sum_def
+  using abelian_groupE(2) h1 h2 module.axioms(2) by auto
 
 text {*For submodules $M_1,M_2\subseteq M$, the map $M_1\oplus M_2\to M$ given by $(m_1,m_2)\mapsto 
 m_1+m_2$ is linear.*}
