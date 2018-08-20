@@ -885,14 +885,16 @@ proof -
     Bv: "finite Bv" "Bv \<subseteq> carrier V" "module.gen_set K V Bv" and
     Bw: "finite Bw" "Bw \<subseteq> carrier W" "module.gen_set K W Bw"
     by (meson vectorspace.fin_dim_def)
-  let ?B = "Bv \<times> {\<zero>\<^bsub>W\<^esub>} \<union> {\<zero>\<^bsub>V\<^esub>} \<times> Bw"
-  from Bv(1) Bw(1) have "finite ?B"
-    by simp
-  moreover have "?B \<subseteq> carrier (direct_sum V W)"
-    unfolding direct_sum_def using assms(1,3) Bv(2) Bw(2) by auto (meson vectorspace.span_closed
-        vectorspace.span_zero)+
+  let ?Bv = "Bv \<times> {\<zero>\<^bsub>W\<^esub>}" and ?Bw = "{\<zero>\<^bsub>V\<^esub>} \<times> Bw" (* rm *)
+  let ?B = "?Bv \<union> ?Bw"
+  from Bv(2) Bw(2) have in_carrier: "?Bv \<subseteq> carrier (direct_sum V W)" "?Bw \<subseteq> carrier (direct_sum V W)"
+    unfolding direct_sum_def by auto (meson assms vectorspace.span_closed vectorspace.span_zero)+
+  from Bv(1) Bw(1) have "finite ?Bv" "finite ?Bw" "finite ?B"
+    by simp_all
+  moreover
+    from in_carrier have in_carrier': "?B \<subseteq> carrier (direct_sum V W)" by simp
   moreover have "module.gen_set K (direct_sum V W) ?B"
-    apply auto using calculation(2) ds.span_closed apply blast
+    apply auto using calculation(4) ds.span_closed apply blast
   proof goal_cases
     case (1 a b)
     then have "a \<in> carrier V" "b \<in> carrier W"
@@ -900,7 +902,12 @@ proof -
     then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
       and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
       by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
-    then show ?case sorry
+    let ?A = "A-{\<zero>\<^bsub>V\<^esub>}" and ?B = "B-{\<zero>\<^bsub>W\<^esub>}"
+    from lincomb1 have "module.lincomb V f ?A = a" "finite ?A" "?A\<subseteq>Bv" "f \<in> ?A\<rightarrow>carrier K" "\<zero>\<^bsub>V\<^esub> \<notin> ?A"
+      apply auto using Bv Bw vectorspace.lincomb_isolate sorry
+      thm ds.lincomb_union ds.lincomb_elim_if module.lincomb_sum vectorspace.span_add
+vectorspace.span_add1 (*!*) linear_map.lincomb_linear_image
+    show ?case sorry
   qed
   ultimately show fin_dim: "ds.fin_dim" unfolding ds.fin_dim_def
     by meson
