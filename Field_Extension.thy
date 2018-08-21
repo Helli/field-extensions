@@ -867,7 +867,7 @@ proof -
   from assms obtain Bv Bw where
     Bv: "finite Bv" "vectorspace.basis K V Bv" and
     Bw: "finite Bw" "vectorspace.basis K W Bw"
-    using vectorspace.finite_basis_exists (* blast loops, even though suggested by sledgehammer oO *)
+    using vectorspace.finite_basis_exists (* blast loops, but not in sledgehammer oO *)
     by metis
   oops
 
@@ -880,6 +880,14 @@ lemma direct_sum_dim: \<comment> \<open>cannot use @{thm[source] linear_map.rank
 proof -
   interpret ds: vectorspace K "direct_sum V W"
     by (simp add: assms(1) assms(3) direct_sum_is_vs)
+
+  txt \<open>injective embeddings\<close>
+  have lin1: "linear_map K V (direct_sum V W) (inj1 V W)"
+    and lin2: "linear_map K W (direct_sum V W) (inj2 V W)"
+    by (simp_all add: assms(1-4) inj1_linear inj2_linear)
+  have inj1: "inj_on (inj1 V W) (carrier V)"
+    and inj2: "inj_on (inj2 V W) (carrier W)"
+    by (simp_all add: inj1_def inj2_def inj_on_def)
 
   from assms obtain Bv Bw where
     Bv: "finite Bv" "Bv \<subseteq> carrier V" "module.gen_set K V Bv" and
@@ -902,11 +910,12 @@ proof -
     then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
       and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
       by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
-    let ?A = "A-{\<zero>\<^bsub>V\<^esub>}" and ?B = "B-{\<zero>\<^bsub>W\<^esub>}"
+    let ?A = "(inj1 V W) A" (*and ?B = "B-{\<zero>\<^bsub>W\<^esub>}"*)
     from lincomb1 have "module.lincomb V f ?A = a" "finite ?A" "?A\<subseteq>Bv" "f \<in> ?A\<rightarrow>carrier K" "\<zero>\<^bsub>V\<^esub> \<notin> ?A"
       apply auto using Bv Bw vectorspace.lincomb_isolate sorry
-      thm ds.lincomb_union ds.lincomb_elim_if module.lincomb_sum vectorspace.span_add
+    thm ds.lincomb_union ds.lincomb_elim_if module.lincomb_sum vectorspace.span_add
 vectorspace.span_add1 (*!*) linear_map.lincomb_linear_image
+    thm linear_map.lincomb_linear_image[OF lin1, simplified]
     show ?case sorry
   qed
   ultimately show fin_dim: "ds.fin_dim" unfolding ds.fin_dim_def
@@ -914,21 +923,14 @@ vectorspace.span_add1 (*!*) linear_map.lincomb_linear_image
 txt \<open>I had planned to adapt the proof above to also show that @{term ?B} is minimal, but it turned
  out to tiresome. Instead, I can now use @{thm[source] linear_map.rank_nullity} once again:\<close>
 
-\<comment> \<open>embed\<close>
-thm linear_map.emb_image_dim[OF _ _ assms(2), of "direct_sum V W" "inj1 V W"]
-  have lin1: "linear_map K V (direct_sum V W) (inj1 V W)"
-    and lin2: "linear_map K W (direct_sum V W) (inj2 V W)"
-    by (simp_all add: assms(1-4) inj1_linear inj2_linear)
-  moreover have "inj_on (inj1 V W) (carrier V)"
-    and "inj_on (inj2 V W) (carrier W)"
-    by (simp_all add: inj1_def inj2_def inj_on_def)
+  note inj1 inj2
   moreover have emb1: "inj1 V W ` carrier V = carrier V \<times> {\<zero>\<^bsub>W\<^esub>}"
     and emb2: "inj2 V W ` carrier W = {\<zero>\<^bsub>V\<^esub>} \<times> carrier W"
     unfolding inj1_def inj2_def by blast+
   ultimately
   have "vectorspace.dim K V = vectorspace.dim K (ds.vs (mod_hom.im V (inj1 V W)))"
     and "vectorspace.dim K W = vectorspace.dim K (ds.vs (mod_hom.im W (inj2 V W)))"
-    by (simp_all add: assms(2,4) linear_map.emb_image_dim)
+    by (simp_all add: lin1 lin2 assms(2,4) linear_map.emb_image_dim)
   then have propagate_dims: "vectorspace.dim K V = vectorspace.dim K (ds.vs (carrier V \<times> {\<zero>\<^bsub>W\<^esub>}))"
     "vectorspace.dim K W = vectorspace.dim K (ds.vs ({\<zero>\<^bsub>V\<^esub>} \<times> carrier W))" apply auto
     apply (metis emb1 lin1 linear_map_def mod_hom.im_def)
