@@ -893,10 +893,11 @@ proof -
     Bv: "finite Bv" "Bv \<subseteq> carrier V" "module.gen_set K V Bv" and
     Bw: "finite Bw" "Bw \<subseteq> carrier W" "module.gen_set K W Bw"
     by (meson vectorspace.fin_dim_def)
-  let ?Bv = "Bv \<times> {\<zero>\<^bsub>W\<^esub>}" and ?Bw = "{\<zero>\<^bsub>V\<^esub>} \<times> Bw" (* rm *)
+  let ?Bv = "inj1 V W ` Bv" and ?Bw = "inj2 V W ` Bw"
   let ?B = "?Bv \<union> ?Bw"
   from Bv(2) Bw(2) have in_carrier: "?Bv \<subseteq> carrier (direct_sum V W)" "?Bw \<subseteq> carrier (direct_sum V W)"
-    unfolding direct_sum_def by auto (meson assms vectorspace.span_closed vectorspace.span_zero)+
+    unfolding direct_sum_def by (auto simp: inj1_def inj2_def)
+      (meson assms vectorspace.span_closed vectorspace.span_zero)+
   from Bv(1) Bw(1) have "finite ?Bv" "finite ?Bw" "finite ?B"
     by simp_all
   moreover
@@ -910,6 +911,24 @@ proof -
     then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
       and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
       by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
+    have "f = (\<lambda>(v,w). f v) \<circ> inj1 V W" unfolding inj1_def
+      by fastforce
+    note a = linear_map.lincomb_linear_image[OF lin1 inj1, where a="\<lambda>(v,w). f v" and A=A]
+    have
+      "ds.lincomb (\<lambda>(v, w). f v) (inj1 V W ` A) = inj1 V W (module.lincomb V ((\<lambda>(v, w). f v) \<circ> inj1 V W) A)"
+      apply (rule a) using calculation apply auto
+      using Bv(2) lincomb1(3) apply blast
+      apply (simp add: ds.coeff_in_ring2 inj1_def lincomb1(4))
+      by (simp add: lincomb1(2))
+    moreover have "inj1 V W ` A \<subseteq> ?Bv"
+      by (simp add: image_mono lincomb1(3))
+    moreover have "finite (inj1 V W ` A)"
+      by (simp add: lincomb1(2))
+    moreover have "(\<lambda>(v, w). f v) \<in> inj1 V W ` A \<rightarrow> carrier K" unfolding inj1_def
+      using lincomb1(4) by auto
+    ultimately have "inj1 V W a \<in> ds.span ?Bv" sledgehammer apply (auto simp: ds.span_def) apply
+        (fold lincomb1(1)) sledgehammer
+
     let ?A = "(inj1 V W) A" (*and ?B = "B-{\<zero>\<^bsub>W\<^esub>}"*)
     from lincomb1 have "module.lincomb V f ?A = a" "finite ?A" "?A\<subseteq>Bv" "f \<in> ?A\<rightarrow>carrier K" "\<zero>\<^bsub>V\<^esub> \<notin> ?A"
       apply auto using Bv Bw vectorspace.lincomb_isolate sorry
