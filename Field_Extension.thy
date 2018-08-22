@@ -96,7 +96,7 @@ lemma "old_sr S \<Longrightarrow> Units S \<subseteq> Units R"
   by (metis (no_types, hide_lams) contra_subsetD r_one ring.ring_simprules(12) ring.ring_simprules(6))
 
 lemma old_sr_refl: "old_sr R"
-  unfolding old_sr_def using local.ring_axioms by blast
+  unfolding old_sr_def using ring_axioms by blast
 
 lemma old_sr_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1\<in>A.\<forall>r2\<in>A. r1\<otimes>r2\<in>A \<and> \<ominus>r1\<oplus>r2\<in>A\<rbrakk>
   \<Longrightarrow> old_sr (R\<lparr>carrier:=A\<rparr>)"
@@ -104,7 +104,7 @@ lemma old_sr_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1
   apply (rule ringI)
      apply (rule abelian_groupI)
           apply auto
-         apply (metis add.inv_closed local.minus_minus r_zero ring_simprules(9) subsetCE)
+         apply (metis add.inv_closed minus_minus r_zero ring_simprules(9) subsetCE)
   using l_neg apply fastforce
        apply (meson add.m_assoc subsetCE)
   apply (meson add.m_comm subsetCE)
@@ -113,10 +113,10 @@ lemma old_sr_fullI: "\<lbrakk>A \<subseteq> carrier R; \<one>\<in>A; \<forall>r1
   apply auto
     apply (meson m_assoc subsetCE)
     apply (meson l_distr subsetCE)
-    by (meson local.ring_axioms ring.ring_simprules(23) subsetCE)
+    by (meson ring_axioms ring.ring_simprules(23) subsetCE)
 
 lemma old_sr_zero: "old_sr S \<Longrightarrow> zero S = \<zero>"
-  by (metis (full_types) l_zero local.add.right_cancel ring.ring_simprules(15)
+  by (metis (full_types) l_zero add.right_cancel ring.ring_simprules(15)
       ring.ring_simprules(2) old_sr_def subsetCE zero_closed)
 
 lemma normalize_old_sr: "old_sr S \<Longrightarrow> old_sr (R\<lparr>carrier:=carrier S\<rparr>)"
@@ -213,7 +213,7 @@ lemma (in cring) old_sr_ring_hom_cring: "old_sr S \<Longrightarrow> ring_hom_cri
   by (simp add: RingHom.ring_hom_cringI is_cring old_sr_cring old_sr_ring_hom_ring)
 
 lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
-  using cring.subcringI' is_cring local.ring_axioms ring.subcring_iff subringE(1) by blast
+  using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
 
 lemma (in subring) cring_ring_hom_cring:
   "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
@@ -246,7 +246,7 @@ definition old_sf where
   "old_sf K \<longleftrightarrow> old_sr K \<and> field K"
 
 lemma old_sf_refl: "old_sf R"
-  by (simp add: local.field_axioms old_sf_def old_sr_refl)
+  by (simp add: field_axioms old_sf_def old_sr_refl)
 
 lemma old_sf_zero: "old_sf S \<Longrightarrow> zero S = \<zero>"
   unfolding old_sf_def using old_sr_zero by blast
@@ -256,9 +256,9 @@ proof -
   assume a1: "old_sf S"
   then have "carrier S \<subseteq> carrier R \<and> ring S \<and> \<one> \<in> carrier S \<and> (\<forall>a. a \<notin> carrier S \<or> (\<forall>aa. aa \<notin>
     carrier S \<or> a \<oplus>\<^bsub>S\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>S\<^esub> aa = a \<otimes> aa))"
-    by (simp add: field.old_sf_def local.field_axioms old_sr_def)
+    by (simp add: field.old_sf_def field_axioms old_sr_def)
   then show ?thesis
-    using a1 by (metis (no_types, hide_lams) contra_subsetD local.ring_axioms monoid.r_one
+    using a1 by (metis (no_types, hide_lams) contra_subsetD ring_axioms monoid.r_one
         ring.ring_simprules(6,12) ring_def)
 qed
 
@@ -306,7 +306,7 @@ proof -
   assume a1: "a \<in> A"
   assume a2: "a \<noteq> \<zero>"
   have "\<forall>a. (a \<in> {\<zero>} \<or> a \<in> Units R) \<or> a \<notin> A"
-    by (metis (no_types) Diff_iff assms(2) carrier_mult_of contra_subsetD local.field_Units subgroup_def)
+    by (metis (no_types) Diff_iff assms(2) carrier_mult_of contra_subsetD field_Units subgroup_def)
   then show "\<exists>aa\<in>A. a \<otimes> aa = \<one>"
     using a2 a1 by (metis (no_types) Diff_iff Units_r_inv assms(2) empty_iff mult_of_is_Units insert_iff subgroup_def units_of_inv)
 qed
@@ -315,7 +315,7 @@ lemma subgroup_add: \<open>old_sf S \<Longrightarrow> abelian_subgroup (carrier 
   by (simp add: abelian_subgroupI3 is_abelian_group old_sf_def old_sr_imp_subgroup)
 
 lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
-  using Units_inv_Units local.field_Units by simp
+  using Units_inv_Units field_Units by simp
 
 lemma old_sf_imp_subgroup:
   "old_sf S \<Longrightarrow> subgroup (carrier S-{\<zero>}) (mult_of R)"
@@ -327,7 +327,7 @@ lemma old_sf_imp_subgroup:
   using field.has_inverse[of "R\<lparr>carrier := carrier S\<rparr>", simplified] monoid.inv_unique[of
       "R\<lparr>carrier := carrier S\<rparr>", simplified] apply auto
   using set_rev_mp  Units_one_closed comm_inv_char mult_of_is_Units units_of_inv
-  apply (metis (no_types, lifting) insert_Diff insert_iff local.field_Units zero_closed)
+  apply (metis (no_types, lifting) insert_Diff insert_iff field_Units zero_closed)
 subgoal
 proof -
   fix a :: 'a
@@ -338,7 +338,7 @@ assume a3: "a \<noteq> \<zero>"
   have "a \<in> carrier R"
   using a2 a1 by auto
   then show False
-    using a4 a3 by (metis (no_types) carrier_mult_of insert_Diff insert_iff local.field_Units m_inv_mult_of monoid.Units_r_inv monoid_axioms r_null zero_closed zero_not_one)
+    using a4 a3 by (metis (no_types) carrier_mult_of insert_Diff insert_iff field_Units m_inv_mult_of monoid.Units_r_inv monoid_axioms r_null zero_closed zero_not_one)
 qed
   apply (metis monoid_incl_imp_submonoid ring.is_monoid submonoid_def)
   by (metis (full_types) integral monoid.monoid_incl_imp_submonoid monoid_axioms ring.is_monoid
@@ -394,12 +394,12 @@ end
 
 lemma (in field) old_fe_refl: "old_fe R (carrier R)"
   unfolding old_fe_def old_fe_axioms_def apply auto
-  using local.field_axioms apply blast
+  using field_axioms apply blast
   using normalize_old_sf old_sf_refl by auto
 
 lemma (in field) old_fe_iff_old_sf: "old_fe R K \<longleftrightarrow> old_sf (R\<lparr>carrier:=K\<rparr>)"
   using old_fe.L_extends_K old_fe.intro old_fe_axioms_def
-    local.field_axioms by blast
+    field_axioms by blast
 
 lemma (in subfield) finsum_simp: (* unused *)
   assumes \<open>ring L\<close>
@@ -441,7 +441,7 @@ next
 qed
 
 lemma (in field) field_extension_refl: "field_extension R (carrier R)"
-  by (simp add: field_extension.intro local.field_axioms subfield_iff(1))
+  by (simp add: field_extension.intro field_axioms subfield_iff(1))
 
 
 subsection \<open>Intersections of intermediate fields\<close>
@@ -464,7 +464,7 @@ lemma "\<Inter>_is_old_sf": "\<M>\<noteq>{} \<Longrightarrow> \<forall>M\<in>\<M
 proof goal_cases
   case (1 M)
   then show ?case using group.subgroups_Inter[OF field_mult_group]
-    by (smt equals0D field.old_fe_iff_old_sf local.field_axioms mem_Collect_eq old_sf_altdef
+    by (smt equals0D field.old_fe_iff_old_sf field_axioms mem_Collect_eq old_sf_altdef
         intersect_nonzeros)
 qed
 
@@ -604,7 +604,7 @@ proof -
       using m_assoc m_comm by force
     then have "(a \<otimes> (b \<otimes> inv a \<otimes> inv b) = \<one> \<and> b \<otimes> inv a \<in> carrier R) \<and> inv b \<in> carrier R"
       by (metis (no_types) Diff_iff Units_inv_closed Units_one_closed Units_r_inv assms empty_iff
-          insert_iff inv_one local.field_Units m_assoc m_closed)
+          insert_iff inv_one field_Units m_assoc m_closed)
     then show ?thesis
       by (metis (no_types) assms(1) m_assoc m_comm)
   qed
@@ -646,7 +646,7 @@ proof -
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
     by (intro subring.cring_ring_hom_cring)
-      (simp_all add: Field_Extension.subfield.axioms assms(1) subfieldE(1) S.is_cring that)
+      (simp_all add: subfield.axioms assms(1) subfieldE(1) S.is_cring that)
   from a[THEN this] show
     "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) =
     (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
@@ -735,7 +735,7 @@ proof -
         apply (simp add: subfield.axioms L_over_M S.subring_is_ring subfieldE(1))
         using * apply blast
         apply (simp add: R.ring_axioms)
-        using Field_Extension.subfield_def L_over_M S.Subring_cring subfieldE(1) apply blast
+        using subfield_def L_over_M S.Subring_cring subfieldE(1) apply blast
           apply (fact is_UP_cring)
          apply (simp add: ** UP_univ_prop_axioms_def)
         unfolding Eval_def apply (rule eq_reflection)
@@ -1007,7 +1007,7 @@ proof -
   let ?L = "M\<lparr>carrier:=L\<rparr>" and ?K = "M\<lparr>carrier:=K\<rparr>"
 
   have "K \<subseteq> L"
-    using Field_Extension.subfield_def assms(1) subfieldE(3) by force
+    using subfield_def assms(1) subfieldE(3) by force
   then have "K \<subseteq> carrier M"
     by (meson assms(2) order.trans subfieldE(3))
   then have M_over_K: "field_extension M K"
@@ -1023,7 +1023,7 @@ proof -
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
       apply (rule enclosing.module.module_incl_imp_submodule)
-      apply (simp add: Field_Extension.subfield.axioms assms(2) field_extension.axioms(1)
+      apply (simp add: subfield.axioms assms(2) field_extension.axioms(1)
           subfieldE(3))
       subgoal proof -
       from assms have "field_extension ?L K"
