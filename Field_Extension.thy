@@ -881,7 +881,7 @@ proof -
   interpret ds: vectorspace K "direct_sum V W"
     by (simp add: assms(1) assms(3) direct_sum_is_vs)
 
-  txt \<open>injective embeddings\<close>
+  txt \<open>embeddings into @{term "direct_sum V W"}\<close>
   have lin1: "linear_map K V (direct_sum V W) (inj1 V W)"
     and lin2: "linear_map K W (direct_sum V W) (inj2 V W)"
     by (simp_all add: assms(1-4) inj1_linear inj2_linear)
@@ -894,52 +894,60 @@ proof -
     Bw: "finite Bw" "Bw \<subseteq> carrier W" "module.gen_set K W Bw"
     by (meson vectorspace.fin_dim_def)
   let ?Bv = "inj1 V W ` Bv" and ?Bw = "inj2 V W ` Bw"
-  let ?B = "?Bv \<union> ?Bw"
-  from Bv(2) Bw(2) have in_carrier: "?Bv \<subseteq> carrier (direct_sum V W)" "?Bw \<subseteq> carrier (direct_sum V W)"
-    unfolding direct_sum_def by (auto simp: inj1_def inj2_def)
-      (meson assms vectorspace.span_closed vectorspace.span_zero)+
-  from Bv(1) Bw(1) have "finite ?Bv" "finite ?Bw" "finite ?B"
+  let ?Bds = "?Bv \<union> ?Bw"
+  from Bv(1) Bw(1) have "finite ?Bds"
     by simp_all
   moreover
-    from in_carrier have in_carrier': "?B \<subseteq> carrier (direct_sum V W)" by simp
-  moreover have "module.gen_set K (direct_sum V W) ?B"
-    apply auto using calculation(4) ds.span_closed apply blast
+    from Bv(2) Bw(2) have "?Bds \<subseteq> carrier (direct_sum V W)"
+    unfolding direct_sum_def by (auto simp: inj1_def inj2_def)
+      (meson assms vectorspace.span_closed vectorspace.span_zero)+
+  moreover have "module.gen_set K (direct_sum V W) ?Bds"
+    apply auto using calculation(2) ds.span_closed apply blast
   proof goal_cases
     case (1 a b)
-    then have "a \<in> carrier V" "b \<in> carrier W"
+    then have in_carrier: "a \<in> carrier V" "b \<in> carrier W"
       by (simp_all add: direct_sum_def)
     then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
       and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
       by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
-    have f: "f = f\<circ>fst \<circ> inj1 V W" unfolding inj1_def
-      by fastforce
-    note im_lincomb = linear_map.lincomb_linear_image[OF lin1 inj1, where a="f\<circ>fst" and A=A]
+    have f: "f = f\<circ>fst \<circ> inj1 V W" and g: "g = g\<circ>snd \<circ> inj2 V W"
+      unfolding inj1_def inj2_def by fastforce+
+    note im_lincomb =
+      linear_map.lincomb_linear_image[OF lin1 inj1, where a="f\<circ>fst" and A=A]
+      linear_map.lincomb_linear_image[OF lin2 inj2, where a="g\<circ>snd" and A=B]
     let ?A = "inj1 V W ` A" and ?B = "inj2 V W ` B"
     have
       "ds.lincomb (f\<circ>fst) ?A = inj1 V W (module.lincomb V (f\<circ>fst \<circ> inj1 V W) A)"
-      apply (rule im_lincomb) using calculation apply auto
+      "ds.lincomb (g\<circ>snd) ?B = inj2 V W (module.lincomb W (g\<circ>snd \<circ> inj2 V W) B)"
+      apply (auto intro!: im_lincomb)
       using Bv(2) lincomb1(3) apply blast
       apply (simp add: ds.coeff_in_ring2 inj1_def lincomb1(4))
-      by (simp add: lincomb1(2))
-    moreover have "?A \<subseteq> ?Bv"
-      by (simp add: image_mono lincomb1(3))
-    moreover have "finite ?A"
-      by (simp add: lincomb1(2))
-    moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" unfolding inj1_def
-      using lincomb1(4) by auto
-    ultimately have "inj1 V W a \<in> ds.span ?Bv"
-      by (metis (mono_tags, lifting) f ds.span_def lincomb1(1) mem_Collect_eq)
-
-    thm ds.lincomb_union ds.lincomb_elim_if module.lincomb_sum vectorspace.span_add
-vectorspace.span_add1 (*!*) linear_map.lincomb_linear_image
-    thm linear_map.lincomb_linear_image[OF lin1, simplified]
-    show ?case sorry
+      apply (simp add: lincomb1(2))
+      using Bw(2) lincomb2(3) apply blast
+      apply (simp add: ds.coeff_in_ring2 inj2_def lincomb2(4))
+      by (simp add: lincomb2(2))
+    moreover have "?A \<subseteq> ?Bv" "?B \<subseteq> ?Bw"
+      by (simp_all add: image_mono lincomb1(3) lincomb2(3))
+    moreover have "finite ?A" "finite ?B"
+      by (simp_all add: lincomb1(2) lincomb2(2))
+    moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" "g\<circ>snd \<in> ?B \<rightarrow> carrier K"
+      unfolding inj1_def inj2_def using lincomb1(4) lincomb2(4)by auto
+    ultimately have "inj1 V W a \<in> ds.span ?Bv" "inj2 V W b \<in> ds.span ?Bw"
+       apply (metis (mono_tags, lifting) f g ds.span_def lincomb1(1) lincomb2(1) mem_Collect_eq)+
+      done
+    then have "inj1 V W a \<in> ds.span ?Bds" "inj2 V W b \<in> ds.span ?Bds"
+      by (meson contra_subsetD ds.span_is_monotone le_sup_iff order_refl)+
+    then have "inj1 V W a \<oplus>\<^bsub>direct_sum V W\<^esub> inj2 V W b \<in> ds.span ?Bds"
+      using ds.span_add1[OF \<open>?Bds \<subseteq> carrier (direct_sum V W)\<close>] by simp
+    then show ?case unfolding inj1_def inj2_def
+      unfolding direct_sum_def using assms(1,3)[unfolded vectorspace_def] in_carrier
+      by (simp add: module_def abelian_group_def abelian_monoid.l_zero abelian_monoid.r_zero)
   qed
-  ultimately show fin_dim: "ds.fin_dim" unfolding ds.fin_dim_def
+  ultimately show "ds.fin_dim" unfolding ds.fin_dim_def
     by meson
-txt \<open>I had planned to adapt the proof above to also show that @{term ?B} is minimal, but it turned
- out to tiresome. Instead, I can now use @{thm[source] linear_map.rank_nullity} once again:\<close>
 
+txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds} is minimal, but it turned
+  out too tiresome. Instead, I use @{thm[source] linear_map.rank_nullity[OF _ \<open>ds.fin_dim\<close>]}:\<close>
   note inj1 inj2
   moreover have emb1: "inj1 V W ` carrier V = carrier V \<times> {\<zero>\<^bsub>W\<^esub>}"
     and emb2: "inj2 V W ` carrier W = {\<zero>\<^bsub>V\<^esub>} \<times> carrier W"
@@ -984,7 +992,7 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?B} i
       then show "(a, \<zero>\<^bsub>W\<^esub>) \<in> (\<lambda>(c, e). (c, \<zero>\<^bsub>W\<^esub>)) ` (carrier V \<times> carrier W)"
         using a1 by auto
     qed
-    with fin_dim ker_is_V show ?thesis
+    with \<open>ds.fin_dim\<close> ker_is_V show ?thesis
       using T.rank_nullity by auto
   qed
   with propagate_dims show "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
