@@ -871,8 +871,7 @@ proof -
     by metis
   oops
 
-lemma direct_sum_dim: \<comment> \<open>cannot use @{thm[source] linear_map.rank_nullity} directly because the
- sum's dimension is not yet shown to be finite...\<close>
+lemma direct_sum_dim:
   assumes "vectorspace K V" "vectorspace.fin_dim K V"
   assumes "vectorspace K W" "vectorspace.fin_dim K W"
   shows "vectorspace.fin_dim K (direct_sum V W)"
@@ -881,7 +880,7 @@ proof -
   interpret ds: vectorspace K "direct_sum V W"
     by (simp add: assms(1) assms(3) direct_sum_is_vs)
 
-  txt \<open>embeddings into @{term "direct_sum V W"}\<close>
+  txt \<open>embeddings into @{term "direct_sum V W"}:\<close>
   have lin1: "linear_map K V (direct_sum V W) (inj1 V W)"
     and lin2: "linear_map K W (direct_sum V W) (inj2 V W)"
     by (simp_all add: assms(1-4) inj1_linear inj2_linear)
@@ -993,11 +992,11 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
         using a1 by auto
     qed
     with \<open>ds.fin_dim\<close> ker_is_V show ?thesis
-      using T.rank_nullity by auto
+      using T.rank_nullity by simp
   qed
   with propagate_dims show "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
     by simp
-qed (* to-do: use \<^sub> *)
+qed (* to-do: use \<^sub> in part 1*)
 
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
