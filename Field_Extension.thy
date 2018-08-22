@@ -911,27 +911,25 @@ proof -
     then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
       and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
       by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
-    have f: "f = (\<lambda>(v,w). f v) \<circ> inj1 V W" unfolding inj1_def
+    have f: "f = f\<circ>fst \<circ> inj1 V W" unfolding inj1_def
       by fastforce
-    note im_lincomb = linear_map.lincomb_linear_image[OF lin1 inj1, where a="\<lambda>(v,w). f v" and A=A]
+    note im_lincomb = linear_map.lincomb_linear_image[OF lin1 inj1, where a="f\<circ>fst" and A=A]
+    let ?A = "inj1 V W ` A" and ?B = "inj2 V W ` B"
     have
-      "ds.lincomb (\<lambda>(v, w). f v) (inj1 V W ` A) = inj1 V W (module.lincomb V ((\<lambda>(v, w). f v) \<circ> inj1 V W) A)"
+      "ds.lincomb (f\<circ>fst) ?A = inj1 V W (module.lincomb V (f\<circ>fst \<circ> inj1 V W) A)"
       apply (rule im_lincomb) using calculation apply auto
       using Bv(2) lincomb1(3) apply blast
       apply (simp add: ds.coeff_in_ring2 inj1_def lincomb1(4))
       by (simp add: lincomb1(2))
-    moreover have "inj1 V W ` A \<subseteq> ?Bv"
+    moreover have "?A \<subseteq> ?Bv"
       by (simp add: image_mono lincomb1(3))
-    moreover have "finite (inj1 V W ` A)"
+    moreover have "finite ?A"
       by (simp add: lincomb1(2))
-    moreover have "(\<lambda>(v, w). f v) \<in> inj1 V W ` A \<rightarrow> carrier K" unfolding inj1_def
+    moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" unfolding inj1_def
       using lincomb1(4) by auto
     ultimately have "inj1 V W a \<in> ds.span ?Bv"
       by (metis (mono_tags, lifting) f ds.span_def lincomb1(1) mem_Collect_eq)
 
-    let ?A = "inj1 V W ` A" (*and ?B = "B-{\<zero>\<^bsub>W\<^esub>}"*)
-    from lincomb1 have "module.lincomb V f ?A = a" "finite ?A" "?A\<subseteq>Bv" "f \<in> ?A\<rightarrow>carrier K" "\<zero>\<^bsub>V\<^esub> \<notin> ?A"
-      apply auto using Bv Bw vectorspace.lincomb_isolate sorry
     thm ds.lincomb_union ds.lincomb_elim_if module.lincomb_sum vectorspace.span_add
 vectorspace.span_add1 (*!*) linear_map.lincomb_linear_image
     thm linear_map.lincomb_linear_image[OF lin1, simplified]
