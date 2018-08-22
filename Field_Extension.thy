@@ -947,7 +947,7 @@ proof -
     by meson
 
 txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds} is minimal, but it turned
-  out too tiresome. Instead, I use @{thm[source] linear_map.rank_nullity[OF _ \<open>ds.fin_dim\<close>]}:\<close>
+  out too tiresome. Instead, I use @{thm[source] linear_map.rank_nullity[OF _ this]}:\<close>
   note inj1 inj2
   moreover have emb1: "inj1 V W ` carrier V = carrier V \<times> {\<zero>\<^bsub>W\<^esub>}"
     and emb2: "inj2 V W ` carrier W = {\<zero>\<^bsub>V\<^esub>} \<times> carrier W"
