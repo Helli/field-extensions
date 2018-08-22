@@ -193,13 +193,16 @@ lemma intermediate_ring_2:
     \<Longrightarrow> ring.old_sr (R\<lparr>carrier:=M\<rparr>) S"
   unfolding old_sr_def ring.old_sr_def by auto
 
-lemma old_sr_ring_hom_ring: "old_sr S \<Longrightarrow> ring_hom_ring S R id" apply intro_locales unfolding old_sr_def
-  subgoal using abelian_group.axioms(1) ring.is_abelian_group old_sr_def by blast
-  subgoal using abelian_group.axioms(2) ring_axioms ring.is_abelian_group old_sr_def by blast
-  subgoal using local.ring_axioms ring.is_monoid old_sr_def by blast
-  subgoal unfolding old_sr_def by (simp add: ring.axioms(3))
-  apply unfold_locales unfolding ring_hom_def apply auto
+lemma old_sr_ring_hom_ring: "old_sr S \<Longrightarrow> ring_hom_ring S R id"
+  unfolding ring_hom_ring_def ring_hom_ring_axioms_def apply auto
+  using old_sr_def apply blast
+  apply (rule ring_axioms)
+  apply (auto intro!: ring_hom_memI simp: old_sr_def)
   by (metis (no_types, lifting) r_one ring.ring_simprules(12) ring.ring_simprules(6) subsetCE)
+
+lemma subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
+  unfolding ring_hom_ring_def ring_hom_ring_axioms_def
+  by (auto simp: subring_is_ring ring_axioms intro!: ring_hom_memI) (use subringE(1) in blast)
 
 end
 
@@ -214,7 +217,7 @@ lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>c
 
 lemma (in subring) cring_ring_hom_cring:
   "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
-  by (simp add: cring.axioms(1) cring.old_sr_ring_hom_cring ring.old_sr_fullI subringE(5) subringE(7) subring_axioms subset)
+  by (simp add: RingHom.ring_hom_cringI cring.Subring_cring cring.axioms(1) ring.subring_ring_hom_ring subring_axioms)
 
 lemma (in ring) subring_m_inv:
   assumes "subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
@@ -255,8 +258,8 @@ proof -
     carrier S \<or> a \<oplus>\<^bsub>S\<^esub> aa = a \<oplus> aa \<and> a \<otimes>\<^bsub>S\<^esub> aa = a \<otimes> aa))"
     by (simp add: field.old_sf_def local.field_axioms old_sr_def)
   then show ?thesis
-    using a1 by (metis (no_types) cring.cring_simprules(6) field.old_sf_def local.field_axioms
-        r_one ring.ring_simprules(12) set_rev_mp old_sr_cring)
+    using a1 by (metis (no_types, hide_lams) contra_subsetD local.ring_axioms monoid.r_one
+        ring.ring_simprules(6,12) ring_def)
 qed
 
 lemma normalize_old_sf: "old_sf S \<Longrightarrow> old_sf (R\<lparr>carrier:=carrier S\<rparr>)"
@@ -716,8 +719,6 @@ proof -
     then have L_over_M: "subfield M L" by auto
     have *: "K \<subseteq> M" and **: "s \<in> M"
       using \<open>M \<in> ?\<M>\<close> by auto
-    interpret field_M: field "(L\<lparr>carrier:=M\<rparr>)"
-      by (simp add: L_over_M S.subfield_iff(2))
     have "?L' \<subseteq> M"
     proof auto
       fix f g
@@ -731,12 +732,12 @@ proof -
         unfolding double_update
         apply (intro subring.cring_ring_hom_cring) apply auto
            apply (intro ring.ring_incl_imp_subring) apply auto
-        apply (simp add: field_M.ring_axioms)
+        apply (simp add: subfield.axioms L_over_M S.subring_is_ring subfieldE(1))
         using * apply blast
         apply (simp add: R.ring_axioms)
-        apply (simp add: field_M.is_cring)
-        apply (fact is_UP_cring)
-         apply (simp add: "**" UP_univ_prop_axioms_def)
+        using Field_Extension.subfield_def L_over_M S.Subring_cring subfieldE(1) apply blast
+          apply (fact is_UP_cring)
+         apply (simp add: ** UP_univ_prop_axioms_def)
         unfolding Eval_def apply (rule eq_reflection)
         apply (intro field_extension_with_UP.intermediate_field_eval)
         by (simp_all add: field_extension_with_UP_axioms L_over_M * **)
@@ -747,7 +748,7 @@ proof -
       with \<open>Eval g \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "inv\<^bsub>L\<^esub> Eval g \<in> M"
         using L_over_M S.subfield_m_inv(1) by auto
       with \<open>Eval f \<in> M\<close> show "Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<in> M"
-        using field_M.m_closed[simplified] by simp
+        using M_over_K.m_closed[simplified] by simp
     qed
   }
   ultimately show "\<Inter>?\<M> = ?L'"
@@ -1089,6 +1090,6 @@ text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<clo
 
 text \<open>@{thm[source] field_simps} are *not* available in general. Re-prove them?\<close>
 
-value INTEG value "\<Z>" \<comment> \<open>duplicate definition\<close>
+value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
 
 end
