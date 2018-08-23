@@ -1000,7 +1000,7 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
 qed (* to-do: use \<^sub> in part 1*)
 
 proposition degree_multiplicative:
-  assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M"
+  assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
 proof -

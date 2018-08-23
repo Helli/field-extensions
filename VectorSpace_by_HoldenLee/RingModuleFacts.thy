@@ -72,9 +72,11 @@ lemma (in abelian_group) minus_other_side [simp]:
   "\<lbrakk>a\<in>carrier G; b\<in>carrier G\<rbrakk> \<Longrightarrow> (a\<ominus>\<^bsub>G\<^esub>b = \<zero>\<^bsub>G\<^esub>) = (a=b)"
   by (metis a_minus_def add.inv_closed add.m_comm r_neg r_neg2)
 
-text \<open>The multiplication fields of the module group are not used:\<close>
+text \<open>Additive structures contain unused multiplication fields:\<close>
+lemma abelian_group_sanitise: "abelian_group G \<longleftrightarrow> abelian_group (G\<lparr>mult:=undefined,one:=undefined\<rparr>)"
+  unfolding abelian_group_def abelian_group_axioms_def abelian_monoid_def by simp
+
 lemma module_sanitise: "module R M \<longleftrightarrow> module R (M\<lparr>mult:=undefined,one:=undefined\<rparr>)"
-  unfolding module_def module_axioms_def abelian_group_def abelian_group_axioms_def
-    abelian_monoid_def comm_monoid_def by simp
+  unfolding module_def module_axioms_def by (simp flip: abelian_group_sanitise)
 
 end
