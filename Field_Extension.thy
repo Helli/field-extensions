@@ -624,6 +624,12 @@ definition "zvs \<equiv>
 lemma (in cring) module_zvs: "module R zvs" unfolding zvs_def
   by unfold_locales (simp_all add: Units_def)
 
+lemma zvs_simps[simp]:
+"carrier zvs = {0}"
+"zero zvs = 0"
+"add zvs = (\<lambda>_ _.0)"
+  by (simp_all add: zvs_def)
+
 lemma (in field) vectorspace_zvs: "vectorspace R zvs"
   by (simp add: field_axioms module_zvs vectorspace_def)
 
@@ -632,6 +638,15 @@ lemma (in module) submodule_zero: "submodule {\<zero>\<^bsub>M\<^esub>} R M" (*r
 
 lemma (in module) module_md_zero: "module R (md {\<zero>\<^bsub>M\<^esub>})" (*rm*)
   by (simp add: submodule_is_module submodule_zero)
+
+lemma (in field) dim_zvs: "vectorspace.dim R zvs = 0"
+  unfolding vectorspace.dim_def[OF vectorspace_zvs]
+proof simp
+  have "\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {0::'c} \<and> LinearCombinations.module.span R zvs C = {0}"
+by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finite.emptyI subset_insertI zvs_simps(2))
+  then show "(LEAST n. \<exists>C. finite C \<and> card C = n \<and> C \<subseteq> {0::'c} \<and> LinearCombinations.module.span R zvs C = {0}) = 0"
+    using Least_eq_0 by presburger
+qed
 
 term "(direct_sum V ^^ n) zvs"
 
