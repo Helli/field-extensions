@@ -649,6 +649,9 @@ by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finit
 qed
 
 term "(direct_sum V ^^ n) zvs"
+lemma (in vectorspace) "vectorspace K (((\<lambda>W. direct_sum V W) ^^ n) zvs)"
+  apply (induction n)
+  apply simp
 
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
