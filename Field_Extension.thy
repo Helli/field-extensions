@@ -618,6 +618,23 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
     by simp
 qed (* to-do: use \<^sub> in part 1*)
 
+definition "zvs \<equiv>
+  \<lparr>carrier={0}, monoid.mult=undefined, one=undefined, zero=0, add=\<lambda>_ _.0, smult=\<lambda>_ _.0\<rparr>"
+
+lemma (in cring) module_zvs: "module R zvs" unfolding zvs_def
+  by unfold_locales (simp_all add: Units_def)
+
+lemma (in field) vectorspace_zvs: "vectorspace R zvs"
+  by (simp add: field_axioms module_zvs vectorspace_def)
+
+lemma (in module) submodule_zero: "submodule {\<zero>\<^bsub>M\<^esub>} R M" (*rm*)
+  using M.r_neg submoduleI by fastforce
+
+lemma (in module) module_md_zero: "module R (md {\<zero>\<^bsub>M\<^esub>})" (*rm*)
+  by (simp add: submodule_is_module submodule_zero)
+
+term "(direct_sum V ^^ n) zvs"
+
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows
