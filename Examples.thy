@@ -51,24 +51,12 @@ lemma ring_standard_ring:
 
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
-lemma old_sr_example: "ring.old_sr rat_field (standard_ring (range rat_of_int))"
-  unfolding rat_field_def ring.old_sr_def[OF ring_univ_ring]
-  apply (auto simp add: univ_ring_def) unfolding standard_ring_def
-     apply (metis ring_standard_ring(1) standard_ring_def)
-  by auto
+lemma subring_example: "subring (range rat_of_int) rat_field"
+  unfolding rat_field_def univ_ring_def apply unfold_locales apply auto
+  apply (metis of_int_add rangeI) unfolding m_inv_def apply simp using of_int_minus rangeI
+  apply force by (metis of_int_mult rangeI)
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
-
-lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
-  apply standard
-                   apply (auto simp: standard_ring_def)
-  using Rats_add Rats_def apply blast
-  unfolding Units_def apply auto
-      apply (smt of_rat_minus)
-  using Rats_def apply auto[1]
-  apply (simp_all add: ring_class.ring_distribs)
-  by (metis mult.commute nonzero_mult_div_cancel_left of_rat_eq_1_iff of_rat_mult
-      times_divide_eq_right)
 
 lemma inv_standard_ring:
   fixes x::"_::ring"
@@ -85,21 +73,6 @@ lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
       ring_standard_ring(2) standard_ring_def)
   apply (simp add: Units_def)+
   by (metis mult.commute nonzero_of_rat_inverse of_rat_eq_0_iff right_inverse)
-
-lemma old_fe_real_over_rat: "old_fe real_field (range real_of_rat)"
-  apply (simp add: old_fe_def old_fe_axioms_def field_examples)
-proof -
-  have f1: "ring \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
-    by (metis (no_types) ring_standard_ring(2) standard_ring_def)
-  have f2: "real_field = \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
-    using real_field_def univ_ring_def by auto
-  have "ring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1::real, zero = 0, add = (+)\<rparr>"
-    by (metis ring_univ_ring univ_ring_def)
-  then have "ring.old_sr \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
-    using f1 by (simp add: ring.old_sr_def)
-  then show "field.old_sf real_field (real_field\<lparr>carrier := range real_of_rat\<rparr>)"
-    using f2 by (metis f_r_o_r field.old_sf_def field_examples(2) partial_object.update_convs(1) standard_ring_def)
-qed
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
