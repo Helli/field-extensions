@@ -553,8 +553,7 @@ proof -
     moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" "g\<circ>snd \<in> ?B \<rightarrow> carrier K"
       unfolding inj1_def inj2_def using lincomb1(4) lincomb2(4)by auto
     ultimately have "inj1 V W a \<in> ds.span ?Bv" "inj2 V W b \<in> ds.span ?Bw"
-       apply (metis (mono_tags, lifting) f g ds.span_def lincomb1(1) lincomb2(1) mem_Collect_eq)+
-      done
+      by (auto simp: f[symmetric] g[symmetric] ds.span_def lincomb1(1) lincomb2(1)) metis+
     then have "inj1 V W a \<in> ds.span ?Bds" "inj2 V W b \<in> ds.span ?Bds"
       by (meson contra_subsetD ds.span_is_monotone le_sup_iff order_refl)+
     then have "inj1 V W a \<oplus>\<^bsub>direct_sum V W\<^esub> inj2 V W b \<in> ds.span ?Bds"
