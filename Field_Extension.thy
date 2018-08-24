@@ -618,16 +618,16 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
     by simp
 qed (* to-do: use \<^sub> in part 1*)
 
-definition "zvs \<equiv>
-  \<lparr>carrier={0}, monoid.mult=undefined, one=undefined, zero=0, add=\<lambda>_ _.0, smult=\<lambda>_ _.0\<rparr>"
+definition "zvs \<equiv> \<comment> \<open>to-do: add type\<close> \<comment> \<open>use @{const undefined}?\<close>
+  \<lparr>carrier={\<some>_.True}, monoid.mult=undefined, one=undefined, zero=\<some>_.True, add=\<lambda>_ _.\<some>_.True, smult=\<lambda>_ _.\<some>_.True\<rparr>"
 
 lemma (in cring) module_zvs: "module R zvs" unfolding zvs_def
   by unfold_locales (simp_all add: Units_def)
 
 lemma zvs_simps[simp]:
-"carrier zvs = {0}"
-"zero zvs = 0"
-"add zvs = (\<lambda>_ _.0)"
+"carrier zvs = {\<some>_.True}"
+"zero zvs = (\<some>_.True)"
+"add zvs = (\<lambda>_ _.\<some>_.True)"
   by (simp_all add: zvs_def)
 
 lemma (in field) vectorspace_zvs: "vectorspace R zvs"
@@ -640,12 +640,22 @@ lemma (in module) module_md_zero: "module R (md {\<zero>\<^bsub>M\<^esub>})" (*r
   by (simp add: submodule_is_module submodule_zero)
 
 lemma (in field) dim_zvs: "vectorspace.dim R zvs = 0"
-  unfolding vectorspace.dim_def[OF vectorspace_zvs]
-proof simp
-  have "\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {0::'c} \<and> LinearCombinations.module.span R zvs C = {0}"
+  unfolding vectorspace.dim_def[OF vectorspace_zvs] apply simp
+proof -
+  have "\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {\<some>_.True} \<and> LinearCombinations.module.span R zvs C = {\<some>_.True}"
 by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finite.emptyI subset_insertI zvs_simps(2))
-  then show "(LEAST n. \<exists>C. finite C \<and> card C = n \<and> C \<subseteq> {0::'c} \<and> LinearCombinations.module.span R zvs C = {0}) = 0"
-    using Least_eq_0 by presburger
+  then show "(LEAST n. \<exists>C. finite C \<and> card C = n \<and> C \<subseteq> {\<some>_.True} \<and> LinearCombinations.module.span R zvs C = {\<some>_.True}) = 0"
+  proof -
+    obtain DD :: "'d set" where
+      "(\<exists>v0. finite v0 \<and> card v0 = 0 \<and> v0 \<subseteq> {SOME uu. True::'d} \<and> LinearCombinations.module.span R zvs v0 = {SOME uu. True}) = (finite DD \<and> card DD = 0 \<and> DD \<subseteq> {SOME uu. True} \<and> LinearCombinations.module.span R zvs DD = {SOME uu. True})"
+      by (metis (no_types))
+    then have "finite DD \<and> card DD = 0 \<and> DD \<subseteq> {SOME d. True} \<and> LinearCombinations.module.span R zvs DD = {SOME d. True}"
+      by (metis \<open>\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {SOME _. True} \<and> LinearCombinations.module.span R zvs C = {SOME _. True}\<close>) (* failed *)
+    then have "\<exists>D. finite D \<and> card D = 0 \<and> D \<subseteq> {SOME d. True::'d} \<and> LinearCombinations.module.span R zvs D = {SOME d. True}"
+      by blast
+    then show ?thesis
+      using Least_eq_0 by presburger
+  qed
 qed
 
 lemma (in subring) module_wrt_subring:
@@ -663,6 +673,27 @@ lemma (in subring) hom_wrt_subring:
 lemma (in subfield) linear_wrt_subfield:
   "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
+
+lemma
+  assumes "vectorspace K V"
+  assumes "vectorspace.fin_dim K V"
+  (* assumes "vectorspace.dim K V \<ge> 1" rm, use saturating "-" instead*)
+  shows "\<exists>V'. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
+  using assms
+proof (induction "vectorspace.dim K V" arbitrary: V)
+  case 0
+  then have a: "vectorspace K zvs \<and> vectorspace.dim K zvs = 0"
+    using field.dim_zvs vectorspace.axioms(2)
+    using field.vectorspace_zvs by blast
+  then have b: "vectorspace K zvs \<and> vectorspace.dim K zvs = vectorspace.dim K V - 1"
+    using "0.hyps" by auto
+  show ?case using b sledgehammer
+    thm exI[of _ zvs, OF b]
+  next
+  case (Suc x)
+  then show ?case sorry
+qed
+qed
 
 term "(direct_sum V ^^ n) zvs"
 
