@@ -648,10 +648,23 @@ by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finit
     using Least_eq_0 by presburger
 qed
 
+lemma (in subring) module_wrt_subring:
+  "module R M \<Longrightarrow> module (R\<lparr>carrier:=H\<rparr>) M"
+  unfolding module_def module_axioms_def by (simp add: cring.Subring_cring subring_axioms)
+
+lemma (in subfield) vectorspace_wrt_subfield:
+  "vectorspace L V \<Longrightarrow> vectorspace (L\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
+  by (auto simp: module_wrt_subring ring.subfield_iff(2) cring.axioms(1) module.axioms(1) subfield_axioms)
+
+lemma (in subring) hom_wrt_subring:
+  "h \<in> module_hom R M N \<Longrightarrow> h \<in> module_hom (R\<lparr>carrier:=H\<rparr>) M N"
+  by (simp add: LinearCombinations.module_hom_def)
+
+lemma (in subfield) linear_wrt_subfield:
+  "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
+  by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
+
 term "(direct_sum V ^^ n) zvs"
-lemma (in vectorspace) "vectorspace K (((\<lambda>W. direct_sum V W) ^^ n) zvs)"
-  apply (induction n)
-  apply simp
 
 proposition degree_multiplicative:
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
