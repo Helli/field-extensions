@@ -618,7 +618,7 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
     by simp
 qed (* to-do: use \<^sub> in part 1*)
 
-definition "zvs \<equiv> \<comment> \<open>to-do: add type\<close> \<comment> \<open>use @{const undefined}?\<close>
+definition "zvs = \<comment> \<open>to-do: add type\<close> \<comment> \<open>use @{const undefined}?\<close>
   \<lparr>carrier={\<some>_.True}, monoid.mult=undefined, one=undefined, zero=\<some>_.True, add=\<lambda>_ _.\<some>_.True, smult=\<lambda>_ _.\<some>_.True\<rparr>"
 
 lemma (in cring) module_zvs: "module R zvs" unfolding zvs_def
@@ -678,21 +678,22 @@ lemma
   assumes "vectorspace K V"
   assumes "vectorspace.fin_dim K V"
   (* assumes "vectorspace.dim K V \<ge> 1" rm, use saturating "-" instead*)
-  shows "\<exists>V'. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
+  shows "\<exists>V'::('a,'e) module. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
   using assms
 proof (induction "vectorspace.dim K V" arbitrary: V)
   case 0
-  then have a: "vectorspace K zvs \<and> vectorspace.dim K zvs = 0"
+(* unused *)
+  then have a: "vectorspace K (zvs::('a,'x\<times>'y) module) \<and> vectorspace.dim K (zvs::('a,'x\<times>'y) module) = 0"
     using field.dim_zvs vectorspace.axioms(2)
     using field.vectorspace_zvs by blast
-  then have b: "vectorspace K zvs \<and> vectorspace.dim K zvs = vectorspace.dim K V - 1"
+  then have b: "vectorspace K (zvs::('a,'x\<times>'y) module) \<and> vectorspace.dim K (zvs::('a,'x\<times>'y) module) = vectorspace.dim K V - 1"
     using "0.hyps" by auto
-  show ?case using b sledgehammer
-    thm exI[of _ zvs, OF b]
+  show ?case using exI[of "\<lambda>V'. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
+        zvs, OF b]
+    by (metis b field.dim_zvs field.vectorspace_zvs vectorspace.axioms(2))
   next
   case (Suc x)
   then show ?case sorry
-qed
 qed
 
 term "(direct_sum V ^^ n) zvs"
