@@ -1,5 +1,3 @@
-use thm basis_criterion
-
 clarify which stuff was added to the VectorSpace theories. remove oops- and thm-commands from the
 repository
 

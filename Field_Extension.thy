@@ -658,6 +658,10 @@ by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finit
   qed
 qed
 
+lemma (in vectorspace) dim_0_trivial:
+  "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
+  using dim_greater_0 by linarith
+
 lemma (in subring) module_wrt_subring:
   "module R M \<Longrightarrow> module (R\<lparr>carrier:=H\<rparr>) M"
   unfolding module_def module_axioms_def by (simp add: cring.Subring_cring subring_axioms)
@@ -674,27 +678,13 @@ lemma (in subfield) linear_wrt_subfield:
   "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
-lemma
-  assumes "vectorspace K V"
-  assumes "vectorspace.fin_dim K V"
-  (* assumes "vectorspace.dim K V \<ge> 1" rm, use saturating "-" instead*)
-  shows "\<exists>V'::('a,'e) module. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
-  using assms
-proof (induction "vectorspace.dim K V" arbitrary: V)
-  case 0
-(* unused *)
-  then have a: "vectorspace K (zvs::('a,'x\<times>'y) module) \<and> vectorspace.dim K (zvs::('a,'x\<times>'y) module) = 0"
-    using field.dim_zvs vectorspace.axioms(2)
-    using field.vectorspace_zvs by blast
-  then have b: "vectorspace K (zvs::('a,'x\<times>'y) module) \<and> vectorspace.dim K (zvs::('a,'x\<times>'y) module) = vectorspace.dim K V - 1"
-    using "0.hyps" by auto
-  show ?case using exI[of "\<lambda>V'. vectorspace K V' \<and> vectorspace.dim K V' = vectorspace.dim K V - 1"
-        zvs, OF b]
-    by (metis b field.dim_zvs field.vectorspace_zvs vectorspace.axioms(2))
-  next
-  case (Suc x)
-  then show ?case sorry
-qed
+lemma aux1:
+  assumes "vectorspace (M\<lparr>carrier:=L\<rparr>) (vs_of M)" "vectorspace.fin_dim (M\<lparr>carrier:=L\<rparr>) (vs_of M)"
+  assumes "vectorspace (M\<lparr>carrier:=K\<rparr>) (vs_of M\<lparr>carrier:=L\<rparr>)" "vectorspace.fin_dim (M\<lparr>carrier:=K\<rparr>) (vs_of M\<lparr>carrier:=L\<rparr>)"
+  shows "vectorspace.dim (M\<lparr>carrier:=L\<rparr>) M = 34"
+  using assms apply simp
+proof -
+  have "subfield (carrier K) L"
 
 term "(direct_sum V ^^ n) zvs"
 
@@ -759,11 +749,24 @@ proof -
   qed
 
   moreover {
-    assume "field_extension.fin M L" "field_extension.fin ?L K"
+    assume fin: "field_extension.fin M L" "field_extension.fin ?L K"
+    have "vectorspace ?L (vs_of M)" "vectorspace.fin_dim ?L (vs_of M)"
+      using subfield_def assms(2-3) field.field_is_vecs_over_itself
+        subfield.vectorspace_wrt_subfield apply blast
+      using fin(1) by blast
+    with assms(2-3) fin(2) M_over_K \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it\<close>
     have "field_extension.degree M K =
       vectorspace.dim ?L (vs_of M) *
       vectorspace.dim ?K (vs_of ?L)"
-      sorry
+    proof (induction "vectorspace.dim ?L (vs_of M)" arbitrary: M)
+      case 0
+      from "0"(1,2,3,7) have False
+        using subfield.intro field_extension.fin_dim_nonzero field_extension.intro by fastforce
+      then show ?case ..
+    next
+      case (Suc x)
+      then show ?case sorry
+    qed
   }
 
   ultimately
