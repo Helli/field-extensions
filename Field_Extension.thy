@@ -678,10 +678,27 @@ lemma (in subfield) linear_wrt_subfield:
   "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
-lemma aux1:
-  assumes "vectorspace (M\<lparr>carrier:=L\<rparr>) (vs_of M)" "vectorspace.fin_dim (M\<lparr>carrier:=L\<rparr>) (vs_of M)"
-  assumes "vectorspace (M\<lparr>carrier:=K\<rparr>) (vs_of M\<lparr>carrier:=L\<rparr>)" "vectorspace.fin_dim (M\<lparr>carrier:=K\<rparr>) (vs_of M\<lparr>carrier:=L\<rparr>)"
-  shows "vectorspace.dim (M\<lparr>carrier:=L\<rparr>) M = 34"
+(*private*) locale samespace = vectorspace
+  "\<lparr>carrier=A, monoid.mult=monoid.mult B, one=one B, zero=zero B, add = add B\<rparr>"
+  "B\<lparr>smult:=monoid.mult B\<rparr>" for A and B
+
+term "ring.extend"
+term "ring.truncate"
+
+lemma
+  assumes "field_extension (L::'a ring) K"
+  shows "samespace K (vs_of L)" unfolding samespace_def
+  apply auto using field_extension.vectorspace_satisfied[OF assms]
+proof -
+  have "\<forall>u p f. \<lparr>carrier = f (carrier p), monoid.mult = (\<otimes>\<^bsub>p\<^esub>), one = \<one>\<^bsub>p\<^esub>::'a, zero = \<zero>\<^bsub>p\<^esub>, add = (\<oplus>\<^bsub>p\<^esub>), \<dots> = u::unit\<rparr> = carrier_update f p"
+    by simp
+  then show "vectorspace \<lparr>carrier = K, monoid.mult = (\<otimes>\<^bsub>L\<^esub>), one = \<one>\<^bsub>L\<^esub>, zero = \<zero>\<^bsub>L\<^esub>, add = (\<oplus>\<^bsub>L\<^esub>)\<rparr> (vs_of L)"
+    by (metis \<open>vectorspace (L\<lparr>carrier := K\<rparr>) (vs_of L)\<close>)
+qed
+
+lemma (in subspace) aux1:
+  assumes "vectorspace.fin_dim (vectorspace.vs V W) V"
+  shows "\<exists>L' h. linear_map K (direct_sum (vs_of L\<lparr>carrier:=K\<rparr>) L') (vs_of L) h"
   using assms apply simp
 proof -
   have "subfield (carrier K) L"
