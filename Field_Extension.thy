@@ -760,8 +760,33 @@ proof -
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed[simplified]
-    apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
-    using c_sum' sledgehammer
+        apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
+    using c_sum' lincomb_sum
+  proof goal_cases
+    case (1 m1 m2)
+    let ?asdf = "\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv"
+    have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?asdf B"
+      by (simp add: "1"(4) "1"(5) c_sum')
+    moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
+      "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow>\<^sub>E carrier K"
+       apply (simp add: "1"(4) "1"(5) c_sum(1))
+      apply auto
+      apply (metis "1"(4) "1"(5) Module.module_def PiE_mem cring.cring_simprules(1)
+          module.module_axioms okese(1))
+      ultimately
+      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv)"
+      using basis_criterion
+        then show ?case sorry
+  next
+    case (2 m1 m2)
+    then show ?case sorry
+  next
+    case (3 r m)
+    then show ?case sorry
+  next
+    case (4 r m)
+    then show ?case sorry
+  qed
   {
     fix v
     assume "v \<in> carrier V"
