@@ -684,6 +684,12 @@ lemma (in subfield) linear_wrt_subfield:
   "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
+lemma (in module) lincomb_restrict_simp[simp]:
+  assumes U: "U \<subseteq> carrier M"
+      and a: "a : U \<rightarrow> carrier R"
+  shows "lincomb (restrict a U) U = lincomb a U"
+  by (meson U a lincomb_cong restrict_apply')
+
 (*private*) locale samespace = vectorspace
   "\<lparr>carrier=A, monoid.mult=monoid.mult B, one=one B, zero=zero B, add = add B\<rparr>"
   "B\<lparr>smult:=monoid.mult B\<rparr>" for A and B
@@ -753,30 +759,35 @@ proof -
   have "linear_map K V (direct_sum (vs_of K) ?V) ?h"
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
-    using direct_sum_is_vs field_is_vecs_over_itself vs_span_B.vectorspace_axioms
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
-    using module.module_axioms apply blast
-    using vectorspace_def apply blast
+    using direct_sum_is_vs field_is_vecs_over_itself vs_span_B.vectorspace_axioms apply blast
+    apply (simp add: module.module_axioms)
+    using direct_sum_is_module field_is_vecs_over_itself vectorspace_def vs_span_B.module_axioms apply blast
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed[simplified]
         apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
-    using c_sum' lincomb_sum
   proof goal_cases
     case (1 m1 m2)
-    let ?asdf = "\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv"
+    have meh: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
+      by (smt "1"(4) "1"(5) PiE_mem Pi_I R.add.m_closed okese(1))
+    let ?asdf = "restrict (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) B"
     have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?asdf B"
-      by (simp add: "1"(4) "1"(5) c_sum')
+      using "1"(4) "1"(5) B(1) basis_def c_sum' meh by auto
     moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
-      "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow>\<^sub>E carrier K"
+      "?asdf \<in> B \<rightarrow>\<^sub>E carrier K"
        apply (simp add: "1"(4) "1"(5) c_sum(1))
       apply auto
       apply (metis "1"(4) "1"(5) Module.module_def PiE_mem cring.cring_simprules(1)
           module.module_axioms okese(1))
-      ultimately
-      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv)"
+      done
+    ultimately
+      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = ?asdf"
       using basis_criterion
-        then show ?case sorry
+      by (metis (no_types, lifting) "1"(4) "1"(5) B(1) B(2) M.add.m_closed basis_def c_sum(2)
+          card_ge_0_finite)
+    then show ?case
+      by (simp add: \<open>b \<in> B\<close>)
   next
     case (2 m1 m2)
     then show ?case sorry

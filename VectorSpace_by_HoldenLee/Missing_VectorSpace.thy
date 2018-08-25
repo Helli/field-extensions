@@ -62,14 +62,14 @@ context vectorspace begin
 
 lemmas lincomb_insert2 = lincomb_insert[unfolded insert_union[symmetric]]
 
-lemma lincomb_restrict:
-  assumes U: "U \<subseteq> carrier V"
-      and a: "a : U \<rightarrow> carrier K"
+lemma (in module) lincomb_restrict:
+  assumes U: "U \<subseteq> carrier M"
+      and a: "a : U \<rightarrow> carrier R"
       and restr: "restrict a U = restrict b U"
   shows "lincomb a U = lincomb b U"
 proof -
-  let ?f = "\<lambda>a u. a u \<odot>\<^bsub>V\<^esub> u"
-  have fa: "?f a : U \<rightarrow> carrier V" using a U by auto
+  let ?f = "\<lambda>a u. a u \<odot>\<^bsub>M\<^esub> u"
+  have fa: "?f a : U \<rightarrow> carrier M" using a U by auto
   have "restrict (?f a) U = restrict (?f b) U"
   proof
     fix u
