@@ -698,9 +698,9 @@ qed
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
 
-lemma aux1:
-  assumes "fdvs K V"
-  assumes "vectorspace.dim K V > 0"
+lemma (in vectorspace)
+  assumes fin_dim
+  assumes "dim > 0"
   shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) V') h \<and> bij_betw h (carrier V) (carrier K \<times> carrier V')"
   using assms try
 proof -
