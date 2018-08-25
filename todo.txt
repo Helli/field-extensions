@@ -1,3 +1,5 @@
+move the subgoals as lemmas into a context 'assumes "basis B"'
+
 clarify which stuff was added to the VectorSpace theories. remove oops- and thm-commands from the
 repository
 

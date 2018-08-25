@@ -684,9 +684,9 @@ lemma (in subfield) linear_wrt_subfield:
   "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
-lemma (in module) lincomb_restrict_simp[simp]:
+lemma (in module) lincomb_restrict_simp[simp, intro]:
   assumes U: "U \<subseteq> carrier M"
-      and a: "a : U \<rightarrow> carrier R"
+      and a: "a : U \<rightarrow> carrier R" (* needed? *)
   shows "lincomb (restrict a U) U = lincomb a U"
   by (meson U a lincomb_cong restrict_apply')
 
@@ -709,7 +709,7 @@ proof -
 qed
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
-term module.lin_indpt
+
 lemma (in vectorspace)
   assumes fin_dim
   assumes "dim > 0"
@@ -767,36 +767,48 @@ proof -
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed[simplified]
         apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
-  proof goal_cases
-    case (1 m1 m2)
+  proof -
+    fix m1 m2
+    assume mcV: "m1 \<in> carrier V" "m2 \<in> carrier V"
     have meh: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
-      by (smt "1"(4) "1"(5) PiE_mem Pi_I R.add.m_closed okese(1))
-    let ?asdf = "restrict (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) B"
-    have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?asdf B"
-      using "1"(4) "1"(5) B(1) basis_def c_sum' meh by auto
+      by (smt module_def PiE_mem Pi_I cring.cring_simprules(1) mcV module.module_axioms okese(1))
+    let ?restricted = "restrict (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) B"
+    have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?restricted B"
+      using mcV B(1) basis_def c_sum' meh by auto
     moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
-      "?asdf \<in> B \<rightarrow>\<^sub>E carrier K"
-       apply (simp add: "1"(4) "1"(5) c_sum(1))
+      "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
+       apply (simp add: mcV c_sum(1))
       apply auto
-      apply (metis "1"(4) "1"(5) Module.module_def PiE_mem cring.cring_simprules(1)
+      by (metis mcV Module.module_def PiE_mem cring.cring_simprules(1)
           module.module_axioms okese(1))
-      done
     ultimately
-      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = ?asdf"
+      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = ?restricted"
       using basis_criterion
-      by (metis (no_types, lifting) "1"(4) "1"(5) B(1) B(2) M.add.m_closed basis_def c_sum(2)
+      by (metis (no_types, lifting) mcV B(1) B(2) M.add.m_closed basis_def c_sum(2)
           card_ge_0_finite)
-    then show ?case
+    then have distr: "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) b = coeffs m1 b \<oplus>\<^bsub>K\<^esub> coeffs m2 b" if "b \<in> B" for b
+      by (simp add: that)
+    then show "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) b = coeffs m1 b \<oplus>\<^bsub>K\<^esub> coeffs m2 b"
       by (simp add: \<open>b \<in> B\<close>)
-  next
-    case (2 m1 m2)
-    then show ?case sorry
-  next
-    case (3 r m)
-    then show ?case sorry
-  next
-    case (4 r m)
-    then show ?case sorry
+    have tmp[simp]: "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else xyz bv) (B-{b})
+      = lincomb xyz (B-{b})" if "xyz \<in> B \<rightarrow> carrier K" for xyz
+      using that
+      by (smt BiV(1) Diff_not_in Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong)
+    have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow> carrier K"
+      "coeffs m1 \<in> B \<rightarrow> carrier K"
+      "coeffs m2 \<in> B \<rightarrow> carrier K"
+      using \<open>coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K\<close> apply auto[1]
+      using mcV okese(1) by fastforce+
+    with distr show "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) bv) (B-{b})
+      = lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m1 bv) (B-{b})
+      \<oplus>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m2 bv) (B-{b})" apply simp
+      by (smt BiV DiffE Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong lincomb_sum)
+(* next *)
+    fix r m
+    assume rK: "r \<in> carrier K" and mV: "m \<in> carrier V"
+    then show "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b" sorry
+    then show "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs (r \<odot>\<^bsub>V\<^esub> m) bv) (B-{b}) =
+    r \<odot>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m bv) (B-{b})" sorry
   qed
   {
     fix v
@@ -804,17 +816,16 @@ proof -
     let ?c = "coeffs v"
     have a: "?c \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb ?c B"
       using okese by (simp add: \<open>v \<in> carrier V\<close>)+
-    let ?a = "\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else ?c bv"
     have c0s: "v = \<zero>\<^bsub>V\<^esub> \<Longrightarrow> coeffs v \<in> B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
       by (metis (no_types, lifting) B(1) B(2) Diff_cancel Diff_eq_empty_iff PiE_mem Pi_I a(1) a(2) basis_def card_ge_0_finite not_lindepD)
-    define im where "im = (?c b, lincomb ?a ?B)"
-    have inj: "lincomb ?a ?B = \<zero>\<^bsub>V\<^esub> \<longleftrightarrow> ?c \<in> ?B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
+    have inj: "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else ?c bv) ?B = \<zero>\<^bsub>V\<^esub> \<longleftrightarrow> ?c \<in> ?B\<rightarrow>{\<zero>\<^bsub>K\<^esub>}" (*
+ to-do: one implication should suffice *)
       apply standard
       using not_lindepD
        apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I a(1) liB lin_dep_crit singletonI)
       by (smt BiV(1) Diff_not_in Pi_cong lincomb_zero)
-    have "im = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longleftrightarrow> v = \<zero>\<^bsub>V\<^esub>"
-      unfolding im_def direct_sum_def apply auto
+    have "?h v = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longleftrightarrow> v = \<zero>\<^bsub>V\<^esub>"
+      unfolding direct_sum_def apply auto
       apply (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) inj insertCI insert_Diff lincomb_zero
           vectorspace.basis_def vectorspace_axioms)
       apply (metis B(1) B(2) PiE_mem Pi_I \<open>b \<in> B\<close> a(1) a(2) card_ge_0_finite lin_dep_crit subsetI
