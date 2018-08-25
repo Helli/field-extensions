@@ -696,10 +696,13 @@ proof -
     by (metis \<open>vectorspace (L\<lparr>carrier := K\<rparr>) (vs_of L)\<close>)
 qed
 
-lemma (in subspace) aux1:
-  assumes "vectorspace.fin_dim (vectorspace.vs V W) V"
-  shows "\<exists>L' h. linear_map K (direct_sum (vs_of L\<lparr>carrier:=K\<rparr>) L') (vs_of L) h"
-  using assms apply simp
+abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
+
+lemma aux1:
+  assumes "fdvs K V"
+  assumes "vectorspace.dim K V > 0"
+  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) V') h \<and> bij_betw h (carrier V) (carrier K \<times> carrier V')"
+  using assms try
 proof -
   have "subfield (carrier K) L"
 
