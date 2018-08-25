@@ -475,6 +475,12 @@ lemma (in linear_map) iso_preserves_dim: (* rm *)
   shows "V.dim = W.dim"
   using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
 
+lemma (in linear_map) iso_imports_dim: (* rm *)
+  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
+  assumes W.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  shows "V.dim = W.dim"
+  using assms sorry
+
 lemma (in vectorspace) zero_not_in_basis:
   "basis B \<Longrightarrow> \<zero>\<^bsub>V\<^esub> \<notin> B"
   by (simp add: basis_def vs_zero_lin_dep)
@@ -697,14 +703,90 @@ proof -
 qed
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
-
+term module.lin_indpt
 lemma (in vectorspace)
   assumes fin_dim
   assumes "dim > 0"
   shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) V') h \<and> bij_betw h (carrier V) (carrier K \<times> carrier V')"
-  using assms try
+  using assms
 proof -
-  have "subfield (carrier K) L"
+  from assms obtain B where B: "basis B" "card B > 0"
+    using dim_basis finite_basis_exists by auto
+  then obtain b where "b \<in> B"
+    by fastforce
+  let ?B = "B - {b}"
+  have liB: "lin_indpt ?B" and BiV: "?B \<subseteq> carrier V" "finite ?B"
+    apply (meson B(1) Diff_subset basis_def supset_ld_is_ld)
+    using B(1) basis_def apply blast using B
+    using card_infinite neq0_conv by blast
+  let ?V = "vs (span ?B)"
+  have md_span_B: "module K ?V"
+    by (simp add: BiV(1) span_is_submodule submodule_is_module)
+  interpret vs_span_B: vectorspace K ?V
+    by (metis B(1) DiffE basis_def contra_subsetD span_is_subspace subsetI subspace_is_vs)
+  from liB have liB': "\<not>LinearCombinations.module.lin_dep K ?V ?B"
+    by (simp add: BiV in_own_span span_is_subspace span_li_not_depend(2))
+  then have "vectorspace.basis K ?V ?B"
+    by (simp add: BiV(1) in_own_span span_is_submodule span_li_not_depend(1) vs_span_B.basis_def)
+  define coeffs where "coeffs \<equiv> \<lambda>v. THE a. a \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb a B"
+  have "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
+    unfolding coeffs_def
+    by (smt B basis_criterion basis_def card_ge_0_finite that theI)
+  then have okese: "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
+    using that by auto
+  have c_sum: "coeffs (v1\<oplus>\<^bsub>V\<^esub>v2) \<in> B \<rightarrow>\<^sub>E carrier K"
+    "v1\<oplus>\<^bsub>V\<^esub>v2 = lincomb (coeffs (v1\<oplus>\<^bsub>V\<^esub>v2)) B" if "v1 \<in> carrier V" "v2 \<in> carrier V" for v1 v2
+    apply (simp add: okese(1) that(1) that(2))
+    apply (simp add: okese(2) that(1) that(2))
+    done
+  have c_sum': "lincomb (\<lambda>v. coeffs v1 v \<oplus>\<^bsub>K\<^esub> coeffs v2 v) B = lincomb (coeffs (v1\<oplus>\<^bsub>V\<^esub>v2)) B" if "v1 \<in> carrier V" "v2 \<in> carrier V" for v1 v2
+  proof -
+    note b = okese(2)[OF that(1)] okese(2)[OF that(2)]
+    note a = okese(1)[OF that(1)] okese(1)[OF that(2)]
+    then have "coeffs v1 \<in> B \<rightarrow> carrier K" "coeffs v2 \<in> B \<rightarrow> carrier K"
+      by blast+
+    note lincomb_sum[OF _ _ this, folded b]
+    then show ?thesis
+      using B(1) B(2) basis_def c_sum(2) that(1) that(2) by force
+  qed
+  let ?h = "\<lambda>v. (coeffs v b, lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs v bv) (B - {b}))"
+  have "linear_map K V (direct_sum (vs_of K) ?V) ?h"
+    unfolding linear_map_def apply auto
+    apply (simp add: vectorspace_axioms)
+    using direct_sum_is_vs field_is_vecs_over_itself vs_span_B.vectorspace_axioms
+    unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
+    using module.module_axioms apply blast
+    using vectorspace_def apply blast
+    unfolding direct_sum_def apply auto
+    using \<open>b \<in> B\<close> okese(1) apply fastforce
+    using vs_span_B.lincomb_closed[simplified]
+    apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
+    using c_sum' sledgehammer
+  {
+    fix v
+    assume "v \<in> carrier V"
+    let ?c = "coeffs v"
+    have a: "?c \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb ?c B"
+      using okese by (simp add: \<open>v \<in> carrier V\<close>)+
+    let ?a = "\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else ?c bv"
+    have c0s: "v = \<zero>\<^bsub>V\<^esub> \<Longrightarrow> coeffs v \<in> B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
+      by (metis (no_types, lifting) B(1) B(2) Diff_cancel Diff_eq_empty_iff PiE_mem Pi_I a(1) a(2) basis_def card_ge_0_finite not_lindepD)
+    define im where "im = (?c b, lincomb ?a ?B)"
+    have inj: "lincomb ?a ?B = \<zero>\<^bsub>V\<^esub> \<longleftrightarrow> ?c \<in> ?B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
+      apply standard
+      using not_lindepD
+       apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I a(1) liB lin_dep_crit singletonI)
+      by (smt BiV(1) Diff_not_in Pi_cong lincomb_zero)
+    have "im = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longleftrightarrow> v = \<zero>\<^bsub>V\<^esub>"
+      unfolding im_def direct_sum_def apply auto
+      apply (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) inj insertCI insert_Diff lincomb_zero
+          vectorspace.basis_def vectorspace_axioms)
+      apply (metis B(1) B(2) PiE_mem Pi_I \<open>b \<in> B\<close> a(1) a(2) card_ge_0_finite lin_dep_crit subsetI
+          vectorspace.basis_def vectorspace_axioms)
+      by (smt BiV(1) Diff_not_in Pi_cong Pi_split_insert_domain \<open>b \<in> B\<close> c0s insert_Diff lincomb_zero)
+  }
+    have "?h \<in> module_hom "
+
 
 term "(direct_sum V ^^ n) zvs"
 
