@@ -638,11 +638,36 @@ lemma zvs_simps[simp]:
 lemma (in field) vectorspace_zvs: "vectorspace R zvs"
   by (simp add: field_axioms module_zvs vectorspace_def)
 
-lemma (in module) submodule_zero: "submodule {\<zero>\<^bsub>M\<^esub>} R M" (*rm*)
+lemma (in module) submodule_zsm: "submodule {\<zero>\<^bsub>M\<^esub>} R M"
   using M.r_neg submoduleI by fastforce
 
-lemma (in module) module_md_zero: "module R (md {\<zero>\<^bsub>M\<^esub>})" (*rm*)
-  by (simp add: submodule_is_module submodule_zero)
+lemma (in module) module_zsm: "module R (md {\<zero>\<^bsub>M\<^esub>})"
+  by (simp add: submodule_is_module submodule_zsm)
+
+lemma (in vectorspace) vectorspace_zss: "vectorspace K (vs {\<zero>\<^bsub>V\<^esub>})"
+  using module_zsm vectorspace_axioms vectorspace_def by blast
+
+lemma (in subspace) dim0_zss:
+  "vectorspace.fin_dim K V \<Longrightarrow> vectorspace.dim K (V\<lparr>carrier:=W\<rparr>) = 0 \<Longrightarrow> W = {\<zero>\<^bsub>V\<^esub>}"
+proof -
+  have vs: "vectorspace K (V\<lparr>carrier:=W\<rparr>)"
+    by (simp add: subspace_axioms vectorspace.subspace_is_vs vs)
+  assume "vectorspace.fin_dim K V" "vectorspace.dim K (V\<lparr>carrier:=W\<rparr>) = 0"
+  with vs have "vectorspace.basis K (V\<lparr>carrier:=W\<rparr>) {}"
+    by (simp add: corollary_5_16 module.finite_lin_indpt2 vectorspace.dim_li_is_basis vectorspace_def)
+  then show ?thesis
+    using vectorspace.basis_def vectorspace.span_empty vs by fastforce
+qed
+
+lemma (in vectorspace) zss_dim0:
+  "vectorspace.dim K (vs {\<zero>\<^bsub>V\<^esub>}) = 0"
+proof -
+  have "vectorspace.basis K (vs {\<zero>\<^bsub>V\<^esub>}) {}"
+    by (simp add: LinearCombinations.module.finite_lin_indpt2 local.span_empty module_zsm
+        span_li_not_depend(1) submodule_zsm vectorspace.basis_def vectorspace_zss)
+  then show ?thesis
+    using vectorspace.dim_basis vectorspace_zss by fastforce
+qed
 
 lemma (in field) dim_zvs: "vectorspace.dim R zvs = 0"
   unfolding vectorspace.dim_def[OF vectorspace_zvs] apply simp
@@ -909,8 +934,9 @@ proof -
       vectorspace.dim ?L (vs_of M) * vectorspace.dim ?K (vs_of ?L)"
     proof (induction "vectorspace.dim ?L (vs_of M)" arbitrary: M)
       case 0
-      then show "?case" sledgehammer
-      then have False
+      then have "(vs_of M) = zvs"
+        sledgehammer
+      then show "?case" sledgehamme
         using subfield.intro field_extension.fin_dim_nonzero field_extension.intro by fastforc
       then show ?case ..
     next
