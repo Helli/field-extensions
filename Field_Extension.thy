@@ -710,11 +710,13 @@ qed
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
 
-lemma (in vectorspace)
+lemma (in vectorspace) decompose_step: (* use obtains? *)
   assumes fin_dim
   assumes "dim > 0"
-  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) V') h \<and> bij_betw h (carrier V) (carrier K \<times> carrier V')"
-  using assms
+  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (V\<lparr>carrier:=V'\<rparr>)) h
+    \<and> bij_betw h (carrier V) (carrier K \<times> V')
+    \<and> subspace K V' V
+    \<and> vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = dim - 1" (* could be derived? *)
 proof -
   from assms obtain B where B: "basis B" "card B > 0"
     using dim_basis finite_basis_exists by auto
@@ -832,8 +834,8 @@ proof -
           vectorspace.basis_def vectorspace_axioms)
       by (smt BiV(1) Diff_not_in Pi_cong Pi_split_insert_domain \<open>b \<in> B\<close> c0s insert_Diff lincomb_zero)
   }
-    have "?h \<in> module_hom "
-
+  then show ?thesis sorry
+qed
 
 term "(direct_sum V ^^ n) zvs"
 
@@ -914,6 +916,31 @@ proof -
       then show ?case ..
     next
       case (Suc x)
+      (* no Suc.hyps. Setup might need a fix: only "carrier M" should be arbitrary *)
+      then obtain h M' where "linear_map (M\<lparr>carrier:=L\<rparr>) (vs_of M) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier:=M'\<rparr>)) h
+        \<and> bij_betw h (carrier (vs_of M)) (carrier (M\<lparr>carrier:=L\<rparr>) \<times> M')
+        \<and> subspace (M\<lparr>carrier:=L\<rparr>) M' (vs_of M) \<and>
+       vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=M'\<rparr>) = vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M) - 1"
+        using vectorspace.decompose_step[OF Suc.prems(5-6)] by auto
+      note a = this[simplified] thm a
+
+(* test: *)
+      { let ?M = "M\<lparr>carrier:=M'\<rparr>"
+        assume aasdf: "x = vectorspace.dim (?M\<lparr>carrier := L\<rparr>) (vs_of ?M)" "Subrings.subfield L ?M" "field ?M"
+          "vectorspace.fin_dim (?M\<lparr>carrier := L, carrier := K\<rparr>) (vs_of (?M\<lparr>carrier := L\<rparr>))""
+    field_extension ?M K ""
+    vectorspace (?M\<lparr>carrier := L\<rparr>) (vs_of ?M)""
+    vectorspace.fin_dim (?M\<lparr>carrier := L\<rparr>)
+     (vs_of ?M) "
+        have "
+    field_extension.degree ?M K =
+    vectorspace.dim (?M\<lparr>carrier := L\<rparr>) (vs_of ?M) *
+    vectorspace.dim (?M\<lparr>carrier := K\<rparr>)
+     (vs_of (?M\<lparr>carrier := L\<rparr>))" using Suc.hyps(1)[OF aasdf].
+        (* OK, it seems to be usable *)
+
+      then have "vectorspace (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=M'\<rparr>)"
+        using subspace.vs vectorspace.subspace_is_vs by blast
       then show ?case sorry
     qed
   }
