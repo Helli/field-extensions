@@ -455,8 +455,8 @@ end
 text {*We will show that for any set $S$, the space of functions $S\to K$ forms a vector space.*}
 definition (in ring) func_space:: "'z set\<Rightarrow>('a,('z \<Rightarrow> 'a)) module"
   where "func_space S = \<lparr>carrier = S\<rightarrow>\<^sub>Ecarrier R, 
-                  mult = (\<lambda> f g. restrict (\<lambda>v. \<zero>\<^bsub>R\<^esub>) S),
-                  one =  restrict (\<lambda>v. \<zero>\<^bsub>R\<^esub>) S,
+                  mult = undefined,
+                  one = undefined,
                   zero = restrict (\<lambda>v. \<zero>\<^bsub>R\<^esub>) S,
                   add = (\<lambda> f g. restrict (\<lambda>v. f v \<oplus>\<^bsub>R\<^esub> g v) S),
                   smult = (\<lambda> c f. restrict (\<lambda>v. c \<otimes>\<^bsub>R\<^esub> f v) S)\<rparr>"

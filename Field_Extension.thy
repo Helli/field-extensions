@@ -3,7 +3,6 @@ theory Field_Extension imports
 "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
-
 section \<open>missing preliminaries?\<close>
 
 lemma (in subgroup) subgroup_is_comm_group [intro]:
@@ -839,7 +838,7 @@ qed
 
 term "(direct_sum V ^^ n) zvs"
 
-proposition degree_multiplicative:
+proposition degree_multiplicative: \<comment> \<open>Maybe this works better when following this comment: \<^url>\<open>https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy?at=default&fileviewer=file-view-default#LinearCombinations.thy-500\<close>\<close>
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
