@@ -904,24 +904,29 @@ proof -
       using subfield_def assms(2-3) field.field_is_vecs_over_itself
         subfield.vectorspace_wrt_subfield apply blast
       using fin(1) by blast
-    with assms(2-3) fin(2) M_over_K \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it\<close>
-    have "field_extension.degree M K =
-      vectorspace.dim ?L (vs_of M) *
-      vectorspace.dim ?K (vs_of ?L)"
+    with TrueI TrueI fin(2) M_over_K \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: reduce\<close>
+    have "vectorspace.fin_dim ?K (vs_of M) \<and> vectorspace.dim ?K (vs_of M) =
+      vectorspace.dim ?L (vs_of M) * vectorspace.dim ?K (vs_of ?L)"
     proof (induction "vectorspace.dim ?L (vs_of M)" arbitrary: M)
       case 0
-      from "0"(1,2,3,7) have False
-        using subfield.intro field_extension.fin_dim_nonzero field_extension.intro by fastforce
+      then show "?case" sledgehammer
+      then have False
+        using subfield.intro field_extension.fin_dim_nonzero field_extension.intro by fastforc
       then show ?case ..
     next
       case (Suc x)
       (* no Suc.hyps. Setup might need a fix: only "carrier M" should be arbitrary *)
-      then obtain h M' where "linear_map (M\<lparr>carrier:=L\<rparr>) (vs_of M) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier:=M'\<rparr>)) h
-        \<and> bij_betw h (carrier (vs_of M)) (carrier (M\<lparr>carrier:=L\<rparr>) \<times> M')
-        \<and> subspace (M\<lparr>carrier:=L\<rparr>) M' (vs_of M) \<and>
-       vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=M'\<rparr>) = vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M) - 1"
+      then obtain h M' where hM':
+        "linear_map (M\<lparr>carrier:=L\<rparr>) (vs_of M) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier:=M'\<rparr>)) h"
+        "bij_betw h (carrier (vs_of M)) (carrier (M\<lparr>carrier:=L\<rparr>) \<times> M')"
+        "subspace (M\<lparr>carrier:=L\<rparr>) M' (vs_of M)"
+        "vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=M'\<rparr>) = vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M) - 1"
         using vectorspace.decompose_step[OF Suc.prems(5-6)] by auto
       note a = this[simplified] thm a
+      have "field_extension.degree (M\<lparr>carrier:=M'\<rparr>) K = vectorspace.dim (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := L\<rparr>) (vs_of (M\<lparr>carrier:=M'\<rparr>)) *
+    vectorspace.dim (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := L\<rparr>))"
+        apply (rule Suc.hyps(1)) apply auto
+        using Suc.hyps(2) a(4) apply linarith sledgehammer
 
 (* test: *)
       { let ?M = "M\<lparr>carrier:=M'\<rparr>"
@@ -944,11 +949,16 @@ proof -
     qed
   }
 
-  ultimately
+  moreover
   show ?thesis
-    by (smt ring.subfield_iff(1) M_over_K Subrings.ring.subfield_iff(2) assms cring.axioms(1)
-        domain_def field_def field_extension.degree_def field_extension.intro monoid.surjective
-        mult_is_0 partial_object.update_convs(1) subfieldE(3))
+  proof -
+    have f1: "ring M"
+      using assms(3) cring.axioms(1) domain_def field_def by blast
+    then have "Field_Extension.subfield K ?L"
+      by (metis (no_types) ring.subfield_iff(1) Subrings.ring.subfield_iff(2) assms(1-2) cring.axioms(1) domain_def field_def subfieldE(3))
+    then show ?thesis using f1
+      by (simp add: Field_Extension.ring.subfield_iff(1) M_over_K Subrings.ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
+  qed
 qed
 
 
