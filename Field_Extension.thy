@@ -862,7 +862,8 @@ qed
 
 term "(direct_sum V ^^ n) zvs"
 
-proposition degree_multiplicative: \<comment> \<open>Maybe this works better when following this comment: \<^url>\<open>https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy?at=default&fileviewer=file-view-default#LinearCombinations.thy-500\<close>\<close>
+proposition degree_multiplicative: \<comment> \<open>Maybe this works better when following the comment on line 500 here: @{url
+  "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}\<close>
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
@@ -924,15 +925,15 @@ proof -
 
   moreover {
     assume fin: "field_extension.fin M L" "field_extension.fin ?L K"
-    obtain cM where cM: "M = M\<lparr>carrier := cM\<rparr>"
+    obtain cM where cM: "M = M\<lparr>carrier := cM\<rparr>" "vs_of M = vs_of M\<lparr>carrier:=cM\<rparr>"
       by (metis partial_object.surjective partial_object.update_convs(1))
         \<comment> \<open>decompose \<^term>\<open>M\<close>: only the carrier should be arbitrary.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
       using subfield_def assms(2-3) field.field_is_vecs_over_itself subfield.vectorspace_wrt_subfield
-        apply (metis cM monoid.surjective partial_object.select_convs(1) partial_object.update_convs(1))
-       apply (metis cM carrier_K fin(1) partial_object.update_convs(1))
-      by (metis M_over_K cM carrier_K field_extension.vectorspace_satisfied partial_object.update_convs(1))
+        apply (metis cM(1) monoid.surjective partial_object.select_convs(1) partial_object.update_convs(1))
+       apply (metis cM(1) carrier_K fin(1) partial_object.update_convs(1))
+      by (metis M_over_K cM(1) carrier_K field_extension.vectorspace_satisfied partial_object.update_convs(1))
     from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
     have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) \<and> vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) =
       vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>) * vectorspace.dim ?K (vs_of ?L)"
@@ -955,42 +956,18 @@ proof -
         using vectorspace.decompose_step[OF Suc.prems(1-2)] by auto
       note a = this[simplified] thm a
       let ?M' = "vs_of M\<lparr>carrier:=cM'\<rparr>"
-have "vectorspace.fin_dim ?K ?M' \<and> vectorspace.dim ?K ?M' =
+      have "vectorspace.fin_dim ?K ?M' \<and> vectorspace.dim ?K ?M' =
     vectorspace.dim ?L ?M' * vectorspace.dim ?K (vs_of (M\<lparr>carrier := L\<rparr>))"
-  apply (rule Suc.hyps(1))
-  apply auto
-  using Suc.hyps(2) a(4)
-  apply simp
-  using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
-  using a(3) Suc.prems(2) subspace.corollary_5_16 apply force
-  using a(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
-  by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
-      have "field_extension.degree (M\<lparr>carrier:=cM'\<rparr>) K = vectorspace.dim (M\<lparr>carrier:=cM'\<rparr>\<lparr>carrier := L\<rparr>) (vs_of (M\<lparr>carrier:=cM'\<rparr>)) *
-    vectorspace.dim (M\<lparr>carrier:=cM'\<rparr>\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier:=cM'\<rparr>\<lparr>carrier := L\<rparr>))"
-        sledgehamme
-        thm Suc.hyps
-        apply (rule Suc.hyps(1)) apply auto
-        using Suc.hyps(2) a(4) apply linarith
-
-(* test: *)
-      { let ?M = "M\<lparr>carrier:=M'\<rparr>"
-        assume aasdf: "x = vectorspace.dim (?M\<lparr>carrier := L\<rparr>) (vs_of ?M)" "Subrings.subfield L ?M" "field ?M"
-          "vectorspace.fin_dim (?M\<lparr>carrier := L, carrier := K\<rparr>) (vs_of (?M\<lparr>carrier := L\<rparr>))""
-    field_extension ?M K ""
-    vectorspace (?M\<lparr>carrier := L\<rparr>) (vs_of ?M)""
-    vectorspace.fin_dim (?M\<lparr>carrier := L\<rparr>)
-     (vs_of ?M) "
-        have "
-    field_extension.degree ?M K =
-    vectorspace.dim (?M\<lparr>carrier := L\<rparr>) (vs_of ?M) *
-    vectorspace.dim (?M\<lparr>carrier := K\<rparr>)
-     (vs_of (?M\<lparr>carrier := L\<rparr>))" using Suc.hyps(1)[OF aasdf].
-        (* OK, it seems to be usable *)
-
-      then have "vectorspace (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=M'\<rparr>)"
-        using subspace.vs vectorspace.subspace_is_vs by blast
+        apply (rule Suc.hyps(1))
+           apply auto
+        using Suc.hyps(2) a(4) apply simp
+        using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
+        using a(3) Suc.prems(2) subspace.corollary_5_16 apply force
+        using a(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
+        by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
       then show ?case sorry
     qed
+    note this[folded cM]
   }
 
   moreover
