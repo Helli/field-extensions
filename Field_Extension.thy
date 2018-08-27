@@ -659,15 +659,14 @@ proof -
     using vectorspace.basis_def vectorspace.span_empty vs by fastforce
 qed
 
-lemma (in vectorspace) zss_dim0:
-  "vectorspace.dim K (vs {\<zero>\<^bsub>V\<^esub>}) = 0"
-proof -
-  have "vectorspace.basis K (vs {\<zero>\<^bsub>V\<^esub>}) {}"
-    by (simp add: LinearCombinations.module.finite_lin_indpt2 local.span_empty module_zsm
-        span_li_not_depend(1) submodule_zsm vectorspace.basis_def vectorspace_zss)
-  then show ?thesis
-    using vectorspace.dim_basis vectorspace_zss by fastforce
-qed
+lemma (in vectorspace) basis_zss: "vectorspace.basis K (vs {\<zero>\<^bsub>V\<^esub>}) {}"
+  by (simp add: LinearCombinations.module.finite_lin_indpt2 span_empty module_zsm
+      span_li_not_depend(1) submodule_zsm vectorspace.basis_def vectorspace_zss)
+
+corollary (in vectorspace) zss_dim:
+  "vectorspace.fin_dim K (vs {\<zero>\<^bsub>V\<^esub>})" "vectorspace.dim K (vs {\<zero>\<^bsub>V\<^esub>}) = 0"
+  using basis_zss vectorspace.basis_def vectorspace.fin_dim_def vectorspace_zss apply fastforce
+  using basis_zss vectorspace.dim_basis vectorspace_zss by fastforce
 
 lemma (in field) dim_zvs: "vectorspace.dim R zvs = 0"
   unfolding vectorspace.dim_def[OF vectorspace_zvs] apply simp
@@ -721,7 +720,7 @@ lemma (in module) lincomb_restrict_simp[simp, intro]:
 term "ring.extend"
 term "ring.truncate"
 
-lemma
+lemma remove_this_experiment:
   assumes "field_extension (L::'a ring) K"
   shows "samespace K (vs_of L)" unfolding samespace_def
   apply auto using field_extension.vectorspace_satisfied[OF assms]
@@ -934,11 +933,12 @@ proof -
       vectorspace.dim ?L (vs_of M) * vectorspace.dim ?K (vs_of ?L)"
     proof (induction "vectorspace.dim ?L (vs_of M)" arbitrary: M)
       case 0
-      then have "(vs_of M) = zvs"
-        sledgehammer
-      then show "?case" sledgehamme
-        using subfield.intro field_extension.fin_dim_nonzero field_extension.intro by fastforc
-      then show ?case ..
+      then have "carrier (vs_of M) = {\<zero>\<^bsub>M\<^esub>}"
+        using vectorspace.dim_0_trivial by force
+      moreover have "vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (vs_of M)"
+        using "0.prems"(4) field_extension.vectorspace_satisfied vectorspace.zss_dim(1) by fastforce
+      ultimately show "?case"
+        using "0.hyps" "0.prems"(4) field_extension.vectorspace_satisfied vectorspace.zss_dim(2) by fastforce
     next
       case (Suc x)
       (* no Suc.hyps. Setup might need a fix: only "carrier M" should be arbitrary *)
@@ -952,7 +952,7 @@ proof -
       have "field_extension.degree (M\<lparr>carrier:=M'\<rparr>) K = vectorspace.dim (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := L\<rparr>) (vs_of (M\<lparr>carrier:=M'\<rparr>)) *
     vectorspace.dim (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier:=M'\<rparr>\<lparr>carrier := L\<rparr>))"
         apply (rule Suc.hyps(1)) apply auto
-        using Suc.hyps(2) a(4) apply linarith sledgehammer
+        using Suc.hyps(2) a(4) apply linarith
 
 (* test: *)
       { let ?M = "M\<lparr>carrier:=M'\<rparr>"
