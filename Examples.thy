@@ -58,7 +58,7 @@ lemma subring_example: "subring (range rat_of_int) rat_field"
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
 
-lemma inv_standard_ring:
+lemma inv_standard_ring[simp]:
   fixes x::"_::ring"
   shows "inv\<^bsub>\<lparr>carrier = UNIV, monoid.mult = (+), one = 0\<rparr>\<^esub> x = - x"
   unfolding m_inv_def apply auto
@@ -67,7 +67,7 @@ lemma inv_standard_ring:
 lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
   apply unfold_locales apply (auto simp: real_field_def univ_ring_def)
   using Rats_add Rats_def apply blast
-  apply (metis Rats_def Rats_minus_iff Rats_of_rat inv_standard_ring)
+  apply (metis Rats_def Rats_minus_iff Rats_of_rat)
   using Rats_def apply auto[1] using Rats_def
   apply (metis (mono_tags, hide_lams) monoid.Units_closed partial_object.select_convs(1) ring_def
       ring_standard_ring(2) standard_ring_def)
@@ -89,7 +89,6 @@ lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
 lemma subfield_example': "subfield (range complex_of_real) complex_field"
   unfolding complex_field_def univ_ring_def apply unfold_locales apply auto
   apply (metis of_real_add rangeI)
-  apply (simp add: inv_standard_ring)
   apply (metis of_real_mult range_eqI)
   apply (simp add: Units_def)+
   by (metis Groups.mult_ac(2) of_real_eq_0_iff of_real_inverse right_inverse)

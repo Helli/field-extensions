@@ -475,11 +475,18 @@ lemma (in linear_map) iso_preserves_dim: (* rm *)
   using assms apply (simp add: bij_betw_def rank_nullity_main(2))
   using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
 
+lemma (in mod_hom)
+  assumes "bij_betw f (carrier M) (carrier N)"
+  shows "mod_hom R N M (the_inv_into (carrier M) f)"
+  apply intro_locales unfolding mod_hom_axioms_def module_hom_def apply auto
+  sledgehammer
+    apply (metis assms bij_betw_def image_eqI the_inv_into_onto)
+  using assms sledgehammer
+
 lemma (in linear_map)
   assumes "bij_betw T (carrier V) (carrier W)"
   shows "linear_map K W V (the_inv_into (carrier V) T)"
-  unfolding linear_map_def mod_hom_def
-  apply auto apply intro_locales
+  apply intro_locales
   unfolding mod_hom_axioms_def module_hom_def using assms apply auto sledgeha
   find_theorems bij_betw the_inv_into
 qed
@@ -935,15 +942,14 @@ proof -
 
   moreover {
     assume fin: "field_extension.fin M L" "field_extension.fin ?L K"
-    obtain cM where cM: "M = M\<lparr>carrier := cM\<rparr>" "vs_of M = vs_of M\<lparr>carrier:=cM\<rparr>"
-      by (metis partial_object.surjective partial_object.update_convs(1))
-        \<comment> \<open>decompose \<^term>\<open>M\<close>: only the carrier should be arbitrary.\<close>
+    define cM where "cM = carrier M" (*"vs_of M = vs_of M\<lparr>carrier:=cM\<rparr>"*)
+      \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
       using subfield_def assms(2-3) field.field_is_vecs_over_itself subfield.vectorspace_wrt_subfield
-        apply (metis cM(1) monoid.surjective partial_object.select_convs(1) partial_object.update_convs(1))
-       apply (metis cM(1) carrier_K fin(1) partial_object.update_convs(1))
-      by (metis M_over_K cM(1) carrier_K field_extension.vectorspace_satisfied partial_object.update_convs(1))
+        apply (simp add: subfield_def field.field_is_vecs_over_itself subfield.vectorspace_wrt_subfield cM_def)
+      apply (simp add: cM_def fin(1))
+      by (simp add: M_over_K cM_def field_extension.vectorspace_satisfied)
     from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
     have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) \<and> vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) =
       vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>) * vectorspace.dim ?K (vs_of ?L)"

@@ -26,7 +26,7 @@ text {*A @{text "subspace"} of a vectorspace is a nonempty subset
 that is closed under addition and scalar multiplication. These properties
 have already been defined in submodule. Caution: W is a set, while V is 
 a module record. To get W as a vectorspace, write vs W.*}
-locale subspace =
+locale subspace = (*Why no import? *)
   fixes K and W and V (structure)
   assumes vs: "vectorspace K V"
       and submod: "submodule W K V"
