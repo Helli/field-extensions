@@ -468,50 +468,31 @@ lemma (in linear_map) emb_image_dim:
   shows "V.dim = vectorspace.dim K (vs imT)"
   using assms inj_imp_dim_ker0 rank_nullity by linarith
 
-lemma (in linear_map) iso_preserves_dim: (* rm *)
+lemma (in linear_map) iso_preserves_dim:
   assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
   assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
   shows "W.fin_dim" "V.dim = W.dim"
   using assms apply (simp add: bij_betw_def rank_nullity_main(2))
   using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
 
-lemma (in mod_hom)
+lemma (in mod_hom) mod_hom_the_inv:
   assumes "bij_betw f (carrier M) (carrier N)"
   shows "mod_hom R N M (the_inv_into (carrier M) f)"
   apply intro_locales unfolding mod_hom_axioms_def module_hom_def
   using assms[unfolded bij_betw_def] apply auto
   apply (simp add: the_inv_into_into)
-  apply (smt M.M.add.m_closed f_add f_the_inv_into_f image_eqI the_inv_into_f_f the_inv_into_onto) sledgehammer
-proof -
-  fix r :: 'a and m :: 'e
-  assume a1: "m \<in> carrier N"
-assume a2: "f ` carrier M = carrier N"
-  assume a3: "inj_on f (carrier M)"
-  assume a4: "r \<in> carrier R"
-  obtain cc :: "'c set \<Rightarrow> ('c \<Rightarrow> 'e) \<Rightarrow> 'e \<Rightarrow> 'c" where
-    f5: "\<forall>x0 x1 x2. (\<exists>v3. x2 = x1 v3 \<and> v3 \<in> x0) = (x2 = x1 (cc x0 x1 x2) \<and> cc x0 x1 x2 \<in> x0)"
-    by moura
-  have "m \<in> f ` carrier M"
-    using a2 a1 by fastforce
-then have "m = f (cc (carrier M) f m) \<and> cc (carrier M) f m \<in> carrier M"
-  using f5 by (meson imageE)
-  then show "the_inv_into (carrier M) f (r \<odot>\<^bsub>N\<^esub> m) = r \<odot>\<^bsub>M\<^esub> the_inv_into (carrier M) f m"
-    using a4 a3 by (metis M.smult_closed f_smult the_inv_into_f_eq)
-qed
+  apply (smt M.M.add.m_closed f_add f_the_inv_into_f image_eqI the_inv_into_f_f the_inv_into_onto)
+  by (smt M.smult_closed f_smult imageE the_inv_into_f_eq)
 
-lemma (in linear_map)
-  assumes "bij_betw T (carrier V) (carrier W)"
-  shows "linear_map K W V (the_inv_into (carrier V) T)"
-  apply intro_locales
-  unfolding mod_hom_axioms_def module_hom_def using assms apply auto sledgeha
-  find_theorems bij_betw the_inv_into
-qed
+corollary (in linear_map) linear_map_the_inv:
+  "bij_betw T (carrier V) (carrier W) \<Longrightarrow> linear_map K W V (the_inv_into (carrier V) T)"
+  by (meson linear_map_axioms linear_map_def mod_hom_the_inv)
 
 lemma (in linear_map) iso_imports_dim: (* rm *)
   assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
   assumes W.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
   shows "V.fin_dim" "V.dim = W.dim"
-  using assms thm linear_map.linear_inj_image_is_basis
+  by (simp_all add: linear_map.iso_preserves_dim[OF linear_map_the_inv] assms bij_betw_the_inv_into)
 
 lemma (in vectorspace) zero_not_in_basis:
   "basis B \<Longrightarrow> \<zero>\<^bsub>V\<^esub> \<notin> B"
@@ -901,6 +882,9 @@ proposition degree_multiplicative: \<comment> \<open>Maybe this works better whe
   shows
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
 proof -
+  \<comment> \<open>to-do: use more \<^theory_text>\<open>interpret\<close>, especially in the "finite" part. Maybe first define a locale
+  \<open>fin_dim_vec_space\<close>?\<close>
+
   let ?L = "M\<lparr>carrier:=L\<rparr>" and ?K = "M\<lparr>carrier:=K\<rparr>"
 
   have "K \<subseteq> L"
@@ -1008,7 +992,7 @@ proof -
         with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16 hM'(2) have
         "vectorspace.dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
         sledgehammer
-        also have "vectorspace.dim ?K (direct_sum (vs_of ?L) ?M') =
+        also have "\<dots> =
         vectorspace.dim ?K (vs_of ?L) + vectorspace.dim ?K ?M'"
       proof - oops
         have "\<forall>p f A. carrier_update f (p::('a, 'b) ring_scheme)\<lparr>carrier := A\<rparr> = p\<lparr>carrier := A\<rparr>"
