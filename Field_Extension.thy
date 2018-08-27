@@ -477,12 +477,11 @@ lemma (in linear_map) iso_preserves_dim: (* rm *)
 
 lemma (in linear_map)
   assumes "bij_betw T (carrier V) (carrier W)"
-  shows "linear_map K W V (\<lambda>y. THE x. x \<in> carrier V \<and> T x = y)"
-  nitpick
-proof
-  let ?inverse = "\<lambda>y\<in>carrier W. THE x. T x = y"
-  from assms have "(restrict T (carrier V)) (?inverse y) = y" if "y \<in> carrier W" for y
-    
+  shows "linear_map K W V (the_inv_into (carrier V) T)"
+  unfolding linear_map_def mod_hom_def
+  apply auto apply intro_locales
+  unfolding mod_hom_axioms_def module_hom_def using assms apply auto sledgeha
+  find_theorems bij_betw the_inv_into
 qed
 
 lemma (in linear_map) iso_imports_dim: (* rm *)
