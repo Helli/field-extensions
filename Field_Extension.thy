@@ -478,10 +478,26 @@ lemma (in linear_map) iso_preserves_dim: (* rm *)
 lemma (in mod_hom)
   assumes "bij_betw f (carrier M) (carrier N)"
   shows "mod_hom R N M (the_inv_into (carrier M) f)"
-  apply intro_locales unfolding mod_hom_axioms_def module_hom_def apply auto
-  sledgehammer
-    apply (metis assms bij_betw_def image_eqI the_inv_into_onto)
-  using assms sledgehammer
+  apply intro_locales unfolding mod_hom_axioms_def module_hom_def
+  using assms[unfolded bij_betw_def] apply auto
+  apply (simp add: the_inv_into_into)
+  apply (smt M.M.add.m_closed f_add f_the_inv_into_f image_eqI the_inv_into_f_f the_inv_into_onto) sledgehammer
+proof -
+  fix r :: 'a and m :: 'e
+  assume a1: "m \<in> carrier N"
+assume a2: "f ` carrier M = carrier N"
+  assume a3: "inj_on f (carrier M)"
+  assume a4: "r \<in> carrier R"
+  obtain cc :: "'c set \<Rightarrow> ('c \<Rightarrow> 'e) \<Rightarrow> 'e \<Rightarrow> 'c" where
+    f5: "\<forall>x0 x1 x2. (\<exists>v3. x2 = x1 v3 \<and> v3 \<in> x0) = (x2 = x1 (cc x0 x1 x2) \<and> cc x0 x1 x2 \<in> x0)"
+    by moura
+  have "m \<in> f ` carrier M"
+    using a2 a1 by fastforce
+then have "m = f (cc (carrier M) f m) \<and> cc (carrier M) f m \<in> carrier M"
+  using f5 by (meson imageE)
+  then show "the_inv_into (carrier M) f (r \<odot>\<^bsub>N\<^esub> m) = r \<odot>\<^bsub>M\<^esub> the_inv_into (carrier M) f m"
+    using a4 a3 by (metis M.smult_closed f_smult the_inv_into_f_eq)
+qed
 
 lemma (in linear_map)
   assumes "bij_betw T (carrier V) (carrier W)"
