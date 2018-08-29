@@ -909,10 +909,19 @@ proof -
   {
     fix t
     assume "t \<in> carrier (direct_sum (vs_of K) ?V)"
-    then have "?h x = t" "x \<in> carrier V" sorry
+    then obtain k v where k_v: "(k,v) = t" "k \<in> carrier K" "v \<in> span ?B"
+      unfolding direct_sum_def by auto
+then have "k\<odot>\<^bsub>V\<^esub>b \<oplus>\<^bsub>V\<^esub> v \<in> carrier V" (is "?t_preimage \<in> _")
+  by (meson B(1) BiV(1) M.add.m_closed Module.module.smult_closed \<open>b \<in> B\<close> module.module_axioms
+      rev_subsetD span_closed vectorspace.basis_def vectorspace_axioms)
+    then have "?h ?t_preimage = t" sledgehammer apply auto
   } note surj=this
-  from inj surj have goal2: "bij_betw ?h (carrier V) (carrier K \<times> carrier ?V)" sorry
-  then show ?thesis sorry
+  from inj surj have goal2: "bij_betw ?h (carrier V) (carrier K \<times> span ?B)" sorry
+  show ?thesis apply (rule exI[of _ ?h]) apply (rule exI[of _ "span ?B"])
+    apply auto
+    using goal1 apply blast
+    using goal2 apply auto[1]
+    apply (simp add: BiV(1) span_is_subspace)
 qed
 
 term "(direct_sum V ^^ n) zvs"
