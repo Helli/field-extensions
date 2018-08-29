@@ -476,13 +476,31 @@ lemma (in linear_map) iso_preserves_dim:
   using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
 
 lemma (in mod_hom) mod_hom_the_inv:
-  assumes "bij_betw f (carrier M) (carrier N)"
-  shows "mod_hom R N M (the_inv_into (carrier M) f)"
-  apply intro_locales unfolding mod_hom_axioms_def module_hom_def
-  using assms[unfolded bij_betw_def] apply auto
-  apply (simp add: the_inv_into_into)
-  apply (smt M.M.add.m_closed f_add f_the_inv_into_f image_eqI the_inv_into_f_f the_inv_into_onto)
-  by (smt M.smult_closed f_smult imageE the_inv_into_f_eq)
+  assumes bij: "bij_betw f (carrier M) (carrier N)"
+  shows "mod_hom R N M (the_inv_into (carrier M) f)" (is "mod_hom R N M ?inv_f")
+proof (unfold_locales; auto simp: module_hom_def)
+  fix n1 n2 assume ns_carrier: "n1 \<in> carrier N" "n2 \<in> carrier N"
+  then have ms_carrier: "?inv_f n1 \<in> carrier M" "?inv_f n2 \<in> carrier M"
+    by (metis bij bij_betw_def order_refl the_inv_into_into)+
+  from bij have "f (?inv_f (n1 \<oplus>\<^bsub>N\<^esub> n2)) = n1 \<oplus>\<^bsub>N\<^esub> n2"
+    by (simp add: bij_betw_def f_the_inv_into_f ns_carrier)
+  also from bij have "... = f(?inv_f n1) \<oplus>\<^bsub>N\<^esub> f(?inv_f n2)"
+    by (simp add: bij_betw_def f_the_inv_into_f ns_carrier)
+  also from bij[unfolded bij_betw_def] f_add have "\<dots> = f(?inv_f n1 \<oplus>\<^bsub>M\<^esub> ?inv_f n2)"
+    by (simp add: ns_carrier the_inv_into_into)
+  finally show "?inv_f (n1 \<oplus>\<^bsub>N\<^esub> n2) = ?inv_f n1 \<oplus>\<^bsub>M\<^esub> ?inv_f n2"
+    using bij[unfolded bij_betw_def, THEN conjunct1, unfolded inj_on_def] ms_carrier
+    by (simp add: bij[unfolded bij_betw_def] ns_carrier the_inv_into_into)
+  fix r n assume "r \<in> carrier R" "n \<in> carrier N"
+  then have "?inv_f n \<in> carrier M"
+    by (simp add: bij[unfolded bij_betw_def] the_inv_into_into)
+  have "?inv_f (r \<odot>\<^bsub>N\<^esub> n) = ?inv_f (r \<odot>\<^bsub>N\<^esub> f(?inv_f n))"
+    by (simp add: bij[unfolded bij_betw_def] \<open>n \<in> carrier N\<close> f_the_inv_into_f)
+  also have "... = ?inv_f (f (r \<odot>\<^bsub>M\<^esub> ?inv_f n))"
+    by (simp add: \<open>r \<in> carrier R\<close> \<open>?inv_f n \<in> carrier M\<close>)
+  finally show "?inv_f (r \<odot>\<^bsub>N\<^esub> n) = r \<odot>\<^bsub>M\<^esub> ?inv_f n"
+    by (metis M.smult_closed bij[unfolded bij_betw_def] \<open>r \<in> carrier R\<close> \<open>?inv_f n \<in> carrier M\<close> the_inv_into_f_f)
+qed (metis bij bij_betw_def order_refl the_inv_into_into)
 
 corollary (in linear_map) linear_map_the_inv:
   "bij_betw T (carrier V) (carrier W) \<Longrightarrow> linear_map K W V (the_inv_into (carrier V) T)"
