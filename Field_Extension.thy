@@ -491,6 +491,7 @@ proof (unfold_locales; auto simp: module_hom_def)
   finally show "?inv_f (n1 \<oplus>\<^bsub>N\<^esub> n2) = ?inv_f n1 \<oplus>\<^bsub>M\<^esub> ?inv_f n2"
     using bij[unfolded bij_betw_def, THEN conjunct1, unfolded inj_on_def] ms_carrier
     by (simp add: bij[unfolded bij_betw_def] ns_carrier the_inv_into_into)
+next
   fix r n assume "r \<in> carrier R" "n \<in> carrier N"
   then have "?inv_f n \<in> carrier M"
     by (simp add: bij[unfolded bij_betw_def] the_inv_into_into)
@@ -1005,14 +1006,24 @@ proof -
             field.field_is_vecs_over_itself fin(2) monoid.surjective partial_object.update_convs(1)
             subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs
             vectorspace_def)
-      then have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
-        using linear_map.iso_imports_dim[OF lin_K_map] sledgehammer oops
-        with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16 hM'(2) have
-        "vectorspace.dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
-        sledgehammer
-        also have "\<dots> =
-        vectorspace.dim ?K (vs_of ?L) + vectorspace.dim ?K ?M'"
-      proof - oops
+      then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
+        using linear_map.iso_imports_dim(1)[OF lin_K_map]
+      proof -
+        have "bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>)))"
+          by (simp add: direct_sum_def hM'(2))
+        then show ?thesis
+          using \<open>\<lbrakk>bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))); vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<rbrakk> \<Longrightarrow> vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>)\<close> \<open>vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<close> by linarith
+      qed
+      with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16 hM'(2) have
+        "vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
+      proof -
+        have "\<forall>A m p. carrier (p::\<lparr>carrier :: 'a set, monoid.mult :: _ \<Rightarrow> _ \<Rightarrow> _, one :: _, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: 'a \<Rightarrow> _ \<Rightarrow> _\<rparr>) \<times> A = carrier (direct_sum p \<lparr>carrier = A, \<dots> = m::\<lparr>monoid.mult :: 'a \<Rightarrow> 'a \<Rightarrow> 'a, one :: 'a, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: _ \<Rightarrow> _ \<Rightarrow> _\<rparr>\<rparr>)"
+          by (simp add: direct_sum_def)
+        then show ?thesis
+          using \<open>\<lbrakk>bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))); vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<rbrakk> \<Longrightarrow> vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<close> \<open>bij_betw h cM (L \<times> cM')\<close> \<open>vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<close> by fastforce
+      qed
+      also have "\<dots> = vectorspace.dim ?K (vs_of ?L) + vectorspace.dim ?K ?M'"
+      proof -
         have "\<forall>p f A. carrier_update f (p::('a, 'b) ring_scheme)\<lparr>carrier := A\<rparr> = p\<lparr>carrier := A\<rparr>"
           by simp
         then have "vectorspace.fin_dim ?K (vs_of ?L) \<and> vectorspace ?K (vs_of ?L) \<and> vectorspace ?K ?M'"
@@ -1020,23 +1031,18 @@ proof -
         then show ?thesis
           using applied_IH direct_sum_dim(2) by blast
       qed
-      with Suc show ?case ledgehammer
-        by (smt Field_Extension.field.generate_fieldE(1) Set.basic_monos(1) a(3) assms(1)
-            direct_sum_dim(2) field.generate_fieldI field_extension.intro
-            field_extension.vectorspace_satisfied fin(2) partial_object.update_convs(1)
-            ring.surjective subfield.vectorspace_wrt_subfield subfieldE(3) subspace.vs
-            vectorspace.subspace_is_vs vectorspace_def
-        by (smt Field_Extension.field.generate_fieldE(1) Set.basic_monos(1) \<open>vectorspace.fin_dim
-            (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM'\<rparr>) \<and> vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of
-            M\<lparr>carrier := cM'\<rparr>) = vectorspace.dim (M\<lparr>carrier := L\<rparr>) (vs_of M\<lparr>carrier := cM'\<rparr>) *
-            vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier := L\<rparr>))\<close> a(3) assms(1)
-            direct_sum_dim(2) field.generate_fieldI field_extension.intro
-            field_extension.vectorspace_satisfied fin(2) partial_object.update_convs(1)
-            ring.surjective subfield.vectorspace_wrt_subfield subfieldE(3) subspace.vs
-            vectorspace.subspace_is_vs vectorspace_def
-      then show ?case sorry
+      finally show ?case apply safe using goal1 apply simp
+      proof -
+        assume a1: "vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier := L\<rparr>)) + vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM'\<rparr>)"
+        have "x = vectorspace.dim (M\<lparr>carrier := L\<rparr>) (vs_of M\<lparr>carrier := cM'\<rparr>)"
+          using Suc.hyps(2) hM'(4) by presburger
+      then have "vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>) = Suc x * vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier := L\<rparr>))"
+        using a1 applied_IH mult_Suc by presburger
+        then show "vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim (M\<lparr>carrier := L\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>) * vectorspace.dim (M\<lparr>carrier := K\<rparr>) (vs_of (M\<lparr>carrier := L\<rparr>))"
+          using Suc.hyps(2) by presburger
+      qed
     qed
-    note this[folded cM]
+    note this[unfolded cM_def, simplified]
   }
 
   moreover
