@@ -766,6 +766,7 @@ qed
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
 
+text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
 lemma (in vectorspace) decompose_step: (* use obtains? *)
   assumes fin_dim
   assumes "dim > 0"
@@ -773,7 +774,7 @@ lemma (in vectorspace) decompose_step: (* use obtains? *)
     \<and> bij_betw h (carrier V) (carrier K \<times> V')
     \<and> subspace K V' V
     \<and> vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = dim - 1" (* could be derived? *)
-proof -
+proof - \<comment> \<open>Possibly easier if the map definition is swapped as in Kemper's proof.\<close>
   from assms obtain B where B: "basis B" "card B > 0"
     using dim_basis finite_basis_exists by auto
   then obtain b where "b \<in> B"
@@ -907,11 +908,17 @@ proof -
       unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) insertCI
           insert_Diff lincomb_zero vectorspace.basis_def vectorspace_axioms)
   }
-  then have "f_lm.ker = {\<zero>\<^bsub>V\<^esub>}"
+  then have "f_lm.kerT = {\<zero>\<^bsub>V\<^esub>}"
     unfolding f_lm.ker_def by auto
   then have inj: "inj_on ?T (carrier V)"
     by (simp add: f_lm.Ke0_imp_inj)
-  find_theorems inj_on the_inv_into "(`)"
+  find_theorems inj_on the_inv_into
+  moreover have "f_lm.imT = carrier K \<times> carrier ?V"
+    unfolding f_lm.im_def apply auto
+    using \<open>b \<in> B\<close> okese(1) apply fastforce
+    apply (smt BiV(1) BiV(2) Diff_subset LinearCombinations.module.finite_span PiE_mem Pi_I'
+        R.zero_closed coeff_in_ring2 mem_Collect_eq module.module_axioms okese(1) subsetCE)
+  proof find_theorems lincomb "(\<union>)"
   {
     fix y
     assume "y \<in> carrier (direct_sum (vs_of K) ?V)"
