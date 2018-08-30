@@ -687,7 +687,7 @@ proof -
     by (simp add: subspace_axioms vectorspace.subspace_is_vs vs)
   assume "vectorspace.fin_dim K V" "vectorspace.dim K (V\<lparr>carrier:=W\<rparr>) = 0"
   with vs have "vectorspace.basis K (V\<lparr>carrier:=W\<rparr>) {}"
-    by (simp add: corollary_5_16 module.finite_lin_indpt2 vectorspace.dim_li_is_basis vectorspace_def)
+    by (simp add: corollary_5_16(1) module.finite_lin_indpt2 vectorspace.dim_li_is_basis vectorspace_def)
   then show ?thesis
     using vectorspace.basis_def vectorspace.span_empty vs by fastforce
 qed
@@ -978,7 +978,7 @@ proof -
     qed done
     assume enclosing.fin_dim
     with that show False
-      using subspace.corollary_5_16[OF subspace] by simp
+      using subspace.corollary_5_16(1)[OF subspace] by simp
   qed
 
   moreover have "\<not>field_extension.finite M K" if "\<not>field_extension.finite M L"
@@ -1040,7 +1040,7 @@ proof -
            apply auto
         using Suc.hyps(2) a(4) apply simp
         using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
-        using a(3) Suc.prems(2) subspace.corollary_5_16 apply force
+        using Suc.prems(2) a(3) subspace.corollary_5_16(1) apply force
         using a(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
         by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
       from hM'(1) have lin_K_map: "linear_map ?K (vs_of M\<lparr>carrier:=cM\<rparr>) (direct_sum (vs_of ?L) ?M') h"
@@ -1058,7 +1058,7 @@ proof -
         then show ?thesis
           using \<open>\<lbrakk>bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))); vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<rbrakk> \<Longrightarrow> vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>)\<close> \<open>vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<close> by linarith
       qed
-      with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16 hM'(2) have
+      with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16(1) hM'(2) have
         "vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
       proof -
         have "\<forall>A m p. carrier (p::\<lparr>carrier :: 'a set, monoid.mult :: _ \<Rightarrow> _ \<Rightarrow> _, one :: _, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: 'a \<Rightarrow> _ \<Rightarrow> _\<rparr>) \<times> A = carrier (direct_sum p \<lparr>carrier = A, \<dots> = m::\<lparr>monoid.mult :: 'a \<Rightarrow> 'a \<Rightarrow> 'a, one :: 'a, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: _ \<Rightarrow> _ \<Rightarrow> _\<rparr>\<rparr>)"

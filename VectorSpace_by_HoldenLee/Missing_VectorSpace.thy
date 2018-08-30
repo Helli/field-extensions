@@ -860,9 +860,11 @@ proof -
     by (smt dual_order.trans max_li_is_basis maximal_def)
 qed
 
-lemma (in subspace) corollary_5_16(*sort of*):
+lemma (in subspace) corollary_5_16:
   assumes "vectorspace.fin_dim K V"
-  shows "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)" and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
+  shows "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
+    and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
+    and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) = vectorspace.dim K V \<Longrightarrow> W = carrier V"
 proof -
   {
     fix S
@@ -877,7 +879,7 @@ proof -
     by (simp add: module.lin_indpt_empty module.submodule_is_module submod vectorspace.axioms(1) vs)
   have "\<exists>B. finite B \<and> maximal B (\<lambda>M. M \<subseteq> W \<and> module.lin_indpt K (V\<lparr>carrier := W\<rparr>) M)"
     apply (rule maximal_exists[OF useful]) apply auto[2] using empty_lin_indpt_in_W by blast
-  show "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
+  show fin_dim: "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
   proof -
     obtain CC :: "'c set" where
       f1: "finite CC \<and> maximal CC (\<lambda>C. C \<subseteq> W \<and> \<not> module.lin_dep K (V\<lparr>carrier := W\<rparr>) C)"
@@ -897,6 +899,11 @@ proof -
     by (metis module.carrier_vs_is_self subspace_axioms subspace_def useful vectorspace.basis_def
         vectorspace.dim_basis vectorspace.finite_basis_exists vectorspace.subspace_is_vs
         vectorspace_def)
+  with fin_dim assms show "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) = vectorspace.dim K V \<Longrightarrow> W = carrier V"
+    by (smt module.carrier_vs_is_self module.span_li_not_depend module.submoduleE(1)
+        monoid.surjective partial_object.update_convs(1) submod subset_trans subspace_axioms
+        vectorspace.axioms(1) vectorspace.basis_def vectorspace.dim_basis
+        vectorspace.dim_li_is_basis vectorspace.finite_basis_exists vectorspace.subspace_is_vs vs)
 qed
 
 
