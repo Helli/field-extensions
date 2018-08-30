@@ -785,14 +785,19 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     using B(1) basis_def apply blast using B
     using card_infinite neq0_conv by blast
   let ?V = "vs (span ?B)"
-  have md_span_B: "module K ?V"
-    by (simp add: BiV(1) span_is_submodule submodule_is_module)
-  interpret vs_span_B: vectorspace K ?V
-    by (metis B(1) DiffE basis_def contra_subsetD span_is_subspace subsetI subspace_is_vs)
-  from liB have liB': "\<not>LinearCombinations.module.lin_dep K ?V ?B"
+  note goal_3 = span_is_subspace[OF BiV(1)]
+  then interpret vs_span_B: vectorspace K ?V
+    using subspace_is_vs by blast
+  from liB have liB': "vs_span_B.lin_indpt ?B"
     by (simp add: BiV in_own_span span_is_subspace span_li_not_depend(2))
-  then have "vectorspace.basis K ?V ?B"
+  then have new_basis: "vs_span_B.basis ?B"
     by (simp add: BiV(1) in_own_span span_is_submodule span_li_not_depend(1) vs_span_B.basis_def)
+  moreover have "card ?B = dim - 1"
+    using B(1) BiV(2) \<open>b \<in> B\<close> dim_basis by auto
+  ultimately have "vs_span_B.fin_dim" and goal_4: "vs_span_B.dim = dim - 1"
+    unfolding vs_span_B.fin_dim_def apply -
+     apply (metis BiV(2) vectorspace.basis_def vs_span_B.vectorspace_axioms)
+    using BiV(2) vs_span_B.dim_basis by presburger
   define coeffs where "coeffs \<equiv> \<lambda>v. THE a. a \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb a B"
 \<comment>\<open>alternative:\<^theory_text>\<open>define coeffs' where "coeffs' \<equiv> the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"\<close>\<close>
   have "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
@@ -816,7 +821,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using B(1) B(2) basis_def c_sum(2) that(1) that(2) by force
   qed
   let ?T = "\<lambda>v. (coeffs v b, lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs v bv) (B - {b}))"
-  have goal1: "linear_map K V (direct_sum (vs_of K) ?V) ?T"
+  have goal_1: "linear_map K V (direct_sum (vs_of K) ?V) ?T"
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
@@ -890,7 +895,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
           insert_Diff lincomb_closed lincomb_del2 mV okese(2) smult_assoc_simp smult_closed
           smult_r_distr span_mem vectorspace.basis_def vectorspace_axioms)
   qed
-  then interpret f_lm: linear_map K V "direct_sum (vs_of K) ?V" ?T.
+  then interpret linmap: linear_map K V "direct_sum (vs_of K) ?V" ?T .
   {
     fix v
     assume "v \<in> carrier V"
@@ -908,33 +913,31 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) insertCI
           insert_Diff lincomb_zero vectorspace.basis_def vectorspace_axioms)
   }
-  then have "f_lm.kerT = {\<zero>\<^bsub>V\<^esub>}"
-    unfolding f_lm.ker_def by auto
-  then have inj: "inj_on ?T (carrier V)"
-    by (simp add: f_lm.Ke0_imp_inj)
-  find_theorems inj_on the_inv_into
-  moreover have "f_lm.imT = carrier K \<times> carrier ?V"
-    unfolding f_lm.im_def apply auto
-    using \<open>b \<in> B\<close> okese(1) apply fastforce
-    apply (smt BiV(1) BiV(2) Diff_subset LinearCombinations.module.finite_span PiE_mem Pi_I'
-        R.zero_closed coeff_in_ring2 mem_Collect_eq module.module_axioms okese(1) subsetCE)
-  proof find_theorems lincomb "(\<union>)"
-  {
-    fix y
-    assume "y \<in> carrier (direct_sum (vs_of K) ?V)"
-    then obtain k v where k_v: "(k,v) = y" "k \<in> carrier K" "v \<in> span ?B"
-      unfolding direct_sum_def by auto
-    then have "k\<odot>\<^bsub>V\<^esub>b \<oplus>\<^bsub>V\<^esub> v \<in> carrier V" (is "?y_preimage \<in> _")
-      by (meson B(1) BiV(1) M.add.m_closed Module.module.smult_closed \<open>b \<in> B\<close> module.module_axioms
-      rev_subsetD span_closed vectorspace.basis_def vectorspace_axioms)
-    then have "coeffs (k \<odot>\<^bsub>V\<^esub> b \<oplus>\<^bsub>V\<^esub> v) b = k" sledgehamme apply auto
-  } note surj=this
-  from inj surj have goal2: "bij_betw ?T (carrier V) (carrier K \<times> span ?B)" sorry
-  show ?thesis apply (rule exI[of _ ?T]) apply (rule exI[of _ "span ?B"])
-    apply auto
-    using goal1 apply blast
-    using goal2 apply auto[1]
-    apply (simp add: BiV(1) span_is_subspace)
+  then have "linmap.kerT = {\<zero>\<^bsub>V\<^esub>}"
+    unfolding linmap.ker_def by auto
+  then have goal_2a: "inj_on ?T (carrier V)"
+    by (simp add: linmap.Ke0_imp_inj)
+  have "vectorspace.fin_dim K (vs_of K)" "vectorspace.dim K (vs_of K) = 1"
+    using trivial_degree[unfolded field_extension.degree_def[OF field_extension_refl]]
+    apply auto[] apply presburger
+  proof -
+    have "\<forall>p. p\<lparr>carrier := carrier p\<rparr> = p"
+      by fastforce
+    then show "vectorspace.dim K (vs_of K) = 1"
+      using field_extension.degree_def field_extension_refl by fastforce
+  qed
+  with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
+    by (simp add: direct_sum_dim(2) field_is_vecs_over_itself vs_span_B.vectorspace_axioms)
+  also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
+  also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
+    using assms(1) linmap.emb_image_dim goal_2a by blast
+  finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
+    using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vectorspace.fin_dim K (vs_of K)\<close>
+      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) field_is_vecs_over_itself vs_span_B.vectorspace_axioms
+    by auto
+  note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
+  from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
+    unfolding bij_betw_def by blast
 qed
 
 term "(direct_sum V ^^ n) zvs"
