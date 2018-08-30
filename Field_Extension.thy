@@ -814,8 +814,8 @@ proof -
     then show ?thesis
       using B(1) B(2) basis_def c_sum(2) that(1) that(2) by force
   qed
-  let ?h = "\<lambda>v. (coeffs v b, lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs v bv) (B - {b}))"
-  have goal1: "linear_map K V (direct_sum (vs_of K) ?V) ?h"
+  let ?T = "\<lambda>v. (coeffs v b, lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs v bv) (B - {b}))"
+  have goal1: "linear_map K V (direct_sum (vs_of K) ?V) ?T"
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
@@ -889,6 +889,7 @@ proof -
           insert_Diff lincomb_closed lincomb_del2 mV okese(2) smult_assoc_simp smult_closed
           smult_r_distr span_mem vectorspace.basis_def vectorspace_axioms)
   qed
+  then interpret f_lm: linear_map K V "direct_sum (vs_of K) ?V" ?T.
   {
     fix v
     assume "v \<in> carrier V"
@@ -902,22 +903,27 @@ proof -
       using not_lindepD
        apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I a(1) liB lin_dep_crit singletonI)
       by (smt BiV(1) Diff_not_in Pi_cong lincomb_zero)
-    then have "?h v = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longrightarrow> v = \<zero>\<^bsub>V\<^esub>"
+    then have "?T v = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longrightarrow> v = \<zero>\<^bsub>V\<^esub>"
       unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) insertCI
           insert_Diff lincomb_zero vectorspace.basis_def vectorspace_axioms)
-  } note inj=this
+  }
+  then have "f_lm.ker = {\<zero>\<^bsub>V\<^esub>}"
+    unfolding f_lm.ker_def by auto
+  then have inj: "inj_on ?T (carrier V)"
+    by (simp add: f_lm.Ke0_imp_inj)
+  find_theorems inj_on the_inv_into "(`)"
   {
-    fix t
-    assume "t \<in> carrier (direct_sum (vs_of K) ?V)"
-    then obtain k v where k_v: "(k,v) = t" "k \<in> carrier K" "v \<in> span ?B"
+    fix y
+    assume "y \<in> carrier (direct_sum (vs_of K) ?V)"
+    then obtain k v where k_v: "(k,v) = y" "k \<in> carrier K" "v \<in> span ?B"
       unfolding direct_sum_def by auto
-then have "k\<odot>\<^bsub>V\<^esub>b \<oplus>\<^bsub>V\<^esub> v \<in> carrier V" (is "?t_preimage \<in> _")
-  by (meson B(1) BiV(1) M.add.m_closed Module.module.smult_closed \<open>b \<in> B\<close> module.module_axioms
+    then have "k\<odot>\<^bsub>V\<^esub>b \<oplus>\<^bsub>V\<^esub> v \<in> carrier V" (is "?y_preimage \<in> _")
+      by (meson B(1) BiV(1) M.add.m_closed Module.module.smult_closed \<open>b \<in> B\<close> module.module_axioms
       rev_subsetD span_closed vectorspace.basis_def vectorspace_axioms)
-    then have "?h ?t_preimage = t" sledgehammer apply auto
+    then have "coeffs (k \<odot>\<^bsub>V\<^esub> b \<oplus>\<^bsub>V\<^esub> v) b = k" sledgehamme apply auto
   } note surj=this
-  from inj surj have goal2: "bij_betw ?h (carrier V) (carrier K \<times> span ?B)" sorry
-  show ?thesis apply (rule exI[of _ ?h]) apply (rule exI[of _ "span ?B"])
+  from inj surj have goal2: "bij_betw ?T (carrier V) (carrier K \<times> span ?B)" sorry
+  show ?thesis apply (rule exI[of _ ?T]) apply (rule exI[of _ "span ?B"])
     apply auto
     using goal1 apply blast
     using goal2 apply auto[1]
