@@ -406,18 +406,18 @@ lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L
 interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
   by (fact vectorspace_satisfied)
 
-abbreviation "fin \<equiv> vecs.fin_dim"
+abbreviation finite where "finite \<equiv> vecs.fin_dim"
 \<comment> \<open>Prop. 14.16 would look much better if I also had an abbreviation for infinite degree\<close>
 
 definition degree where
-  "degree \<equiv> if fin then vecs.dim else 0"
+  "degree \<equiv> if finite then vecs.dim else 0"
  \<comment> \<open>This uses the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting it to another notion of cardinality
  (ecard / enat) should not be too difficult.\<close>
 
-lemma fin_dim_nonzero: "fin \<Longrightarrow> vecs.dim > 0"
+lemma fin_dim_nonzero: "finite \<Longrightarrow> vecs.dim > 0"
   by (rule vecs.dim_greater_0) (auto dest: one_zeroI)
 
-corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> fin"
+corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
   by (simp add: degree_def fin_dim_nonzero)
 
 end
@@ -947,7 +947,7 @@ proof -
         field_extension.intro monoid.surjective partial_object.update_convs(1) subfieldE(3)
         subset_refl)
 
-  have "\<not>field_extension.fin M K" if "\<not>field_extension.fin ?L K"
+  have "\<not>field_extension.finite M K" if "\<not>field_extension.finite ?L K"
   proof
     from M_over_K interpret enclosing: vectorspace ?K "vs_of M"
       by (simp add: field_extension.vectorspace_satisfied)
@@ -968,7 +968,7 @@ proof -
       using subspace.corollary_5_16[OF subspace] by simp
   qed
 
-  moreover have "\<not>field_extension.fin M K" if "\<not>field_extension.fin M L"
+  moreover have "\<not>field_extension.finite M K" if "\<not>field_extension.finite M L"
   proof
     interpret a: module ?L "vs_of M"
       by (simp add: subfield_def assms(2-3) field_extension.vectorspace_satisfied field_extension_def vectorspace.axioms(1))
@@ -980,7 +980,7 @@ proof -
     note 1 = this[unfolded a.span_def a.lincomb_def, simplified]
     interpret b: module ?K "vs_of M"
       by (simp add: M_over_K field_extension.vectorspace_satisfied vectorspace.axioms(1))
-    assume "field_extension.fin M K"
+    assume "field_extension.finite M K"
     then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> b.span B = carrier M"
       using M_over_K field_extension.vectorspace_satisfied vectorspace.fin_dim_def by fastforce
     note 2 = this[unfolded b.span_def b.lincomb_def, simplified]
@@ -991,7 +991,7 @@ proof -
   qed
 
   moreover {
-    assume fin: "field_extension.fin M L" "field_extension.fin ?L K"
+    assume fin: "field_extension.finite M L" "field_extension.finite ?L K"
     define cM where "cM = carrier M" (*"vs_of M = vs_of M\<lparr>carrier:=cM\<rparr>"*)
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
