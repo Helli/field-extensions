@@ -150,6 +150,9 @@ begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
+sublocale UP_domain "L\<lparr>carrier:=K\<rparr>" apply intro_locales
+  using S.subfield_iff(2) domain_def field_def subfield_axioms by auto
+
 (* rm these two? *)
 lemmas L_assoc = R.m_assoc[simplified]
 lemmas one_is_neutral[simp] = R.l_one[simplified] R.r_one[simplified]
@@ -304,19 +307,19 @@ proof -
             auto
           apply (smt S.comm_inv_char S.m_lcomm S.one_closed S.r_null S.r_one S.ring_axioms
               inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
-          using integral by blast
+          using superf'd.integral by blast
       qed
       from \<open>h1 \<in> ?L'\<close> \<open>h2 \<in> ?L'\<close> show "h1 \<oplus>\<^bsub>L\<^esub>h2 \<in> ?L'"
         apply auto
       proof goal_cases
         case (1 f1 f2 g1 g2)
         show ?case apply (rule exI[where x = "f1\<otimes>g2\<oplus>f2\<otimes>g1"], rule exI[where x = "g1\<otimes>g2"])
-          by (simp add: 1 integral_iff sum_of_fractions)
+          by (simp add: 1 superf'd.integral_iff sum_of_fractions)
       qed
     next
       fix k
       assume "k \<in> ?L' - {\<zero>\<^bsub>L\<^esub>}"
-      then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use integral_iff in auto)
+      then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use superf'd.integral_iff in auto)
     qed force+
   next
     show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
@@ -1123,10 +1126,64 @@ context UP_of_field_extension begin
 
 definition irr where
   "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
-print_theorems thm arg_min_def
-thm irr_def[simplified]
+
+lemma "a_kernel P L Eval = {g \<in> carrier P. Eval g = \<zero>\<^bsub>L\<^esub>}"
+  by (fact a_kernel_def')
+
+lemma "algebraic \<Longrightarrow> a_kernel P L Eval \<supset> {\<zero>}"
+  unfolding algebraic_def oops
+
+lemma "euclidean_domain P (deg (L\<lparr>carrier := K\<rparr>))"
+  apply (rule euclidean_domainI) apply auto
+  using long_div_theorem[simplified]
+  oops
+
+lemma asdf: "algebraic \<Longrightarrow> True" oops
 
 end
+
+lemma (in UP_ring) lcoeff_Unit_nonzero:
+  "carrier R \<noteq> {\<zero>} \<Longrightarrow> lcoeff p \<in> Units R \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_r_inv_ex R.l_null R.one_zeroD coeff_zero)
+
+lemma (in UP_cring) Unit_scale_zero:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)
+
+lemma (in UP_cring) Unit_scale_deg[simp]:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> deg R (c \<odot>\<^bsub>P\<^esub> r) = deg R r"
+  by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
+
+lemma (in UP_cring) weak_long_div_theorem:
+  assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
+  and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
+  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g)"
+proof -
+  from long_div_theorem[OF g_in_P f_in_P] obtain q r and k::nat where qrk: "q \<in> carrier P"
+    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g"
+    using R_not_trivial lcoeff_Unit_nonzero lcoeff_g by auto
+  from lcoeff_g have inv: "lcoeff g [^] k \<in> Units R"
+    by (induction k) simp_all
+  let ?inv = "inv (lcoeff g [^] k)"
+  have inv_ok: "?inv \<in> Units R" "?inv \<in> carrier R"
+    using inv by simp_all
+  from inv have "f = ?inv \<otimes> lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f"
+    by simp
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f)"
+    by (simp add: local.inv smult_assoc_simp)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r)"
+    by (simp add: qrk)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    by (simp add: UP_smult_assoc2 UP_smult_r_distr inv_ok qrk(1-2))
+  also have "\<dots> = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    using UP_m_comm inv_ok qrk(1) smult_assoc2 by auto
+  finally have "f = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r" .
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> q \<in> carrier P" "?inv \<odot>\<^bsub>P\<^esub> r \<in> carrier P"
+    by (simp_all add: inv_ok qrk(1-2))
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> deg R (?inv \<odot>\<^bsub>P\<^esub> r) < deg R (?inv \<odot>\<^bsub>P\<^esub> g)"
+    using Unit_scale_deg inv_ok(1) qrk(2,4) by auto
+  ultimately show ?thesis using inv_ok(1) by auto
+qed
 
 
 section \<open>Observations (*rm*)\<close>
