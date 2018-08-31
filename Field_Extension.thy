@@ -145,7 +145,7 @@ qed
 
 (*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
 as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
-locale UP_of_field_extension = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension
+locale UP_of_field_extension = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + fe?: field_extension
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
