@@ -773,7 +773,7 @@ lemma (in vectorspace) decompose_step: (* use obtains? *)
   shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (V\<lparr>carrier:=V'\<rparr>)) h
     \<and> bij_betw h (carrier V) (carrier K \<times> V')
     \<and> subspace K V' V
-    \<and> vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = dim - 1" (* could be derived? *)
+    \<and> vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = dim - 1"
 proof - \<comment> \<open>Possibly easier if the map definition is swapped as in Kemper's proof.\<close>
   from assms obtain B where B: "basis B" "card B > 0"
     using dim_basis finite_basis_exists by auto
@@ -940,12 +940,10 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding bij_betw_def by blast
 qed
 
-term "(direct_sum V ^^ n) zvs"
-
-proposition degree_multiplicative: \<comment> \<open>Maybe this works better when following the comment on line 500 here: @{url
+proposition tower_rule: \<comment> \<open>Maybe this works better when following the comment on line 500 here: @{url
   "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}\<close>
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
-  shows
+  shows degree_multiplicative:
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
 proof -
   \<comment> \<open>to-do: use more \<^theory_text>\<open>interpret\<close>, especially in the "finite" part. Maybe first define a locale
@@ -1121,5 +1119,14 @@ text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<clo
 text \<open>@{thm[source] field_simps} are *not* available in general. Re-prove them?\<close>
 
 value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
+
+section \<open>Vector Spaces\<close>
+
+definition (in vectorspace) B where
+  "B = (SOME B. basis B)"
+
+lemma (in vectorspace)
+  "fin_dim \<Longrightarrow> finite B"
+  by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
 
 end
