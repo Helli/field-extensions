@@ -145,8 +145,7 @@ qed
 
 (*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
 as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
-locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension L K
-  for L (structure) and K
+locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
@@ -377,15 +376,11 @@ qed
 
 subsection \<open>Polynomial Divisibility\<close>
 
-text \<open>use something along the lines of\<close>
-definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
-
 text \<open>keep an eye out whether I need something from @{url
   "https://github.com/DeVilhena-Paulo/GaloisCVC4/blob/master/Polynomial_Divisibility.thy"}\<close>
 
 
 subsection \<open>Degree of a field extension\<close>
-text \<open>Todo: proposition 16.14\<close>
 
 hide_const (open) degree
 
@@ -423,7 +418,7 @@ corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
 end
 
 locale finite_field_extension = field_extension +
-  assumes fin
+  assumes finite
 
 lemma (in field) field_is_vecs_over_itself: "vectorspace R (vs_of R)"
   by (fact field_extension.vectorspace_satisfied[OF field_extension_refl, simplified])
@@ -746,24 +741,6 @@ lemma (in module) lincomb_restrict_simp[simp, intro]:
   shows "lincomb (restrict a U) U = lincomb a U"
   by (meson U a lincomb_cong restrict_apply')
 
-(*private*) locale samespace = vectorspace
-  "\<lparr>carrier=A, monoid.mult=monoid.mult B, one=one B, zero=zero B, add = add B\<rparr>"
-  "B\<lparr>smult:=monoid.mult B\<rparr>" for A and B
-
-term "ring.extend"
-term "ring.truncate"
-
-lemma remove_this_experiment:
-  assumes "field_extension (L::'a ring) K"
-  shows "samespace K (vs_of L)" unfolding samespace_def
-  apply auto using field_extension.vectorspace_satisfied[OF assms]
-proof -
-  have "\<forall>u p f. \<lparr>carrier = f (carrier p), monoid.mult = (\<otimes>\<^bsub>p\<^esub>), one = \<one>\<^bsub>p\<^esub>::'a, zero = \<zero>\<^bsub>p\<^esub>, add = (\<oplus>\<^bsub>p\<^esub>), \<dots> = u::unit\<rparr> = carrier_update f p"
-    by simp
-  then show "vectorspace \<lparr>carrier = K, monoid.mult = (\<otimes>\<^bsub>L\<^esub>), one = \<one>\<^bsub>L\<^esub>, zero = \<zero>\<^bsub>L\<^esub>, add = (\<oplus>\<^bsub>L\<^esub>)\<rparr> (vs_of L)"
-    by (metis \<open>vectorspace (L\<lparr>carrier := K\<rparr>) (vs_of L)\<close>)
-qed
-
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
 
 text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
@@ -890,10 +867,30 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using \<open>coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K\<close> apply auto[1]
       using mV okese(1) by fastforce
     with scale \<open>r \<in> carrier K\<close> show "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs (r \<odot>\<^bsub>V\<^esub> m) bv) (B-{b}) =
-    r \<odot>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m bv) (B-{b})" apply simp
-      by (smt B BiV(1) M.add.l_cancel Pi_split_insert_domain \<open>b \<in> B\<close> card_ge_0_finite
-          insert_Diff lincomb_closed lincomb_del2 mV okese(2) smult_assoc_simp smult_closed
-          smult_r_distr span_mem vectorspace.basis_def vectorspace_axioms)
+    r \<odot>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m bv) (B-{b})"
+    proof simp
+      assume a1: "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow> carrier K"
+      assume a2: "r \<in> carrier K"
+      assume a3: "coeffs m \<in> B \<rightarrow> carrier K"
+      assume a4: "\<And>b. b \<in> B \<Longrightarrow> coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b"
+      have f5: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> (\<exists>c. c \<in> C \<and> f c \<noteq> fa c) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
+        by (metis (no_types) lincomb_cong)
+      obtain cc :: "('c \<Rightarrow> 'a) \<Rightarrow> ('c \<Rightarrow> 'a) \<Rightarrow> 'c set \<Rightarrow> 'c" where
+        "\<forall>x0 x1 x3. (\<exists>v4. v4 \<in> x3 \<and> x1 v4 \<noteq> x0 v4) = (cc x0 x1 x3 \<in> x3 \<and> x1 (cc x0 x1 x3) \<noteq> x0 (cc x0 x1 x3))"
+        by moura
+      then have f6: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> cc fa f C \<in> C \<and> f (cc fa f C) \<noteq> fa (cc fa f C) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
+        using f5 by presburger
+      have f7: "insert b (B - {b}) = B"
+        using \<open>b \<in> B\<close> by blast
+      have f8: "\<forall>f c C fa. (f \<in> Pi (insert (c::'c) C) fa) = (f \<in> Pi C fa \<and> (f c::'a) \<in> fa c)"
+        by blast
+      then have f9: "cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) \<in> B - {b} \<and> r \<otimes>\<^bsub>K\<^esub> coeffs m (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<noteq> coeffs (r \<odot>\<^bsub>V\<^esub> m) (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<or> lincomb (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) = lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b})"
+        using f7 f6 a1 by (metis (no_types) \<open>B - {b} \<subseteq> carrier V\<close>)
+      have "coeffs m \<in> B - {b} \<rightarrow> carrier K \<and> coeffs m b \<in> carrier K"
+        using f8 f7 a3 by (metis (no_types))
+      then show "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b}) = r \<odot>\<^bsub>V\<^esub> lincomb (coeffs m) (B - {b})"
+        using f9 a4 a2 \<open>B - {b} \<subseteq> carrier V\<close> lincomb_distrib by fastforce
+    qed
   qed
   then interpret linmap: linear_map K V "direct_sum (vs_of K) ?V" ?T .
   {
@@ -1101,6 +1098,31 @@ proof -
       by (simp add: Field_Extension.ring.subfield_iff(1) M_over_K Subrings.ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
   qed
 qed
+
+
+subsection \<open>Polynomial Divisibility\<close>
+
+lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Longrightarrow> field_extension_with_UP \<alpha> L K"
+  unfolding field_extension_with_UP_def apply auto
+  apply (metis UP_cring.intro UP_pre_univ_prop.intro UP_univ_prop.intro UP_univ_prop_axioms.intro
+      cring_ring_hom_cring is_cring ring_hom_cring_def)
+  by (simp add: field_extension_axioms)
+(*
+definition (in field_extension)
+*)
+definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
+
+lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
+  unfolding monic_def by auto
+
+context field_extension_with_UP begin
+
+definition irr where
+  "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+print_theorems thm arg_min_def
+thm irr_def[simplified]
+
+end
 
 
 section \<open>Observations (*rm*)\<close>
