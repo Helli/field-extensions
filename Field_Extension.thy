@@ -145,7 +145,7 @@ qed
 
 (*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
 as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
-locale field_extension_with_UP = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension
+locale UP_of_field_extension = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + field_extension
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
@@ -238,7 +238,7 @@ lemma pow_simp[simp]:
   shows "x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
   unfolding nat_pow_def by simp
 
-lemma (in field_extension_with_UP) intermediate_field_eval: (* inline? *)
+lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
   assumes "subfield M L"
   assumes "K \<subseteq> M"
   assumes "s \<in> M"
@@ -271,11 +271,11 @@ proof -
     by fastforce
 qed
 
-lemma (in field_extension_with_UP) insert_s_K: "insert s K \<subseteq> carrier L"
+lemma (in UP_of_field_extension) insert_s_K: "insert s K \<subseteq> carrier L"
   \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
   by (simp add: subset)
 
-proposition (in field_extension_with_UP) genfield_singleton_explicit:
+proposition (in UP_of_field_extension) genfield_singleton_explicit:
   "generate_field L (insert s K) =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
@@ -357,8 +357,8 @@ proof -
           apply (fact is_UP_cring)
          apply (simp add: ** UP_univ_prop_axioms_def)
         unfolding Eval_def apply (rule eq_reflection)
-        apply (intro field_extension_with_UP.intermediate_field_eval)
-        by (simp_all add: field_extension_with_UP_axioms L_over_M * **)
+        apply (intro UP_of_field_extension.intermediate_field_eval)
+        by (simp_all add: UP_of_field_extension_axioms L_over_M * **)
       from \<open>f \<in> carrier P\<close> have "Eval f \<in> M"
         using M_over_K.hom_closed by simp
       from \<open>g \<in> carrier P\<close> have "Eval g \<in> M"
@@ -1102,24 +1102,24 @@ qed
 
 subsection \<open>Polynomial Divisibility\<close>
 
-lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Longrightarrow> field_extension_with_UP \<alpha> L K"
-  unfolding field_extension_with_UP_def apply auto
+lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Longrightarrow> UP_of_field_extension \<alpha> L K"
+  unfolding UP_of_field_extension_def apply auto
   apply (metis UP_cring.intro UP_pre_univ_prop.intro UP_univ_prop.intro UP_univ_prop_axioms.intro
       cring_ring_hom_cring is_cring ring_hom_cring_def)
   by (simp add: field_extension_axioms)
 
-definition (in field_extension_with_UP) algebraic where
+definition (in UP_of_field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P. p \<noteq> \<zero> \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 definition (in field_extension) algebraic where
-  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. field_extension_with_UP.algebraic \<alpha> L K)"
+  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic \<alpha> L K)"
 
 definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   unfolding monic_def by auto
 
-context field_extension_with_UP begin
+context UP_of_field_extension begin
 
 definition irr where
   "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
