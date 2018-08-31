@@ -1107,9 +1107,13 @@ lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Long
   apply (metis UP_cring.intro UP_pre_univ_prop.intro UP_univ_prop.intro UP_univ_prop_axioms.intro
       cring_ring_hom_cring is_cring ring_hom_cring_def)
   by (simp add: field_extension_axioms)
-(*
-definition (in field_extension)
-*)
+
+definition (in field_extension_with_UP) algebraic where
+  "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P. p \<noteq> \<zero> \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+
+definition (in field_extension) algebraic where
+  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. field_extension_with_UP.algebraic \<alpha> L K)"
+
 definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
