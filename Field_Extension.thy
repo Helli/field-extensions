@@ -1189,11 +1189,8 @@ context UP_of_field_extension begin
 definition irr where
   "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
-lemma "a_kernel P L Eval = {g \<in> carrier P. Eval g = \<zero>\<^bsub>L\<^esub>}"
-  by (fact a_kernel_def')
-
-lemma "algebraic \<Longrightarrow> a_kernel P L Eval \<supset> {\<zero>}"
-  unfolding algebraic_def oops
+lemma a_kernel_nontrivial: "algebraic \<Longrightarrow> a_kernel P L Eval \<supset> {\<zero>}"
+  unfolding algebraic_def a_kernel_def' by auto
 
 lemma asdf: "algebraic \<Longrightarrow> True" oops
 
