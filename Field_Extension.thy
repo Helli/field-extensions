@@ -1,6 +1,6 @@
 theory Field_Extension imports
 "HOL-Algebra.Algebra"  (* reduce? *)
-"VectorSpace_by_HoldenLee/Missing_VectorSpace"
+Missing
 begin
 
 section \<open>missing preliminaries?\<close>
@@ -1222,5 +1222,6 @@ definition (in vectorspace) B where
 lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
+
 
 end
