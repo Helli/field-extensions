@@ -4,13 +4,6 @@ begin
 
 subsection \<open>Vector Spaces\<close>
 
-txt \<open>This generalises @{thm [source] Missing_VectorSpace.linear_map.inj_imp_Ker0}. rm.\<close>
-lemma (in mod_hom) inj_imp_Ker0:
-assumes "inj_on f (carrier M)"
-shows "carrier (M.md ker) = {\<zero>\<^bsub>M\<^esub>}"
-  unfolding ker_def
-  using assms inj_on_contraD by fastforce
-
 lemma (in module) lin_indpt_empty: "lin_indpt {}"
   by (simp add: finite_lin_indpt2)
 

@@ -625,18 +625,18 @@ end
 context linear_map
 begin
 
-interpretation Ker: vectorspace K "(V.vs kerT)"
+sublocale Ker: vectorspace K "(V.vs kerT)"
   using kerT_is_subspace
   using V.subspace_is_vs by blast
 
-interpretation im: vectorspace K "(W.vs imT)"
+sublocale im: vectorspace K "(W.vs imT)"
   using imT_is_subspace
   using W.subspace_is_vs by blast
 
-lemma inj_imp_Ker0:
-assumes "inj_on T (carrier V)"
-shows "carrier (V.vs kerT) = {\<zero>\<^bsub>V\<^esub>}"
-  unfolding mod_hom.ker_def
+lemma (in mod_hom) inj_imp_Ker0:
+assumes "inj_on f (carrier M)"
+shows "carrier (M.md ker) = {\<zero>\<^bsub>M\<^esub>}"
+  unfolding ker_def
   using assms inj_on_contraD by fastforce
 
 lemma Ke0_imp_inj:
