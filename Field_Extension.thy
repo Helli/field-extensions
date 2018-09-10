@@ -840,13 +840,11 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding vs_span_B.fin_dim_def apply -
      apply (metis BiV(2) vectorspace.basis_def vs_span_B.vectorspace_axioms)
     using BiV(2) vs_span_B.dim_basis by presburger
-  define coeffs where "coeffs \<equiv> \<lambda>v. THE a. a \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb a B"
-\<comment>\<open>alternative:\<^theory_text>\<open>define coeffs' where "coeffs' \<equiv> the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"\<close>\<close>
-  have "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K \<and> v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
-    unfolding coeffs_def
-    by (smt B basis_criterion basis_def card_ge_0_finite that theI)
-  then have okese: "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
-    using that by auto
+  define coeffs where "coeffs \<equiv> the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"
+  have coeffs_unique: "\<exists>!c. c \<in> B \<rightarrow>\<^sub>E carrier K \<and> lincomb c B = v" if "v \<in> carrier V" for v
+    using basis_criterion by (metis (full_types) B basis_def card_ge_0_finite that)
+  have okese: "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
+    using that theI'[OF coeffs_unique] by (simp_all add: coeffs_def the_inv_into_def)
   have c_sum: "coeffs (v1\<oplus>\<^bsub>V\<^esub>v2) \<in> B \<rightarrow>\<^sub>E carrier K"
     "v1\<oplus>\<^bsub>V\<^esub>v2 = lincomb (coeffs (v1\<oplus>\<^bsub>V\<^esub>v2)) B" if "v1 \<in> carrier V" "v2 \<in> carrier V" for v1 v2
     apply (simp add: okese(1) that(1) that(2))
@@ -873,19 +871,19 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed[simplified]
-        apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring2 insertCI mem_Collect_eq module_axioms okese(1))
+        apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring insertCI mem_Collect_eq module_axioms okese(1))
   proof -
     fix m1 m2
     assume mcV: "m1 \<in> carrier V" "m2 \<in> carrier V"
-    have meh: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
-      by (smt module_def PiE_mem Pi_I cring.cring_simprules(1) mcV module.module_axioms okese(1))
+    then have B_to_K_map: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
+      by (smt PiE_mem Pi_I R.add.m_closed okese(1))
     let ?restricted = "restrict (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) B"
     have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?restricted B"
-      using mcV B(1) basis_def c_sum' meh by auto
+      using mcV B(1) basis_def c_sum' B_to_K_map by auto
     moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
       "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
        apply (simp add: mcV c_sum(1))
-      by (simp add: meh)
+      by (simp add: B_to_K_map)
     ultimately
       have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = ?restricted"
       using basis_criterion
@@ -915,14 +913,13 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using mV okese(1) rK by fastforce
     let ?restricted = "\<lambda>bv\<in>B. r \<otimes>\<^bsub>K\<^esub> coeffs m bv"
     have "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) B = lincomb ?restricted B"
-      by (smt B Module.module.smult_closed basis_criterion card_ge_0_finite finite_in_span
-          lincomb_cong lincomb_distrib mV module.module_axioms okese rK restrict_PiE restrict_apply'
-          sane vectorspace.basis_def vectorspace_axioms)
+      by (metis B(1) PiE_restrict basis_def lincomb_distrib lincomb_restrict_simp mV okese rK
+          restrict_PiE sane smult_closed)
     moreover have "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K" "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
        apply (simp add: mV okese(1) rK)
       by (simp add: sane)
     ultimately have "coeffs (r \<odot>\<^bsub>V\<^esub> m) = ?restricted"
-      by (metis B(1) B(2) basis_criterion basis_def card_ge_0_finite mV okese(2) rK smult_closed)
+      by (metis coeffs_unique mV okese(2) rK smult_closed)
     then have scale: "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b" if "b \<in> B" for b
       by (simp add: that)
     then show "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b"
