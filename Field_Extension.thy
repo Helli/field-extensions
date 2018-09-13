@@ -1186,15 +1186,15 @@ context UP_of_field_extension begin
 definition irr where
   "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
-lemma a_kernel_nontrivial: "algebraic \<Longrightarrow> a_kernel P L Eval \<supset> {\<zero>}"
-  unfolding algebraic_def a_kernel_def' by auto
-
 lemmas Eval_smult = Eval_smult[simplified]
 lemmas coeff_smult = coeff_smult[simplified](* rm all *)
 
 context
   assumes algebraic
 begin
+
+lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
+  unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
 lemma is_arg_min_irr:
   "is_arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
