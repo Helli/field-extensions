@@ -1171,7 +1171,7 @@ lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Long
   by (simp add: field_extension_axioms)
 
 definition (in UP_of_field_extension) algebraic where
-  "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P. p \<noteq> \<zero> \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+  "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 definition (in field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic \<alpha> L K)"
@@ -1188,6 +1188,42 @@ definition irr where
 
 lemma a_kernel_nontrivial: "algebraic \<Longrightarrow> a_kernel P L Eval \<supset> {\<zero>}"
   unfolding algebraic_def a_kernel_def' by auto
+
+lemmas Eval_smult = Eval_smult[simplified]
+lemmas coeff_smult = coeff_smult[simplified](* rm all *)
+
+context
+  assumes algebraic
+begin
+
+lemma is_arg_min_irr:
+  "is_arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
+proof -
+  from \<open>algebraic\<close> obtain p where p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}" "Eval p = \<zero>\<^bsub>L\<^esub>"
+    unfolding algebraic_def using lcoeff_nonzero2 coeff_closed by auto
+  then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K-{\<zero>\<^bsub>L\<^esub>}"
+    using S.subfield_m_inv(1) subfield_axioms by auto
+  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
+  from inv_ok have "Eval ?p = inv\<^bsub>L\<^esub>(lcoeff p) \<otimes>\<^bsub>L\<^esub> (Eval p)"
+    using Eval_smult p(1) by blast
+  also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
+    using inv_ok p(3) by auto
+  finally have "Eval ?p = \<zero>\<^bsub>L\<^esub>" .
+  moreover have "?p \<in> carrier P"
+    using inv_ok p(1) by auto
+  moreover have "monic ?p" unfolding monic_def
+    using S.subfield_m_inv(1) S.subfield_m_inv(3) p(1) p(2) subfield_axioms by auto
+  ultimately show ?thesis
+    unfolding irr_def by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
+qed
+
+corollary irr_sane:
+  shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
+  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow>
+    deg (L\<lparr>carrier := K\<rparr>) irr \<le> deg (L\<lparr>carrier := K\<rparr>) y" (* rm? *)
+  using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
+
+end
 
 lemma asdf: "algebraic \<Longrightarrow> True" oops
 
