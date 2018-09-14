@@ -1183,7 +1183,7 @@ lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero
 
 context UP_of_field_extension begin
 
-definition irr where
+definition irr where (* mv in algebraic context? *)
   "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas Eval_smult = Eval_smult[simplified]
@@ -1192,9 +1192,6 @@ lemmas coeff_smult = coeff_smult[simplified](* rm all *)
 context
   assumes algebraic
 begin
-
-lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
-  unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
 lemma is_arg_min_irr:
   "is_arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
@@ -1223,9 +1220,41 @@ corollary irr_sane:
     deg (L\<lparr>carrier := K\<rparr>) irr \<le> deg (L\<lparr>carrier := K\<rparr>) y" (* rm? *)
   using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
 
+corollary irr_nonzero: "irr \<noteq> \<zero>"
+  by (simp add: monic_irr monic_nonzero)
+
+lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
+  unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
+
+lemma a: "PIdl irr \<subseteq> a_kernel P L Eval"
+  by (metis Eval_irr P.cgenideal_minimal UP_zero_closed abelian_subgroup.a_rcos_const
+      additive_subgroup.zero_closed irr_in_P ring.abelian_subgroup_a_kernel
+      ring.additive_subgroup_a_kernel ring.hom_zero ring.homeq_imp_rcos ring.kernel_is_ideal)
+
+lemma b: "PIdl irr \<supseteq> a_kernel P L Eval"
+proof -
+  have "irr \<in> PIdl irr"
+    using P.cgenideal_self irr_in_P by blast
+  with a have "irr \<in> a_kernel P L Eval" by blast
+  with irr_nonzero a_kernel_nontrivial show ?thesis oops
+
+notepad
+begin
+  obtain g where g: "g \<in> carrier P \<and> PIdl g = a_kernel P L Eval"
+    using exists_gen ring.kernel_is_ideal by metis
+  then obtain g' where "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> PIdl g = a_kernel P L Eval) g'"
+    by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
+  then obtain g'' where
+    "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
+    \<proof> find_theorems is_arg_min arg_min
+  then have "g'' = irr" oops
+  with a_kernel_nontrivial have "g \<noteq> \<zero>"
+    using P.cgenideal_eq_genideal P.genideal_zero by aut
+  have "a \<in> K - {\<zero>\<^bsub>L\<^esub>} \<Longrightarrow> PIdl (a \<odot> g) = PIdl g" for a
+    sorry
 end
 
-lemma asdf: "algebraic \<Longrightarrow> True" oops
+end
 
 end
 
