@@ -1189,6 +1189,9 @@ definition irr where (* mv in algebraic context? *)
 lemmas Eval_smult = Eval_smult[simplified]
 lemmas coeff_smult = coeff_smult[simplified](* rm all *)
 
+lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
+  by (simp add: associated_iff_same_ideal)
+
 context
   assumes algebraic
 begin
@@ -1236,7 +1239,16 @@ proof -
   have "irr \<in> PIdl irr"
     using P.cgenideal_self irr_in_P by blast
   with a have "irr \<in> a_kernel P L Eval" by blast
-  with irr_nonzero a_kernel_nontrivial show ?thesis oops
+  with irr_nonzero a_kernel_nontrivial show ?thesis unfolding a_kernel_def'
+
+lemma move_this_up:
+  "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
+  oops
+
+lemma "\<exists>!g. is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g"
+  apply auto (* <-- part 2 should be the actual lemma *)
+  sledgehamme
+   apply (smt is_arg_min_arg_min_nat local.exists_gen ring.kernel_is_ideal)
 
 notepad
 begin
