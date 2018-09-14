@@ -1184,10 +1184,10 @@ lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero
 context UP_of_field_extension begin
 
 definition irr where (* mv in algebraic context? *)
-  "irr = (ARG_MIN (deg (L\<lparr>carrier:=K\<rparr>)) p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+  "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas Eval_smult = Eval_smult[simplified]
-lemmas coeff_smult = coeff_smult[simplified](* rm all *)
+lemmas coeff_smult = coeff_smult[simplified] (* rm all *)
 
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
