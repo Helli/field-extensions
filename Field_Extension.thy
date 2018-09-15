@@ -1209,8 +1209,7 @@ proof
   moreover have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> UnivPoly.monom P (lcoeff p) 0 = \<one>"
     using inv_ok by (metis Eval_constant P_def S.subfield_m_inv(3) UP_cring_def UP_one_closed UP_ring.intro UP_ring.monom_mult_smult carrier_K coeff_closed cring_def deg_one deg_zero_impl_monom is_UP_cring local.coeff_smult monom_closed monom_mult_is_smult p(1) p(2) pol.coeff_smult ring.hom_one subfield_axioms)
   then have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
-    by (metis ring.subfield_m_inv(1) P.Units_one_closed P.unit_factor R.Units_closed
-        S.ring_axioms monom_closed p(2) subfield_Units subfield_axioms)
+    by (metis P.Units_one_closed P.unit_factor carrier_K coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
   {
