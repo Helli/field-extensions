@@ -1187,10 +1187,45 @@ definition irr where (* mv in algebraic context? *)
   "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas Eval_smult = Eval_smult[simplified]
-lemmas coeff_smult = coeff_smult[simplified] (* rm all *)
+lemmas coeff_smult = coeff_smult[simplified]
+lemmas monom_mult_is_smult = monom_mult_is_smult[simplified]
+lemmas monom_mult_smult = monom_mult_smult[simplified] (* rm all *)
 
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
+
+lemma Units_poly: "Units P = {UnivPoly.monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+  apply auto
+proof goal_cases
+  case (1 x)
+  then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
+    using P.Units_l_inv by blast
+  then have "deg (L\<lparr>carrier:=K\<rparr>) inv_x + deg (L\<lparr>carrier:=K\<rparr>) x = deg (L\<lparr>carrier:=K\<rparr>) \<one>"
+    using deg_mult by (smt "1" P.Units_closed local.integral_iff local.zero_not_one)
+  then have "deg (L\<lparr>carrier:=K\<rparr>) x = 0"
+    unfolding deg_one by blast
+  then show ?case
+  proof -
+    have "x \<in> carrier P"
+      using "1" P.Units_closed by blast (* > 1.0 s, timed out *)
+    then show ?thesis
+      by (metis (no_types) Diff_iff Field_Extension.ring.subfield_m_inv(1) P.Units_closed P.l_null R.nat_pow_0 R.zero_closed R.zero_not_one S.nat_pow_0 S.nat_pow_consistent S.ring_axioms S.subfield_m_inv(3) UP_m_comm \<open>deg (L\<lparr>carrier := K\<rparr>) x = 0\<close> carrier_K coeff_closed coeff_zero deg_zero_impl_monom empty_iff insert_iff inv_x(1) inv_x(2) local.coeff_smult local.zero_not_one monom_closed monom_mult_is_smult monom_zero subfield_axioms)
+  qed
+next
+  case (2 u)
+  then have "UnivPoly.monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> UnivPoly.monom P u 0 = UnivPoly.monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
+    using Field_Extension.ring.subfield_m_inv(1) S.ring_axioms local.monom_mult_smult
+      pol.monom_mult_is_smult subfield_axioms by fastforce
+  also have "\<dots> = \<one>"
+    using "2" S.subfield_m_inv(3) monom_one subfield_axioms by auto
+  finally show ?case
+    by (metis (no_types, lifting) "2" Diff_iff Field_Extension.ring.subfield_m_inv(1)
+        P.Units_one_closed P.prod_unit_l P.unit_factor R.Units_closed S.ring_axioms monom_closed
+        singletonD subfield_Units subfield_axioms)
+qed
+
+corollary Units_poly': "Units P = (\<lambda>u. UnivPoly.monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
+  using Units_poly by auto
 
 lemma ex1_monic_associated:
   assumes "p \<in> carrier P" "p \<noteq> \<zero>" shows "\<exists>!p' \<in> carrier P. p'\<sim> p \<and> monic p'"
@@ -1215,6 +1250,8 @@ proof
   {
   fix p'
   assume p': "p' \<in> carrier P" "p' \<sim> p" "monic p'"
+  then obtain inv_c where "inv_c \<otimes> p' = p" "inv_c \<in> Units P" sledgehamme
+    using P.associated_sym local.ring_associated_iff p(1) by blas
   then have "p' = ?p" sorry
   }
   then show "\<And>p'. p' \<in> carrier P \<and> p' \<sim> p \<and> monic p' \<Longrightarrow> p' = ?p"
