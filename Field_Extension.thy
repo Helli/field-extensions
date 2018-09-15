@@ -5,6 +5,18 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+lemma (in comm_monoid) finprod_singleton':
+  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
+  shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
+  using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
+    fin_A x_in_G finprod_one [of "A-{i}"]
+    finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
+  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
+
+thm comm_monoid.finprod_singleton[of _ i for i] comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
+
+lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
+
 lemma (in subgroup) subgroup_is_comm_group [intro]:
   assumes "comm_group G"
   shows "comm_group (G\<lparr>carrier := H\<rparr>)"
@@ -1231,44 +1243,51 @@ qed
 corollary Units_poly': "Units P = (\<lambda>u. UnivPoly.monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
   using Units_poly by auto
 
-lemma "p \<in> carrier P \<Longrightarrow> q \<in> carrier P \<Longrightarrow> lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
-  apply (cases "p = \<zero>") using coeff_closed apply auto[1]
-  apply (cases "q = \<zero>") using coeff_closed apply auto[1] apply auto
-proof goal_cases
-  case 1
+lemma lcoeff_mult:
+  assumes "p \<in> carrier P" "q \<in> carrier P"
+  shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
+  assume "p \<noteq> \<zero>" "q \<noteq> \<zero>"
   let ?coeff = "\<lambda>i. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i)"
   have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {dg p <.. dg p + dg q}" for i
   proof -
     from that have "i > dg p"
       by force
     then have "UnivPoly.coeff P p i = \<zero>\<^bsub>L\<^esub>"
-      by (simp add: "1"(1) deg_aboveD)
+      by (simp add: assms(1) deg_aboveD)
     then show ?thesis
-      using "1"(2) coeff_closed by auto
+      using assms(2) coeff_closed by auto
   qed
   moreover have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {..< dg p}" for i
   proof -
     from that have "dg p + dg q - i > dg q"
       by fastforce
     then have "UnivPoly.coeff P q (dg p + dg q - i) = \<zero>\<^bsub>L\<^esub>"
-      by (simp add: "1"(2) deg_aboveD)
+      by (simp add: assms(2) deg_aboveD)
     then show ?thesis
-      using "1"(1) coeff_closed by auto
+      using assms(1) coeff_closed by auto
   qed
   moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = dg p" for i
     by (simp add: that)
   ultimately have "(\<lambda>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))
-  = (\<lambda>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
+    = (\<lambda>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
     by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
-  then have "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
+  then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
     = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))"
-    using R.finsum_restrict[of _ "{..dg p + dg q}"] sledgehammer apply auto sledgehammer
-    sorry
-    then show ?case using R.finsum_singleton sledgehammer
-qed
-
-  oops
-  find_theorems deg "_ \<otimes> _"
+    using R.finsum_restrict[of _ "{..dg p + dg q}"] assms coeff_closed by auto
+  have "dg p \<in> {..dg p + dg q}"
+    by fastforce
+  note b = R.finsum_singleton'[OF this, simplified]
+  show "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+  proof -
+    have f1: "\<zero>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> = \<zero>\<^bsub>L\<^esub>"
+      by simp
+    have "lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q \<in> K"
+      using \<open>p \<in> carrier P\<close> \<open>q \<in> carrier P\<close> coeff_closed by auto
+    then show ?thesis
+      using f1 b a \<open>p \<noteq> \<zero>\<close> \<open>q \<noteq> \<zero>\<close> assms deg_mult coeff_mult by presburger
+  qed
+qed (use coeff_closed in \<open>simp_all add: assms\<close>)
 
 lemma ex1_monic_associated:
   assumes "p \<in> carrier P" "p \<noteq> \<zero>" shows "\<exists>!p' \<in> carrier P. p'\<sim> p \<and> monic p'"
@@ -1295,7 +1314,7 @@ proof
   assume p': "p' \<in> carrier P" "p' \<sim> p" "monic p'"
   then obtain inv_c where "inv_c \<otimes> p' = p" "inv_c \<in> Units P"
     using P.associated_sym local.ring_associated_iff p(1) by blast
-  then have "p' = ?p" sledgehamme
+  then have "p' = ?p" sorry
   }
   find_theorems lcoeff "(\<odot>)"
   then show "\<And>p'. p' \<in> carrier P \<and> p' \<sim> p \<and> monic p' \<Longrightarrow> p' = ?p"
@@ -1404,14 +1423,4 @@ lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
 
-lemma (in comm_monoid) finprod_singleton':
-  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
-  shows "(\<Otimes>j\<in>A. if i = j then x else \<one>) = x"
-  using i_in_A finprod_insert [of "A - {i}" i "(\<lambda>j. if i = j then x else \<one>)"]
-    fin_A x_in_G finprod_one [of "A - {i}"]
-    finprod_cong [of "A - {i}" "A - {i}" "(\<lambda>j. if i = j then x else \<one>)" "(\<lambda>i. \<one>)"]
-  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-
-thm comm_monoid.finprod_singleton
-thm comm_monoid.finprod_singleton'[where ?i = i, where ?x = \<open>f i\<close> for f i]
 end
