@@ -1192,6 +1192,36 @@ lemmas coeff_smult = coeff_smult[simplified] (* rm all *)
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
 
+lemma ex1_monic_associated:
+  assumes "p \<in> carrier P" "p \<noteq> \<zero>" shows "\<exists>!p' \<in> carrier P. p'\<sim> p \<and> monic p'"
+proof
+  from assms have p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}"
+    using lcoeff_nonzero coeff_closed by auto
+  then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K"
+    using S.subfield_m_inv(1) subfield_axioms by auto
+  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
+  have "?p \<in> carrier P"
+    using inv_ok p(1) by auto
+  moreover have "monic ?p" unfolding monic_def
+    using S.subfield_m_inv(1) S.subfield_m_inv(3) p subfield_axioms by auto
+  moreover have "?p = UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
+    using inv_ok monom_mult_is_smult p(1) by auto
+  moreover have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> UnivPoly.monom P (lcoeff p) 0 = \<one>"
+    using inv_ok by (metis Eval_constant P_def S.subfield_m_inv(3) UP_cring_def UP_one_closed UP_ring.intro UP_ring.monom_mult_smult carrier_K coeff_closed cring_def deg_one deg_zero_impl_monom is_UP_cring local.coeff_smult monom_closed monom_mult_is_smult p(1) p(2) pol.coeff_smult ring.hom_one subfield_axioms)
+  then have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
+    by (metis ring.subfield_m_inv(1) P.Units_one_closed P.unit_factor R.Units_closed
+        S.ring_axioms monom_closed p(2) subfield_Units subfield_axioms)
+  ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
+    by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
+  {
+  fix p'
+  assume p': "p' \<in> carrier P" "p' \<sim> p" "monic p'"
+  then have "p' = ?p" sorry
+  }
+  then show "\<And>p'. p' \<in> carrier P \<and> p' \<sim> p \<and> monic p' \<Longrightarrow> p' = ?p"
+    by blast
+qed
+
 context
   assumes algebraic
 begin
@@ -1236,19 +1266,17 @@ lemma a: "PIdl irr \<subseteq> a_kernel P L Eval"
 
 lemma b: "PIdl irr \<supseteq> a_kernel P L Eval"
 proof -
-  have "irr \<in> PIdl irr"
-    using P.cgenideal_self irr_in_P by blast
-  with a have "irr \<in> a_kernel P L Eval" by blast
-  with irr_nonzero a_kernel_nontrivial show ?thesis unfolding a_kernel_def'
+  obtain g where g: "g \<in> carrier P" "PIdl g = a_kernel P L Eval"
+    using exists_gen ring.kernel_is_ideal by force
+  have "irr \<in> a_kernel P L Eval" (* rm *)
+    using P.cgenideal_self a irr_in_P by blast
+  have "g divides irr"
+    using P.to_contain_is_to_divide a g(1) g(2) irr_in_P by blast
+  oops
 
 lemma move_this_up:
   "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
   oops
-
-lemma "\<exists>!g. is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g"
-  apply auto (* <-- part 2 should be the actual lemma *)
-  sledgehamme
-   apply (smt is_arg_min_arg_min_nat local.exists_gen ring.kernel_is_ideal)
 
 notepad
 begin
@@ -1258,10 +1286,9 @@ begin
     by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
   then obtain g'' where
     "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
-    \<proof> find_theorems is_arg_min arg_min
-  then have "g'' = irr" oops
+    \<proof>
   with a_kernel_nontrivial have "g \<noteq> \<zero>"
-    using P.cgenideal_eq_genideal P.genideal_zero by aut
+    using P.cgenideal_eq_genideal P.genideal_zero sorry
   have "a \<in> K - {\<zero>\<^bsub>L\<^esub>} \<Longrightarrow> PIdl (a \<odot> g) = PIdl g" for a
     sorry
 end
