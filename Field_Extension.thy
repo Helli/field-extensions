@@ -1195,9 +1195,12 @@ definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   unfolding monic_def by auto
 
+lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (UnivPoly.monom P a n) = a"
+  by (cases "a = \<zero>") auto
+
 context UP_of_field_extension begin
 
-definition irr where (* mv in algebraic context? *)
+definition irr where (* mv into algebraic context? *)
   "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas Eval_smult = Eval_smult[simplified]
@@ -1205,7 +1208,10 @@ lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_is_smult = monom_mult_is_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
 lemmas coeff_monom_mult = coeff_monom_mult[simplified]
-lemmas coeff_mult = coeff_mult[simplified] (* rm all *)
+lemmas coeff_mult = coeff_mult[simplified]
+lemmas lcoeff_monom = lcoeff_monom[simplified]
+lemmas lcoeff_monom' = lcoeff_monom'[simplified]
+lemmas deg_monom = deg_monom[simplified] (* rm all *)
 
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
@@ -1290,7 +1296,7 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
 qed (use coeff_closed in \<open>simp_all add: assms\<close>)
 
 lemma ex1_monic_associated:
-  assumes "p \<in> carrier P" "p \<noteq> \<zero>" shows "\<exists>!p' \<in> carrier P. p'\<sim> p \<and> monic p'"
+  assumes "p \<in> carrier P - {\<zero>}" shows "\<exists>!q \<in> carrier P. q \<sim> p \<and> monic q"
 proof
   from assms have p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}"
     using lcoeff_nonzero coeff_closed by auto
@@ -1310,14 +1316,24 @@ proof
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
   {
-  fix p'
-  assume p': "p' \<in> carrier P" "p' \<sim> p" "monic p'"
-  then obtain inv_c where "inv_c \<otimes> p' = p" "inv_c \<in> Units P"
-    using P.associated_sym local.ring_associated_iff p(1) by blast
-  then have "p' = ?p" sorry
+  fix q
+  assume "q \<in> carrier P" "q \<sim> p" "monic q"
+  then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" and "inv_c' \<in> Units P"
+    using ring_associated_iff p(1) by blast
+  then obtain inv_c where inv_c'_def: "inv_c' = UnivPoly.monom P inv_c 0" and inv_c: "inv_c \<in> K"
+    using Units_poly by auto
+  have "\<one>\<^bsub>L\<^esub> = lcoeff inv_c' \<otimes>\<^bsub>L\<^esub> lcoeff p"
+    using lcoeff_mult \<open>monic q\<close>[unfolded monic_def]
+    by (simp add: P.Units_closed \<open>inv_c' \<in> Units P\<close> \<open>q = inv_c' \<otimes> p\<close> p(1))
+  then have "\<one>\<^bsub>L\<^esub> = inv_c \<otimes>\<^bsub>L\<^esub> lcoeff p"
+    using lcoeff_monom' inv_c unfolding inv_c'_def by force
+  then have "inv_c = inv\<^bsub>L\<^esub> lcoeff p"
+    by (metis DiffD1 S.inv_char inv_c mem_carrier p(2) sub_m_comm)
+  then have "q = ?p"
+    unfolding inv_c' inv_c'_def using monom_mult_is_smult
+    using inv_c p(1) by blast
   }
-  find_theorems lcoeff "(\<odot>)"
-  then show "\<And>p'. p' \<in> carrier P \<and> p' \<sim> p \<and> monic p' \<Longrightarrow> p' = ?p"
+  then show "\<And>q. q \<in> carrier P \<and> q \<sim> p \<and> monic q \<Longrightarrow> q = ?p"
     by blast
 qed
 
