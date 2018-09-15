@@ -1342,7 +1342,7 @@ context
 begin
 
 lemma is_arg_min_irr:
-  "is_arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
+  "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
 proof -
   from \<open>algebraic\<close> obtain p where p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}" "Eval p = \<zero>\<^bsub>L\<^esub>"
     unfolding algebraic_def using lcoeff_nonzero2 coeff_closed by auto
@@ -1365,7 +1365,7 @@ qed
 corollary irr_sane:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
   and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow>
-    deg (L\<lparr>carrier := K\<rparr>) irr \<le> deg (L\<lparr>carrier := K\<rparr>) y" (* rm? *)
+    dg irr \<le> dg y" (* rm? *)
   using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
 
 corollary irr_nonzero: "irr \<noteq> \<zero>"
@@ -1397,11 +1397,11 @@ notepad
 begin
   obtain g where g: "g \<in> carrier P \<and> PIdl g = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal by metis
-  then obtain g' where "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> PIdl g = a_kernel P L Eval) g'"
+  then obtain g' where "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> PIdl g = a_kernel P L Eval) g'"
     by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
   then obtain g'' where
-    "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
-    \<proof>
+    "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
+    sledgehammer
   with a_kernel_nontrivial have "g \<noteq> \<zero>"
     using P.cgenideal_eq_genideal P.genideal_zero sorry
   have "a \<in> K - {\<zero>\<^bsub>L\<^esub>} \<Longrightarrow> PIdl (a \<odot> g) = PIdl g" for a
