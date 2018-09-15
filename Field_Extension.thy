@@ -200,7 +200,9 @@ txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of 
 sublocale UP_domain "L\<lparr>carrier:=K\<rparr>" apply intro_locales
   using S.subfield_iff(2) domain_def field_def subfield_axioms by auto
 
-sublocale euclidean_domain P "deg (L\<lparr>carrier:=K\<rparr>)"
+abbreviation "dg \<equiv> deg (L\<lparr>carrier:=K\<rparr>)"
+
+sublocale euclidean_domain P "dg"
 proof unfold_locales
   have "field (L\<lparr>carrier:=K\<rparr>)"
     by (simp add: S.subfield_iff(2) subfield_axioms)
@@ -1189,7 +1191,9 @@ definition irr where (* mv in algebraic context? *)
 lemmas Eval_smult = Eval_smult[simplified]
 lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_is_smult = monom_mult_is_smult[simplified]
-lemmas monom_mult_smult = monom_mult_smult[simplified] (* rm all *)
+lemmas monom_mult_smult = monom_mult_smult[simplified]
+lemmas coeff_monom_mult = coeff_monom_mult[simplified]
+lemmas coeff_mult = coeff_mult[simplified] (* rm all *)
 
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
@@ -1227,6 +1231,45 @@ qed
 corollary Units_poly': "Units P = (\<lambda>u. UnivPoly.monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
   using Units_poly by auto
 
+lemma "p \<in> carrier P \<Longrightarrow> q \<in> carrier P \<Longrightarrow> lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+  apply (cases "p = \<zero>") using coeff_closed apply auto[1]
+  apply (cases "q = \<zero>") using coeff_closed apply auto[1] apply auto
+proof goal_cases
+  case 1
+  let ?coeff = "\<lambda>i. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i)"
+  have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {dg p <.. dg p + dg q}" for i
+  proof -
+    from that have "i > dg p"
+      by force
+    then have "UnivPoly.coeff P p i = \<zero>\<^bsub>L\<^esub>"
+      by (simp add: "1"(1) deg_aboveD)
+    then show ?thesis
+      using "1"(2) coeff_closed by auto
+  qed
+  moreover have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {..< dg p}" for i
+  proof -
+    from that have "dg p + dg q - i > dg q"
+      by fastforce
+    then have "UnivPoly.coeff P q (dg p + dg q - i) = \<zero>\<^bsub>L\<^esub>"
+      by (simp add: "1"(2) deg_aboveD)
+    then show ?thesis
+      using "1"(1) coeff_closed by auto
+  qed
+  moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = dg p" for i
+    by (simp add: that)
+  ultimately have "(\<lambda>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))
+  = (\<lambda>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
+    by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
+  then have "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
+    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))"
+    using R.finsum_restrict[of _ "{..dg p + dg q}"] sledgehammer apply auto sledgehammer
+    sorry
+    then show ?case using R.finsum_singleton sledgehammer
+qed
+
+  oops
+  find_theorems deg "_ \<otimes> _"
+
 lemma ex1_monic_associated:
   assumes "p \<in> carrier P" "p \<noteq> \<zero>" shows "\<exists>!p' \<in> carrier P. p'\<sim> p \<and> monic p'"
 proof
@@ -1250,10 +1293,11 @@ proof
   {
   fix p'
   assume p': "p' \<in> carrier P" "p' \<sim> p" "monic p'"
-  then obtain inv_c where "inv_c \<otimes> p' = p" "inv_c \<in> Units P" sledgehamme
-    using P.associated_sym local.ring_associated_iff p(1) by blas
-  then have "p' = ?p" sorry
+  then obtain inv_c where "inv_c \<otimes> p' = p" "inv_c \<in> Units P"
+    using P.associated_sym local.ring_associated_iff p(1) by blast
+  then have "p' = ?p" sledgehamme
   }
+  find_theorems lcoeff "(\<odot>)"
   then show "\<And>p'. p' \<in> carrier P \<and> p' \<sim> p \<and> monic p' \<Longrightarrow> p' = ?p"
     by blast
 qed
@@ -1360,5 +1404,14 @@ lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
 
+lemma (in comm_monoid) finprod_singleton':
+  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
+  shows "(\<Otimes>j\<in>A. if i = j then x else \<one>) = x"
+  using i_in_A finprod_insert [of "A - {i}" i "(\<lambda>j. if i = j then x else \<one>)"]
+    fin_A x_in_G finprod_one [of "A - {i}"]
+    finprod_cong [of "A - {i}" "A - {i}" "(\<lambda>j. if i = j then x else \<one>)" "(\<lambda>i. \<one>)"]
+  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
 
+thm comm_monoid.finprod_singleton
+thm comm_monoid.finprod_singleton'[where ?i = i, where ?x = \<open>f i\<close> for f i]
 end
