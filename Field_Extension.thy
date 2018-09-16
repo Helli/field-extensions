@@ -5,6 +5,10 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
+lemma (in cring) in_ideal_impl_divided: \<comment> \<open>part of @{thm to_contain_is_to_divide}\<close>
+  "a \<in> carrier R \<Longrightarrow> b \<in> PIdl a \<Longrightarrow> a divides b"
+  unfolding factor_def cgenideal_def using m_comm by blast
+
 lemma (in comm_monoid) finprod_singleton':
   assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
   shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
@@ -1398,7 +1402,11 @@ proof (cases "q = \<zero>")
 qed (use assms(4) in auto)
 
 lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
-proof -
+proof
+  from Eval_irr have "irr \<in> a_kernel P L Eval"
+    unfolding a_kernel_def' by (simp add: irr_in_P)
+  then show "PIdl irr \<subseteq> a_kernel P L Eval"
+    using P.cgenideal_minimal ring.kernel_is_ideal by blast
   obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal ex1_monic_associated by metis
   then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
@@ -1408,11 +1416,11 @@ proof -
     using P.cgenideal_self ring.kernel_zero by blast
   with g(1,2) have dg_le: "dg irr \<le> dg g"
     using is_minimal_irr by blast
-  have "g divides irr" sledgehammer
-    using P.to_contain_is_to_divide a g(1) g(3) irr_in_P by blast
+  from \<open>irr \<in> a_kernel P L Eval\<close> have "g divides irr"
+    by (simp add: P.in_ideal_impl_divided g(1) g(3))
   with dg_le g(1) irr_in_P have "g \<sim> irr"
     by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
-  with g(1,3) irr_in_P show ?thesis
+  with g(1,3) irr_in_P show "PIdl irr \<supseteq> a_kernel P L Eval"
     using P.associated_iff_same_ideal by auto
 qed
 
