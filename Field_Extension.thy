@@ -5,7 +5,7 @@ begin
 
 section \<open>missing preliminaries?\<close>
 
-lemma (in cring) in_ideal_impl_divided: \<comment> \<open>part of @{thm to_contain_is_to_divide}\<close>
+lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>part of @{thm to_contain_is_to_divide}\<close>
   "a \<in> carrier R \<Longrightarrow> b \<in> PIdl a \<Longrightarrow> a divides b"
   unfolding factor_def cgenideal_def using m_comm by blast
 
@@ -1217,9 +1217,6 @@ lemmas lcoeff_monom' = lcoeff_monom'[simplified]
 lemmas deg_monom = deg_monom[simplified]
 lemmas deg_const = deg_const[simplified] (* rm all *)
 
-lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
-  by (simp add: associated_iff_same_ideal)
-
 lemma Units_poly: "Units P = {UnivPoly.monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
 proof goal_cases
@@ -1414,25 +1411,26 @@ proof -
   from Eval_irr have "irr \<in> a_kernel P L Eval"
     unfolding a_kernel_def' by (simp add: irr_in_P)
   then have "g divides irr"
-    by (simp add: P.in_ideal_impl_divided g(1) g(3))
+    by (simp add: P.in_PIdl_impl_divided g(1,3))
   with dg_le g(1) irr_in_P have "g \<sim> irr"
     by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
   with g(1,3) irr_in_P show "PIdl irr = a_kernel P L Eval"
     using P.associated_iff_same_ideal by auto
 qed
 
-corollary gen_of_a_kernel_Eval_unique[simp]:
+corollary gen_of_a_kernel_Eval_unique:
   assumes "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval"
   shows "p = irr" using assms
   by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval UP_zero_closed ex1_monic_associated
       insert_Diff insert_iff irr_in_P monic_irr)
 
 corollary irr_unique: "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g \<Longrightarrow> g = irr"
-  by (smt P.a_coset_add_zero P.in_ideal_impl_divided PIdl_irr_a_kernel_Eval UP_zero_closed
+  by (smt P.a_coset_add_zero P.in_PIdl_impl_divided PIdl_irr_a_kernel_Eval UP_zero_closed
       additive_subgroup.a_subset arg_min_nat_lemma dg_le_divides_associated ex1_monic_associated
       insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
       ring.hom_zero ring.homeq_imp_rcos)
 
+term "P Quot (PIdl irr)"
 end
 
 end
