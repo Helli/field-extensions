@@ -1421,14 +1421,17 @@ proof -
     using P.associated_iff_same_ideal by auto
 qed
 
-lemma move_this_up:
-  "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
-  unfolding is_arg_min_linorder apply auto
-  using irr_in_P apply blast
-  prefer 4
-  using P.cgenideal_self is_minimal_irr ring.kernel_zero apply blast
-  using monic_irr apply blast
-  using PIdl_irr_a_kernel_Eval by auto
+corollary gen_of_a_kernel_Eval_unique[simp]:
+  assumes "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval"
+  shows "p = irr" using assms
+  by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval UP_zero_closed ex1_monic_associated
+      insert_Diff insert_iff irr_in_P monic_irr)
+
+corollary irr_unique: "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g \<Longrightarrow> g = irr"
+  by (smt P.a_coset_add_zero P.in_ideal_impl_divided PIdl_irr_a_kernel_Eval UP_zero_closed
+      additive_subgroup.a_subset arg_min_nat_lemma dg_le_divides_associated ex1_monic_associated
+      insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
+      ring.hom_zero ring.homeq_imp_rcos)
 
 notepad
 begin
