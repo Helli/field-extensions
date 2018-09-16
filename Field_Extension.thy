@@ -1211,7 +1211,8 @@ lemmas coeff_monom_mult = coeff_monom_mult[simplified]
 lemmas coeff_mult = coeff_mult[simplified]
 lemmas lcoeff_monom = lcoeff_monom[simplified]
 lemmas lcoeff_monom' = lcoeff_monom'[simplified]
-lemmas deg_monom = deg_monom[simplified] (* rm all *)
+lemmas deg_monom = deg_monom[simplified]
+lemmas deg_const = deg_const[simplified] (* rm all *)
 
 lemma (in cring) test: "a \<in> carrier R \<Longrightarrow> b \<in> carrier R \<Longrightarrow> PIdl a = PIdl b \<Longrightarrow> a \<sim> b"
   by (simp add: associated_iff_same_ideal)
@@ -1364,8 +1365,7 @@ qed
 
 corollary irr_sane:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
-  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow>
-    dg irr \<le> dg y" (* rm? *)
+  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> dg irr \<le> dg y" (* rm? *)
   using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
 
 corollary irr_nonzero: "irr \<noteq> \<zero>"
@@ -1374,23 +1374,50 @@ corollary irr_nonzero: "irr \<noteq> \<zero>"
 lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
-lemma a: "PIdl irr \<subseteq> a_kernel P L Eval"
-  by (metis Eval_irr P.cgenideal_minimal UP_zero_closed abelian_subgroup.a_rcos_const
-      additive_subgroup.zero_closed irr_in_P ring.abelian_subgroup_a_kernel
-      ring.additive_subgroup_a_kernel ring.hom_zero ring.homeq_imp_rcos ring.kernel_is_ideal)
+lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> dg p = 0 \<Longrightarrow> p \<in> Units P"
+  using deg_zero_impl_monom[of p] by (metis (mono_tags, lifting) Diff_iff Eval_constant
+      R.carrier_one_not_zero R.zero_closed R.zero_not_one Units_poly carrier_K coeff_closed
+      coeff_zero lcoeff_Unit_nonzero lcoeff_nonzero mem_Collect_eq singleton_iff subfield_Units)
 
-lemma b: "PIdl irr \<supseteq> a_kernel P L Eval"
+lemma dg_le_divides_associated:
+  assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
+  and "dg p \<le> dg q" "q divides p"
+  shows "p \<sim> q"
+proof (cases "q = \<zero>")
+  case False
+  note assms(4)[unfolded factor_def]
+  then obtain c where c: "c \<in> carrier P" "p = q \<otimes> c" by auto
+  with assms(1) have "c \<noteq> \<zero>"
+    using P.r_null assms(2) by blast
+  with assms(1-3) c have "dg p = dg q"
+    by (simp add: False)
+  with \<open>c \<noteq> \<zero>\<close> c have "dg c = 0"
+    by (simp add: False assms(2))
+  then show ?thesis
+    by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<close> assms(2) c nonzero_constant_is_Unit)
+qed (use assms(4) in auto)
+
+lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
 proof -
-  obtain g where g: "g \<in> carrier P" "PIdl g = a_kernel P L Eval"
-    using exists_gen ring.kernel_is_ideal by force
-  have "irr \<in> a_kernel P L Eval" (* rm *)
-    using P.cgenideal_self a irr_in_P by blast
-  have "g divides irr"
-    using P.to_contain_is_to_divide a g(1) g(2) irr_in_P by blast
-  oops
+  obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
+    using exists_gen ring.kernel_is_ideal ex1_monic_associated by metis
+  then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
+    using ex1_monic_associated by (smt Diff_iff P.associated_iff_same_ideal P.cgenideal_eq_genideal
+        P.genideal_zero a_kernel_nontrivial empty_iff insert_iff psubset_imp_ex_mem)
+  then have "Eval g = \<zero>\<^bsub>L\<^esub>"
+    using P.cgenideal_self ring.kernel_zero by blast
+  with g(1,2) have dg_le: "dg irr \<le> dg g"
+    using is_minimal_irr by blast
+  have "g divides irr" sledgehammer
+    using P.to_contain_is_to_divide a g(1) g(3) irr_in_P by blast
+  with dg_le g(1) irr_in_P have "g \<sim> irr"
+    by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
+  with g(1,3) irr_in_P show ?thesis
+    using P.associated_iff_same_ideal by auto
+qed
 
 lemma move_this_up:
-  "is_arg_min (deg (L\<lparr>carrier := K\<rparr>)) (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
+  "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
   oops
 
 notepad
@@ -1401,7 +1428,7 @@ begin
     by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
   then obtain g'' where
     "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
-    sledgehammer
+    sorry
   with a_kernel_nontrivial have "g \<noteq> \<zero>"
     using P.cgenideal_eq_genideal P.genideal_zero sorry
   have "a \<in> K - {\<zero>\<^bsub>L\<^esub>} \<Longrightarrow> PIdl (a \<odot> g) = PIdl g" for a
