@@ -1402,8 +1402,6 @@ qed (use assms(4) in auto)
 
 lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
 proof -
-  from Eval_irr have "irr \<in> a_kernel P L Eval"
-    unfolding a_kernel_def' by (simp add: irr_in_P)
   obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal ex1_monic_associated by metis
   then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
@@ -1413,7 +1411,9 @@ proof -
     using P.cgenideal_self ring.kernel_zero by blast
   with g(1,2) have dg_le: "dg irr \<le> dg g"
     using is_minimal_irr by blast
-  from \<open>irr \<in> a_kernel P L Eval\<close> have "g divides irr"
+  from Eval_irr have "irr \<in> a_kernel P L Eval"
+    unfolding a_kernel_def' by (simp add: irr_in_P)
+  then have "g divides irr"
     by (simp add: P.in_ideal_impl_divided g(1) g(3))
   with dg_le g(1) irr_in_P have "g \<sim> irr"
     by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
