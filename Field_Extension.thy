@@ -16,7 +16,6 @@ lemma (in comm_monoid) finprod_singleton':
     fin_A x_in_G finprod_one [of "A-{i}"]
     finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
   unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-
 thm comm_monoid.finprod_singleton[of _ i for i] comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
 
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
@@ -1402,11 +1401,9 @@ proof (cases "q = \<zero>")
 qed (use assms(4) in auto)
 
 lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
-proof
+proof -
   from Eval_irr have "irr \<in> a_kernel P L Eval"
     unfolding a_kernel_def' by (simp add: irr_in_P)
-  then show "PIdl irr \<subseteq> a_kernel P L Eval"
-    using P.cgenideal_minimal ring.kernel_is_ideal by blast
   obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal ex1_monic_associated by metis
   then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
@@ -1420,7 +1417,7 @@ proof
     by (simp add: P.in_ideal_impl_divided g(1) g(3))
   with dg_le g(1) irr_in_P have "g \<sim> irr"
     by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
-  with g(1,3) irr_in_P show "PIdl irr \<supseteq> a_kernel P L Eval"
+  with g(1,3) irr_in_P show "PIdl irr = a_kernel P L Eval"
     using P.associated_iff_same_ideal by auto
 qed
 
