@@ -1433,21 +1433,6 @@ corollary irr_unique: "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic
       insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
       ring.hom_zero ring.homeq_imp_rcos)
 
-notepad
-begin
-  obtain g where g: "g \<in> carrier P \<and> PIdl g = a_kernel P L Eval"
-    using exists_gen ring.kernel_is_ideal by metis
-  then obtain g' where "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> PIdl g = a_kernel P L Eval) g'"
-    by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
-  then obtain g'' where
-    "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) g''"
-    sorry
-  with a_kernel_nontrivial have "g \<noteq> \<zero>"
-    using P.cgenideal_eq_genideal P.genideal_zero sorry
-  have "a \<in> K - {\<zero>\<^bsub>L\<^esub>} \<Longrightarrow> PIdl (a \<odot> g) = PIdl g" for a
-    sorry
-end
-
 end
 
 end
