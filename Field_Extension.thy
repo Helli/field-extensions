@@ -1423,7 +1423,12 @@ qed
 
 lemma move_this_up:
   "is_arg_min dg (\<lambda>g. g \<in> carrier P \<and> monic g \<and> PIdl g = a_kernel P L Eval) irr"
-  oops
+  unfolding is_arg_min_linorder apply auto
+  using irr_in_P apply blast
+  prefer 4
+  using P.cgenideal_self is_minimal_irr ring.kernel_zero apply blast
+  using monic_irr apply blast
+  using PIdl_irr_a_kernel_Eval by auto
 
 notepad
 begin
