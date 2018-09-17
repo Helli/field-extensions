@@ -1445,10 +1445,10 @@ lemma "domain (P Quot PIdl irr)"
 proof -
   from ring_iso_sym[OF _ theorem_16_9b_left] obtain inv_h where "inv_h \<in> ring_iso (L\<lparr>carrier := Eval `
  carrier P\<rparr>) (P Quot PIdl irr)"
-    unfolding is_ring_iso_def sledgehammer sorry
+    unfolding is_ring_iso_def sorry
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
   then show ?thesis sorry
-  qed
+  oops
 
 lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
   unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
@@ -1461,6 +1461,13 @@ end
 
 end
 
+lemma (in field_extension) example_16_8_3:
+  "\<alpha> \<in> K \<Longrightarrow> UP_of_field_extension.algebraic \<alpha> L K"
+  sorry
+
+corollary (in field) "field_extension.algebraic R (carrier R)"
+  oops
+(* move these up as far as possible *)
 
 section \<open>Observations (*rm*)\<close>
 
