@@ -1016,8 +1016,9 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding bij_betw_def by blast
 qed
 
-proposition tower_rule: \<comment> \<open>Maybe this works better when following the comment on line 500 here: @{url
-  "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}\<close>
+proposition tower_rule: \<comment> \<open>Maybe this is easier when following the comment on line 500 here: @{url
+  "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}.
+  Or wikipedia.\<close>
   assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows degree_multiplicative:
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
