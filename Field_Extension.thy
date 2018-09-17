@@ -215,9 +215,9 @@ txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of 
 sublocale UP_domain "L\<lparr>carrier:=K\<rparr>" apply intro_locales
   using S.subfield_iff(2) domain_def field_def subfield_axioms by auto
 
-abbreviation "dg \<equiv> deg (L\<lparr>carrier:=K\<rparr>)"
+abbreviation degree where "degree \<equiv> deg (L\<lparr>carrier:=K\<rparr>)"
 
-sublocale euclidean_domain P "dg"
+sublocale euclidean_domain P "degree"
 proof unfold_locales
   have "field (L\<lparr>carrier:=K\<rparr>)"
     by (simp add: S.subfield_iff(2) subfield_axioms)
@@ -1256,34 +1256,34 @@ lemma lcoeff_mult:
   shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
 proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
   assume "p \<noteq> \<zero>" "q \<noteq> \<zero>"
-  let ?coeff = "\<lambda>i. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i)"
-  have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {dg p <.. dg p + dg q}" for i
+  let ?coeff = "\<lambda>i. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i)"
+  have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {degree p <.. degree p + degree q}" for i
   proof -
-    from that have "i > dg p"
+    from that have "i > degree p"
       by force
     then have "UnivPoly.coeff P p i = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(1) deg_aboveD)
     then show ?thesis
       using assms(2) coeff_closed by auto
   qed
-  moreover have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {..< dg p}" for i
+  moreover have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {..< degree p}" for i
   proof -
-    from that have "dg p + dg q - i > dg q"
+    from that have "degree p + degree q - i > degree q"
       by fastforce
-    then have "UnivPoly.coeff P q (dg p + dg q - i) = \<zero>\<^bsub>L\<^esub>"
+    then have "UnivPoly.coeff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(2) deg_aboveD)
     then show ?thesis
       using assms(1) coeff_closed by auto
   qed
-  moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = dg p" for i
+  moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = degree p" for i
     by (simp add: that)
-  ultimately have "(\<lambda>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))
-    = (\<lambda>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
+  ultimately have "(\<lambda>i\<in>{..degree p + degree q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i))
+    = (\<lambda>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
     by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
-  then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. if dg p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
-    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..dg p + dg q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (dg p + dg q - i))"
-    using R.finsum_restrict[of _ "{..dg p + dg q}"] assms coeff_closed by auto
-  have "dg p \<in> {..dg p + dg q}"
+  then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
+    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i))"
+    using R.finsum_restrict[of _ "{..degree p + degree q}"] assms coeff_closed by auto
+  have "degree p \<in> {..degree p + degree q}"
     by fastforce
   note b = R.finsum_singleton'[OF this, simplified]
   show "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
@@ -1344,7 +1344,7 @@ context
 begin
 
 lemma is_arg_min_irr:
-  "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
+  "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
 proof -
   from \<open>algebraic\<close> obtain p where p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}" "Eval p = \<zero>\<^bsub>L\<^esub>"
     unfolding algebraic_def using lcoeff_nonzero2 coeff_closed by auto
@@ -1366,7 +1366,7 @@ qed
 
 corollary irr_sane:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
-  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> dg irr \<le> dg y" (* rm? *)
+  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y" (* rm? *)
   using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
 
 corollary irr_nonzero: "irr \<noteq> \<zero>"
@@ -1375,14 +1375,14 @@ corollary irr_nonzero: "irr \<noteq> \<zero>"
 lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
-lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> dg p = 0 \<Longrightarrow> p \<in> Units P"
+lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
   using deg_zero_impl_monom[of p] by (metis (mono_tags, lifting) Diff_iff Eval_constant
       R.carrier_one_not_zero R.zero_closed R.zero_not_one Units_poly carrier_K coeff_closed
       coeff_zero lcoeff_Unit_nonzero lcoeff_nonzero mem_Collect_eq singleton_iff subfield_Units)
 
-lemma dg_le_divides_associated:
+lemma degree_le_divides_associated:
   assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
-  and "dg p \<le> dg q" "q divides p"
+  and "degree p \<le> degree q" "q divides p"
   shows "p \<sim> q"
 proof (cases "q = \<zero>")
   case False
@@ -1390,9 +1390,9 @@ proof (cases "q = \<zero>")
   then obtain c where c: "c \<in> carrier P" "p = q \<otimes> c" by auto
   with assms(1) have "c \<noteq> \<zero>"
     using P.r_null assms(2) by blast
-  with assms(1-3) c have "dg p = dg q"
+  with assms(1-3) c have "degree p = degree q"
     by (simp add: False)
-  with \<open>c \<noteq> \<zero>\<close> c have "dg c = 0"
+  with \<open>c \<noteq> \<zero>\<close> c have "degree c = 0"
     by (simp add: False assms(2))
   then show ?thesis
     by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<close> assms(2) c nonzero_constant_is_Unit)
@@ -1407,14 +1407,14 @@ proof -
         P.genideal_zero a_kernel_nontrivial empty_iff insert_iff psubset_imp_ex_mem)
   then have "Eval g = \<zero>\<^bsub>L\<^esub>"
     using P.cgenideal_self ring.kernel_zero by blast
-  with g(1,2) have dg_le: "dg irr \<le> dg g"
+  with g(1,2) have degree_le: "degree irr \<le> degree g"
     using is_minimal_irr by blast
   from Eval_irr have "irr \<in> a_kernel P L Eval"
     unfolding a_kernel_def' by (simp add: irr_in_P)
   then have "g divides irr"
     by (simp add: P.in_PIdl_impl_divided g(1,3))
-  with dg_le g(1) irr_in_P have "g \<sim> irr"
-    by (simp add: P.associated_sym dg_le_divides_associated irr_nonzero)
+  with degree_le g(1) irr_in_P have "g \<sim> irr"
+    by (simp add: P.associated_sym degree_le_divides_associated irr_nonzero)
   with g(1,3) irr_in_P show "PIdl irr = a_kernel P L Eval"
     using P.associated_iff_same_ideal by auto
 qed
@@ -1425,9 +1425,9 @@ corollary gen_of_a_kernel_Eval_unique:
   by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval UP_zero_closed ex1_monic_associated
       insert_Diff insert_iff irr_in_P monic_irr)
 
-corollary irr_unique: "is_arg_min dg (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g \<Longrightarrow> g = irr"
+corollary irr_unique: "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g \<Longrightarrow> g = irr"
   by (smt P.a_coset_add_zero P.in_PIdl_impl_divided PIdl_irr_a_kernel_Eval UP_zero_closed
-      additive_subgroup.a_subset arg_min_nat_lemma dg_le_divides_associated ex1_monic_associated
+      additive_subgroup.a_subset arg_min_nat_lemma degree_le_divides_associated ex1_monic_associated
       insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
       ring.hom_zero ring.homeq_imp_rcos)
 
@@ -1468,6 +1468,7 @@ lemma (in field_extension) example_16_8_3:
 corollary (in field) "field_extension.algebraic R (carrier R)"
   oops
 (* move these up as far as possible *)
+
 
 section \<open>Observations (*rm*)\<close>
 
