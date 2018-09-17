@@ -1461,9 +1461,49 @@ end
 
 end
 
+lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
+  to non-id homomorphisms?\<close>
+  assumes a: "a \<in> K"
+  shows "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> UnivPoly.monom P a 0) = \<zero>\<^bsub>L\<^esub>"
+  (is "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
+proof -
+  interpret UP_pre_univ_prop "(L\<lparr>carrier:=K\<rparr>)" L id by unfold_locales simp
+  have eval_ring_hom: "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
+    using pol.eval_ring_hom a by simp
+  interpret ring_hom_cring P L "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a" by unfold_locales (rule eval_ring_hom)
+  have mon1_closed: "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
+    and mon0_closed: "UnivPoly.monom P a 0 \<in> carrier P"
+    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> UnivPoly.monom P a 0 \<in> carrier P"
+    using a R.a_inv_closed by auto
+  have "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> UnivPoly.eval
+    (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P a 0)"
+    by (simp add: a_minus_def mon0_closed)
+  also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
+    using assms eval_const eval_monom1 by auto
+  also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
+    using a by simp
+  finally show ?thesis by simp
+qed
+
 lemma (in field_extension) example_16_8_3:
-  "\<alpha> \<in> K \<Longrightarrow> UP_of_field_extension.algebraic \<alpha> L K"
-  sorry
+  assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic \<alpha> L K"
+proof -
+  define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
+  define Eval where "Eval = UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"
+  interpret a: UP_of_field_extension P \<alpha> Eval L K
+    by (simp_all add: assms UP_univ_prop_exists P_def Eval_def)
+  show ?thesis unfolding a.algebraic_def
+  proof
+    let ?x_minus_\<alpha> = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> UnivPoly.monom P \<alpha> 0"
+    show "Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
+      unfolding Eval_def using a.eval_monom_expr'[OF assms] by blast
+    show "?x_minus_\<alpha> \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
+      apply safe sorry
+  qed
+qed
+(* to-do: check relation to this simpler statement: *)
+lemma (in UP_of_field_extension) example_16_8_3':
+  assumes "\<alpha> \<in> K" shows algebraic oops
 
 corollary (in field) "field_extension.algebraic R (carrier R)"
   oops
