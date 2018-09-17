@@ -3,6 +3,10 @@ theory Field_Extension imports
 Missing
 begin
 
+abbreviation "evl == UnivPoly.eval"
+abbreviation "mnm == UnivPoly.monom"
+abbreviation "cff == UnivPoly.coeff" (* rm all *)
+
 section \<open>missing preliminaries?\<close>
 
 lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>part of @{thm to_contain_is_to_divide}\<close>
@@ -237,19 +241,19 @@ lemmas L_assoc = R.m_assoc[simplified]
 lemmas one_is_neutral[simp] = R.l_one[simplified] R.r_one[simplified]
 
 lemma Eval_x[simp]: (*rm?*)
-  "Eval (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
+  "Eval (mnm P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
 
-lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (UnivPoly.monom P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
+lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
 proof goal_cases
   case 1
-  then have "UnivPoly.monom P c 1 = c \<odot> UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"
+  then have "mnm P c 1 = c \<odot> mnm P \<one>\<^bsub>L\<^esub> 1"
     using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
     done
   then show ?case using "1" Eval_smult Eval_x subfield_axioms One_nat_def id_apply monom_closed
       carrier_K by (metis one_closed)
 qed
 
-lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (UnivPoly.monom P x 0) = x" unfolding
+lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (mnm P x 0) = x" unfolding
   Eval_monom[simplified] by auto
 
 end
@@ -324,7 +328,7 @@ lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
   assumes "subfield M L"
   assumes "K \<subseteq> M"
   assumes "s \<in> M"
-  shows "Eval = UnivPoly.eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
+  shows "Eval = evl (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
 proof -
   have "field (L\<lparr>carrier:=M\<rparr>)"
@@ -334,13 +338,13 @@ proof -
   proof auto
     fix i
     assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
-    then have "UnivPoly.coeff P p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
+    then have "cff P p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
       using assms coeff_closed that apply auto
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
             simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
-    then show "UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
+    then show "cff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
       using assms(1) by (simp add: subfield_def Subrings.subfield.axioms(1) subdomainE(6))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
@@ -402,13 +406,13 @@ proof -
     qed force+
   next
     show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "mnm P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
       by (auto simp del: One_nat_def)
   next
     fix \<alpha>
     assume "\<alpha> \<in> K"
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "UnivPoly.monom P \<alpha> 0"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "mnm P \<alpha> 0"], rule exI[where x = "\<one>"])
       by (simp add: \<open>\<alpha> \<in> K\<close>)
   qed
   then have "?L' \<in> ?\<M>".
@@ -1199,7 +1203,7 @@ definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   unfolding monic_def by auto
 
-lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (UnivPoly.monom P a n) = a"
+lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (mnm P a n) = a"
   by (cases "a = \<zero>") auto
 
 context UP_of_field_extension begin
@@ -1218,7 +1222,7 @@ lemmas lcoeff_monom' = lcoeff_monom'[simplified]
 lemmas deg_monom = deg_monom[simplified]
 lemmas deg_const = deg_const[simplified] (* rm all *)
 
-lemma Units_poly: "Units P = {UnivPoly.monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+lemma Units_poly: "Units P = {mnm P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
 proof goal_cases
   case (1 x)
@@ -1237,7 +1241,7 @@ proof goal_cases
   qed
 next
   case (2 u)
-  then have "UnivPoly.monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> UnivPoly.monom P u 0 = UnivPoly.monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
+  then have "mnm P (inv\<^bsub>L\<^esub> u) 0 \<otimes> mnm P u 0 = mnm P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
     using Field_Extension.ring.subfield_m_inv(1) S.ring_axioms local.monom_mult_smult
       pol.monom_mult_is_smult subfield_axioms by fastforce
   also have "\<dots> = \<one>"
@@ -1248,7 +1252,7 @@ next
         singletonD subfield_Units subfield_axioms)
 qed
 
-corollary Units_poly': "Units P = (\<lambda>u. UnivPoly.monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
+corollary Units_poly': "Units P = (\<lambda>u. mnm P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
   using Units_poly by auto
 
 lemma lcoeff_mult:
@@ -1256,12 +1260,12 @@ lemma lcoeff_mult:
   shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
 proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
   assume "p \<noteq> \<zero>" "q \<noteq> \<zero>"
-  let ?coeff = "\<lambda>i. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i)"
+  let ?coeff = "\<lambda>i. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i)"
   have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {degree p <.. degree p + degree q}" for i
   proof -
     from that have "i > degree p"
       by force
-    then have "UnivPoly.coeff P p i = \<zero>\<^bsub>L\<^esub>"
+    then have "cff P p i = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(1) deg_aboveD)
     then show ?thesis
       using assms(2) coeff_closed by auto
@@ -1270,18 +1274,18 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
   proof -
     from that have "degree p + degree q - i > degree q"
       by fastforce
-    then have "UnivPoly.coeff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
+    then have "cff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(2) deg_aboveD)
     then show ?thesis
       using assms(1) coeff_closed by auto
   qed
   moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = degree p" for i
     by (simp add: that)
-  ultimately have "(\<lambda>i\<in>{..degree p + degree q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i))
+  ultimately have "(\<lambda>i\<in>{..degree p + degree q}. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i))
     = (\<lambda>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
     by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
   then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
-    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. UnivPoly.coeff P p i \<otimes>\<^bsub>L\<^esub> UnivPoly.coeff P q (degree p + degree q - i))"
+    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i))"
     using R.finsum_restrict[of _ "{..degree p + degree q}"] assms coeff_closed by auto
   have "degree p \<in> {..degree p + degree q}"
     by fastforce
@@ -1309,11 +1313,11 @@ proof
     using inv_ok p(1) by auto
   moreover have "monic ?p" unfolding monic_def
     using S.subfield_m_inv(1) S.subfield_m_inv(3) p subfield_axioms by auto
-  moreover have "?p = UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
+  moreover have "?p = mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
-  moreover have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> UnivPoly.monom P (lcoeff p) 0 = \<one>"
+  moreover have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> mnm P (lcoeff p) 0 = \<one>"
     using inv_ok by (metis Eval_constant P_def S.subfield_m_inv(3) UP_cring_def UP_one_closed UP_ring.intro UP_ring.monom_mult_smult carrier_K coeff_closed cring_def deg_one deg_zero_impl_monom is_UP_cring local.coeff_smult monom_closed monom_mult_is_smult p(1) p(2) pol.coeff_smult ring.hom_one subfield_axioms)
-  then have "UnivPoly.monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
+  then have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor carrier_K coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
@@ -1322,7 +1326,7 @@ proof
   assume "q \<in> carrier P" "q \<sim> p" "monic q"
   then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" and "inv_c' \<in> Units P"
     using ring_associated_iff p(1) by blast
-  then obtain inv_c where inv_c'_def: "inv_c' = UnivPoly.monom P inv_c 0" and inv_c: "inv_c \<in> K"
+  then obtain inv_c where inv_c'_def: "inv_c' = mnm P inv_c 0" and inv_c: "inv_c \<in> K"
     using Units_poly by auto
   have "\<one>\<^bsub>L\<^esub> = lcoeff inv_c' \<otimes>\<^bsub>L\<^esub> lcoeff p"
     using lcoeff_mult \<open>monic q\<close>[unfolded monic_def]
@@ -1464,19 +1468,19 @@ end
 lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
   to non-id homomorphisms?\<close>
   assumes a: "a \<in> K"
-  shows "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> UnivPoly.monom P a 0) = \<zero>\<^bsub>L\<^esub>"
-  (is "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
+  shows "evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
+  (is "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
   interpret UP_pre_univ_prop "(L\<lparr>carrier:=K\<rparr>)" L id by unfold_locales simp
-  have eval_ring_hom: "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
+  have eval_ring_hom: "evl (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
     using pol.eval_ring_hom a by simp
-  interpret ring_hom_cring P L "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a" by unfold_locales (rule eval_ring_hom)
-  have mon1_closed: "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
-    and mon0_closed: "UnivPoly.monom P a 0 \<in> carrier P"
-    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> UnivPoly.monom P a 0 \<in> carrier P"
+  interpret ring_hom_cring P L "evl (L\<lparr>carrier:=K\<rparr>) L id a" by unfold_locales (rule eval_ring_hom)
+  have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
+    and mon0_closed: "mnm P a 0 \<in> carrier P"
+    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> mnm P a 0 \<in> carrier P"
     using a R.a_inv_closed by auto
-  have "UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> UnivPoly.eval
-    (L\<lparr>carrier:=K\<rparr>) L id a (UnivPoly.monom P a 0)"
+  have "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> evl
+    (L\<lparr>carrier:=K\<rparr>) L id a (mnm P a 0)"
     by (simp add: a_minus_def mon0_closed)
   also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
     using assms eval_const eval_monom1 by auto
@@ -1489,12 +1493,12 @@ lemma (in field_extension) example_16_8_3:
   assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic \<alpha> L K"
 proof -
   define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
-  define Eval where "Eval = UnivPoly.eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"
+  define Eval where "Eval = evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"
   interpret a: UP_of_field_extension P \<alpha> Eval L K
     by (simp_all add: assms UP_univ_prop_exists P_def Eval_def)
   show ?thesis unfolding a.algebraic_def
   proof
-    let ?x_minus_\<alpha> = "UnivPoly.monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> UnivPoly.monom P \<alpha> 0"
+    let ?x_minus_\<alpha> = "mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P \<alpha> 0"
     show "Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
       unfolding Eval_def using a.eval_monom_expr'[OF assms] by blast
     show "?x_minus_\<alpha> \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
