@@ -471,7 +471,8 @@ subsection \<open>Degree of a field extension\<close>
 hide_const (open) degree
 
 abbreviation "vs_of K \<equiv> \<comment> \<open>\<open>K\<close> extended with \<open>(\<otimes>\<^bsub>K\<^esub>)\<close> as \<^const>\<open>smult\<close>\<close>
-  \<lparr>carrier = carrier K, monoid.mult = (\<otimes>\<^bsub>K\<^esub>), one = \<one>\<^bsub>K\<^esub>, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
+  \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
+  smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
 context field_extension begin
 
@@ -672,7 +673,7 @@ proof -
     moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" "g\<circ>snd \<in> ?B \<rightarrow> carrier K"
       unfolding inj1_def inj2_def using lincomb1(4) lincomb2(4)by auto
     ultimately have "inj1 V W a \<in> ds.span ?Bv" "inj2 V W b \<in> ds.span ?Bw"
-      by (auto simp: f[symmetric] g[symmetric] ds.span_def lincomb1(1) lincomb2(1)) metis+
+      by (auto simp flip: f g simp: ds.span_def lincomb1(1) lincomb2(1)) metis+
     then have "inj1 V W a \<in> ds.span ?Bds" "inj2 V W b \<in> ds.span ?Bds"
       by (meson contra_subsetD ds.span_is_monotone le_sup_iff order_refl)+
     then have "inj1 V W a \<oplus>\<^bsub>direct_sum V W\<^esub> inj2 V W b \<in> ds.span ?Bds"
@@ -828,6 +829,7 @@ lemma (in module) lincomb_restrict_simp[simp, intro]:
   by (meson U a lincomb_cong restrict_apply')
 
 abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
+(*to-do: git blame to find out intention. use?*)
 
 text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
 lemma (in vectorspace) decompose_step: (* use obtains? *)
@@ -1133,13 +1135,7 @@ proof -
             subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs
             vectorspace_def)
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
-        using linear_map.iso_imports_dim(1)[OF lin_K_map]
-      proof -
-        have "bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>)))"
-          by (simp add: direct_sum_def hM'(2))
-        then show ?thesis
-          using \<open>\<lbrakk>bij_betw h (carrier (vs_of M\<lparr>carrier := cM\<rparr>)) (carrier (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))); vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<rbrakk> \<Longrightarrow> vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>)\<close> \<open>vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (direct_sum (vs_of (M\<lparr>carrier := L\<rparr>)) (vs_of M\<lparr>carrier := cM'\<rparr>))\<close> by linarith
-      qed
+        using linear_map.iso_imports_dim(1)[OF lin_K_map] by (simp add: direct_sum_def hM'(2))
       with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16(1) hM'(2) have
         "vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
       proof -
