@@ -97,7 +97,7 @@ lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (rang
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
-  interpret UP_of_field_extension P \<i> Eval complex_field "range of_real"
+  interpret UP_of_field_extension P \<i> Eval complex_field \<open>range of_real\<close>
     unfolding UP_of_field_extension_def apply auto
     unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
     unfolding UP_pre_univ_prop_def apply auto

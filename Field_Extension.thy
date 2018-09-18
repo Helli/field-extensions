@@ -415,7 +415,7 @@ proof -
       assume "f \<in> carrier P" "g \<in> carrier P"
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
-      interpret M_over_K: UP_univ_prop "L\<lparr>carrier:=K\<rparr>" "L\<lparr>carrier:=M\<rparr>" id
+      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id
           apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port \<open>old_fe.intermediate_field_2\<close> to the
           new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
@@ -471,7 +471,7 @@ lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L
    apply (simp add: l_distr)
   by (simp add: semiring.semiring_simprules(13) semiring_axioms)
 
-interpretation vecs: vectorspace "L\<lparr>carrier:=K\<rparr>" "vs_of L"
+interpretation vecs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
   by (fact vectorspace_satisfied)
 
 abbreviation finite where "finite \<equiv> vecs.fin_dim"
@@ -501,10 +501,10 @@ proof -
 (* to-do: can this\<down> provide "vecs." lemmas and definitions? Probably if I use sublocale for vecs,
  but do I want/need this? Only when \<^bold>n\<^bold>o\<^bold>t working in field_extension...
 
-  interpret asdfasdffe: field_extension R "carrier R"
+  interpret asdfasdffe: field_extension R \<open>carrier R\<close>
     by (fact field_extension_refl)
 *)
-  interpret vecs: vectorspace R "vs_of R" by (fact field_is_vecs_over_itself)
+  interpret vecs: vectorspace R \<open>vs_of R\<close> by (fact field_is_vecs_over_itself)
   let ?A = "{\<one>}"
   have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> vecs.gen_set ?A"
   proof auto
@@ -604,7 +604,7 @@ lemma direct_sum_dim:
   shows "vectorspace.fin_dim K (direct_sum V W)"
     and "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
 proof -
-  interpret ds: vectorspace K "direct_sum V W"
+  interpret ds: vectorspace K \<open>direct_sum V W\<close>
     by (simp add: assms(1) assms(3) direct_sum_is_vs)
 
   txt \<open>embeddings into @{term "direct_sum V W"}:\<close>
@@ -690,7 +690,7 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
   have "ds.dim = vectorspace.dim K (ds.vs (carrier V \<times> {\<zero>\<^bsub>W\<^esub>})) + vectorspace.dim K (ds.vs ({\<zero>\<^bsub>V\<^esub>} \<times> carrier W))"
   proof -
     let ?T = "\<lambda>(v,w). (v,\<zero>\<^bsub>W\<^esub>)"
-    interpret T: linear_map K "direct_sum V W" "direct_sum V W" ?T
+    interpret T: linear_map K \<open>direct_sum V W\<close> \<open>direct_sum V W\<close> ?T
       apply unfold_locales unfolding module_hom_def apply auto
       unfolding direct_sum_def apply auto
       using Module.module_def abelian_groupE(2) assms(3) vectorspace.axioms(1) apply blast
@@ -963,7 +963,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
         using f9 a4 a2 \<open>B - {b} \<subseteq> carrier V\<close> lincomb_distrib by fastforce
     qed
   qed
-  then interpret linmap: linear_map K V "direct_sum (vs_of K) ?V" ?T .
+  then interpret linmap: linear_map K V \<open>direct_sum (vs_of K) ?V\<close> ?T .
   {
     fix v
     assume "v \<in> carrier V"
@@ -1032,7 +1032,7 @@ proof -
 
   have "\<not>field_extension.finite M K" if "\<not>field_extension.finite ?L K"
   proof
-    from M_over_K interpret enclosing: vectorspace ?K "vs_of M"
+    from M_over_K interpret enclosing: vectorspace ?K \<open>vs_of M\<close>
       by (simp add: field_extension.vectorspace_satisfied)
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
@@ -1053,7 +1053,7 @@ proof -
 
   moreover have "\<not>field_extension.finite M K" if "\<not>field_extension.finite M L"
   proof
-    interpret a: module ?L "vs_of M"
+    interpret a: module ?L \<open>vs_of M\<close>
       by (simp add: subfield_def assms(2-3) field_extension.vectorspace_satisfied field_extension_def vectorspace.axioms(1))
     from that have "\<not>(\<exists>\<comment>\<open>Avoid latex dependency\<close>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
       using subfield_def assms(2-3) field_extension.vectorspace_satisfied
@@ -1061,7 +1061,7 @@ proof -
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
       using a.span_is_subset2 by auto
     note 1 = this[unfolded a.span_def a.lincomb_def, simplified]
-    interpret b: module ?K "vs_of M"
+    interpret b: module ?K \<open>vs_of M\<close>
       by (simp add: M_over_K field_extension.vectorspace_satisfied vectorspace.axioms(1))
     assume "field_extension.finite M K"
     then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> b.span B = carrier M"
@@ -1453,10 +1453,10 @@ lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and 
   shows "evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
   (is "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
-  interpret UP_pre_univ_prop "(L\<lparr>carrier:=K\<rparr>)" L id by unfold_locales simp
+  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id by unfold_locales simp
   have eval_ring_hom: "evl (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
     using pol.eval_ring_hom a by simp
-  interpret ring_hom_cring P L "evl (L\<lparr>carrier:=K\<rparr>) L id a" by unfold_locales (rule eval_ring_hom)
+  interpret ring_hom_cring P L \<open>evl (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
   have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
     and mon0_closed: "mnm P a 0 \<in> carrier P"
     and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> mnm P a 0 \<in> carrier P"
