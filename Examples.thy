@@ -19,53 +19,57 @@ lemma field_univ_ring: "Ring.field (univ_ring::_::Fields.field ring)"
   apply unfold_locales apply (auto intro: right_inverse simp: univ_ring_def Units_def field_simps)
   by (metis ab_group_add_class.ab_left_minus add.commute)
 
-definition rat_field :: "rat ring" where "rat_field = univ_ring"
+definition rat_field where "rat_field = standard_ring \<rat>"
 definition real_field :: "real ring" where "real_field = univ_ring"
 definition complex_field :: "complex ring" where "complex_field = univ_ring"
 
 lemma field_examples: "field rat_field" "field real_field" "field complex_field"
-  unfolding rat_field_def real_field_def complex_field_def by (fact field_univ_ring)+
+  unfolding rat_field_def standard_ring_def real_field_def complex_field_def
+  apply unfold_locales[] apply (auto simp: Units_def)
+  using ab_group_add_class.ab_left_minus apply fastforce
+  apply (simp add: distrib_right)
+  apply (simp add: semiring_normalization_rules(34))
+  using Rats_inverse apply force by (fact field_univ_ring)+
 
 lemma ring_standard_ring:
-  "ring (standard_ring (range rat_of_int))"
-  "ring (standard_ring (range real_of_rat))"
-  "ring (standard_ring (range complex_of_real))"
-  unfolding standard_ring_def
+  "cring (standard_ring \<int>)"
+  "cring (standard_ring (range complex_of_real))" (*rm*)
+  unfolding rat_field_def standard_ring_def
   apply standard
-               apply auto
-      apply (metis of_int_add range_eqI)
-  unfolding Units_def apply auto
-     apply (metis add.left_neutral add_diff_cancel_right' add_uminus_conv_diff of_int_add)
-  using Ints_def apply auto[1]
-        apply (simp add: mult.commute ring_class.ring_distribs(1))
-  apply (simp add: ring_class.ring_distribs(1))
-  using Rats_def apply auto[]
-     apply (smt of_rat_minus)
-  using Rats_def apply auto[1]
-  using ring_class.ring_distribs(2) apply blast
-  apply (simp add: ring_class.ring_distribs(1))
-  using Reals_def apply auto[1]
-  apply (simp add: add_eq_0_iff)
-  using Reals_def apply auto[1]
-  by (simp_all add: ring_class.ring_distribs)
+               apply auto unfolding Units_def apply auto
+  using Ints_minus add.left_inverse add.right_inverse apply blast
+  using mult.assoc apply blast
+  using distrib_right apply blast
+  using ring_class.ring_distribs(1) apply blast
+  apply (metis Ints_cases mult_of_int_commute)
+  using ring_class.ring_distribs apply auto
+        apply (simp_all add: ring_class.ring_distribs)
+  apply (metis of_real_add rangeI)
+  apply (smt ab_group_add_class.ab_left_minus of_real_minus)
+  by (metis of_real_mult rangeI)
 
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
-lemma inv_standard_ring[simp]:
-  fixes x::"_::ring"
-  shows "inv\<^bsub>\<lparr>carrier = UNIV, monoid.mult = (+), one = 0\<rparr>\<^esub> x = - x"
-  unfolding m_inv_def apply auto
-  using add.inverse_unique add_eq_0_iff eq_neg_iff_add_eq_0 by fastforce
+lemma a: "cring rat_field"
+  by (simp add: fieldE(1) field_examples(1))
 
-lemma subring_example: "subring \<int> rat_field"
-  unfolding rat_field_def univ_ring_def by unfold_locales auto
+lemma subcring_example: "subcring \<int> rat_field"
+  apply (rule cring.subcringI'[OF a])
+  apply (rule ring.ring_incl_imp_subring)
+  apply (simp add: a cring.axioms(1))
+  unfolding rat_field_def
+   apply (simp add: Ints_subset_Rats standard_ring_def)
+  unfolding standard_ring_def apply auto
+  by (metis cring.axioms(1) ring_standard_ring(1) standard_ring_def)
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
 
 lemma subfield_example: \<open>subfield \<rat> real_field\<close>
-  apply unfold_locales apply (auto simp: real_field_def univ_ring_def)
-  apply (simp_all add: Units_def)
-  by (metis Rats_inverse mult.commute right_inverse)
+  apply (rule ring.subfield_iff(1))
+  apply (simp add: real_field_def ring_univ_ring)
+  apply (metis field_examples(1) partial_object.update_convs(1) rat_field_def real_field_def
+      standard_ring_def univ_ring_def)
+  by (simp add: real_field_def univ_ring_def)
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
@@ -80,11 +84,11 @@ lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
   by (metis divide_inverse divide_self_if mult.commute of_real_eq_1_iff of_real_mult)
 
 lemma subfield_example': "subfield (range complex_of_real) complex_field"
-  unfolding complex_field_def univ_ring_def apply unfold_locales apply auto
-  apply (metis of_real_add rangeI)
-  apply (metis of_real_mult range_eqI)
-  apply (simp add: Units_def)+
-  by (metis Groups.mult_ac(2) of_real_eq_0_iff of_real_inverse right_inverse)
+  apply (rule ring.subfield_iff(1))
+  apply (simp add: complex_field_def ring_univ_ring)
+  apply (metis (full_types) complex_field_def f_r_o_r' partial_object.update_convs(1) standard_ring_def
+      univ_ring_def)
+  by (simp add: complex_field_def univ_ring_def)
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
