@@ -2,8 +2,8 @@ subsection \<open>Example instantiations\<close>
 theory Examples imports Field_Extension
 begin
 
-definition standard_ring
-  where "standard_ring A = \<lparr>carrier = A, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+definition standard_ring (* replace by abbreviation, it is never used on its own *)
+  where "standard_ring C = \<lparr>carrier = C, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
   where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
@@ -31,7 +31,7 @@ lemma field_examples: "field rat_field" "field real_field" "field complex_field"
   apply (simp add: semiring_normalization_rules(34))
   using Rats_inverse apply force by (fact field_univ_ring)+
 
-lemma ring_standard_ring:
+lemma cring_Ints:
   "cring (standard_ring \<int>)"
   "cring (standard_ring (range complex_of_real))" (*rm*)
   unfolding rat_field_def standard_ring_def
@@ -50,17 +50,17 @@ lemma ring_standard_ring:
 
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
-lemma a: "cring rat_field"
-  by (simp add: fieldE(1) field_examples(1))
-
 lemma subcring_example: "subcring \<int> rat_field"
-  apply (rule cring.subcringI'[OF a])
-  apply (rule ring.ring_incl_imp_subring)
-  apply (simp add: a cring.axioms(1))
-  unfolding rat_field_def
-   apply (simp add: Ints_subset_Rats standard_ring_def)
-  unfolding standard_ring_def apply auto
-  by (metis cring.axioms(1) ring_standard_ring(1) standard_ring_def)
+proof -
+  interpret field rat_field
+    by (fact field_examples(1))
+  show ?thesis
+    apply (rule subcringI')
+    apply (rule ring.ring_incl_imp_subring)
+      apply (simp add: local.ring_axioms)
+    unfolding rat_field_def apply (simp add: Ints_subset_Rats standard_ring_def)
+    using cring_Ints unfolding standard_ring_def cring_def by auto
+qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
 
@@ -73,7 +73,7 @@ lemma subfield_example: \<open>subfield \<rat> real_field\<close>
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
-lemma f_r_o_r': \<open>field (standard_ring (range complex_of_real))\<close>
+lemma f_r_o_r': "field (standard_ring (range complex_of_real))"
   apply standard
                    apply (auto simp: standard_ring_def)
   using Reals_def apply auto[1]
