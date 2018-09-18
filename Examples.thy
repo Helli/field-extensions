@@ -51,28 +51,21 @@ lemma ring_standard_ring:
 
 text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
 
-lemma subring_example: "subring (range rat_of_int) rat_field"
-  unfolding rat_field_def univ_ring_def apply unfold_locales apply auto
-  apply (metis of_int_add rangeI) unfolding m_inv_def apply simp using of_int_minus rangeI
-  apply force by (metis of_int_mult rangeI)
-
-text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
-
 lemma inv_standard_ring[simp]:
   fixes x::"_::ring"
   shows "inv\<^bsub>\<lparr>carrier = UNIV, monoid.mult = (+), one = 0\<rparr>\<^esub> x = - x"
   unfolding m_inv_def apply auto
   using add.inverse_unique add_eq_0_iff eq_neg_iff_add_eq_0 by fastforce
 
-lemma subfield_example: \<open>subfield (range real_of_rat) real_field\<close>
+lemma subring_example: "subring \<int> rat_field"
+  unfolding rat_field_def univ_ring_def by unfold_locales auto
+
+text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
+
+lemma subfield_example: \<open>subfield \<rat> real_field\<close>
   apply unfold_locales apply (auto simp: real_field_def univ_ring_def)
-  using Rats_add Rats_def apply blast
-  apply (metis Rats_def Rats_minus_iff Rats_of_rat)
-  using Rats_def apply auto[1] using Rats_def
-  apply (metis (mono_tags, hide_lams) monoid.Units_closed partial_object.select_convs(1) ring_def
-      ring_standard_ring(2) standard_ring_def)
-  apply (simp add: Units_def)+
-  by (metis mult.commute nonzero_of_rat_inverse of_rat_eq_0_iff right_inverse)
+  apply (simp_all add: Units_def)
+  by (metis Rats_inverse mult.commute right_inverse)
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
