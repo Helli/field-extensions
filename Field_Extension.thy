@@ -24,18 +24,6 @@ thm comm_monoid.finprod_singleton[of _ i for i] comm_monoid.finprod_singleton'[o
 
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
 
-lemma (in subgroup) subgroup_is_comm_group [intro]:
-  assumes "comm_group G"
-  shows "comm_group (G\<lparr>carrier := H\<rparr>)"
-proof -
-  interpret comm_group G by fact
-  have "monoid (G\<lparr>carrier := H\<rparr>)"
-    by (simp add: group.is_monoid is_group subgroup_is_group)
-  then show ?thesis
-    by (simp add: comm_group.intro is_group subgroup_is_group subgroup_is_submonoid
-        submonoid_is_comm_monoid)
-qed
-
 lemmas (in field)
   [simp] = mult_of_is_Units[symmetric] \<comment> \<open>avoid the duplicate constant\<close> and
   [simp] = units_of_inv
@@ -86,8 +74,6 @@ context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
-
-lemmas group_mult_of_subgroup = subgroup.subgroup_is_comm_group[OF _ units_comm_group, simplified]
 
 lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
   by simp
