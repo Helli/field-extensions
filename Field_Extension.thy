@@ -271,22 +271,9 @@ end
 *)
 
 lemma (in field) sum_of_fractions:
-      "n1 \<in> carrier R \<Longrightarrow>
-       n2 \<in> carrier R \<Longrightarrow>
-       d1 \<in> carrier R \<Longrightarrow>
-       d2 \<in> carrier R \<Longrightarrow>
-       d1 \<noteq> \<zero> \<Longrightarrow>
-       d2 \<noteq> \<zero> \<Longrightarrow>
-          n1 \<otimes>inv d1 \<oplus> n2 \<otimes>inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes>inv (d1\<otimes>d2)"
-proof goal_cases
-  case 1
-  then have
-    "n1\<otimes>inv d1 = (n1\<otimes>d2)\<otimes>inv (d1\<otimes>d2)"
-    "n2\<otimes>inv d2 = (n2\<otimes>d1)\<otimes>inv (d1\<otimes>d2)"
-    by (smt comm_inv_char has_inverse m_closed m_lcomm r_one)+
-  then show ?case
-    by (simp add: 1 field_Units integral_iff l_distr)
-qed
+  "n1 \<in> carrier R \<Longrightarrow> n2 \<in> carrier R \<Longrightarrow> d1 \<in> carrier R \<Longrightarrow> d2 \<in> carrier R \<Longrightarrow>
+    d1\<noteq>\<zero> \<Longrightarrow> d2\<noteq>\<zero> \<Longrightarrow> n1 \<otimes> inv d1 \<oplus> n2 \<otimes> inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes> inv (d1\<otimes>d2)"
+  by (smt comm_inv_char has_inverse l_distr m_lcomm monoid.m_closed monoid_axioms r_one)
 
 corollary (in field) fraction_sumE:
   assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
@@ -1375,7 +1362,9 @@ lemma aux: (*inline*)
 lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> L\<lparr>carrier := Eval ` carrier P\<rparr>"
   using aux is_ring_iso_def by auto
 
-lemma domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+
+lemma domain_im_Eval: "domain im_Eval"
   by (simp add: ring.img_is_domain S.domain_axioms)
 
 lemma "domain (P Quot PIdl irr)"
