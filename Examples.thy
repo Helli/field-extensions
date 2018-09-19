@@ -106,15 +106,14 @@ proof -
     have "x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
       unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
       unfolding complex_field_def univ_ring_def using add.commute complex_eq mult.commute
-      by (metis Reals_def Reals_of_real Eval_cx complex_field_def monoid.simps(1)
-          partial_object.update_convs(1) univ_ring_def)
+      by (metis Reals_def Reals_of_real Eval_cx complex_field_def monoid.simps(1) univ_ring_def)
     show ?case
       apply (rule exI[of _ "mnm P (Im x) 1 \<oplus>\<^bsub>P\<^esub> mnm P (Re x) 0"])
       apply (rule exI[of _ "mnm P 1 0"])
       apply auto
       unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
         \<open>x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
-        complex_field_def ring.simps(2) univ_ring_def by (metis partial_object.update_convs(1))
+        complex_field_def ring.simps(2) univ_ring_def by metis
   qed
 qed
 

@@ -1194,7 +1194,7 @@ proof goal_cases
   then have "deg (L\<lparr>carrier:=K\<rparr>) x = 0"
     unfolding deg_one by blast
   then show ?case
-    by (metis "1" P.Units_closed P.Units_r_inv_ex S.l_null coeff_closed deg_zero_impl_monom id_apply
+    by (metis "1" P.Units_closed P.Units_r_inv_ex S.l_null coeff_closed deg_zero_impl_monom
         pol.Eval_smult pol.monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
 next
   case (2 u)
@@ -1205,8 +1205,8 @@ next
     using "2" S.subfield_m_inv(3) monom_one subfield_axioms by auto
   finally show ?case
     by (metis (no_types, lifting) "2" Diff_iff Field_Extension.ring.subfield_m_inv(1)
-        P.Units_one_closed P.prod_unit_l P.unit_factor R.Units_closed S.ring_axioms monom_closed
-        singletonD subfield_Units subfield_axioms)
+        P.Units_one_closed P.prod_unit_l P.unit_factor S.ring_axioms monom_closed singletonD
+        subfield_axioms)
 qed
 
 corollary Units_poly': "Units P = (\<lambda>u. mnm P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
