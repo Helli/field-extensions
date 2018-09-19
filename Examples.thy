@@ -43,18 +43,18 @@ lemma cring_Ints:
   using ring_class.ring_distribs(1) apply blast
   apply (metis Ints_cases mult_of_int_commute)
   using ring_class.ring_distribs apply auto
-        apply (simp_all add: ring_class.ring_distribs)
-  apply (metis of_real_add rangeI)
-  apply (smt ab_group_add_class.ab_left_minus of_real_minus)
+     apply (simp_all add: ring_class.ring_distribs)
+    apply (metis of_real_add rangeI)
+   apply (smt ab_group_add_class.ab_left_minus of_real_minus)
   by (metis of_real_mult rangeI)
 
-text \<open>\<open>\<int>\<close> is a subring of \<open>\<rat>\<close>:\<close>
+text \<open>\<open>\<int>\<close> is a subdomain of \<open>\<rat>\<close>:\<close>
 
-lemma subcring_example: "subcring \<int> rat_field"
+lemma subdomain_example: "subdomain \<int> rat_field"
 proof -
-  interpret field rat_field
-    by (fact field_examples(1))
+  interpret field rat_field by (fact field_examples(1))
   show ?thesis
+    apply (rule subdomainI)
     apply (rule subcringI')
     apply (rule ring.ring_incl_imp_subring)
       apply (simp add: local.ring_axioms)
