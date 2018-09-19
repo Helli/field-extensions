@@ -250,21 +250,8 @@ proof unfold_locales
     using R.carrier_one_not_zero by auto
 qed
 
-(* rm these two? *)
-lemmas L_assoc = R.m_assoc[simplified]
-lemmas one_is_neutral[simp] = R.l_one[simplified] R.r_one[simplified]
-
-lemma Eval_x[simp]: (*rm?*)
-  "Eval (mnm P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 by simp
-
 lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
-proof goal_cases
-  case 1
-  then have "mnm P c 1 = c \<odot> mnm P \<one>\<^bsub>L\<^esub> 1"
-    using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
-    done
-  then show ?case using "1" using Eval_smult Eval_x by auto
-qed
+  by (simp add: Eval_monom)
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (mnm P x 0) = x" unfolding
   Eval_monom[simplified] by auto
@@ -1222,7 +1209,6 @@ context UP_of_field_extension begin
 definition irr where (* mv into algebraic context? *)
   "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
-lemmas Eval_smult = Eval_smult[simplified]
 lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_is_smult = monom_mult_is_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
@@ -1363,7 +1349,7 @@ proof -
     using S.subfield_m_inv(1) subfield_axioms by auto
   let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
   from inv_ok have "Eval ?p = inv\<^bsub>L\<^esub>(lcoeff p) \<otimes>\<^bsub>L\<^esub> (Eval p)"
-    using Eval_smult p(1) by blast
+    using Eval_smult p(1) by auto
   also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
     using inv_ok p(3) by auto
   finally have "Eval ?p = \<zero>\<^bsub>L\<^esub>" .
