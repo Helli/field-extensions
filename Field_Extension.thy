@@ -502,24 +502,17 @@ lemma (in field) field_is_vecs_over_itself: "vectorspace R (vs_of R)"
 
 lemma (in field) trivial_degree[simp]: "field_extension.degree R (carrier R) = 1"
 proof -
-(* to-do: can this\<down> provide "vecs." lemmas and definitions? Probably if I use sublocale for vecs,
- but do I want/need this? Only when \<^bold>n\<^bold>o\<^bold>t working in field_extension...
-
-  interpret asdfasdffe: field_extension R \<open>carrier R\<close>
-    by (fact field_extension_refl)
-*)
-  interpret vecs: vectorspace R \<open>vs_of R\<close> by (fact field_is_vecs_over_itself)
+  interpret vectorspace R \<open>vs_of R\<close> by (fact field_is_vecs_over_itself)
   let ?A = "{\<one>}"
-  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> vecs.gen_set ?A"
+  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> gen_set ?A"
   proof auto
-    show "x \<in> vecs.span {\<one>}" if "x \<in> carrier R" for x
-      unfolding vecs.span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
-      by (rule exI[of _ ?A]) (auto simp: that vecs.lincomb_def)
-  qed (metis (mono_tags, lifting) empty_subsetI insert_subset module.span_is_subset2 one_closed
-        partial_object.select_convs(1) subsetCE vecs.module_axioms)
-  then have vecs.fin_dim "vecs.dim \<le> 1"
-    using vecs.fin_dim_def apply force
-    using A_generates_R vecs.dim_le1I by auto
+    show "x \<in> span {\<one>}" if "x \<in> carrier R" for x
+      unfolding span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
+      by (rule exI[of _ ?A]) (auto simp: that lincomb_def)
+  qed (metis empty_subsetI insert_subset one_closed partial_object.select_convs(1) span_closed)
+  then have fin_dim "dim \<le> 1"
+    using fin_dim_def apply force
+    using A_generates_R dim_le1I by auto
   then show ?thesis unfolding field_extension.degree_def[OF field_extension_refl]
     using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
 qed
@@ -527,13 +520,6 @@ qed
 lemma (in module) id_module_hom: "id \<in> module_hom R M M"
   unfolding module_hom_def by simp
 
-find_theorems linear_map bij
-term a_kernel
-term kernel
-term "linear_map.kerT"
-find_theorems direct_sum vectorspace.dim
-
-term bij_betw
 lemma (in linear_map) emb_image_dim:
   assumes "inj_on T (carrier V)" \<comment> \<open>A module-monomorphism\<close>
   assumes V.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
