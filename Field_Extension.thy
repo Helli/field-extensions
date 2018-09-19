@@ -456,17 +456,11 @@ proof -
 qed
 
 
-subsection \<open>Polynomial Divisibility\<close>
-
-text \<open>keep an eye out whether I need something from @{url
-  "https://github.com/DeVilhena-Paulo/GaloisCVC4/blob/master/Polynomial_Divisibility.thy"}\<close>
-
-
 subsection \<open>Degree of a field extension\<close>
 
 hide_const (open) degree
 
-abbreviation "vs_of K \<equiv> \<comment> \<open>\<open>K\<close> extended with \<open>(\<otimes>\<^bsub>K\<^esub>)\<close> as \<^const>\<open>smult\<close>\<close>
+abbreviation "vs_of K \<equiv> \<comment> \<open>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>(\<otimes>\<^bsub>K\<^esub>)\<close> as \<^const>\<open>smult\<close>)\<close>
   \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
   smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
@@ -481,19 +475,19 @@ lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L
    apply (simp add: l_distr)
   by (simp add: semiring.semiring_simprules(13) semiring_axioms)
 
-interpretation vecs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
+interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
   by (fact vectorspace_satisfied)
 
-abbreviation finite where "finite \<equiv> vecs.fin_dim"
+abbreviation finite where "finite \<equiv> vs.fin_dim"
 \<comment> \<open>Prop. 14.16 would look much better if I also had an abbreviation for infinite degree\<close>
 
 definition degree where
-  "degree \<equiv> if finite then vecs.dim else 0"
+  "degree \<equiv> if finite then vs.dim else 0"
  \<comment> \<open>This uses the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting it to another notion of cardinality
  (ecard / enat) should not be too difficult.\<close>
 
-lemma fin_dim_nonzero: "finite \<Longrightarrow> vecs.dim > 0"
-  by (rule vecs.dim_greater_0) (auto dest: one_zeroI)
+lemma fin_dim_nonzero: "finite \<Longrightarrow> vs.dim > 0"
+  by (rule vs.dim_greater_0) (auto dest: one_zeroI)
 
 corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
   by (simp add: degree_def fin_dim_nonzero)
@@ -790,11 +784,8 @@ lemma (in module) lincomb_restrict_simp[simp, intro]:
   shows "lincomb (restrict a U) U = lincomb a U"
   by (meson U a lincomb_cong restrict_apply')
 
-abbreviation "fdvs K V \<equiv> vectorspace K V \<and> vectorspace.fin_dim K V"
-(*to-do: git blame to find out intention. use?*)
-
 text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
-lemma (in vectorspace) decompose_step: (* use obtains? *)
+lemma (in vectorspace) decompose_step:
   assumes fin_dim
   assumes "dim > 0"
   shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (V\<lparr>carrier:=V'\<rparr>)) h
@@ -891,7 +882,6 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       = lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m1 bv) (B-{b})
       \<oplus>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m2 bv) (B-{b})" apply simp
       by (smt BiV DiffE Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong lincomb_sum)
-(* next *)
     fix r m
     assume rK: "r \<in> carrier K" and mV: "m \<in> carrier V"
     have sane: "(\<lambda>bv. r \<otimes>\<^bsub>K\<^esub> coeffs m bv) \<in> B \<rightarrow> carrier K"
@@ -1497,8 +1487,8 @@ lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
 
-text \<open>In @{thm[source] ring.ring_hom_imp_img_ring} and its follow-ups, a self update could be avoided due to @{thm
-  ring_hom_one} (the latter may be a good simp rule?):\<close>
+text \<open>In @{thm[source] ring.ring_hom_imp_img_ring} and its follow-ups, a self update could be
+ avoided due to @{thm ring_hom_one} (the latter may be a good simp rule?):\<close>
 lemma (in ring) ring_hom_imp_img_ring':
   assumes "h \<in> ring_hom R S"
   shows "ring (S \<lparr> carrier := h ` (carrier R), zero := h \<zero> \<rparr>)" (is "ring ?h_img")
