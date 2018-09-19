@@ -94,21 +94,11 @@ lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (rang
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
   define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
-  interpret UP_of_field_extension P \<i> Eval complex_field \<open>range of_real\<close>
-    unfolding UP_of_field_extension_def apply auto
-    unfolding UP_univ_prop_def UP_univ_prop_axioms_def apply auto
-    unfolding UP_pre_univ_prop_def apply auto
-    unfolding ring_hom_cring_def apply auto
-    apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
-        partial_object.update_convs(1) standard_ring_def univ_ring_def)
-    using fieldE(1) field_examples(3) apply blast
-    unfolding ring_hom_cring_axioms_def
-      apply (simp add: complex_field_def ring_hom_memI univ_ring_def)
-    unfolding UP_cring_def
-    apply (metis (full_types) complex_field_def domain_def f_r_o_r' field_def
-        partial_object.update_convs(1) standard_ring_def univ_ring_def)
-    apply (simp add: complex_field_def univ_ring_def) unfolding P_def Eval_def
-    by (simp_all add: field_examples(3) field_extension_def subfield_example')
+  interpret UP_of_field_extension complex_field \<open>range of_real\<close> P \<i> Eval
+    unfolding UP_of_field_extension_def UP_of_field_extension_axioms_def
+       apply (simp add: field_examples(3) field_extension_def subfield_example')
+      apply (simp_all add: complex_field_def univ_ring_def P_def Eval_def)
+    done
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)

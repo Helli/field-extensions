@@ -28,9 +28,6 @@ lemmas (in field)
   [simp] = mult_of_is_Units[symmetric] \<comment> \<open>avoid the duplicate constant\<close> and
   [simp] = units_of_inv
 
-lemma carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
-  by simp
-
 
 subsection \<open>Subrings\<close>
 
@@ -137,7 +134,7 @@ subsection \<open>convenient locale setup\<close>
 locale subfield = subfield K L for K L
   \<comment> \<open>only for renaming. rm.\<close>
 
-locale field_extension = subf'd?: subfield K L + superf'd?: field L for L K
+locale field_extension = subf'd?: subfield K L + S?: field L for L K
 
 lemmas
   subfield_intro = Subrings.subfield.intro[folded subfield_def]
@@ -195,13 +192,43 @@ next
     by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
 qed
 
-(*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
-as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
+locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s and Eval
+  defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
+  assumes indet_img_carrier: "s \<in> carrier L"
+  defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"
+begin
+sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id
+  rewrites updated_carrier[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+  (*  and "id x = x" *)
+proof -
+  interpret field \<open>L\<lparr>carrier:=K\<rparr>\<close>
+    by (simp add: subfield_axioms subfield_iff(2))
+  show "UP_univ_prop (L\<lparr>carrier := K\<rparr>) L id s"
+    apply unfold_locales
+     apply (simp add: ring_hom_ring.homh subring_axioms S.subring_ring_hom_ring)
+    by (simp add: indet_img_carrier)
+qed (simp_all add: Eval_def P_def)
+
+find_theorems name: indet_img_carrier
+find_theorems "carrier (_\<lparr>carrier:=_\<rparr>)"
+find_theorems name: "pol." "id _"
+term Eval
+term "(\<otimes>)"
+find_theorems name: P_def
+thm Eval_def
+thm pol.Eval_def
+
+lemma indet_img_carrier [simp, intro]: "s \<in> carrier L" oops
+
+(*
+end
+
+(*to-do: swap summands? remove qualifiers?*)
 locale UP_of_field_extension = pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id + fe?: field_extension
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
-
+*)
 sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close> apply intro_locales
   using S.subfield_iff(2) domain_def field_def subfield_axioms by auto
 
@@ -235,8 +262,7 @@ proof goal_cases
   then have "mnm P c 1 = c \<odot> mnm P \<one>\<^bsub>L\<^esub> 1"
     using monom_mult_smult[of c "\<one>\<^bsub>L\<^esub>" 1, simplified] apply simp
     done
-  then show ?case using "1" Eval_smult Eval_x subfield_axioms One_nat_def id_apply monom_closed
-      carrier_K by (metis one_closed)
+  then show ?case using "1" using Eval_smult Eval_x by auto
 qed
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (mnm P x 0) = x" unfolding
@@ -376,19 +402,19 @@ proof -
             auto
           apply (smt S.comm_inv_char S.m_lcomm S.one_closed S.r_null S.r_one S.ring_axioms
               inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
-          using superf'd.integral by blast
+          using S.integral by blast
       qed
       from \<open>h1 \<in> ?L'\<close> \<open>h2 \<in> ?L'\<close> show "h1 \<oplus>\<^bsub>L\<^esub>h2 \<in> ?L'"
         apply auto
       proof goal_cases
         case (1 f1 f2 g1 g2)
         show ?case apply (rule exI[where x = "f1\<otimes>g2\<oplus>f2\<otimes>g1"], rule exI[where x = "g1\<otimes>g2"])
-          by (simp add: 1 superf'd.integral_iff sum_of_fractions)
+          by (simp add: 1 S.integral_iff sum_of_fractions)
       qed
     next
       fix k
       assume "k \<in> ?L' - {\<zero>\<^bsub>L\<^esub>}"
-      then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use superf'd.integral_iff in auto)
+      then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use S.integral_iff in auto)
     qed force+
   next
     show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
@@ -1168,17 +1194,21 @@ qed
 
 subsection \<open>Polynomial Divisibility\<close>
 
+(*
 lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Longrightarrow> UP_of_field_extension \<alpha> L K"
   unfolding UP_of_field_extension_def apply auto
   apply (metis UP_cring.intro UP_pre_univ_prop.intro UP_univ_prop.intro UP_univ_prop_axioms.intro
       cring_ring_hom_cring is_cring ring_hom_cring_def)
   by (simp add: field_extension_axioms)
+*)
 
 definition (in UP_of_field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
 
+(*
 definition (in field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic \<alpha> L K)"
+*)
 
 definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 
@@ -1215,12 +1245,8 @@ proof goal_cases
   then have "deg (L\<lparr>carrier:=K\<rparr>) x = 0"
     unfolding deg_one by blast
   then show ?case
-  proof -
-    have "x \<in> carrier P"
-      using "1" P.Units_closed by blast (* > 1.0 s, timed out *)
-    then show ?thesis
-      by (metis (no_types) Diff_iff Field_Extension.ring.subfield_m_inv(1) P.Units_closed P.l_null R.nat_pow_0 R.zero_closed R.zero_not_one S.nat_pow_0 S.nat_pow_consistent S.ring_axioms S.subfield_m_inv(3) UP_m_comm \<open>deg (L\<lparr>carrier := K\<rparr>) x = 0\<close> carrier_K coeff_closed coeff_zero deg_zero_impl_monom empty_iff insert_iff inv_x(1) inv_x(2) local.coeff_smult local.zero_not_one monom_closed monom_mult_is_smult monom_zero subfield_axioms)
-  qed
+    by (metis "1" P.Units_closed P.Units_r_inv_ex S.l_null coeff_closed deg_zero_impl_monom id_apply
+        pol.Eval_smult pol.monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
 next
   case (2 u)
   then have "mnm P (inv\<^bsub>L\<^esub> u) 0 \<otimes> mnm P u 0 = mnm P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
@@ -1297,10 +1323,10 @@ proof
     using S.subfield_m_inv(1) S.subfield_m_inv(3) p subfield_axioms by auto
   moreover have "?p = mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
-  moreover have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> mnm P (lcoeff p) 0 = \<one>"
-    using inv_ok by (metis Eval_constant P_def S.subfield_m_inv(3) UP_cring_def UP_one_closed UP_ring.intro UP_ring.monom_mult_smult carrier_K coeff_closed cring_def deg_one deg_zero_impl_monom is_UP_cring local.coeff_smult monom_closed monom_mult_is_smult p(1) p(2) pol.coeff_smult ring.hom_one subfield_axioms)
+  moreover from inv_ok have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> mnm P (lcoeff p) 0 = \<one>"
+    by (smt calculation(2) coeff_closed lcoeff_mult local.monom_mult_smult monic_def monom_closed monom_one p(1) pol.lcoeff_monom' pol.monom_mult_is_smult)
   then have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
-    by (metis P.Units_one_closed P.unit_factor carrier_K coeff_closed inv_ok monom_closed p(1))
+    by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
   {
@@ -1362,9 +1388,9 @@ lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
 lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
-  using deg_zero_impl_monom[of p] by (metis (mono_tags, lifting) Diff_iff Eval_constant
-      R.carrier_one_not_zero R.zero_closed R.zero_not_one Units_poly carrier_K coeff_closed
-      coeff_zero lcoeff_Unit_nonzero lcoeff_nonzero mem_Collect_eq singleton_iff subfield_Units)
+  using deg_zero_impl_monom[of p]
+  by (metis (mono_tags, lifting) Diff_iff R.zero_closed Units_poly coeff_closed coeff_zero
+      insert_iff lcoeff_Unit_nonzero lcoeff_nonzero mem_Collect_eq singletonD subfield_Units)
 
 lemma degree_le_divides_associated:
   assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
@@ -1425,7 +1451,7 @@ lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> L\<lparr>carrier := Eval ` c
   using aux is_ring_iso_def by auto
 
 lemma domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
-  by (simp add: ring.img_is_domain superf'd.domain_axioms)
+  by (simp add: ring.img_is_domain S.domain_axioms)
 
 lemma "domain (P Quot PIdl irr)"
 proof -
@@ -1438,7 +1464,7 @@ proof -
 
 lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
   unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
-  using ring.primeideal_vimage[OF cring_axioms superf'd.zeroprimeideal, simplified] .
+  using ring.primeideal_vimage[OF cring_axioms S.zeroprimeideal, simplified] .
 
 lemma "ring_irreducible irr"
   using primeideal_PIdl_irr oops
@@ -1470,7 +1496,7 @@ proof -
     using a by simp
   finally show ?thesis by simp
 qed
-
+(*
 lemma (in field_extension) example_16_8_3:
   assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic \<alpha> L K"
 proof -
@@ -1486,13 +1512,13 @@ proof -
     show "?x_minus_\<alpha> \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
       apply safe sorry
   qed
-qed
+qed*)
 (* to-do: check relation to this simpler statement: *)
 lemma (in UP_of_field_extension) example_16_8_3':
   assumes "\<alpha> \<in> K" shows algebraic oops
-
+(*
 corollary (in field) "field_extension.algebraic R (carrier R)"
-  oops
+  oops*)
 (* move these up as far as possible *)
 
 
