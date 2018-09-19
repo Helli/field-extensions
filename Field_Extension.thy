@@ -197,10 +197,10 @@ locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s 
   assumes indet_img_carrier: "s \<in> carrier L"
 (*defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"*)
 begin
-abbreviation "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"  (*replace by "definition". Do the same for P (there with notation)*)
+definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"  (*Do the same for P (there with notation)*)
 sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ _ Eval
   rewrites updated_carrier[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
-  (*  and "id x = x" *)
+    and "id x = x"
 proof -
   interpret field \<open>L\<lparr>carrier:=K\<rparr>\<close>
     by (simp add: subfield_axioms subfield_iff(2))
@@ -208,7 +208,7 @@ proof -
     apply unfold_locales
      apply (simp add: ring_hom_ring.homh subring_axioms S.subring_ring_hom_ring)
     by (simp add: indet_img_carrier)
-qed (simp_all add: P_def)
+qed (simp_all add: P_def Eval_def)
 
 find_theorems name: indet_img_carrier
 find_theorems "carrier (_\<lparr>carrier:=_\<rparr>)"
@@ -251,10 +251,10 @@ proof unfold_locales
 qed
 
 lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
-  by (simp add: Eval_monom)
+  by (simp add: Eval_monom id_def)
 
 lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (mnm P x 0) = x" unfolding
-  Eval_monom[simplified] by auto
+  Eval_monom by simp
 
 end
 
@@ -264,11 +264,9 @@ subsection \<open>Finitely generated field extensions\<close>
 locale finitely_generated_field_extension = field_extension +
   assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
 (*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>? Or replace locale by a simple predicate?\<close>
-or simply add one of these:
+or simply add this:
 begin
-definition "S \<equiv> THE S. finite S \<and> generate_field L (S \<union> K) = carrier L"
 definition "S \<equiv> SOME S. finite S \<and> generate_field L (S \<union> K) = carrier L"
-What is the difference?
 end
 *)
 
@@ -1464,9 +1462,9 @@ lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and 
   shows "evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
   (is "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
-  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id by unfold_locales simp
+  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
   have eval_ring_hom: "evl (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
-    using pol.eval_ring_hom a by simp
+    using pol.eval_ring_hom a by (simp add: local.eval_ring_hom)
   interpret ring_hom_cring P L \<open>evl (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
   have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
     and mon0_closed: "mnm P a 0 \<in> carrier P"
@@ -1476,7 +1474,7 @@ proof -
     (L\<lparr>carrier:=K\<rparr>) L id a (mnm P a 0)"
     by (simp add: a_minus_def mon0_closed)
   also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
-    using assms eval_const eval_monom1 by auto
+    using assms eval_const eval_monom1 by simp
   also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
     using a by simp
   finally show ?thesis by simp
