@@ -57,7 +57,7 @@ proof -
     apply (rule subdomainI)
     apply (rule subcringI')
     apply (rule ring.ring_incl_imp_subring)
-      apply (simp add: local.ring_axioms)
+      apply (simp add: ring_axioms)
     unfolding rat_field_def apply (simp add: Ints_subset_Rats standard_ring_def)
     using cring_Ints unfolding standard_ring_def cring_def by auto
 qed

@@ -111,7 +111,7 @@ proof -
   from inv have "f = ?inv \<otimes> lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f"
     by simp
   also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f)"
-    by (simp add: local.inv smult_assoc_simp)
+    by (simp add: inv smult_assoc_simp)
   also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r)"
     by (simp add: qrk)
   also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
@@ -734,21 +734,6 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
     by simp
 qed (* to-do: use \<^sub> in part 1*)
 
-definition "zvs = \<comment> \<open>to-do: add type\<close> \<comment> \<open>use @{const undefined}?\<close>
-  \<lparr>carrier={\<some>_.True}, monoid.mult=undefined, one=undefined, zero=\<some>_.True, add=\<lambda>_ _.\<some>_.True, smult=\<lambda>_ _.\<some>_.True\<rparr>"
-
-lemma (in cring) module_zvs: "module R zvs" unfolding zvs_def
-  by unfold_locales (simp_all add: Units_def)
-
-lemma zvs_simps[simp]:
-"carrier zvs = {\<some>_.True}"
-"zero zvs = (\<some>_.True)"
-"add zvs = (\<lambda>_ _.\<some>_.True)"
-  by (simp_all add: zvs_def)
-
-lemma (in field) vectorspace_zvs: "vectorspace R zvs"
-  by (simp add: field_axioms module_zvs vectorspace_def)
-
 lemma (in module) submodule_zsm: "submodule {\<zero>\<^bsub>M\<^esub>} R M"
   using M.r_neg submoduleI by fastforce
 
@@ -778,25 +763,6 @@ corollary (in vectorspace) zss_dim:
   "vectorspace.fin_dim K (vs {\<zero>\<^bsub>V\<^esub>})" "vectorspace.dim K (vs {\<zero>\<^bsub>V\<^esub>}) = 0"
   using basis_zss vectorspace.basis_def vectorspace.fin_dim_def vectorspace_zss apply fastforce
   using basis_zss vectorspace.dim_basis vectorspace_zss by fastforce
-
-lemma (in field) dim_zvs: "vectorspace.dim R zvs = 0"
-  unfolding vectorspace.dim_def[OF vectorspace_zvs] apply simp
-proof -
-  have "\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {\<some>_.True} \<and> LinearCombinations.module.span R zvs C = {\<some>_.True}"
-by (metis (no_types) vectorspace.span_empty[OF vectorspace_zvs] card_empty finite.emptyI subset_insertI zvs_simps(2))
-  then show "(LEAST n. \<exists>C. finite C \<and> card C = n \<and> C \<subseteq> {\<some>_.True} \<and> LinearCombinations.module.span R zvs C = {\<some>_.True}) = 0"
-  proof -
-    obtain DD :: "'d set" where
-      "(\<exists>v0. finite v0 \<and> card v0 = 0 \<and> v0 \<subseteq> {SOME uu. True::'d} \<and> LinearCombinations.module.span R zvs v0 = {SOME uu. True}) = (finite DD \<and> card DD = 0 \<and> DD \<subseteq> {SOME uu. True} \<and> LinearCombinations.module.span R zvs DD = {SOME uu. True})"
-      by (metis (no_types))
-    then have "finite DD \<and> card DD = 0 \<and> DD \<subseteq> {SOME d. True} \<and> LinearCombinations.module.span R zvs DD = {SOME d. True}"
-      by (metis \<open>\<exists>C. finite C \<and> card C = 0 \<and> C \<subseteq> {SOME _. True} \<and> LinearCombinations.module.span R zvs C = {SOME _. True}\<close>) (* failed *)
-    then have "\<exists>D. finite D \<and> card D = 0 \<and> D \<subseteq> {SOME d. True::'d} \<and> LinearCombinations.module.span R zvs D = {SOME d. True}"
-      by blast
-    then show ?thesis
-      using Least_eq_0 by presburger
-  qed
-qed
 
 lemma (in vectorspace) dim_0_trivial:
   "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
@@ -1224,7 +1190,7 @@ proof goal_cases
   then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
     using P.Units_l_inv by blast
   then have "deg (L\<lparr>carrier:=K\<rparr>) inv_x + deg (L\<lparr>carrier:=K\<rparr>) x = deg (L\<lparr>carrier:=K\<rparr>) \<one>"
-    using deg_mult by (smt "1" P.Units_closed local.integral_iff local.zero_not_one)
+    using deg_mult by (smt "1" P.Units_closed integral_iff zero_not_one)
   then have "deg (L\<lparr>carrier:=K\<rparr>) x = 0"
     unfolding deg_one by blast
   then show ?case
@@ -1233,7 +1199,7 @@ proof goal_cases
 next
   case (2 u)
   then have "mnm P (inv\<^bsub>L\<^esub> u) 0 \<otimes> mnm P u 0 = mnm P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
-    using Field_Extension.ring.subfield_m_inv(1) S.ring_axioms local.monom_mult_smult
+    using Field_Extension.ring.subfield_m_inv(1) S.ring_axioms monom_mult_smult
       pol.monom_mult_is_smult subfield_axioms by fastforce
   also have "\<dots> = \<one>"
     using "2" S.subfield_m_inv(3) monom_one subfield_axioms by auto
@@ -1307,7 +1273,7 @@ proof
   moreover have "?p = mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
   moreover from inv_ok have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> mnm P (lcoeff p) 0 = \<one>"
-    by (smt calculation(2) coeff_closed lcoeff_mult local.monom_mult_smult monic_def monom_closed monom_one p(1) pol.lcoeff_monom' pol.monom_mult_is_smult)
+    by (smt calculation(2) coeff_closed lcoeff_mult monom_mult_smult monic_def monom_closed monom_one p(1) pol.lcoeff_monom' pol.monom_mult_is_smult)
   then have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
@@ -1464,7 +1430,7 @@ lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and 
 proof -
   interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
   have eval_ring_hom: "evl (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
-    using pol.eval_ring_hom a by (simp add: local.eval_ring_hom)
+    using pol.eval_ring_hom a by (simp add: eval_ring_hom)
   interpret ring_hom_cring P L \<open>evl (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
   have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
     and mon0_closed: "mnm P a 0 \<in> carrier P"
