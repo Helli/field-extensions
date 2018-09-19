@@ -192,12 +192,13 @@ next
     by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
 qed
 
-locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s and Eval
+locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s (* and Eval *)
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "s \<in> carrier L"
-  defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"
+(*defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"*)
 begin
-sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id
+abbreviation "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"  (*replace by "definition". Do the same for P (there with notation)*)
+sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ _ Eval
   rewrites updated_carrier[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   (*  and "id x = x" *)
 proof -
@@ -207,7 +208,7 @@ proof -
     apply unfold_locales
      apply (simp add: ring_hom_ring.homh subring_axioms S.subring_ring_hom_ring)
     by (simp add: indet_img_carrier)
-qed (simp_all add: Eval_def P_def)
+qed (simp_all add: P_def)
 
 find_theorems name: indet_img_carrier
 find_theorems "carrier (_\<lparr>carrier:=_\<rparr>)"
@@ -254,7 +255,7 @@ lemmas L_assoc = R.m_assoc[simplified]
 lemmas one_is_neutral[simp] = R.l_one[simplified] R.r_one[simplified]
 
 lemma Eval_x[simp]: (*rm?*)
-  "Eval (mnm P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 Eval_def by simp
+  "Eval (mnm P \<one>\<^bsub>L\<^esub> 1) = s" using eval_monom1 by simp
 
 lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
 proof goal_cases
@@ -441,7 +442,7 @@ proof -
       assume "f \<in> carrier P" "g \<in> carrier P"
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
-      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id
+      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id _ _ Eval
           apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port \<open>old_fe.intermediate_field_2\<close> to the
           new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
@@ -454,9 +455,7 @@ proof -
         using subfield_def L_over_M S.Subring_cring subfieldE(1) apply blast
           apply (fact is_UP_cring)
          apply (simp add: ** UP_univ_prop_axioms_def)
-        unfolding Eval_def apply (rule eq_reflection)
-        apply (intro UP_of_field_extension.intermediate_field_eval)
-        by (simp_all add: UP_of_field_extension_axioms L_over_M * **)
+        using "*" "**" L_over_M intermediate_field_eval pol.Eval_def by auto
       from \<open>f \<in> carrier P\<close> have "Eval f \<in> M"
         using M_over_K.hom_closed by simp
       from \<open>g \<in> carrier P\<close> have "Eval g \<in> M"

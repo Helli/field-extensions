@@ -93,11 +93,10 @@ lemma subfield_example': "subfield (range complex_of_real) complex_field"
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
-  define Eval where "Eval = eval (complex_field\<lparr>carrier := range complex_of_real\<rparr>) complex_field id \<i>"
-  interpret UP_of_field_extension complex_field \<open>range of_real\<close> P \<i> Eval
+  interpret UP_of_field_extension complex_field \<open>range of_real\<close> P \<i>
     unfolding UP_of_field_extension_def UP_of_field_extension_axioms_def
        apply (simp add: field_examples(3) field_extension_def subfield_example')
-      apply (simp_all add: complex_field_def univ_ring_def P_def Eval_def)
+      apply (simp_all add: complex_field_def univ_ring_def P_def)
     done
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
@@ -106,16 +105,16 @@ proof -
       unfolding complex_field_def univ_ring_def m_inv_def by simp
     have "x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
       unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
-      unfolding complex_field_def univ_ring_def by (auto simp: add.commute complex_eq
-          mult.commute)
+      unfolding complex_field_def univ_ring_def using add.commute complex_eq mult.commute
+      by (metis Reals_def Reals_of_real Eval_cx complex_field_def monoid.simps(1)
+          partial_object.update_convs(1) univ_ring_def)
     show ?case
       apply (rule exI[of _ "mnm P (Im x) 1 \<oplus>\<^bsub>P\<^esub> mnm P (Re x) 0"])
       apply (rule exI[of _ "mnm P 1 0"])
       apply auto
       unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
         \<open>x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
-        complex_field_def ring.simps(2) univ_ring_def
-      by metis
+        complex_field_def ring.simps(2) univ_ring_def by (metis partial_object.update_convs(1))
   qed
 qed
 
