@@ -197,17 +197,17 @@ qed
 
 (*to-do: swap summands? remove qualifiers? It would be good if \<open>P\<close> appeared a bit more often (e.g.
 as operator subscript) so that it does not come "out of nowhere" in the few places where it's used.*)
-locale UP_of_field_extension = pol?: UP_univ_prop "L\<lparr>carrier := K\<rparr>" L id + fe?: field_extension
+locale UP_of_field_extension = pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id + fe?: field_extension
 begin
 txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
 
-sublocale UP_domain "L\<lparr>carrier:=K\<rparr>" apply intro_locales
+sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close> apply intro_locales
   using S.subfield_iff(2) domain_def field_def subfield_axioms by auto
 
 abbreviation degree where "degree \<equiv> deg (L\<lparr>carrier:=K\<rparr>)"
 
-sublocale euclidean_domain P "degree"
+sublocale euclidean_domain P degree
 proof unfold_locales
   have "field (L\<lparr>carrier:=K\<rparr>)"
     by (simp add: S.subfield_iff(2) subfield_axioms)
