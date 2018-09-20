@@ -3,7 +3,7 @@ theory Examples imports Field_Extension
 begin
 
 definition standard_ring (* replace by abbreviation, it is never used on its own *)
-  where "standard_ring C = \<lparr>carrier = C, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+  where "standard_ring carr = \<lparr>carrier = carr, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
   where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
@@ -31,8 +31,7 @@ lemma field_examples: "field rat_field" "field real_field" "field complex_field"
   apply (simp add: semiring_normalization_rules(34))
   using Rats_inverse apply force by (fact field_univ_ring)+
 
-lemma cring_Ints:
-  "cring (standard_ring \<int>)"
+lemma cring_Ints: "cring (standard_ring \<int>)"
   "cring (standard_ring (range complex_of_real))" (*rm*)
   unfolding rat_field_def standard_ring_def
   apply standard

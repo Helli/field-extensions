@@ -199,7 +199,7 @@ locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s 
 begin
 definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"  (*Do the same for P (there with notation)*)
 sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ _ Eval
-  rewrites updated_carrier[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+  rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
 proof -
   interpret field \<open>L\<lparr>carrier:=K\<rparr>\<close>
@@ -211,7 +211,6 @@ proof -
 qed (simp_all add: P_def Eval_def)
 
 find_theorems name: indet_img_carrier
-find_theorems "carrier (_\<lparr>carrier:=_\<rparr>)"
 find_theorems name: "pol." "id _"
 term Eval
 term "(\<otimes>)"
@@ -435,7 +434,7 @@ proof -
       with \<open>Eval g \<noteq> \<zero>\<^bsub>L\<^esub>\<close> have "inv\<^bsub>L\<^esub> Eval g \<in> M"
         using L_over_M S.subfield_m_inv(1) by auto
       with \<open>Eval f \<in> M\<close> show "Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<in> M"
-        using M_over_K.m_closed[simplified] by simp
+        using M_over_K.m_closed by simp
     qed
   }
   ultimately show "\<Inter>?\<M> = ?L'"
@@ -819,14 +818,14 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     using direct_sum_is_module field_is_vecs_over_itself vectorspace_def vs_span_B.module_axioms apply blast
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
-    using vs_span_B.lincomb_closed[simplified]
-        apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring insertCI mem_Collect_eq module_axioms okese(1))
+    using vs_span_B.lincomb_closed apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring
+        insertCI mem_Collect_eq module_axioms okese(1))
   proof -
     fix m1 m2
     assume mcV: "m1 \<in> carrier V" "m2 \<in> carrier V"
     then have B_to_K_map: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
       by (smt PiE_mem Pi_I R.add.m_closed okese(1))
-    let ?restricted = "restrict (\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) B"
+    let ?restricted = "\<lambda>bv\<in>B. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv"
     have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?restricted B"
       using mcV B(1) basis_def c_sum' B_to_K_map by auto
     moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
@@ -1041,21 +1040,20 @@ proof -
         "subspace (M\<lparr>carrier:=L\<rparr>) cM' (vs_of M\<lparr>carrier:=cM\<rparr>)"
         "vectorspace.dim ?L (vs_of M\<lparr>carrier:=cM'\<rparr>) = vectorspace.dim (M\<lparr>carrier:=L\<rparr>) (vs_of M\<lparr>carrier:=cM\<rparr>) - 1"
         using vectorspace.decompose_step[OF Suc.prems(1-2)] by auto
-      note a = this[simplified]
       let ?M' = "vs_of M\<lparr>carrier:=cM'\<rparr>"
       have applied_IH: "vectorspace.fin_dim ?K ?M' \<and> vectorspace.dim ?K ?M' =
         vectorspace.dim ?L ?M' * vectorspace.dim ?K (vs_of ?L)"
         apply (rule Suc.hyps(1))
            apply auto
-        using Suc.hyps(2) a(4) apply simp
+        using Suc.hyps(2) hM'(4) apply simp
         using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
-        using Suc.prems(2) a(3) subspace.corollary_5_16(1) apply force
-        using a(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
+        using Suc.prems(2) hM'(3) subspace.corollary_5_16(1) apply force
+        using hM'(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
         by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
       from hM'(1) have lin_K_map: "linear_map ?K (vs_of M\<lparr>carrier:=cM\<rparr>) (direct_sum (vs_of ?L) ?M') h"
         using subfield.linear_wrt_subfield[unfolded subfield_def, OF assms(1)] by auto
       have "vectorspace.fin_dim ?K (direct_sum (vs_of ?L) ?M')"
-        by (smt Field_Extension.subfield_def a(3) applied_IH assms(1) direct_sum_dim(1)
+        by (smt Field_Extension.subfield_def hM'(3) applied_IH assms(1) direct_sum_dim(1)
             field.field_is_vecs_over_itself fin(2) monoid.surjective partial_object.update_convs(1)
             subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs
             vectorspace_def)
@@ -1074,7 +1072,7 @@ proof -
         have "\<forall>p f A. carrier_update f (p::('a, 'b) ring_scheme)\<lparr>carrier := A\<rparr> = p\<lparr>carrier := A\<rparr>"
           by simp
         then have "vectorspace.fin_dim ?K (vs_of ?L) \<and> vectorspace ?K (vs_of ?L) \<and> vectorspace ?K ?M'"
-          by (metis (no_types) Field_Extension.subfield_def a(3) assms(1) field_extension.intro field_extension.vectorspace_satisfied fin(2) partial_object.update_convs(1) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs vectorspace_def)
+          by (metis (no_types) Field_Extension.subfield_def hM'(3) assms(1) field_extension.intro field_extension.vectorspace_satisfied fin(2) partial_object.update_convs(1) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs vectorspace_def)
         then show ?thesis
           using applied_IH direct_sum_dim(2) by blast
       qed
@@ -1137,14 +1135,11 @@ definition irr where (* mv into algebraic context? *)
   "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas coeff_smult = coeff_smult[simplified]
-lemmas monom_mult_is_smult = monom_mult_is_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
 lemmas coeff_monom_mult = coeff_monom_mult[simplified]
 lemmas coeff_mult = coeff_mult[simplified]
 lemmas lcoeff_monom = lcoeff_monom[simplified]
-lemmas lcoeff_monom' = lcoeff_monom'[simplified]
-lemmas deg_monom = deg_monom[simplified]
-lemmas deg_const = deg_const[simplified] (* rm all *)
+lemmas deg_monom = deg_monom[simplified] (* rm all *)
 
 lemma Units_poly: "Units P = {mnm P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
