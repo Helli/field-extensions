@@ -1359,10 +1359,10 @@ lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> L\<lparr>carrier := Eval ` c
 
 abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
 
-lemma domain_im_Eval: "domain im_Eval"
+lemma domain_im_Eval: "domain im_Eval" (* unused *)
   by (simp add: ring.img_is_domain S.domain_axioms)
 
-lemma "domain (P Quot PIdl irr)"
+lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" (* unused *)
 proof -
   have rings: "ring im_Eval" "ring (P Quot PIdl irr)"
     by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
@@ -1377,8 +1377,8 @@ lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
   unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
   using ring.primeideal_vimage[OF cring_axioms S.zeroprimeideal, simplified] .
 
-lemma "ring_irreducible irr"
-  using primeideal_PIdl_irr oops
+lemma irr_irreducible_polynomial: "ring_irreducible irr"
+  using primeideal_PIdl_irr irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by blast
 
 end
 
