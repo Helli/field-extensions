@@ -1380,6 +1380,9 @@ lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
   using primeideal_PIdl_irr irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by blast
 
+lemma maximalideal_PIdl_irr: "maximalideal (PIdl irr) P"
+  by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+
 end
 
 end
