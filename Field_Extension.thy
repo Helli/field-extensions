@@ -446,7 +446,7 @@ subsection \<open>Degree of a field extension\<close>
 
 hide_const (open) degree
 
-abbreviation "vs_of K \<equiv> \<comment> \<open>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>(\<otimes>\<^bsub>K\<^esub>)\<close> as \<^const>\<open>smult\<close>)\<close>
+abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>monoid.mult K\<close> as \<^const>\<open>smult\<close>)\<close>
   \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
   smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
@@ -465,11 +465,11 @@ interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open
   by (fact vectorspace_satisfied)
 
 abbreviation finite where "finite \<equiv> vs.fin_dim"
-\<comment> \<open>Prop. 14.16 would look much better if I also had an abbreviation for infinite degree\<close>
+\<comment> \<open>Proposition 14.16 would look much better if I also had an abbreviation for infinite degree.\<close>
 
 definition degree where
   "degree \<equiv> if finite then vs.dim else 0"
- \<comment> \<open>This uses the pragmatic tradition \<open>\<infinity> = 0\<close>. Adapting it to another notion of cardinality
+ \<comment> \<open>Here, \<open>\<infinity>\<close> is encoded as \<open>0\<close>. Adapting it to another notion of cardinality
  (ecard / enat) should not be too difficult.\<close>
 
 lemma fin_dim_nonzero: "finite \<Longrightarrow> vs.dim > 0"
@@ -1364,12 +1364,14 @@ lemma domain_im_Eval: "domain im_Eval"
 
 lemma "domain (P Quot PIdl irr)"
 proof -
-  from ring_iso_sym[OF _ theorem_16_9b_left] obtain inv_h where "inv_h \<in> ring_iso (L\<lparr>carrier := Eval `
- carrier P\<rparr>) (P Quot PIdl irr)"
-    unfolding is_ring_iso_def sorry
+  have rings: "ring im_Eval" "ring (P Quot PIdl irr)"
+    by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
+  then obtain inv_h where inv_h: "inv_h \<in> ring_iso im_Eval (P Quot PIdl irr)"
+    using ring_iso_sym theorem_16_9b_left unfolding is_ring_iso_def by blast
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
-  then show ?thesis sorry
-  oops
+  then show ?thesis
+    using inv_h[unfolded ring_iso_def] ring_hom_one ring_hom_zero[OF _ rings] by fastforce
+qed
 
 lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
   unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
