@@ -479,12 +479,12 @@ end
 locale finite_field_extension = field_extension +
   assumes finite
 
-lemma (in field) field_is_vecs_over_itself: "vectorspace R (vs_of R)"
+lemma (in field) field_is_vectorspace_over_itself: "vectorspace R (vs_of R)"
   by (fact field_extension.vectorspace_satisfied[OF field_extension_refl, simplified])
 
 lemma (in field) trivial_degree[simp]: "field_extension.degree R (carrier R) = 1"
 proof -
-  interpret vectorspace R \<open>vs_of R\<close> by (fact field_is_vecs_over_itself)
+  interpret vectorspace R \<open>vs_of R\<close> by (fact field_is_vectorspace_over_itself)
   let ?A = "{\<one>}"
   have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> gen_set ?A"
   proof auto
@@ -547,7 +547,7 @@ corollary (in linear_map) linear_map_the_inv:
   "bij_betw T (carrier V) (carrier W) \<Longrightarrow> linear_map K W V (the_inv_into (carrier V) T)"
   by (meson linear_map_axioms linear_map_def mod_hom_the_inv)
 
-lemma (in linear_map) iso_imports_dim: (* rm *)
+lemma (in linear_map) iso_imports_dim:
   assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
   assumes W.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
   shows "V.fin_dim" "V.dim = W.dim"
@@ -810,9 +810,9 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
-    using direct_sum_is_vs field_is_vecs_over_itself vs_span_B.vectorspace_axioms apply blast
+    using direct_sum_is_vs field_is_vectorspace_over_itself vs_span_B.vectorspace_axioms apply blast
     apply (simp add: module.module_axioms)
-    using direct_sum_is_module field_is_vecs_over_itself vectorspace_def vs_span_B.module_axioms apply blast
+    using direct_sum_is_module field_is_vectorspace_over_itself vectorspace_def vs_span_B.module_axioms apply blast
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring
@@ -930,13 +930,13 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using field_extension.degree_def field_extension_refl by fastforce
   qed
   with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
-    by (simp add: direct_sum_dim(2) field_is_vecs_over_itself vs_span_B.vectorspace_axioms)
+    by (simp add: direct_sum_dim(2) field_is_vectorspace_over_itself vs_span_B.vectorspace_axioms)
   also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
   also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
     using assms(1) linmap.emb_image_dim goal_2a by blast
   finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
     using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vectorspace.fin_dim K (vs_of K)\<close>
-      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) field_is_vecs_over_itself vs_span_B.vectorspace_axioms
+      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) field_is_vectorspace_over_itself vs_span_B.vectorspace_axioms
     by auto
   note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
   from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
@@ -1014,8 +1014,8 @@ proof -
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
-      using subfield_def assms(2-3) field.field_is_vecs_over_itself subfield.vectorspace_wrt_subfield
-        apply (simp add: subfield_def field.field_is_vecs_over_itself subfield.vectorspace_wrt_subfield cM_def)
+      using subfield_def assms(2-3) field.field_is_vectorspace_over_itself subfield.vectorspace_wrt_subfield
+        apply (simp add: subfield_def field.field_is_vectorspace_over_itself subfield.vectorspace_wrt_subfield cM_def)
       apply (simp add: cM_def fin(1))
       by (simp add: M_over_K cM_def field_extension.vectorspace_satisfied)
     from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
@@ -1051,7 +1051,7 @@ proof -
         using subfield.linear_wrt_subfield[unfolded subfield_def, OF assms(1)] by auto
       have "vectorspace.fin_dim ?K (direct_sum (vs_of ?L) ?M')"
         by (smt Field_Extension.subfield_def hM'(3) applied_IH assms(1) direct_sum_dim(1)
-            field.field_is_vecs_over_itself fin(2) monoid.surjective partial_object.update_convs(1)
+            field.field_is_vectorspace_over_itself fin(2) monoid.surjective partial_object.update_convs(1)
             subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs
             vectorspace_def)
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
