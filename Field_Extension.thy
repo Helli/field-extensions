@@ -192,19 +192,19 @@ next
     by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
 qed
 
-locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and s (* and Eval *)
+locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<alpha> (* and Eval *)
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
-  assumes indet_img_carrier: "s \<in> carrier L"
+  assumes indet_img_carrier: "\<alpha> \<in> carrier L"
 (*defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"*)
 begin
-definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"  (*Do the same for P (there with notation)*)
-sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ _ Eval
+definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
+sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
 proof -
   interpret field \<open>L\<lparr>carrier:=K\<rparr>\<close>
     by (simp add: subfield_axioms subfield_iff(2))
-  show "UP_univ_prop (L\<lparr>carrier := K\<rparr>) L id s"
+  show "UP_univ_prop (L\<lparr>carrier := K\<rparr>) L id \<alpha>"
     apply unfold_locales
      apply (simp add: ring_hom_ring.homh subring_axioms S.subring_ring_hom_ring)
     by (simp add: indet_img_carrier)
@@ -217,8 +217,6 @@ term "(\<otimes>)"
 find_theorems name: P_def
 thm Eval_def
 thm pol.Eval_def
-
-lemma indet_img_carrier [simp, intro]: "s \<in> carrier L" oops
 
 (*
 end
@@ -249,7 +247,7 @@ proof unfold_locales
     using R.carrier_one_not_zero by auto
 qed
 
-lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
+lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> \<alpha>"
   by (simp add: Eval_monom id_def)
 
 lemma Eval_constant[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 0) = c"
@@ -311,24 +309,24 @@ lemma pow_simp[simp]:
 lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
   assumes "subfield M L"
   assumes "K \<subseteq> M"
-  assumes "s \<in> M"
-  shows "Eval = evl (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id s"
+  assumes "\<alpha> \<in> M"
+  shows "Eval = evl (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id \<alpha>"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
 proof -
   have "field (L\<lparr>carrier:=M\<rparr>)"
     using subfield_def S.subfield_iff(2) assms(1) by blast
-  have a: "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) \<in> {..deg (L\<lparr>carrier := K\<rparr>) p} \<rightarrow> M"
+  have a: "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i) \<in> {..deg (L\<lparr>carrier := K\<rparr>) p} \<rightarrow> M"
     if "p \<in> carrier P" for p
   proof auto
     fix i
     assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
-    then have "cff P p i \<in> M" and "s [^]\<^bsub>L\<^esub> i \<in> M"
+    then have "cff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
       using assms coeff_closed that apply auto
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
             simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
-    then show "cff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i \<in> M"
+    then show "cff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
       using assms(1) by (simp add: subfield_def Subrings.subfield.axioms(1) subdomainE(6))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
@@ -336,23 +334,23 @@ proof -
     by (intro subring.cring_ring_hom_cring)
       (simp_all add: subfield.axioms assms(1) subfieldE(1) S.is_cring that)
   from a[THEN this] show
-    "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub> i) =
-    (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> s [^]\<^bsub>L\<^esub>i)"
+    "(\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i) =
+    (\<lambda>p\<in>carrier P. \<Oplus>\<^bsub>L\<lparr>carrier := M\<rparr>\<^esub>i\<in>{..deg (L\<lparr>carrier := K\<rparr>) p}. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub>i)"
     by fastforce
 qed
 
-lemma (in UP_of_field_extension) insert_s_K: "insert s K \<subseteq> carrier L"
-  \<comment>\<open>\<^term>\<open>s\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
+lemma (in UP_of_field_extension) insert_s_K: "insert \<alpha> K \<subseteq> carrier L"
+  \<comment>\<open>\<^term>\<open>\<alpha>\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
   by (simp add: subset)
 
 proposition (in UP_of_field_extension) genfield_singleton_explicit:
-  "generate_field L (insert s K) =
+  "generate_field L (insert \<alpha> K) =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
 proof -
   (* to-do: replace by define? *)
   let ?L' = "{Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  and ?\<M> = "{M. subfield M L \<and> s \<in> M \<and> K \<subseteq> M}"
+  and ?\<M> = "{M. subfield M L \<and> \<alpha> \<in> M \<and> K \<subseteq> M}"
   have "?L' \<in> ?\<M>"
   proof auto
     show "subfield ?L' L"
@@ -389,7 +387,7 @@ proof -
       then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use S.integral_iff in auto)
     qed force+
   next
-    show "\<exists>f g. s = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
+    show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       apply (rule exI[where x = "mnm P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
       by (auto simp del: One_nat_def)
   next
@@ -405,7 +403,7 @@ proof -
     fix M
     assume "M \<in> ?\<M>"
     then have L_over_M: "subfield M L" by auto
-    have *: "K \<subseteq> M" and **: "s \<in> M"
+    have *: "K \<subseteq> M" and **: "\<alpha> \<in> M"
       using \<open>M \<in> ?\<M>\<close> by auto
     have "?L' \<subseteq> M"
     proof auto
@@ -413,7 +411,7 @@ proof -
       assume "f \<in> carrier P" "g \<in> carrier P"
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
-      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id _ _ Eval
+      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id _ \<alpha> Eval
           apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port \<open>old_fe.intermediate_field_2\<close> to the
           new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
@@ -1399,13 +1397,13 @@ qed
 lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
   by (rule ring.subfield_iff(1)) (simp_all add: S.ring_axioms field_im_Eval image_subsetI)
 
-lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert s K)"
+lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   apply (rule S.generate_field_min_subfield1) apply auto
   using Field_Extension.subfield_def subfield_im_Eval apply blast
   using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI subf'd.one_closed)
   using Eval_constant pol.monom_closed by (metis image_eqI)
 
-lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert s K)"
+lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)"
 proof -
   have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
     by fast
@@ -1413,17 +1411,17 @@ proof -
     by force
   also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
     by fastforce
-  also have "\<dots> = generate_field L (insert s K)"
+  also have "\<dots> = generate_field L (insert \<alpha> K)"
     by (fact genfield_singleton_explicit[symmetric])
   finally show ?thesis .
 qed
 
 theorem the_elem_ring_iso_Quot_irr_generate_field:
-  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert s K)\<rparr>)"
+  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
   using aux 1 2 by force
 
 corollary simple_algebraic_extension:
-  "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert s K)\<rparr>"
+  "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
   using the_elem_ring_iso_Quot_irr_generate_field is_ring_iso_def by blast
 
 end
