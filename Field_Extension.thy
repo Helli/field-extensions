@@ -451,7 +451,7 @@ abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewe
 
 context field_extension begin
 
-lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
+lemma vectorspace: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
   apply (rule vs_criteria) apply auto
        apply (simp add: subfield_axioms subfield_iff(2))
       apply (simp add: add.m_comm)
@@ -461,7 +461,7 @@ lemma vectorspace_satisfied: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L
   by (simp add: semiring.semiring_simprules(13) semiring_axioms)
 
 interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
-  by (fact vectorspace_satisfied)
+  by (fact vectorspace)
 
 abbreviation finite where "finite \<equiv> vs.fin_dim"
 
@@ -483,7 +483,7 @@ locale finite_field_extension = field_extension +
 
 lemma (in field) trivial_degree[simp]: "trivial_extension.degree = 1"
 proof -
-  interpret vectorspace R \<open>vs_of R\<close> by (fact trivial_extension.vectorspace_satisfied)
+  interpret vectorspace R \<open>vs_of R\<close> by (fact trivial_extension.vectorspace)
   let ?A = "{\<one>}"
   have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> gen_set ?A"
   proof auto
@@ -796,9 +796,9 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
-    using direct_sum_is_vs trivial_extension.vectorspace_satisfied vs_span_B.vectorspace_axioms apply blast
+    using direct_sum_is_vs trivial_extension.vectorspace vs_span_B.vectorspace_axioms apply blast
     apply (simp add: module.module_axioms)
-    using direct_sum_is_module trivial_extension.vectorspace_satisfied vectorspace_def
+    using direct_sum_is_module trivial_extension.vectorspace vectorspace_def
       vs_span_B.module_axioms apply blast
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
@@ -917,13 +917,13 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using field_extension.degree_def field_extension_refl by fastforce
   qed
   with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
-    by (simp add: direct_sum_dim(2) trivial_extension.vectorspace_satisfied vs_span_B.vectorspace_axioms)
+    by (simp add: direct_sum_dim(2) trivial_extension.vectorspace vs_span_B.vectorspace_axioms)
   also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
   also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
     using assms(1) linmap.emb_image_dim goal_2a by blast
   finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
     using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vectorspace.fin_dim K (vs_of K)\<close>
-      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) trivial_extension.vectorspace_satisfied vs_span_B.vectorspace_axioms
+      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) trivial_extension.vectorspace vs_span_B.vectorspace_axioms
     by auto
   note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
   from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
@@ -955,7 +955,7 @@ proof -
   have "\<not>field_extension.finite M K" if "\<not>field_extension.finite ?L K"
   proof
     from M_over_K interpret enclosing: vectorspace ?K \<open>vs_of M\<close>
-      by (simp add: field_extension.vectorspace_satisfied)
+      by (simp add: field_extension.vectorspace)
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
       apply (rule enclosing.module.module_incl_imp_submodule)
@@ -965,7 +965,7 @@ proof -
       from assms have "field_extension ?L K"
         using subfield.intro Subrings.ring.subfield_iff(2) cring_def domain_def field_def
           field_extension.intro by blast
-      note field_extension.vectorspace_satisfied[OF this]
+      note field_extension.vectorspace[OF this]
       then show ?thesis by (auto simp: vectorspace_def)
     qed done
     assume enclosing.fin_dim
@@ -976,18 +976,18 @@ proof -
   moreover have "\<not>field_extension.finite M K" if "\<not>field_extension.finite M L"
   proof
     interpret a: module ?L \<open>vs_of M\<close>
-      by (simp add: subfield_def assms(2-3) field_extension.vectorspace_satisfied field_extension_def vectorspace.axioms(1))
+      by (simp add: subfield_def assms(2-3) field_extension.vectorspace field_extension_def vectorspace.axioms(1))
     from that have "\<not>(\<exists>\<comment>\<open>Avoid latex dependency\<close>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
-      using subfield_def assms(2-3) field_extension.vectorspace_satisfied
+      using subfield_def assms(2-3) field_extension.vectorspace
         field_extension_def vectorspace.fin_dim_def[of ?L "vs_of M", simplified] by blast
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
       using a.span_is_subset2 by auto
     note 1 = this[unfolded a.span_def a.lincomb_def, simplified]
     interpret b: module ?K \<open>vs_of M\<close>
-      by (simp add: M_over_K field_extension.vectorspace_satisfied vectorspace.axioms(1))
+      by (simp add: M_over_K field_extension.vectorspace vectorspace.axioms(1))
     assume "field_extension.finite M K"
     then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> b.span B = carrier M"
-      using M_over_K field_extension.vectorspace_satisfied vectorspace.fin_dim_def by fastforce
+      using M_over_K field_extension.vectorspace vectorspace.fin_dim_def by fastforce
     note 2 = this[unfolded b.span_def b.lincomb_def, simplified]
     from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f and A::"'a set"
       using that by auto
@@ -1001,9 +1001,9 @@ proof -
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
-      apply (simp add: subfield_def assms(2-3) cM_def field_extension.vectorspace_satisfied field_extension_def)
+      apply (simp add: subfield_def assms(2-3) cM_def field_extension.vectorspace field_extension_def)
       apply (simp add: cM_def fin(1))
-      by (simp add: M_over_K cM_def field_extension.vectorspace_satisfied)
+      by (simp add: M_over_K cM_def field_extension.vectorspace)
     from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
     have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) \<and> vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) =
       vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>) * vectorspace.dim ?K (vs_of ?L)"
@@ -1037,7 +1037,7 @@ proof -
         using subfield.linear_wrt_subfield[unfolded subfield_def, OF assms(1)] by auto
       have "vectorspace.fin_dim ?K (direct_sum (vs_of ?L) ?M')"
         by (smt Field_Extension.subfield_def applied_IH assms(1) direct_sum_dim(1)
-            field_extension.intro field_extension.vectorspace_satisfied fin(2) hM'(3)
+            field_extension.intro field_extension.vectorspace fin(2) hM'(3)
             partial_object.update_convs(1) ring.surjective subfield.vectorspace_wrt_subfield
             subspace.vs vectorspace.subspace_is_vs vectorspace_def)
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
@@ -1055,7 +1055,7 @@ proof -
         have "\<forall>p f A. carrier_update f (p::('a, 'b) ring_scheme)\<lparr>carrier := A\<rparr> = p\<lparr>carrier := A\<rparr>"
           by simp
         then have "vectorspace.fin_dim ?K (vs_of ?L) \<and> vectorspace ?K (vs_of ?L) \<and> vectorspace ?K ?M'"
-          by (metis (no_types) Field_Extension.subfield_def hM'(3) assms(1) field_extension.intro field_extension.vectorspace_satisfied fin(2) partial_object.update_convs(1) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs vectorspace_def)
+          by (metis (no_types) Field_Extension.subfield_def hM'(3) assms(1) field_extension.intro field_extension.vectorspace fin(2) partial_object.update_convs(1) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs vectorspace_def)
         then show ?thesis
           using applied_IH direct_sum_dim(2) by blast
       qed
