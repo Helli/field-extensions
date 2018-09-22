@@ -1217,21 +1217,6 @@ proof (rule ccontr, simp)
     using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
 qed
 
-lemma (in subspace)
-  assumes "vectorspace.fin_dim K V"
-  shows "vectorspace.fin_dim K (V\<lparr>carrier :=W\<rparr>)" (* and dim \<le> dim *)
-proof -
-  interpret vectorspace K V by (fact vs)
-  from assms obtain A where
-    A: "finite A" "A \<subseteq> carrier V" "gen_set A"
-    using fin_dim_def by blast
-  let ?B = "A \<inter> W"
-  from A(1) have "finite ?B" by simp
-  have "?B \<subseteq> W" by simp
-  have "span ?B = W"
-    thm span_li_not_depend(1)
-    oops
-
 text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} are ever used:\<close>
 find_theorems name: "subspace."
 find_theorems name: "submodule."

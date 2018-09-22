@@ -9,7 +9,7 @@ abbreviation "cff == UnivPoly.coeff" (* rm all *)
 
 section \<open>missing preliminaries?\<close>
 
-lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>part of @{thm to_contain_is_to_divide}\<close>
+lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{thm[source] to_contain_is_to_divide}\<close>
   "a \<in> carrier R \<Longrightarrow> b \<in> PIdl a \<Longrightarrow> a divides b"
   unfolding factor_def cgenideal_def using m_comm by blast
 
@@ -20,7 +20,7 @@ lemma (in comm_monoid) finprod_singleton':
     fin_A x_in_G finprod_one [of "A-{i}"]
     finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
   unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-thm comm_monoid.finprod_singleton[of _ i for i] comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
+thm comm_monoid.finprod_singleton[of _ i _ f for i f] comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
 
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
 
@@ -214,8 +214,6 @@ find_theorems name: indet_img_carrier
 find_theorems name: "pol." "id _"
 term Eval
 find_theorems name: P_def
-thm Eval_def
-thm pol.Eval_def
 
 (*
 end
@@ -556,19 +554,6 @@ lemma (in linear_map) iso_imports_dim:
 lemma (in vectorspace) zero_not_in_basis:
   "basis B \<Longrightarrow> \<zero>\<^bsub>V\<^esub> \<notin> B"
   by (simp add: basis_def vs_zero_lin_dep)
-
-lemma direct_sum_dim:
-  assumes "vectorspace K V" "vectorspace.fin_dim K V"
-  assumes "vectorspace K W" "vectorspace.fin_dim K W"
-  shows "vectorspace.fin_dim K (direct_sum V W)"
-    and "vectorspace.dim K (direct_sum V W) = vectorspace.dim K V + vectorspace.dim K W"
-proof -
-  from assms obtain Bv Bw where
-    Bv: "finite Bv" "vectorspace.basis K V Bv" and
-    Bw: "finite Bw" "vectorspace.basis K W Bw"
-    using vectorspace.finite_basis_exists (* blast loops, but not in sledgehammer oO *)
-    by metis
-  oops
 
 lemma direct_sum_dim:
   assumes "vectorspace K V" "vectorspace.fin_dim K V"
@@ -1468,15 +1453,8 @@ section \<open>Observations (*rm*)\<close>
 text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
 locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
 
-context subgroup begin
-lemma "group G" oops
-lemma "group (G\<lparr>carrier:=H\<rparr>)" oops
-end
-
 thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
-
-text \<open>@{thm[source] field_simps} are *not* available in general. Re-prove them?\<close>
 
 value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
 
@@ -1493,7 +1471,7 @@ text \<open>In @{thm[source] ring.ring_hom_imp_img_ring} and its follow-ups, a s
  avoided due to @{thm ring_hom_one} (the latter may be a good simp rule?):\<close>
 lemma (in ring) ring_hom_imp_img_ring':
   assumes "h \<in> ring_hom R S"
-  shows "ring (S \<lparr> carrier := h ` (carrier R), zero := h \<zero> \<rparr>)" (is "ring ?h_img")
+  shows "ring (S \<lparr> carrier := h ` carrier R, zero := h \<zero> \<rparr>)" (is "ring ?h_img")
 proof -
   from assms have [simp]: "?h_img = (S \<lparr> carrier := h ` (carrier R), one := h \<one>, zero := h \<zero> \<rparr>)"
     by (simp add: ring_hom_one)
@@ -1512,7 +1490,6 @@ proof -
     unfolding monoid_def by (simp add: monoid.defs)
 
   show ?thesis
-    apply simp
   proof (rule ringI, simp_all add: comm_group_abelian_groupI[OF comm_group, simplified] monoid[simplified])
     fix x y z assume "x \<in> h ` carrier R" "y \<in> h ` carrier R" "z \<in> h ` carrier R"
     then obtain r1 r2 r3
