@@ -481,7 +481,9 @@ end
 locale finite_field_extension = field_extension +
   assumes finite
 
-lemma (in field) trivial_degree[simp]: "trivial_extension.degree = 1"
+lemma (in field) trivial_extension_size:
+  shows trivial_extenion_finite: trivial_extension.finite
+    and trivial_extension_degree: "trivial_extension.degree = 1"
 proof -
   interpret vectorspace R \<open>vs_of R\<close> by (fact trivial_extension.vectorspace)
   let ?A = "{\<one>}"
@@ -494,8 +496,9 @@ proof -
   then have fin_dim "dim \<le> 1"
     using fin_dim_def apply force
     using A_generates_R dim_le1I by auto
-  then show ?thesis unfolding field_extension.degree_def[OF field_extension_refl]
-    using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp
+  then show trivial_extension.finite "trivial_extension.degree = 1"
+    unfolding field_extension.degree_def[OF field_extension_refl]
+    using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp_all
 qed
 
 lemma (in module) id_module_hom: "id \<in> module_hom R M M"
@@ -908,14 +911,8 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
   then have goal_2a: "inj_on ?T (carrier V)"
     by (simp add: linmap.Ke0_imp_inj)
   have "vectorspace.fin_dim K (vs_of K)" "vectorspace.dim K (vs_of K) = 1"
-    using trivial_degree[unfolded field_extension.degree_def[OF field_extension_refl]]
-    apply auto[] apply presburger
-  proof -
-    have "\<forall>p. p\<lparr>carrier := carrier p\<rparr> = p"
-      by fastforce
-    then show "vectorspace.dim K (vs_of K) = 1"
-      using field_extension.degree_def field_extension_refl by fastforce
-  qed
+    using trivial_extension_size[unfolded field_extension.degree_def[OF field_extension_refl]]
+    apply simp using trivial_extension.degree_def trivial_extension_degree by presburger
   with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
     by (simp add: direct_sum_dim(2) trivial_extension.vectorspace vs_span_B.vectorspace_axioms)
   also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
