@@ -773,7 +773,8 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
   let ?V = "vs (span ?B)"
   note goal_3 = span_is_subspace[OF BiV(1)]
   then interpret vs_span_B: vectorspace K ?V
-    using subspace_is_vs by blast
+    rewrites "carrier (vs (span ?B)) = span ?B"
+    using subspace_is_vs by blast simp
   from liB have liB': "vs_span_B.lin_indpt ?B"
     by (simp add: BiV in_own_span span_is_subspace span_li_not_depend(2))
   then have new_basis: "vs_span_B.basis ?B"
@@ -782,7 +783,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     using B(1) BiV(2) \<open>b \<in> B\<close> dim_basis by auto
   ultimately have "vs_span_B.fin_dim" and goal_4: "vs_span_B.dim = dim - 1"
     unfolding vs_span_B.fin_dim_def apply -
-     apply (metis BiV(2) vectorspace.basis_def vs_span_B.vectorspace_axioms)
+    apply (metis BiV(2) new_basis vs_span_B.basis_def)
     using BiV(2) vs_span_B.dim_basis by presburger
   define coeffs where "coeffs \<equiv> the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"
   have coeffs_unique: "\<exists>!c. c \<in> B \<rightarrow>\<^sub>E carrier K \<and> lincomb c B = v" if "v \<in> carrier V" for v
