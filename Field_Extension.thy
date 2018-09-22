@@ -213,7 +213,6 @@ qed (simp_all add: P_def Eval_def)
 find_theorems name: indet_img_carrier
 find_theorems name: "pol." "id _"
 term Eval
-term "(\<otimes>)"
 find_theorems name: P_def
 thm Eval_def
 thm pol.Eval_def
@@ -463,7 +462,6 @@ interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open
   by (fact vectorspace_satisfied)
 
 abbreviation finite where "finite \<equiv> vs.fin_dim"
-\<comment> \<open>Proposition 14.16 would look much better if I also had an abbreviation for infinite degree.\<close>
 
 definition degree where
   "degree \<equiv> if finite then vs.dim else 0"
@@ -1103,21 +1101,11 @@ qed
 
 subsection \<open>Polynomial Divisibility\<close>
 
-(*
-lemma (in field_extension) UP_univ_prop_exists: "\<alpha> \<in> carrier L \<Longrightarrow> UP_of_field_extension \<alpha> L K"
-  unfolding UP_of_field_extension_def apply auto
-  apply (metis UP_cring.intro UP_pre_univ_prop.intro UP_univ_prop.intro UP_univ_prop_axioms.intro
-      cring_ring_hom_cring is_cring ring_hom_cring_def)
-  by (simp add: field_extension_axioms)
-*)
-
 definition (in UP_of_field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
 
-(*
 definition (in field_extension) algebraic where
-  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic \<alpha> L K)"
-*)
+  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic L K \<alpha>)"
 
 definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 
@@ -1451,29 +1439,26 @@ proof -
     using a by simp
   finally show ?thesis by simp
 qed
-(*
-lemma (in field_extension) example_16_8_3:
-  assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic \<alpha> L K"
+
+lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
+  assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic L K \<alpha>"
 proof -
   define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
-  define Eval where "Eval = evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"
-  interpret a: UP_of_field_extension P \<alpha> Eval L K
-    by (simp_all add: assms UP_univ_prop_exists P_def Eval_def)
-  show ?thesis unfolding a.algebraic_def
-  proof
-    let ?x_minus_\<alpha> = "mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P \<alpha> 0"
-    show "Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
-      unfolding Eval_def using a.eval_monom_expr'[OF assms] by blast
-    show "?x_minus_\<alpha> \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
-      apply safe sorry
-  qed
-qed*)
-(* to-do: check relation to this simpler statement: *)
-lemma (in UP_of_field_extension) example_16_8_3':
-  assumes "\<alpha> \<in> K" shows algebraic oops
-(*
-corollary (in field) "field_extension.algebraic R (carrier R)"
-  oops*)
+  interpret \<alpha>?: UP_of_field_extension L K P
+    by unfold_locales (simp_all add: assms P_def)
+  let ?x_minus_\<alpha> = "mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P \<alpha> 0"
+  have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
+    unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast
+  have "?x_minus_\<alpha> \<noteq> \<zero>\<^bsub>P\<^esub>"
+    by simp (metis r_right_minus_eq deg_monom assms deg_const monom_closed nat.simps(3) sub_one_not_zero subf'd.one_closed)
+  with goal1 show ?thesis unfolding algebraic_def
+    using assms by fastforce
+qed
+lemma (in UP_of_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarrow> algebraic"
+  by (simp add: example_16_8_3)
+
+corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
+  by (simp add: field_extension.algebraic_def field_extension_refl field_extension.example_16_8_3)
 (* move these up as far as possible *)
 
 
