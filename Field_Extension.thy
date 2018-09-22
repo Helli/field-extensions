@@ -252,8 +252,8 @@ qed
 lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> s"
   by (simp add: Eval_monom id_def)
 
-lemma Eval_constant[simp]: "x \<in> K \<Longrightarrow> Eval (mnm P x 0) = x" unfolding
-  Eval_monom by simp
+lemma Eval_constant[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 0) = c"
+  unfolding Eval_monom by simp
 
 end
 
@@ -1350,14 +1350,14 @@ corollary irr_unique: "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> m
       insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
       ring.hom_zero ring.homeq_imp_rcos)
 
+abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+
 lemma aux: (*inline*)
-  "(\<lambda>Y. the_elem (Eval ` Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) im_Eval"
   unfolding PIdl_irr_a_kernel_Eval using ring.FactRing_iso_set_aux .
 
-lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> L\<lparr>carrier := Eval ` carrier P\<rparr>"
+lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> im_Eval"
   using aux is_ring_iso_def by auto
-
-abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
 
 lemma domain_im_Eval: "domain im_Eval" (* unused *)
   by (simp add: ring.img_is_domain S.domain_axioms)
@@ -1382,6 +1382,49 @@ lemma irr_irreducible_polynomial: "ring_irreducible irr"
 
 lemma maximalideal_PIdl_irr: "maximalideal (PIdl irr) P"
   by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+
+lemma rings: "ring (P Quot PIdl irr)"
+  by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
+
+lemma field_im_Eval: "field im_Eval"
+proof -
+  from theorem_16_9b_left obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
+    by (auto simp: is_ring_iso_def)
+  from maximalideal_PIdl_irr have "field (P Quot PIdl irr)"
+    using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
+  from field.ring_iso_imp_img_field[OF this h] show ?thesis
+    using h[unfolded ring_iso_def] ring_hom_zero[OF _ rings ring.img_is_ring] ring_hom_one by force
+qed
+
+lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
+  by (rule ring.subfield_iff(1)) (simp_all add: S.ring_axioms field_im_Eval image_subsetI)
+
+lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert s K)"
+  apply (rule S.generate_field_min_subfield1) apply auto
+  using Field_Extension.subfield_def subfield_im_Eval apply blast
+  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI subf'd.one_closed)
+  using Eval_constant pol.monom_closed by (metis image_eqI)
+
+lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert s K)"
+proof -
+  have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
+    by fast
+  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
+    by force
+  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+    by fastforce
+  also have "\<dots> = generate_field L (insert s K)"
+    by (fact genfield_singleton_explicit[symmetric])
+  finally show ?thesis .
+qed
+
+theorem the_elem_ring_iso_Quot_irr_generate_field:
+  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert s K)\<rparr>)"
+  using aux 1 2 by force
+
+corollary simple_algebraic_extension:
+  "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert s K)\<rparr>"
+  using the_elem_ring_iso_Quot_irr_generate_field is_ring_iso_def by blast
 
 end
 
