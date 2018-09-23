@@ -296,8 +296,8 @@ lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
   shows "Eval = evl (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id \<alpha>"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
 proof -
-  have "field (L\<lparr>carrier:=M\<rparr>)"
-    using subfield_def S.subfield_iff(2) assms(1) by blast
+  from assms(1) have "field (L\<lparr>carrier:=M\<rparr>)"
+    by (simp add: S.subfield_iff(2))
   have a: "(\<lambda>i. up_ring.coeff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i) \<in> {..deg (L\<lparr>carrier := K\<rparr>) p} \<rightarrow> M"
     if "p \<in> carrier P" for p
   proof auto
@@ -310,7 +310,7 @@ proof -
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "cff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
-      using assms(1) by (simp add: Subrings.subfield.axioms(1) subdomainE(6))
+      by (simp add: assms(1))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
@@ -403,8 +403,8 @@ proof -
            apply (intro ring.ring_incl_imp_subring) apply auto
         apply (simp add: subfield.axioms L_over_M S.subring_is_ring subfieldE(1))
         using * apply blast
-        apply (simp add: R.ring_axioms)
-        using subfield_def L_over_M S.Subring_cring subfieldE(1) apply blast
+            apply (simp add: R.ring_axioms)
+           apply (simp add: L_over_M S.Subring_cring subfieldE(1))
           apply (fact is_UP_cring)
          apply (simp add: ** UP_univ_prop_axioms_def)
         using "*" "**" L_over_M intermediate_field_eval pol.Eval_def by auto
@@ -915,7 +915,7 @@ qed
 proposition tower_rule: \<comment> \<open>Maybe this is easier when following the comment on line 500 here: @{url
   "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}.
   Or wikipedia.\<close>
-  assumes "Subrings.subfield K (M\<lparr>carrier:=L\<rparr>)" "Subrings.subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
+  assumes "subfield K (M\<lparr>carrier:=L\<rparr>)" "subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows degree_multiplicative:
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
 proof -
@@ -1060,7 +1060,7 @@ proof -
     have "ring M"
       using assms(3) cring.axioms(1) domain_def field_def by blast
     with assms(1) show ?thesis
-      by (simp add: M_over_K Subrings.ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
+      by (simp add: M_over_K ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
   qed
 qed
 
