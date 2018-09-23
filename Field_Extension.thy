@@ -183,7 +183,7 @@ locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
 begin
-definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
+definition "Eval = evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
 sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
@@ -246,7 +246,7 @@ locale finitely_generated_field_extension = field_extension +
 (*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>? Or replace locale by a simple predicate?\<close>
 or simply add this:
 begin
-definition "S \<equiv> SOME S. finite S \<and> generate_field L (S \<union> K) = carrier L"
+definition "S = (SOME S. finite S \<and> generate_field L (S \<union> K) = carrier L)"
 end
 *)
 
@@ -452,7 +452,7 @@ interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open
 abbreviation finite where "finite \<equiv> vs.fin_dim"
 
 definition degree where
-  "degree \<equiv> if finite then vs.dim else 0"
+  "degree = (if finite then vs.dim else 0)"
  \<comment> \<open>Here, \<open>\<infinity>\<close> is encoded as \<open>0\<close>. Adapting it to another notion of cardinality
  (ecard / enat) should not be too difficult.\<close>
 
@@ -760,7 +760,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding vs_span_B.fin_dim_def apply -
     apply (metis BiV(2) new_basis vs_span_B.basis_def)
     using BiV(2) vs_span_B.dim_basis by presburger
-  define coeffs where "coeffs \<equiv> the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"
+  define coeffs where "coeffs = the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"
   have coeffs_unique: "\<exists>!c. c \<in> B \<rightarrow>\<^sub>E carrier K \<and> lincomb c B = v" if "v \<in> carrier V" for v
     using basis_criterion by (metis (full_types) B basis_def card_ge_0_finite that)
   have okese: "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
@@ -1084,7 +1084,7 @@ lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lco
 context UP_of_field_extension begin
 
 definition irr where (* mv into algebraic context? *)
-  "irr = arg_min (deg (L\<lparr>carrier:=K\<rparr>)) (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+  "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
