@@ -12,7 +12,7 @@ text\<open>The next two lemmas formalise
 
 lemma (in vectorspace) corollary_5_14:
   assumes fin_dim
-  assumes "S \<subseteq> carrier V" "lin_indpt S"
+  assumes "S \<subseteq> carrier V" and "lin_indpt S"
   shows "\<exists>B. S \<subseteq> B \<and> basis B"
 proof -
   from \<open>fin_dim\<close> have "finite M \<and> card M \<le> dim" if "M \<subseteq> carrier V" "lin_indpt M" for M

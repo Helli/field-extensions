@@ -147,12 +147,9 @@ lemmas (in ring)
   subfieldI = subfieldI[folded subfield_def] and
   subfield_m_inv = subfield_m_inv[folded subfield_def]
 
-lemma (in field) field_extension_refl: "field_extension R (carrier R)"
-  by (simp add: field_extension.intro field_axioms subfield_iff(1))
-
 sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close>
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
-  by (fact field_extension_refl) simp
+  by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
 
 lemma (in subfield) additive_subgroup: "additive_subgroup K L"
   by (simp add: additive_subgroupI is_subgroup)
@@ -322,7 +319,7 @@ proof -
     fix i
     assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
     then have "cff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
-      using assms coeff_closed that apply auto
+      using assms coeff_closed that
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
             simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
@@ -501,8 +498,8 @@ proof -
     using fin_dim_def apply force
     using A_generates_R dim_le1I by auto
   then show trivial_extension.finite "trivial_extension.degree = 1"
-    unfolding field_extension.degree_def[OF field_extension_refl]
-    using field_extension.fin_dim_nonzero[OF field_extension_refl] by simp_all
+    unfolding trivial_extension.degree_def
+    using trivial_extension.fin_dim_nonzero by simp_all
 qed
 
 lemma (in module) id_module_hom: "id \<in> module_hom R M M"
@@ -915,8 +912,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
   then have goal_2a: "inj_on ?T (carrier V)"
     by (simp add: linmap.Ke0_imp_inj)
   have "vectorspace.fin_dim K (vs_of K)" "vectorspace.dim K (vs_of K) = 1"
-    using trivial_extension_size[unfolded field_extension.degree_def[OF field_extension_refl]]
-    apply simp using trivial_extension.degree_def trivial_extension_degree by presburger
+    using trivial_extension_size[unfolded trivial_extension.degree_def] by simp_all
   with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
     by (simp add: direct_sum_dim(2) trivial_extension.vectorspace vs_span_B.vectorspace_axioms)
   also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
@@ -1446,7 +1442,7 @@ lemma (in UP_of_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrighta
   by (simp add: example_16_8_3)
 
 corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
-  by (simp add: field_extension.algebraic_def field_extension_refl field_extension.example_16_8_3)
+  using trivial_extension.algebraic_def trivial_extension.example_16_8_3 by blast
 (* move these up as far as possible *)
 
 
