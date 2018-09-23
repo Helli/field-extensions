@@ -5,7 +5,7 @@ begin
 
 abbreviation "evl == UnivPoly.eval"
 abbreviation "mnm == UnivPoly.monom"
-abbreviation "cff == UnivPoly.coeff" (* rm all *)
+abbreviation "cff == UnivPoly.coeff" (* rm after import reduction *)
 
 section \<open>missing preliminaries?\<close>
 
@@ -131,33 +131,19 @@ section \<open>Field Extensions\<close>
 
 subsection \<open>convenient locale setup\<close>
 
-locale subfield = subfield K L for K L
-  \<comment> \<open>only for renaming. rm.\<close>
-
 locale field_extension = subf'd?: subfield K L + S?: field L for L K
-
-lemmas
-  subfield_intro = Subrings.subfield.intro[folded subfield_def]
-lemmas (in field)
-  generate_fieldE = generate_fieldE[folded subfield_def] and
-  subfieldI' = subfieldI'[folded subfield_def] and
-  generate_field_min_subfield2 = generate_field_min_subfield2[folded subfield_def]
-lemmas (in ring)
-  subfield_iff = subfield_iff[folded subfield_def] and
-  subfieldI = subfieldI[folded subfield_def] and
-  subfield_m_inv = subfield_m_inv[folded subfield_def]
 
 sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close>
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
   by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
 
-lemma (in subfield) additive_subgroup: "additive_subgroup K L"
+lemma (in subfield) additive_subgroup: "additive_subgroup K R"
   by (simp add: additive_subgroupI is_subgroup)
 
 lemma (in subfield) finsum_simp: (* unused *)
-  assumes \<open>ring L\<close>
+  assumes \<open>ring R\<close>
   assumes "v ` A \<subseteq> K"
-  shows "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>L\<^esub>i \<in> A. v i)"
+  shows "(\<Oplus>\<^bsub>R\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>R\<^esub>i \<in> A. v i)"
   unfolding finsum_def apply auto using assms
 proof (induction A rule: infinite_finite_induct)
   case (infinite A)
@@ -165,7 +151,7 @@ proof (induction A rule: infinite_finite_induct)
     by (simp add: finprod_def)
 next
   case empty
-  have "\<zero>\<^bsub>L\<^esub> \<in> K"
+  have "\<zero> \<in> K"
     by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
   then show ?case
       by (simp add: finprod_def)
@@ -173,30 +159,29 @@ next
   case (insert x F)
   have a: "v \<in> F \<rightarrow> K"
     using insert.prems(2) by auto
-  moreover have "K \<subseteq> carrier L"
+  moreover have "K \<subseteq> carrier R"
     by (simp add: subset)
-  ultimately have b: "v \<in> F \<rightarrow> carrier L"
+  ultimately have b: "v \<in> F \<rightarrow> carrier R"
     by fast
   have d: "v x \<in> K"
     using insert.prems(2) by auto
-  then have e: "v x \<in> carrier L"
-    using \<open>K \<subseteq> carrier L\<close> by blast
-  have "abelian_monoid (L\<lparr>carrier := K\<rparr>)" using assms(1)
+  then have e: "v x \<in> carrier R"
+    using \<open>K \<subseteq> carrier R\<close> by blast
+  have "abelian_monoid (R\<lparr>carrier := K\<rparr>)" using assms(1)
     using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
-  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>\<^bsub>L\<^esub>), one = \<zero>\<^bsub>L\<^esub>, \<dots> = undefined::'b\<rparr>"
+  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
     by (simp add: abelian_monoid_def)
-  note comm_monoid.finprod_insert[of "add_monoid L", simplified, OF _ insert.hyps b e, simplified]
-  then have "finprod (add_monoid L) v (insert x F) = v x \<oplus>\<^bsub>L\<^esub> finprod (add_monoid L) v F"
+  note comm_monoid.finprod_insert[of "add_monoid R", simplified, OF _ insert.hyps b e, simplified]
+  then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
     using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
-  with comm_monoid.finprod_insert[of "add_monoid (L\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
+  with comm_monoid.finprod_insert[of "add_monoid (R\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
   show ?case
     by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
 qed
 
-locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<alpha> (* and Eval *)
+locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
-(*defines "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id s"*)
 begin
 definition "Eval \<equiv> evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
 sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
@@ -325,7 +310,7 @@ proof -
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "cff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
-      using assms(1) by (simp add: subfield_def Subrings.subfield.axioms(1) subdomainE(6))
+      using assms(1) by (simp add: Subrings.subfield.axioms(1) subdomainE(6))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
@@ -725,7 +710,7 @@ lemma (in subring) module_wrt_subring:
   unfolding module_def module_axioms_def by (simp add: cring.Subring_cring subring_axioms)
 
 lemma (in subfield) vectorspace_wrt_subfield:
-  "vectorspace L V \<Longrightarrow> vectorspace (L\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
+  "vectorspace R V \<Longrightarrow> vectorspace (R\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
   by (auto simp: module_wrt_subring ring.subfield_iff(2) cring.axioms(1) module.axioms(1) subfield_axioms)
 
 lemma (in subring) hom_wrt_subring:
@@ -733,7 +718,7 @@ lemma (in subring) hom_wrt_subring:
   by (simp add: LinearCombinations.module_hom_def)
 
 lemma (in subfield) linear_wrt_subfield:
-  "linear_map L M N T \<Longrightarrow> linear_map (L\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
+  "linear_map R M N T \<Longrightarrow> linear_map (R\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
   by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
 lemma (in module) lincomb_restrict_simp[simp, intro]:
@@ -940,14 +925,13 @@ proof -
   let ?L = "M\<lparr>carrier:=L\<rparr>" and ?K = "M\<lparr>carrier:=K\<rparr>"
 
   have "K \<subseteq> L"
-    using subfield_def assms(1) subfieldE(3) by force
+    using assms(1) subfieldE(3) by fastforce
   then have "K \<subseteq> carrier M"
     by (meson assms(2) order.trans subfieldE(3))
   then have M_over_K: "field_extension M K"
-    by (metis (no_types, lifting) field.generate_fieldE(1) subfield.axioms \<open>K \<subseteq> L\<close> assms(1-3)
-        field.generate_fieldI field.generate_field_is_field field.subfield_gen_equality
-        field_extension.intro monoid.surjective partial_object.update_convs(1) subfieldE(3)
-        subset_refl)
+    by (metis (no_types) \<open>K \<subseteq> L\<close> assms cring.axioms(1) domain_def field.generate_fieldE(1)
+        field.generate_fieldI field.subfield_gen_equality field_def field_extension.intro order_refl
+        ring.subfield_iff(2) subfieldE(3))
 
   have "\<not>field_extension.finite M K" if "\<not>field_extension.finite ?L K"
   proof -
@@ -956,12 +940,10 @@ proof -
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: enclosing.vectorspace_axioms)
       apply (rule enclosing.module.module_incl_imp_submodule)
-      apply (simp add: subfield.axioms assms(2) field_extension.axioms(1)
-          subfieldE(3))
+      apply (simp add: assms(2) subfieldE(3))
       subgoal proof -
       from assms have "field_extension ?L K"
-        using subfield.intro Subrings.ring.subfield_iff(2) cring_def domain_def field_def
-          field_extension.intro by blast
+        using cring.axioms(1) domain_def field_def field_extension.intro ring.subfield_iff(2) by blast
       note field_extension.vectorspace[OF this]
       then show ?thesis by (auto simp: vectorspace_def)
     qed done
@@ -973,7 +955,7 @@ proof -
   proof
     interpret a: vectorspace ?L \<open>vs_of M\<close>
       rewrites "carrier (M\<lparr>carrier:=L\<rparr>) = L"
-      by (simp_all add: subfield_def assms(2-3) field_extension.vectorspace field_extension_def)
+      by (simp_all add: assms(2-3) field_extension.vectorspace field_extension_def)
     from that have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
       by (simp add: a.fin_dim_def)
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
@@ -998,7 +980,7 @@ proof -
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
-      apply (simp add: subfield_def assms(2-3) cM_def field_extension.vectorspace field_extension_def)
+      apply (simp add: assms(2-3) cM_def field_extension.vectorspace field_extension_def)
       apply (simp add: cM_def fin(1))
       by (simp add: M_over_K cM_def field_extension.vectorspace)
     from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
@@ -1028,15 +1010,17 @@ proof -
         using Suc.hyps(2) hM'(4) apply simp
         using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
         using Suc.prems(2) hM'(3) subspace.corollary_5_16(1) apply force
-        using hM'(3) assms(1) subfield.vectorspace_wrt_subfield[unfolded subfield_def, OF assms(1)] Suc(3)
+        using hM'(3) assms(1) subfield.vectorspace_wrt_subfield[OF assms(1)] Suc(3)
         by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
       from hM'(1) have lin_K_map: "linear_map ?K (vs_of M\<lparr>carrier:=cM\<rparr>) (direct_sum (vs_of ?L) ?M') h"
-        using subfield.linear_wrt_subfield[unfolded subfield_def, OF assms(1)] by auto
+        using subfield.linear_wrt_subfield[OF assms(1)] by auto
       have "vectorspace.fin_dim ?K (direct_sum (vs_of ?L) ?M')"
-        by (smt Field_Extension.subfield_def applied_IH assms(1) direct_sum_dim(1)
-            field_extension.intro field_extension.vectorspace fin(2) hM'(3)
-            partial_object.update_convs(1) ring.surjective subfield.vectorspace_wrt_subfield
-            subspace.vs vectorspace.subspace_is_vs vectorspace_def)
+      proof -
+        have "vectorspace (M\<lparr>carrier := K\<rparr>) \<lparr>carrier = cM', monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>M\<^esub>, add = (\<oplus>\<^bsub>M\<^esub>), smult = (\<otimes>\<^bsub>M\<^esub>)\<rparr>"
+          using assms(1) hM'(3) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs by fastforce
+        then show ?thesis
+          by (metis (no_types) applied_IH assms(1) direct_sum_dim(1) field_extension.intro field_extension.vectorspace fin(2) m_facts(1) partial_object.select_convs(1) partial_object.surjective partial_object.update_convs(1) vectorspace_def)
+      qed
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
         using linear_map.iso_imports_dim(1)[OF lin_K_map] by (simp add: direct_sum_def hM'(2))
       with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16(1) hM'(2) have
@@ -1049,12 +1033,12 @@ proof -
       qed
       also have "\<dots> = vectorspace.dim ?K (vs_of ?L) + vectorspace.dim ?K ?M'"
       proof -
-        have "\<forall>p f A. carrier_update f (p::('a, 'b) ring_scheme)\<lparr>carrier := A\<rparr> = p\<lparr>carrier := A\<rparr>"
+        have f1: "M\<lparr>carrier := K\<rparr> = M\<lparr>carrier := L, carrier := K\<rparr>"
           by simp
-        then have "vectorspace.fin_dim ?K (vs_of ?L) \<and> vectorspace ?K (vs_of ?L) \<and> vectorspace ?K ?M'"
-          by (metis (no_types) Field_Extension.subfield_def hM'(3) assms(1) field_extension.intro field_extension.vectorspace fin(2) partial_object.update_convs(1) subfield.vectorspace_wrt_subfield subspace.vs vectorspace.subspace_is_vs vectorspace_def)
+        have "vectorspace (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM'\<rparr>)"
+          using Suc(3) assms(1) hM'(3) subfield.vectorspace_wrt_subfield vectorspace.subspace_is_vs by fastforce
         then show ?thesis
-          using applied_IH direct_sum_dim(2) by blast
+          using f1 by (metis (no_types) Suc(3) applied_IH assms(1) direct_sum_dim(2) field_extension.intro field_extension.vectorspace fin(2) vectorspace_def)
       qed
       finally show ?case apply safe using goal1 apply simp
       proof -
@@ -1073,12 +1057,10 @@ proof -
   moreover
   show ?thesis
   proof -
-    have f1: "ring M"
+    have "ring M"
       using assms(3) cring.axioms(1) domain_def field_def by blast
-    then have "Field_Extension.subfield K ?L"
-      by (metis (no_types) ring.subfield_iff(1) Subrings.ring.subfield_iff(2) assms(1-2) cring.axioms(1) domain_def field_def subfieldE(3))
-    then show ?thesis using f1
-      by (simp add: Field_Extension.ring.subfield_iff(1) M_over_K Subrings.ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
+    with assms(1) show ?thesis
+      by (simp add: M_over_K Subrings.ring.subfield_iff(2) assms(2-3) calculation field_extension.degree_def field_extension.intro subfieldE(3))
   qed
 qed
 
@@ -1127,14 +1109,12 @@ proof goal_cases
 next
   case (2 u)
   then have "mnm P (inv\<^bsub>L\<^esub> u) 0 \<otimes> mnm P u 0 = mnm P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
-    using Field_Extension.ring.subfield_m_inv(1) S.ring_axioms monom_mult_smult
-      pol.monom_mult_is_smult subfield_axioms by fastforce
+    using monom_mult_smult pol.monom_mult_is_smult subfield_axioms S.subfield_m_inv(1) by auto
   also have "\<dots> = \<one>"
     using "2" S.subfield_m_inv(3) monom_one subfield_axioms by auto
   finally show ?case
-    by (metis (no_types, lifting) "2" Diff_iff Field_Extension.ring.subfield_m_inv(1)
-        P.Units_one_closed P.prod_unit_l P.unit_factor S.ring_axioms monom_closed singletonD
-        subfield_axioms)
+    by (metis (no_types, lifting) "2" Diff_iff P.Units_one_closed P.prod_unit_l P.unit_factor
+        S.ring_axioms monom_closed ring.subfield_m_inv(1) singletonD subfield_axioms)
 qed
 
 corollary Units_poly': "Units P = (\<lambda>u. mnm P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
@@ -1371,7 +1351,7 @@ lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
 
 lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   apply (rule S.generate_field_min_subfield1) apply auto
-  using Field_Extension.subfield_def subfield_im_Eval apply blast
+  using subfield_im_Eval apply blast
   using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI subf'd.one_closed)
   using Eval_constant pol.monom_closed by (metis image_eqI)
 
