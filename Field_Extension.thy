@@ -461,7 +461,11 @@ lemma vectorspace: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
   by (simp add: semiring.semiring_simprules(13) semiring_axioms)
 
 interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
-  by (fact vectorspace)
+(*  rewrites 436: "carrier (L\<lparr>carrier := K\<rparr>) = K"
+    and 346: "carrier (vs_of L) = carrier L"
+    and 3478: "(\<Oplus>\<^bsub>vs_of L\<^esub>v\<in>A. a v) = (\<Oplus>\<^bsub>L\<^esub>v\<in>A. a v)"
+    and 34690: "(\<odot>\<^bsub>vs_of L\<^esub>) = (\<otimes>\<^bsub>L\<^esub>)"  *)
+  by (fact vectorspace) (*(simp_all add: finsum_def finprod_def)*)
 
 abbreviation finite where "finite \<equiv> vs.fin_dim"
 
@@ -950,7 +954,7 @@ proof -
         subset_refl)
 
   have "\<not>field_extension.finite M K" if "\<not>field_extension.finite ?L K"
-  proof
+  proof -
     from M_over_K interpret enclosing: vectorspace ?K \<open>vs_of M\<close>
       by (simp add: field_extension.vectorspace)
     have subspace: "subspace ?K L (vs_of M)"
@@ -965,27 +969,27 @@ proof -
       note field_extension.vectorspace[OF this]
       then show ?thesis by (auto simp: vectorspace_def)
     qed done
-    assume enclosing.fin_dim
-    with that show False
-      using subspace.corollary_5_16(1)[OF subspace] by simp
+    with that show "\<not>enclosing.fin_dim"
+      using subspace.corollary_5_16(1)[OF subspace] by force
   qed
 
   moreover have "\<not>field_extension.finite M K" if "\<not>field_extension.finite M L"
   proof
-    interpret a: module ?L \<open>vs_of M\<close>
-      by (simp add: subfield_def assms(2-3) field_extension.vectorspace field_extension_def vectorspace.axioms(1))
-    from that have "\<not>(\<exists>\<comment>\<open>Avoid latex dependency\<close>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
-      using subfield_def assms(2-3) field_extension.vectorspace
-        field_extension_def vectorspace.fin_dim_def[of ?L "vs_of M", simplified] by blast
+    interpret a: vectorspace ?L \<open>vs_of M\<close>
+      rewrites "carrier (M\<lparr>carrier:=L\<rparr>) = L"
+      by (simp_all add: subfield_def assms(2-3) field_extension.vectorspace field_extension_def)
+    from that have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
+      by (simp add: a.fin_dim_def)
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
       using a.span_is_subset2 by auto
-    note 1 = this[unfolded a.span_def a.lincomb_def, simplified]
-    interpret b: module ?K \<open>vs_of M\<close>
-      by (simp add: M_over_K field_extension.vectorspace vectorspace.axioms(1))
+    note 1 = this[unfolded a.span_def a.lincomb_def]
+    interpret b: vectorspace ?K \<open>vs_of M\<close>
+      rewrites "carrier (M\<lparr>carrier:=K\<rparr>) = K"
+      by (simp_all add: M_over_K field_extension.vectorspace)
     assume "field_extension.finite M K"
     then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> b.span B = carrier M"
-      using M_over_K field_extension.vectorspace vectorspace.fin_dim_def by fastforce
-    note 2 = this[unfolded b.span_def b.lincomb_def, simplified]
+      by (simp add: b.fin_dim_def)
+    note 2 = this[unfolded b.span_def b.lincomb_def]
     from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f and A::"'a set"
       using that by auto
     with 1 2 show False
