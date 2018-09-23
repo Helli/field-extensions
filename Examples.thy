@@ -3,10 +3,10 @@ theory Examples imports Field_Extension
 begin
 
 definition standard_ring (* replace by abbreviation, it is never used on its own *)
-  where "standard_ring carr = \<lparr>carrier = carr, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+  where "standard_ring carr = \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
-  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
+  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = (*) , one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
   unfolding univ_ring_def
