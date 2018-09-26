@@ -31,19 +31,19 @@ proof -
   from h1 h2 have 2: "abelian_group (direct_sum M1 M2)" 
     apply (intro abelian_groupI, auto)
          apply (unfold direct_sum_def, auto)
-       by (auto simp: v1.a_ac v2.a_ac)
+       by (auto simp add: v1.a_ac v2.a_ac)
   from h1 h2 assms have 3: "module_axioms R (direct_sum M1 M2)"
     apply (unfold module_axioms_def, auto)
         apply (unfold direct_sum_def, auto)
-         by (auto simp: v1.smult_l_distr v2.smult_l_distr v1.smult_r_distr v2.smult_r_distr
+         by (auto simp add: v1.smult_l_distr v2.smult_l_distr v1.smult_r_distr v2.smult_r_distr
       v1.smult_assoc1 v2.smult_assoc1)
   from 1 2 3  show ?thesis by (unfold module_def, auto)
 qed
 
-definition inj1
+definition inj1 :: "('a, 'b, 'm1) module_scheme \<Rightarrow> ('a, 'c, 'm2) module_scheme \<Rightarrow> 'b \<Rightarrow> 'b\<times>'c"
   where "inj1 M1 M2 = (\<lambda>v. (v, \<zero>\<^bsub>M2\<^esub>))"
 
-definition inj2
+definition inj2 :: "('a, 'b, 'm1) module_scheme \<Rightarrow> ('a, 'c, 'm2) module_scheme \<Rightarrow> 'c \<Rightarrow> 'b\<times>'c"
   where "inj2 M1 M2 = (\<lambda>v. (\<zero>\<^bsub>M1\<^esub>, v))"
 
 lemma inj1_hom:
@@ -56,7 +56,7 @@ proof -
   from h1 h2 show ?thesis
     apply (unfold mod_hom_def module_hom_def mod_hom_axioms_def inj1_def, auto)
        apply (rule direct_sum_is_module, auto)
-    by (unfold direct_sum_def, auto)
+      by (unfold direct_sum_def, auto)
 qed
 
 lemma inj2_hom:
@@ -69,16 +69,8 @@ proof -
   from h1 h2 show ?thesis
     apply (unfold mod_hom_def module_hom_def mod_hom_axioms_def inj2_def, auto)
        apply (rule direct_sum_is_module, auto)
-    by (unfold direct_sum_def, auto)
+      by (unfold direct_sum_def, auto)
 qed
-
-lemma
-  assumes h1: "module R M1" and h2: "module R M2"
-  shows inj1_ker: "mod_hom.ker M1 (direct_sum M1 M2) (inj1 M1 M2) = {\<zero>\<^bsub>M1\<^esub>}"
-    and inj2_ker: "mod_hom.ker M2 (direct_sum M1 M2) (inj2 M1 M2) = {\<zero>\<^bsub>M2\<^esub>}"
-  unfolding mod_hom.ker_def[OF inj1_hom[OF h1 h2]] mod_hom.ker_def[OF inj2_hom[OF h1 h2]]
-  unfolding inj1_def inj2_def direct_sum_def
-  using abelian_groupE(2) h1 h2 module.axioms(2) by auto
 
 text {*For submodules $M_1,M_2\subseteq M$, the map $M_1\oplus M_2\to M$ given by $(m_1,m_2)\mapsto 
 m_1+m_2$ is linear.*}
@@ -97,7 +89,7 @@ proof -
        apply (rule direct_sum_is_module, auto)
       apply (unfold direct_sum_def, auto)
       using submoduleE apply auto
-     by (auto simp: a_ac smult_r_distr ring_subset_carrier)
+     by (auto simp add: a_ac smult_r_distr ring_subset_carrier) 
       (*key is a_ac, permutative rewrite rule*)
 qed
 
@@ -141,8 +133,6 @@ proof -
      apply (unfold submodule_def)
      apply (rename_tac v w)
     using M.add.m_comm M.add.subgroupE(1) by blast+
-    (* Alternatively, apply (rule_tac x="w" in bexI, rule_tac x="v" in bexI,
-      auto simp add: ring_subset_carrier M.a_ac)+ *)
 qed
 
 text {*If $M_1,M_2\subseteq M$ are submodules, then $M_1+M_2$ is the minimal subspace such that 
