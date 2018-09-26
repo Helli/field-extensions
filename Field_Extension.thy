@@ -1235,11 +1235,20 @@ qed
 
 corollary irr_sane:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
-  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y" (* rm? *)
+  and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y"
   using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
 
 corollary irr_nonzero: "irr \<noteq> \<zero>"
   by (simp add: monic_irr monic_nonzero)
+
+corollary irr_nonconstant: "degree irr > 0"
+proof (rule ccontr)
+  assume "\<not> degree irr > 0"
+  with monic_irr have "irr = mnm P \<one>\<^bsub>L\<^esub> 0"
+    using deg_zero_impl_monom irr_in_P monic_def by fastforce
+  then show False
+    using Eval_irr by simp
+qed
 
 lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
