@@ -99,7 +99,7 @@ proof -
   from 3 6 show ?thesis by auto
 qed
 
-lemmas (in comm_monoid)[simp] = finprod_one_eqI
+lemmas (in comm_monoid) [simp] = finprod_one_eqI
 
 context abelian_monoid
 begin

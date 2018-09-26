@@ -7,7 +7,6 @@ imports Main
   (*MonoidSums*)
 begin
 
-subsection {* Basic facts *}
 text {*In a field, every nonzero element has an inverse.*} (* Add to Ring.*)
 lemma (in field) inverse_exists [simp, intro]: 
   assumes h1: "a\<in>carrier R"  and h2: "a\<noteq>\<zero>\<^bsub>R\<^esub>"
