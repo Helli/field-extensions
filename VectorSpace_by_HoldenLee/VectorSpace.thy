@@ -26,10 +26,10 @@ text {*A @{text "subspace"} of a vectorspace is a nonempty subset
 that is closed under addition and scalar multiplication. These properties
 have already been defined in submodule. Caution: W is a set, while V is 
 a module record. To get W as a vectorspace, write vs W.*}
-locale subspace = (*Why no import? *)
+locale subspace =
   fixes K and W and V (structure)
   assumes vs: "vectorspace K V"
-      and submod: "submodule W K V"
+      and submod: "submodule W K V" (* F.H.: Why not as imports? *)
 
 
 lemma (in vectorspace) is_module[simp]:
@@ -327,7 +327,7 @@ proof -
     from a a31 nz3 singleton show ?thesis 
       apply (unfold span_def, auto) 
       apply (rule_tac x="?b" in exI)
-      apply (rule_tac x="A\<inter>S" in exI)
+      apply (rule_tac x="A\<inter>S" in exI) 
       by blast
   qed
   have a2: "v\<in> (span S) \<Longrightarrow> lin_dep ?T"
@@ -884,9 +884,9 @@ proof -
     from b1 have A_li: "lin_indpt A"
     proof -
       let ?z="\<lambda> x. (if (x\<in>A) then \<zero>\<^bsub>K\<^esub> else undefined)" 
-      from A_fin AinC have zero: "?Q ?z \<zero>\<^bsub>V\<^esub>"
+      from A_fin AinC have zero: "?Q ?z \<zero>\<^bsub>V\<^esub>" 
         by (unfold PiE_def extensional_def lincomb_def, auto simp add: ring_subset_carrier)
-          \<comment> \<open>uses @{thm[source] finsum_all0}\<close>
+        (*uses finsum_all0*)
       from A_fin AinC show ?thesis 
       proof (rule finite_lin_indpt2)
         fix a
@@ -1199,27 +1199,6 @@ theorem (in linear_map) rank_nullity:
   shows "(vectorspace.dim K (W.vs imT)) + (vectorspace.dim K (V.vs kerT)) = V.dim"       
   by (rule rank_nullity_main[OF fd])
 
-lemma (in vectorspace) dim_greater_0:
-  assumes fin_dim
-  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
-  shows "dim > 0"
-proof (rule ccontr, simp)
-  assume "dim = 0"
-  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
-    using assms basis_def dim_basis finite_basis_exists by auto
-  then have "gen_set {}"
-    by force
-  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
-    using assms(2) by blast
-  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
-    unfolding span_def by auto
-  then show False unfolding lincomb_def
-    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
-qed
-
-text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} are ever used:\<close>
-find_theorems name: "subspace."
-find_theorems name: "submodule."
-
 
 end
+

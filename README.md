@@ -14,3 +14,4 @@ confusing junk from within the definition of func_space.
 definieren, als falsch zu definieren"). All jesting aside, the theory of algebras is developed elsewhere, and the
 definition was wrong anyway. I also slightly relaxed the type constrain on inj1 and inj2, one could further relax it to
 ring_scheme.
+- In VectorSpace, I only remove two superseded lemmas.

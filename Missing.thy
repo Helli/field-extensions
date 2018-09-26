@@ -5,7 +5,25 @@ begin
 subsection \<open>Vector Spaces\<close>
 
 lemma (in module) lin_indpt_empty: "lin_indpt {}"
-  by (simp add: finite_lin_indpt2)
+  by (simp add: lin_dep_def)
+
+lemma (in vectorspace) dim_greater_0:
+  assumes fin_dim
+  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
+  shows "dim > 0"
+proof (rule ccontr, simp)
+  assume "dim = 0"
+  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
+    using assms basis_def dim_basis finite_basis_exists by auto
+  then have "gen_set {}"
+    by force
+  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
+    using assms(2) by blast
+  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
+    unfolding span_def by auto
+  then show False unfolding lincomb_def
+    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
+qed
 
 text\<open>The next two lemmas formalise
   \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LA_info_no_dates.pdf#chapter.5\<close>\<close>

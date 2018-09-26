@@ -1492,4 +1492,9 @@ proof -
   qed
 qed
 
+text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
+find_theorems name: "subspace."
+find_theorems name: "submodule."
+text\<open>Also, the different argument order is somewhat annoying.\<close>
+
 end
