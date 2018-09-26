@@ -19,7 +19,7 @@ proof -
     using that by (simp add: li_le_dim)
   note useful = maximal_exists[OF this]
   have "\<exists>B. finite B \<and> maximal B (\<lambda>M. S \<subseteq> M \<and> M \<subseteq> carrier V \<and> lin_indpt M)"
-    apply (rule useful) using assms apply auto done
+    by (rule useful) (use assms in auto)
   then show ?thesis
     by (smt dual_order.trans max_li_is_basis maximal_def)
 qed

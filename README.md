@@ -4,5 +4,5 @@ The theories in VectorSpace_by_HoldenLee stem from https://devel.isa-afp.org/ent
 https://devel.isa-afp.org/browser_info/current/AFP/Jordan_Normal_Form/Missing_VectorSpace.html. I have slightly
 adjusted VectorSpace to better use the new HOL-Algebra:
 
-- In RingModuleFacts.thy, I removed the now-superseded facts lmult_0 and rmult_O,
+- In RingModuleFacts.thy, I removed the now-superseded facts lmult_0 and rmult_0,
    and the constant units_group, which duplicates Group.units_of
