@@ -41,13 +41,13 @@ text{*-1 is not 0*}
 lemma (in field) neg_1_not_0 [simp]: "\<ominus>\<^bsub>R\<^esub> \<one>\<^bsub>R\<^esub> \<noteq> \<zero>\<^bsub>R\<^esub>"
 by (metis minus_minus minus_zero one_closed zero_not_one) 
 
-text {* Note @{thm[source] module.smult_assoc1} is the wrong way around for simplification.
-This is the reverse of @{thm[source] module.smult_assoc1}. *}(*Add to Module. *)
+text {* Note smult-assoc1 is the wrong way around for simplification.
+This is the reverse of smult-assoc1. *}(*Add to Module. *)
 lemma (in module) smult_assoc_simp:
-"\<lbrakk> a \<in> carrier R; b \<in> carrier R; x \<in> carrier M \<rbrakk> \<Longrightarrow>
+"[| a \<in> carrier R; b \<in> carrier R; x \<in> carrier M |] ==>
       a \<odot>\<^bsub>M\<^esub> (b \<odot>\<^bsub>M\<^esub> x) = (a \<otimes> b) \<odot>\<^bsub>M\<^esub> x "
-by (fact smult_assoc1[symmetric])
-
+by (auto simp add: smult_assoc1)
+  
 (* Add to Ring? *)
 lemmas (in abelian_group) show_r_zero= add.l_cancel_one
 lemmas (in abelian_group) show_l_zero= add.r_cancel_one
@@ -72,11 +72,5 @@ lemma (in abelian_group) minus_other_side [simp]:
   "\<lbrakk>a\<in>carrier G; b\<in>carrier G\<rbrakk> \<Longrightarrow> (a\<ominus>\<^bsub>G\<^esub>b = \<zero>\<^bsub>G\<^esub>) = (a=b)"
   by (metis a_minus_def add.inv_closed add.m_comm r_neg r_neg2)
 
-text \<open>Additive structures contain unused multiplication fields:\<close>
-lemma abelian_group_sanitise: "abelian_group G \<longleftrightarrow> abelian_group (G\<lparr>mult:=undefined,one:=undefined\<rparr>)"
-  unfolding abelian_group_def abelian_group_axioms_def abelian_monoid_def by simp
-
-lemma module_sanitise: "module R M \<longleftrightarrow> module R (M\<lparr>mult:=undefined,one:=undefined\<rparr>)"
-  unfolding module_def module_axioms_def by (simp flip: abelian_group_sanitise)
 
 end
