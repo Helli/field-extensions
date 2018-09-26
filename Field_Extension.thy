@@ -302,7 +302,7 @@ proof -
     if "p \<in> carrier P" for p
   proof auto
     fix i
-    assume "i \<le> deg (L\<lparr>carrier := K\<rparr>) p"
+    assume "i \<le> degree p"
     then have "cff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
       using assms coeff_closed that
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
@@ -731,10 +731,10 @@ text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://ww
 lemma (in vectorspace) decompose_step:
   assumes fin_dim
   assumes "dim > 0"
-  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (V\<lparr>carrier:=V'\<rparr>)) h
+  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (vs V')) h
     \<and> bij_betw h (carrier V) (carrier K \<times> V')
     \<and> subspace K V' V
-    \<and> vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = dim - 1"
+    \<and> vectorspace.dim K (vs V') = dim - 1"
 proof - \<comment> \<open>Possibly easier if the map definition is swapped as in Kemper's proof.\<close>
   from assms obtain B where B: "basis B" "card B > 0"
     using dim_basis finite_basis_exists by auto
@@ -1099,9 +1099,9 @@ proof goal_cases
   case (1 x)
   then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
     using P.Units_l_inv by blast
-  then have "deg (L\<lparr>carrier:=K\<rparr>) inv_x + deg (L\<lparr>carrier:=K\<rparr>) x = deg (L\<lparr>carrier:=K\<rparr>) \<one>"
+  then have "degree inv_x + degree x = degree \<one>"
     using deg_mult by (smt "1" P.Units_closed integral_iff zero_not_one)
-  then have "deg (L\<lparr>carrier:=K\<rparr>) x = 0"
+  then have "degree x = 0"
     unfolding deg_one by blast
   then show ?case
     by (metis "1" P.Units_closed P.Units_r_inv_ex S.l_null coeff_closed deg_zero_impl_monom
