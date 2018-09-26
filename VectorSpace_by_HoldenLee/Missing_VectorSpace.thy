@@ -62,14 +62,14 @@ context vectorspace begin
 
 lemmas lincomb_insert2 = lincomb_insert[unfolded insert_union[symmetric]]
 
-lemma (in module) lincomb_restrict:
-  assumes U: "U \<subseteq> carrier M"
-      and a: "a : U \<rightarrow> carrier R"
+lemma lincomb_restrict:
+  assumes U: "U \<subseteq> carrier V"
+      and a: "a : U \<rightarrow> carrier K"
       and restr: "restrict a U = restrict b U"
   shows "lincomb a U = lincomb b U"
 proof -
-  let ?f = "\<lambda>a u. a u \<odot>\<^bsub>M\<^esub> u"
-  have fa: "?f a : U \<rightarrow> carrier M" using a U by auto
+  let ?f = "\<lambda>a u. a u \<odot>\<^bsub>V\<^esub> u"
+  have fa: "?f a : U \<rightarrow> carrier V" using a U by auto
   have "restrict (?f a) U = restrict (?f b) U"
   proof
     fix u
@@ -625,18 +625,18 @@ end
 context linear_map
 begin
 
-sublocale Ker: vectorspace K "(V.vs kerT)"
+interpretation Ker: vectorspace K "(V.vs kerT)"
   using kerT_is_subspace
   using V.subspace_is_vs by blast
 
-sublocale im: vectorspace K "(W.vs imT)"
+interpretation im: vectorspace K "(W.vs imT)"
   using imT_is_subspace
   using W.subspace_is_vs by blast
 
-lemma (in mod_hom) inj_imp_Ker0:
-assumes "inj_on f (carrier M)"
-shows "carrier (M.md ker) = {\<zero>\<^bsub>M\<^esub>}"
-  unfolding ker_def
+lemma inj_imp_Ker0:
+assumes "inj_on T (carrier V)"
+shows "carrier (V.vs kerT) = {\<zero>\<^bsub>V\<^esub>}"
+  unfolding mod_hom.ker_def
   using assms inj_on_contraD by fastforce
 
 lemma Ke0_imp_inj:
@@ -673,7 +673,7 @@ qed
 
 lemma surj_imp_imT_carrier:
 assumes surj: "T` (carrier V) = carrier W"
-shows "imT = carrier W"
+shows "(imT) = carrier W"
 by (simp add: surj im_def) 
 
 lemma dim_eq:
