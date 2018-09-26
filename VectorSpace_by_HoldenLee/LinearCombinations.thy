@@ -321,8 +321,8 @@ proof -
     by (unfold module_def module_def, auto)
 qed
 
-text {*A submodule is $N\subseteq M$ that is closed under addition and scalar multiplication, and
-contains 0 (so is not empty).*}
+text {*A submodule is a set $N\subseteq M$ that is closed under addition and scalar multiplication, and
+contains 0.*}
 \<^cancel>\<open>
 locale submodule =
   fixes R and N and M (structure)
