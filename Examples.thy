@@ -93,8 +93,8 @@ lemma subfield_example': "subfield (range complex_of_real) complex_field"
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> (range complex_of_real)) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := range complex_of_real\<rparr>)"
-  interpret UP_of_field_extension complex_field \<open>range of_real\<close> P \<i>
-    unfolding UP_of_field_extension_def UP_of_field_extension_axioms_def
+  interpret UP_field_extension complex_field \<open>range of_real\<close> P \<i>
+    unfolding UP_field_extension_def UP_field_extension_axioms_def
        apply (simp add: field_examples(3) field_extension_def subfield_example')
       apply (simp_all add: complex_field_def univ_ring_def P_def)
     done

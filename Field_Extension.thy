@@ -14,7 +14,7 @@ sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier 
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
   by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
 
-locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
+locale UP_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
 begin
@@ -36,8 +36,11 @@ qed (simp_all add: P_def Eval_def)
 txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>\<alpha>\<close>.\<close>
 
-sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close> apply intro_locales
-  using L.subfield_iff(2) domain_def field_def subfield_axioms by auto
+sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close>
+proof (simp_all add: P_def UP_domain_def)
+  show "domain (L\<lparr>carrier:=K\<rparr>)"
+    using L.subdomain_iff subdomain_axioms by blast
+qed
 
 sublocale euclidean_domain P degree
 proof unfold_locales
@@ -104,7 +107,7 @@ lemma pow_simp[simp]:
   shows "x [^]\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> n = x [^]\<^bsub>L\<^esub> n"
   unfolding nat_pow_def by simp
 
-lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
+lemma (in UP_field_extension) intermediate_field_eval: (* inline? *)
   assumes "subfield M L"
   assumes "K \<subseteq> M"
   assumes "\<alpha> \<in> M"
@@ -137,11 +140,11 @@ proof -
     by fastforce
 qed
 
-lemma (in UP_of_field_extension) insert_s_K: "insert \<alpha> K \<subseteq> carrier L"
+lemma (in UP_field_extension) insert_s_K: "insert \<alpha> K \<subseteq> carrier L"
   \<comment>\<open>\<^term>\<open>\<alpha>\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
   by (simp add: subset)
 
-proposition (in UP_of_field_extension) genfield_singleton_explicit:
+proposition (in UP_field_extension) genfield_singleton_explicit:
   "generate_field L (insert \<alpha> K) =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
@@ -886,11 +889,11 @@ qed
 
 subsection \<open>Polynomial Divisibility\<close>
 
-definition (in UP_of_field_extension) algebraic where
+definition (in UP_field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 definition (in field_extension) algebraic where
-  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_of_field_extension.algebraic L K \<alpha>)"
+  "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_field_extension.algebraic L K \<alpha>)"
 
 definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 
@@ -900,7 +903,7 @@ lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero
 lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (monom P a n) = a"
   by (cases "a = \<zero>") auto
 
-context UP_of_field_extension begin
+context UP_field_extension begin
 
 definition irr where (* mv into algebraic context? *)
   "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
@@ -1208,7 +1211,7 @@ end
 
 end
 
-lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
+lemma (in UP_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
   to non-id homomorphisms?\<close>
   assumes a: "a \<in> K"
   shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P a 0) = \<zero>\<^bsub>L\<^esub>"
@@ -1233,10 +1236,10 @@ proof -
 qed
 
 lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
-  assumes "\<alpha> \<in> K" shows "UP_of_field_extension.algebraic L K \<alpha>"
+  assumes "\<alpha> \<in> K" shows "UP_field_extension.algebraic L K \<alpha>"
 proof -
   define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
-  interpret \<alpha>?: UP_of_field_extension L K P
+  interpret \<alpha>?: UP_field_extension L K P
     by unfold_locales (simp_all add: assms P_def)
   let ?x_minus_\<alpha> = "monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P \<alpha> 0"
   have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
@@ -1246,7 +1249,7 @@ proof -
   with goal1 show ?thesis unfolding algebraic_def
     using assms by fastforce
 qed
-lemma (in UP_of_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarrow> algebraic"
+lemma (in UP_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarrow> algebraic"
   by (simp add: example_16_8_3)
 
 corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
