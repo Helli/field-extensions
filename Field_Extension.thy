@@ -18,9 +18,10 @@ locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
 begin
+
 definition "Eval = eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
 
-sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
+sublocale pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
 proof -
@@ -32,15 +33,9 @@ proof -
     by (simp add: indet_img_carrier)
 qed (simp_all add: P_def Eval_def)
 
-(*
-end
+txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
+  \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>\<alpha>\<close>.\<close>
 
-(*to-do: swap summands? remove qualifiers?*)
-locale UP_of_field_extension = pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id + fe?: field_extension
-begin
-txt \<open>The above locale header defines the ring \<^term>\<open>P\<close> of univariate polynomials over the field
-  \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>s\<close>.\<close>
-*)
 sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close> apply intro_locales
   using L.subfield_iff(2) domain_def field_def subfield_axioms by auto
 
@@ -236,7 +231,7 @@ proof -
            apply (simp add: L_over_M L.Subring_cring subfieldE(1))
           apply (fact is_UP_cring)
          apply (simp add: ** UP_univ_prop_axioms_def)
-        using "*" "**" L_over_M intermediate_field_eval pol.Eval_def by auto
+        using "*" "**" L_over_M intermediate_field_eval Eval_def by auto
       from \<open>f \<in> carrier P\<close> have "Eval f \<in> M"
         using M_over_K.hom_closed by simp
       from \<open>g \<in> carrier P\<close> have "Eval g \<in> M"
@@ -932,11 +927,11 @@ proof goal_cases
     unfolding deg_one by blast
   then show ?case
     by (metis "1" P.Units_closed P.Units_r_inv_ex L.l_null coeff_closed deg_zero_impl_monom
-        pol.Eval_smult pol.monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
+        Eval_smult monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
 next
   case (2 u)
   then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
-    using monom_mult_smult pol.monom_mult_is_smult subfield_axioms L.subfield_m_inv(1) by auto
+    using monom_mult_smult monom_mult_is_smult subfield_axioms L.subfield_m_inv(1) by auto
   also have "\<dots> = \<one>"
     using "2" L.subfield_m_inv(3) monom_one subfield_axioms by auto
   finally show ?case
@@ -1008,7 +1003,7 @@ proof
   moreover have "?p = monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
   moreover from inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> monom P (lcoeff p) 0 = \<one>"
-    by (smt calculation(2) coeff_closed lcoeff_mult monom_mult_smult monic_def monom_closed monom_one p(1) pol.lcoeff_monom' pol.monom_mult_is_smult)
+    by (smt calculation(2) coeff_closed lcoeff_monom' lcoeff_mult monom_mult_smult monic_def monom_closed monom_mult_is_smult monom_one p(1))
   then have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
@@ -1188,8 +1183,8 @@ lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
 lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   apply (rule L.generate_field_min_subfield1) apply auto
   using subfield_im_Eval apply blast
-  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI K.one_closed)
-  using Eval_constant pol.monom_closed by (metis image_eqI)
+  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] monom_closed apply (metis image_eqI K.one_closed)
+  using Eval_constant monom_closed by (metis image_eqI)
 
 lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)"
 proof -
@@ -1224,7 +1219,7 @@ lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and 
 proof -
   interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
   have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
-    using pol.eval_ring_hom a by (simp add: eval_ring_hom)
+    using eval_ring_hom a by (simp add: eval_ring_hom)
   interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
   have mon1_closed: "monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
     and mon0_closed: "monom P a 0 \<in> carrier P"
