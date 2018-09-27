@@ -402,10 +402,10 @@ interpretation old_fe_up: UP_pre_univ_prop "L\<lparr>carrier := K\<rparr>" L id 
 end
 
 definition standard_ring
-  where "standard_ring A = \<lparr>carrier = A, monoid.mult = ( *), one = 1, zero = 0, add = (+)\<rparr>"
+  where "standard_ring A = \<lparr>carrier = A, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
-  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( *) , one = 1, zero = 0, add = (+)\<rparr>"
+  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = (*) , one = 1, zero = 0, add = (+)\<rparr>"
 
 lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
   unfolding univ_ring_def
@@ -461,13 +461,13 @@ lemma f_r_o_r: \<open>field (standard_ring (range real_of_rat))\<close>
 lemma old_fe_real_over_rat: "old_fe univ_ring (range real_of_rat)"
   apply (simp add: old_fe_def old_fe_axioms_def field_univ_ring)
 proof -
-  have f1: "ring \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+  have f1: "ring \<lparr>carrier = range real_of_rat, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
     by (metis (no_types) ring_standard_ring(2) standard_ring_def)
-  have f2: "univ_ring = \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+  have f2: "univ_ring = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
     using univ_ring_def by auto
-  have "ring \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1::real, zero = 0, add = (+)\<rparr>"
+  have "ring \<lparr>carrier = UNIV, monoid.mult = (*), one = 1::real, zero = 0, add = (+)\<rparr>"
     by (metis ring_univ_ring univ_ring_def)
-  then have "ring.old_sr \<lparr>carrier = UNIV, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = ( * ), one = 1, zero = 0, add = (+)\<rparr>"
+  then have "ring.old_sr \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr> \<lparr>carrier = range real_of_rat, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
     using f1 by (simp add: ring.old_sr_def)
   then show "field.old_sf univ_ring (univ_ring\<lparr>carrier := range real_of_rat\<rparr>)"
     using f2 by (metis (mono_tags, lifting) f_r_o_r field.old_sf_def field_univ_ring partial_object.update_convs(1) standard_ring_def)
