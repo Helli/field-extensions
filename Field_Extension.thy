@@ -14,48 +14,6 @@ sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier 
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
   by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
 
-lemma (in subfield) additive_subgroup: "additive_subgroup K R"
-  by (simp add: additive_subgroupI is_subgroup)
-
-lemma (in subfield) finsum_simp: (* unused *)
-  assumes \<open>ring R\<close>
-  assumes "v ` A \<subseteq> K"
-  shows "(\<Oplus>\<^bsub>R\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>R\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto using assms
-proof (induction A rule: infinite_finite_induct)
-  case (infinite A)
-  then show ?case
-    by (simp add: finprod_def)
-next
-  case empty
-  have "\<zero> \<in> K"
-    by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
-  then show ?case
-      by (simp add: finprod_def)
-next
-  case (insert x F)
-  have a: "v \<in> F \<rightarrow> K"
-    using insert.prems(2) by auto
-  moreover have "K \<subseteq> carrier R"
-    by (simp add: subset)
-  ultimately have b: "v \<in> F \<rightarrow> carrier R"
-    by fast
-  have d: "v x \<in> K"
-    using insert.prems(2) by auto
-  then have e: "v x \<in> carrier R"
-    using \<open>K \<subseteq> carrier R\<close> by blast
-  have "abelian_monoid (R\<lparr>carrier := K\<rparr>)" using assms(1)
-    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
-  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
-    by (simp add: abelian_monoid_def)
-  note comm_monoid.finprod_insert[of "add_monoid R", simplified, OF _ insert.hyps b e, simplified]
-  then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
-    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
-  with comm_monoid.finprod_insert[of "add_monoid (R\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
-  show ?case
-    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
-qed
-
 locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
