@@ -65,15 +65,6 @@ end
 
 subsection \<open>Finitely generated field extensions\<close>
 
-locale finitely_generated_field_extension = field_extension +
-  assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
-(*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>? Or replace locale by a simple predicate?\<close>
-or simply add this:
-begin
-definition "S = (SOME L. finite S \<and> generate_field L (S \<union> K) = carrier L)"
-end
-*)
-
 lemma (in field) sum_of_fractions:
   "n1 \<in> carrier R \<Longrightarrow> n2 \<in> carrier R \<Longrightarrow> d1 \<in> carrier R \<Longrightarrow> d2 \<in> carrier R \<Longrightarrow>
     d1\<noteq>\<zero> \<Longrightarrow> d2\<noteq>\<zero> \<Longrightarrow> n1 \<otimes> inv d1 \<oplus> n2 \<otimes> inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes> inv (d1\<otimes>d2)"
@@ -192,7 +183,7 @@ proof -
       fix k
       assume "k \<in> ?L' - {\<zero>\<^bsub>L\<^esub>}"
       then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use L.integral_iff in auto)
-    qed force+
+    qed force+ (* to-do: When did this become so slow? *)
   next
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       apply (rule exI[where x = "monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
@@ -246,6 +237,15 @@ proof -
     by (meson cInf_eq_minimum)
 qed
 
+locale finitely_generated_field_extension = field_extension +
+  assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
+(*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>? Or replace locale by a simple predicate?\<close>
+or simply add this:
+begin
+definition "S = (SOME L. finite S \<and> generate_field L (S \<union> K) = carrier L)"
+end
+*)
+
 
 subsection \<open>Degree of a field extension\<close>
 
@@ -271,7 +271,7 @@ interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open
     and 34690: "(\<odot>\<^bsub>vs_of L\<^esub>) = (\<otimes>\<^bsub>L\<^esub>)"  *)
   by (fact vectorspace) (*(simp_all add: finsum_def finprod_def)*)
 
-abbreviation finite where "finite \<equiv> vs.fin_dim"
+abbreviation finite where "finite \<equiv> vs.fin_dim" (* to-do: replace by definition *)
 
 definition degree where
   "degree = (if finite then vs.dim else 0)"
@@ -1267,11 +1267,9 @@ text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<clo
 
 value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
 
-section \<open>Vector Spaces\<close>
-
+(* idea: *)
 definition (in vectorspace) B where
   "B = (SOME B. basis B)"
-
 lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
