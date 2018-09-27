@@ -29,9 +29,6 @@ context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
 
-lemma one_Units [simp]: "one (R\<lparr>carrier:=carrier A - {\<zero>}\<rparr>) = \<one>"
-  by simp
-
 lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
   using Units_inv_Units field_Units by simp
 
