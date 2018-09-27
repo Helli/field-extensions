@@ -7,16 +7,9 @@ begin
 
 subsection \<open>Subrings\<close>
 
-context ring begin \<comment> \<open>"Let @{term R} be a ring."\<close>
-
-lemma ring_card: "card (carrier R) \<ge> 1 \<or> infinite (carrier R)"
-  using not_less_eq_eq ring.ring_simprules(6) by fastforce
-
-lemma subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
+lemma (in ring) subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
   unfolding ring_hom_ring_def ring_hom_ring_axioms_def
   by (auto simp: subring_is_ring ring_axioms intro!: ring_hom_memI) (use subringE(1) in blast)
-
-end
 
 lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
   using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
