@@ -43,7 +43,7 @@ lemma (in UP_cring) Unit_scale_deg[simp]:
   "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> deg R (c \<odot>\<^bsub>P\<^esub> r) = deg R r"
   by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
 
-lemma (in UP_cring) weak_long_div_theorem:
+lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Useful to make K[X] a @{locale euclidean_domain}.\<close>
   assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
   and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
   shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g)"
