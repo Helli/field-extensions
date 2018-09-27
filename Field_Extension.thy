@@ -1,6 +1,7 @@
-theory Field_Extension imports
-"HOL-Algebra.Algebra"  (* reduce? *)
-Missing
+theory Field_Extension
+  imports
+    "HOL-Algebra.Generated_Fields"
+    Missing
 begin
 
 abbreviation "evl == UnivPoly.eval"
@@ -310,7 +311,7 @@ proof -
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
     then show "cff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
-      by (simp add: assms(1))
+      by (simp add: assms(1) subdomainE(6) subfield.axioms(1))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
     apply (intro ring_hom_cring.hom_finsum[of "L\<lparr>carrier:=M\<rparr>" L id, simplified])
