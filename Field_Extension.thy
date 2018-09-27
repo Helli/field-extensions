@@ -4,7 +4,6 @@ theory Field_Extension
     Missing
 begin
 
-abbreviation "mnm == UnivPoly.monom"
 abbreviation "cff == UnivPoly.coeff" (* rm after import reduction *)
 
 section \<open>missing preliminaries?\<close>
@@ -230,10 +229,10 @@ proof unfold_locales
     using R.carrier_one_not_zero by auto
 qed
 
-lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 1) = c \<otimes>\<^bsub>L\<^esub> \<alpha>"
+lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c \<otimes>\<^bsub>L\<^esub> \<alpha>"
   by (simp add: Eval_monom id_def)
 
-lemma Eval_constant[simp]: "c \<in> K \<Longrightarrow> Eval (mnm P c 0) = c"
+lemma Eval_constant[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 0) = c"
   unfolding Eval_monom by simp
 
 end
@@ -371,13 +370,13 @@ proof -
     qed force+
   next
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "mnm P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
       by (auto simp del: One_nat_def)
   next
     fix \<alpha>
     assume "\<alpha> \<in> K"
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "mnm P \<alpha> 0"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "monom P \<alpha> 0"], rule exI[where x = "\<one>"])
       by (simp add: \<open>\<alpha> \<in> K\<close>)
   qed
   then have "?L' \<in> ?\<M>".
@@ -1076,7 +1075,7 @@ definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   unfolding monic_def by auto
 
-lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (mnm P a n) = a"
+lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (monom P a n) = a"
   by (cases "a = \<zero>") auto
 
 context UP_of_field_extension begin
@@ -1091,7 +1090,7 @@ lemmas coeff_mult = coeff_mult[simplified]
 lemmas lcoeff_monom = lcoeff_monom[simplified]
 lemmas deg_monom = deg_monom[simplified] (* rm all *)
 
-lemma Units_poly: "Units P = {mnm P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+lemma Units_poly: "Units P = {monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
 proof goal_cases
   case (1 x)
@@ -1106,7 +1105,7 @@ proof goal_cases
         pol.Eval_smult pol.monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
 next
   case (2 u)
-  then have "mnm P (inv\<^bsub>L\<^esub> u) 0 \<otimes> mnm P u 0 = mnm P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
+  then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
     using monom_mult_smult pol.monom_mult_is_smult subfield_axioms S.subfield_m_inv(1) by auto
   also have "\<dots> = \<one>"
     using "2" S.subfield_m_inv(3) monom_one subfield_axioms by auto
@@ -1115,7 +1114,7 @@ next
         S.ring_axioms monom_closed ring.subfield_m_inv(1) singletonD subfield_axioms)
 qed
 
-corollary Units_poly': "Units P = (\<lambda>u. mnm P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
+corollary Units_poly': "Units P = (\<lambda>u. monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
   using Units_poly by auto
 
 lemma lcoeff_mult:
@@ -1176,11 +1175,11 @@ proof
     using inv_ok p(1) by auto
   moreover have "monic ?p" unfolding monic_def
     using S.subfield_m_inv(1) S.subfield_m_inv(3) p subfield_axioms by auto
-  moreover have "?p = mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
+  moreover have "?p = monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
-  moreover from inv_ok have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> mnm P (lcoeff p) 0 = \<one>"
+  moreover from inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> monom P (lcoeff p) 0 = \<one>"
     by (smt calculation(2) coeff_closed lcoeff_mult monom_mult_smult monic_def monom_closed monom_one p(1) pol.lcoeff_monom' pol.monom_mult_is_smult)
-  then have "mnm P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
+  then have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
@@ -1189,7 +1188,7 @@ proof
   assume "q \<in> carrier P" "q \<sim> p" "monic q"
   then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" and "inv_c' \<in> Units P"
     using ring_associated_iff p(1) by blast
-  then obtain inv_c where inv_c'_def: "inv_c' = mnm P inv_c 0" and inv_c: "inv_c \<in> K"
+  then obtain inv_c where inv_c'_def: "inv_c' = monom P inv_c 0" and inv_c: "inv_c \<in> K"
     using Units_poly by auto
   have "\<one>\<^bsub>L\<^esub> = lcoeff inv_c' \<otimes>\<^bsub>L\<^esub> lcoeff p"
     using lcoeff_mult \<open>monic q\<close>[unfolded monic_def]
@@ -1242,7 +1241,7 @@ corollary irr_nonzero: "irr \<noteq> \<zero>"
 corollary irr_nonconstant: "degree irr > 0"
 proof (rule ccontr)
   assume "\<not> degree irr > 0"
-  with monic_irr have "irr = mnm P \<one>\<^bsub>L\<^esub> 0"
+  with monic_irr have "irr = monom P \<one>\<^bsub>L\<^esub> 0"
     using deg_zero_impl_monom irr_in_P monic_def by fastforce
   then show False
     using Eval_irr by simp
@@ -1390,19 +1389,19 @@ end
 lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
   to non-id homomorphisms?\<close>
   assumes a: "a \<in> K"
-  shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
+  shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P a 0) = \<zero>\<^bsub>L\<^esub>"
   (is "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
   interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
   have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
     using pol.eval_ring_hom a by (simp add: eval_ring_hom)
   interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
-  have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
-    and mon0_closed: "mnm P a 0 \<in> carrier P"
-    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> mnm P a 0 \<in> carrier P"
+  have mon1_closed: "monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
+    and mon0_closed: "monom P a 0 \<in> carrier P"
+    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> monom P a 0 \<in> carrier P"
     using a R.a_inv_closed by auto
-  have "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = eval (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> eval
-    (L\<lparr>carrier:=K\<rparr>) L id a (mnm P a 0)"
+  have "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> eval
+    (L\<lparr>carrier:=K\<rparr>) L id a (monom P a 0)"
     by (simp add: a_minus_def mon0_closed)
   also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
     using assms eval_const eval_monom1 by simp
@@ -1417,7 +1416,7 @@ proof -
   define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
   interpret \<alpha>?: UP_of_field_extension L K P
     by unfold_locales (simp_all add: assms P_def)
-  let ?x_minus_\<alpha> = "mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P \<alpha> 0"
+  let ?x_minus_\<alpha> = "monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P \<alpha> 0"
   have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
     unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast
   have "?x_minus_\<alpha> \<noteq> \<zero>\<^bsub>P\<^esub>"

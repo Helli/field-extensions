@@ -102,16 +102,16 @@ proof -
     case (1 x)
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
       unfolding complex_field_def univ_ring_def m_inv_def by simp
-    have "x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
+    have "x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
       unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
       unfolding complex_field_def univ_ring_def using add.commute complex_eq mult.commute
       by (metis Reals_def Reals_of_real Eval_cx complex_field_def monoid.simps(1) univ_ring_def)
     show ?case
-      apply (rule exI[of _ "mnm P (Im x) 1 \<oplus>\<^bsub>P\<^esub> mnm P (Re x) 0"])
-      apply (rule exI[of _ "mnm P 1 0"])
+      apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
+      apply (rule exI[of _ "monom P 1 0"])
       apply auto
       unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
-        \<open>x = Eval (mnm P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
+        \<open>x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
         complex_field_def ring.simps(2) univ_ring_def by metis
   qed
 qed
