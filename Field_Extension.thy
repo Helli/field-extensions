@@ -4,11 +4,6 @@ theory Field_Extension
     Missing
 begin
 
-lemmas (in field)
-  [simp] = mult_of_is_Units[symmetric] \<comment> \<open>avoid the duplicate constant\<close> and
-  [simp] = units_of_inv
-
-
 subsection \<open>Subrings\<close>
 
 context ring begin \<comment> \<open>"Let @{term R} be a ring."\<close>
