@@ -4,8 +4,6 @@ theory Field_Extension
     Missing
 begin
 
-abbreviation "cff == UnivPoly.coeff" (* rm after import reduction *)
-
 section \<open>missing preliminaries?\<close>
 
 lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{thm[source] to_contain_is_to_divide}\<close>
@@ -302,13 +300,13 @@ proof -
   proof auto
     fix i
     assume "i \<le> degree p"
-    then have "cff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
+    then have "coeff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
       using assms coeff_closed that
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
             simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
       done
-    then show "cff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
+    then show "coeff P p i \<otimes>\<^bsub>L\<^esub> \<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
       by (simp add: assms(1) subdomainE(6) subfield.axioms(1))
   qed
   have "finsum (L\<lparr>carrier := M\<rparr>) f A = finsum L f A" if "f \<in> A \<rightarrow> M" for f and A :: "'c set"
@@ -1122,12 +1120,12 @@ lemma lcoeff_mult:
   shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
 proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
   assume "p \<noteq> \<zero>" "q \<noteq> \<zero>"
-  let ?coeff = "\<lambda>i. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i)"
+  let ?coeff = "\<lambda>i. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i)"
   have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {degree p <.. degree p + degree q}" for i
   proof -
     from that have "i > degree p"
       by force
-    then have "cff P p i = \<zero>\<^bsub>L\<^esub>"
+    then have "coeff P p i = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(1) deg_aboveD)
     then show ?thesis
       using assms(2) coeff_closed by auto
@@ -1136,18 +1134,18 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
   proof -
     from that have "degree p + degree q - i > degree q"
       by fastforce
-    then have "cff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
+    then have "coeff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(2) deg_aboveD)
     then show ?thesis
       using assms(1) coeff_closed by auto
   qed
   moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = degree p" for i
     by (simp add: that)
-  ultimately have "(\<lambda>i\<in>{..degree p + degree q}. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i))
+  ultimately have "(\<lambda>i\<in>{..degree p + degree q}. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i))
     = (\<lambda>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
     by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
   then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
-    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. cff P p i \<otimes>\<^bsub>L\<^esub> cff P q (degree p + degree q - i))"
+    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i))"
     using R.finsum_restrict[of _ "{..degree p + degree q}"] assms coeff_closed by auto
   have "degree p \<in> {..degree p + degree q}"
     by fastforce
