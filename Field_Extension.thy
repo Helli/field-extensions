@@ -4,7 +4,6 @@ theory Field_Extension
     Missing
 begin
 
-abbreviation "evl == UnivPoly.eval"
 abbreviation "mnm == UnivPoly.monom"
 abbreviation "cff == UnivPoly.coeff" (* rm after import reduction *)
 
@@ -184,7 +183,7 @@ locale UP_of_field_extension = fe?: field_extension + fixes P (structure) and \<
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes indet_img_carrier: "\<alpha> \<in> carrier L"
 begin
-definition "Eval = evl (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
+definition "Eval = eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
 sublocale pol?(*rm qualifier?*) : UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
@@ -294,7 +293,7 @@ lemma (in UP_of_field_extension) intermediate_field_eval: (* inline? *)
   assumes "subfield M L"
   assumes "K \<subseteq> M"
   assumes "\<alpha> \<in> M"
-  shows "Eval = evl (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id \<alpha>"
+  shows "Eval = eval (L\<lparr>carrier := K\<rparr>) (L\<lparr>carrier := M\<rparr>) id \<alpha>"
   unfolding Eval_def eval_def apply auto apply (fold P_def)
 proof -
   from assms(1) have "field (L\<lparr>carrier:=M\<rparr>)"
@@ -425,8 +424,6 @@ qed
 
 
 subsection \<open>Degree of a field extension\<close>
-
-hide_const (open) degree
 
 abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>monoid.mult K\<close> as \<^const>\<open>smult\<close>)\<close>
   \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
@@ -1393,18 +1390,18 @@ end
 lemma (in UP_of_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
   to non-id homomorphisms?\<close>
   assumes a: "a \<in> K"
-  shows "evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
-  (is "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
+  shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> mnm P a 0) = \<zero>\<^bsub>L\<^esub>"
+  (is "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
   interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
-  have eval_ring_hom: "evl (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
+  have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
     using pol.eval_ring_hom a by (simp add: eval_ring_hom)
-  interpret ring_hom_cring P L \<open>evl (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
+  interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
   have mon1_closed: "mnm P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
     and mon0_closed: "mnm P a 0 \<in> carrier P"
     and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> mnm P a 0 \<in> carrier P"
     using a R.a_inv_closed by auto
-  have "evl (L\<lparr>carrier:=K\<rparr>) L id a ?g = evl (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> evl
+  have "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = eval (L\<lparr>carrier:=K\<rparr>) L id a (mnm P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> eval
     (L\<lparr>carrier:=K\<rparr>) L id a (mnm P a 0)"
     by (simp add: a_minus_def mon0_closed)
   also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
