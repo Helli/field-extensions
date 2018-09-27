@@ -1,3 +1,4 @@
+(* Author: Fabian Hellauer, 2018 *)
 theory Old_Field_Extension
   imports "HOL-Algebra.Subrings"
 begin
@@ -6,7 +7,7 @@ lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
     by simp
 
-lemma (in -) carrier_K[simp]: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
+lemma carrier_K: "carrier (L\<lparr>carrier:=K\<rparr>) = K"
   by simp
 
 lemma (in abelian_monoid) intersect_nonzeros:

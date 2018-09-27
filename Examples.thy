@@ -1,3 +1,4 @@
+(* Author: Fabian Hellauer, 2018 *)
 subsection \<open>Example instantiations\<close>
 theory Examples imports Field_Extension
 begin

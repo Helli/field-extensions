@@ -1,3 +1,4 @@
+(* Author: Fabian Hellauer, 2018 *)
 theory Field_Extension
   imports
     "HOL-Algebra.Generated_Fields"
