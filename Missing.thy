@@ -1,3 +1,4 @@
+section \<open>Missing Preliminaries\<close>
 theory Missing
   imports
     "HOL-Algebra.Ring_Divisibility"
@@ -50,6 +51,8 @@ lemma (in subspace) corollary_5_16:
     and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
     and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) = vectorspace.dim K V \<Longrightarrow> W = carrier V"
 proof -
+  have subspace: "vectorspace K (V\<lparr>carrier := W\<rparr>)"
+    by (simp add: subspace_axioms vectorspace.subspace_is_vs vs)
   {
     fix S
     assume "S \<subseteq> W" "module.lin_indpt K (V\<lparr>carrier := W\<rparr>) S"
@@ -61,33 +64,21 @@ proof -
   }  note useful = this
   have empty_lin_indpt_in_W: "module.lin_indpt K (V\<lparr>carrier := W\<rparr>) {}"
     by (simp add: module.lin_indpt_empty module.submodule_is_module submod vectorspace.axioms(1) vs)
-  have "\<exists>B. finite B \<and> maximal B (\<lambda>M. M \<subseteq> W \<and> module.lin_indpt K (V\<lparr>carrier := W\<rparr>) M)"
-    apply (rule maximal_exists[OF useful]) apply auto[2] using empty_lin_indpt_in_W by blast
-  show fin_dim: "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
-  proof -
-    obtain CC :: "'c set" where
-      f1: "finite CC \<and> maximal CC (\<lambda>C. C \<subseteq> W \<and> \<not> module.lin_dep K (V\<lparr>carrier := W\<rparr>) C)"
-    using \<open>\<exists>B. finite B \<and> maximal B (\<lambda>M. M \<subseteq> W \<and> \<not> module.lin_dep K (V\<lparr>carrier := W\<rparr>) M)\<close> by blast
-    then have f2: "\<forall>p pa. ((vectorspace.fin_dim (pa::\<lparr>carrier :: 'a set, mult :: _ \<Rightarrow> _ \<Rightarrow> _, one :: _, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, \<dots> :: 'b\<rparr>) (p::(_, 'c, 'd) module_scheme) \<or> module.span pa p CC \<noteq> carrier p) \<or> \<not> CC \<subseteq> carrier p) \<or> \<not> vectorspace pa p"
-      using vectorspace.fin_dim_def by blast
-    have f3: "CC \<subseteq> W \<and> \<not> module.lin_dep K (V\<lparr>carrier := W\<rparr>) CC"
-      using f1 by (simp add: maximal_def)
-    have "vectorspace K (V\<lparr>carrier := W\<rparr>)"
-      using subspace_axioms subspace_def vectorspace.subspace_is_vs by blast
-    then have "module.span K (V\<lparr>carrier := W\<rparr>) CC = W"
-      using f1 by (simp add: vectorspace.max_li_is_gen)
-    then show ?thesis
-      using f3 f2 by (metis (no_types) module.carrier_vs_is_self subspace_axioms subspace_def vectorspace.subspace_is_vs vectorspace_def)
-  qed
-  then show "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
-    by (metis module.carrier_vs_is_self subspace_axioms subspace_def useful vectorspace.basis_def
-        vectorspace.dim_basis vectorspace.finite_basis_exists vectorspace.subspace_is_vs
-        vectorspace_def)
-  with fin_dim assms show "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) = vectorspace.dim K V \<Longrightarrow> W = carrier V"
-    by (smt module.carrier_vs_is_self module.span_li_not_depend module.submoduleE(1)
-        monoid.surjective partial_object.update_convs(1) submod subset_trans subspace_axioms
-        vectorspace.axioms(1) vectorspace.basis_def vectorspace.dim_basis
-        vectorspace.dim_li_is_basis vectorspace.finite_basis_exists vectorspace.subspace_is_vs vs)
+  then obtain B where B: "finite B \<and> maximal B (\<lambda>B. B \<subseteq> W \<and> module.lin_indpt K (V\<lparr>carrier := W\<rparr>) B)"
+    using maximal_exists[OF useful, of _ "{}"] by fastforce
+  then have B_lin_indpt: "B \<subseteq> W \<and> module.lin_indpt K (V\<lparr>carrier := W\<rparr>) B"
+    by (simp add: maximal_def)
+  from subspace B have B_spans_W: "module.span K (V\<lparr>carrier := W\<rparr>) B = W"
+    by (simp add: vectorspace.max_li_is_gen)
+  then show "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
+    using B B_lin_indpt subspace vectorspace.fin_dim_def by fastforce
+  show "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
+    by (metis (no_types) B_lin_indpt B_spans_W dual_order.trans module.carrier_vs_is_self subspace
+        useful vectorspace.gen_ge_dim vectorspace_def vs)
+  from B B_lin_indpt B_spans_W assms show "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) = vectorspace.dim K V \<Longrightarrow> W = carrier V"
+    by (smt module.carrier_vs_is_self module.span_li_not_depend(1,2) module.submoduleE(1)
+        partial_object.surjective partial_object.update_convs(1) submod subset_trans subspace
+        vectorspace.axioms(1) vectorspace.basis_def vectorspace.dim_li_is_basis vectorspace.gen_ge_dim vs)
 qed
 
 
