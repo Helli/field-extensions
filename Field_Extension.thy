@@ -6,9 +6,9 @@ theory Field_Extension
     Missing
 begin
 
-subsection \<open>convenient locale setup\<close>
+subsection \<open>Definition\<close>
 
-locale field_extension = subf'd?: subfield K L + L?: field L for L K
+locale field_extension = K?: subfield K L + L?: field L for L K
 
 sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close>
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
@@ -1230,7 +1230,7 @@ lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
 lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   apply (rule L.generate_field_min_subfield1) apply auto
   using subfield_im_Eval apply blast
-  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI subf'd.one_closed)
+  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] pol.monom_closed apply (metis image_eqI K.one_closed)
   using Eval_constant pol.monom_closed by (metis image_eqI)
 
 lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)"
@@ -1292,7 +1292,7 @@ proof -
   have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
     unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast
   have "?x_minus_\<alpha> \<noteq> \<zero>\<^bsub>P\<^esub>"
-    by simp (metis r_right_minus_eq deg_monom assms deg_const monom_closed nat.simps(3) sub_one_not_zero subf'd.one_closed)
+    by simp (metis r_right_minus_eq deg_monom assms deg_const monom_closed nat.simps(3) sub_one_not_zero K.one_closed)
   with goal1 show ?thesis unfolding algebraic_def
     using assms by fastforce
 qed
