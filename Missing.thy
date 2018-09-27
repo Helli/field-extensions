@@ -1,5 +1,7 @@
 theory Missing
-  imports "VectorSpace_by_HoldenLee/Missing_VectorSpace"
+  imports
+    "HOL-Algebra.Ring_Divisibility"
+    "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
 subsection \<open>Vector Spaces\<close>
