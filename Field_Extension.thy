@@ -24,24 +24,6 @@ lemma (in subring) cring_ring_hom_cring:
   "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
   by (simp add: RingHom.ring_hom_cringI cring.Subring_cring cring.axioms(1) ring.subring_ring_hom_ring subring_axioms)
 
-lemma (in ring) subring_m_inv:
-  assumes "subring K R" and "k \<in> Units (R\<lparr>carrier:=K\<rparr>)"
-  shows "inv k \<in> Units (R\<lparr>carrier:=K\<rparr>)" and "k \<otimes> inv k = \<one>" and "inv k \<otimes> k = \<one>"
-proof -
-  have K: "submonoid K R"
-    by (simp add: assms(1) subring.axioms(2))
-  have monoid: "monoid (R \<lparr> carrier := K \<rparr>)"
-    by (simp add: K monoid_axioms submonoid.submonoid_is_monoid)
-
-  from assms(2) have unit_of_R: "k \<in> Units R"
-    using assms(2) unfolding Units_def by auto (meson K submonoid.mem_carrier)+
-  have "inv\<^bsub>(R \<lparr> carrier := K \<rparr>)\<^esub> k \<in> Units (R \<lparr> carrier := K \<rparr>)"
-    by (simp add: assms(2) monoid monoid.Units_inv_Units)
-  thus "inv k \<in> Units (R \<lparr> carrier := K \<rparr>)" and "k \<otimes> inv k = \<one>" and "inv k \<otimes> k = \<one>"
-    using Units_l_inv[OF unit_of_R] Units_r_inv[OF unit_of_R]
-    using monoid.m_inv_monoid_consistent[OF monoid_axioms assms(2) K] by auto
-qed
-
 context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 
 lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
