@@ -3,14 +3,17 @@ section \<open>Missing Preliminaries\<close>
 theory Missing
   imports
     "HOL-Algebra.Ring_Divisibility"
+    "HOL-Algebra.Subrings"
     "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
+
 
 subsection \<open>Ring Divisibility\<close>
 
 lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{thm[source] to_contain_is_to_divide}\<close>
   "a \<in> carrier R \<Longrightarrow> b \<in> PIdl a \<Longrightarrow> a divides b"
   unfolding factor_def cgenideal_def using m_comm by blast
+
 
 subsection \<open>Vector Spaces\<close>
 
@@ -87,6 +90,80 @@ proof -
         partial_object.surjective partial_object.update_convs(1) submod subset_trans subspace
         vectorspace.axioms(1) vectorspace.basis_def vectorspace.dim_li_is_basis vectorspace.gen_ge_dim vs)
 qed
+
+
+subsection \<open>Subrings\<close>
+
+lemma (in ring) subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
+  unfolding ring_hom_ring_def ring_hom_ring_axioms_def
+  by (auto simp: subring_is_ring ring_axioms intro!: ring_hom_memI) (use subringE(1) in blast)
+
+lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
+  using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
+
+lemma (in subring) cring_ring_hom_cring:
+  "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
+  by (simp add: RingHom.ring_hom_cringI cring.Subring_cring cring.axioms(1) ring.subring_ring_hom_ring subring_axioms)
+
+
+subsection \<open>Fields\<close>
+
+context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
+
+lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+  by (simp add: Units_r_inv_ex field_Units)
+
+lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
+  using Units_inv_Units field_Units by simp
+
+end
+
+
+subsection \<open>Univariate Polynomials\<close>
+
+lemma (in UP_ring) lcoeff_Unit_nonzero:
+  "carrier R \<noteq> {\<zero>} \<Longrightarrow> lcoeff p \<in> Units R \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_r_inv_ex R.l_null R.one_zeroD coeff_zero)
+
+lemma (in UP_cring) Unit_scale_zero:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)
+
+lemma (in UP_cring) Unit_scale_deg[simp]:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> deg R (c \<odot>\<^bsub>P\<^esub> r) = deg R r"
+  by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
+
+lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Useful to prove \<^term>\<open>euclidean_domain P degree\<close>.\<close>
+  assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
+  and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
+  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g)"
+proof -
+  from long_div_theorem[OF g_in_P f_in_P] obtain q r and k::nat where qrk: "q \<in> carrier P"
+    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g"
+    using R_not_trivial lcoeff_Unit_nonzero lcoeff_g by auto
+  from lcoeff_g have inv: "lcoeff g [^] k \<in> Units R"
+    by (induction k) simp_all
+  let ?inv = "inv (lcoeff g [^] k)"
+  have inv_ok: "?inv \<in> Units R" "?inv \<in> carrier R"
+    using inv by simp_all
+  from inv have "f = ?inv \<otimes> lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f"
+    by simp
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f)"
+    by (simp add: inv smult_assoc_simp)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r)"
+    by (simp add: qrk)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    by (simp add: UP_smult_assoc2 UP_smult_r_distr inv_ok qrk(1-2))
+  also have "\<dots> = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    using UP_m_comm inv_ok qrk(1) smult_assoc2 by auto
+  finally have "f = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r" .
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> q \<in> carrier P" "?inv \<odot>\<^bsub>P\<^esub> r \<in> carrier P"
+    by (simp_all add: inv_ok qrk(1-2))
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> deg R (?inv \<odot>\<^bsub>P\<^esub> r) < deg R (?inv \<odot>\<^bsub>P\<^esub> g)"
+    using Unit_scale_deg inv_ok(1) qrk(2,4) by auto
+  ultimately show ?thesis using inv_ok(1) by auto
+qed
+
 
 subsection \<open>Generalisations\<close>
 
