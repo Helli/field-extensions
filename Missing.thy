@@ -129,17 +129,19 @@ lemma (in UP_cring) Unit_scale_zero:
   "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
   by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)
 
+abbreviation (in UP) degree where "degree \<equiv> deg R" \<comment> \<open>Why is \<^term>\<open>R\<close> not part of the definition?\<close>
+
 lemma (in UP_cring) Unit_scale_deg[simp]:
-  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> deg R (c \<odot>\<^bsub>P\<^esub> r) = deg R r"
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> degree (c \<odot>\<^bsub>P\<^esub> r) = degree r"
   by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
 
 lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Useful to prove \<^term>\<open>euclidean_domain P degree\<close>.\<close>
   assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
   and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
-  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g)"
+  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g)"
 proof -
   from long_div_theorem[OF g_in_P f_in_P] obtain q r and k::nat where qrk: "q \<in> carrier P"
-    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> deg R r < deg R g"
+    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g"
     using R_not_trivial lcoeff_Unit_nonzero lcoeff_g by auto
   from lcoeff_g have inv: "lcoeff g [^] k \<in> Units R"
     by (induction k) simp_all
@@ -159,7 +161,7 @@ proof -
   finally have "f = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r" .
   moreover have "?inv \<odot>\<^bsub>P\<^esub> q \<in> carrier P" "?inv \<odot>\<^bsub>P\<^esub> r \<in> carrier P"
     by (simp_all add: inv_ok qrk(1-2))
-  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> deg R (?inv \<odot>\<^bsub>P\<^esub> r) < deg R (?inv \<odot>\<^bsub>P\<^esub> g)"
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> degree (?inv \<odot>\<^bsub>P\<^esub> r) < degree (?inv \<odot>\<^bsub>P\<^esub> g)"
     using Unit_scale_deg inv_ok(1) qrk(2,4) by auto
   ultimately show ?thesis using inv_ok(1) by auto
 qed
