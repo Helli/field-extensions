@@ -286,9 +286,6 @@ corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
 
 end
 
-locale finite_field_extension = field_extension +
-  assumes finite
-
 lemma (in field) trivial_extension_size:
   shows trivial_extenion_finite: trivial_extension.finite
     and trivial_extension_degree: "trivial_extension.degree = 1"
