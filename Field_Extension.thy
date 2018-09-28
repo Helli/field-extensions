@@ -140,15 +140,10 @@ proof -
     by fastforce
 qed
 
-lemma (in UP_field_extension) insert_s_K: "insert \<alpha> K \<subseteq> carrier L"
-  \<comment>\<open>\<^term>\<open>\<alpha>\<close> is already fixed in this locale (via @{locale UP_univ_prop})\<close>
-  by (simp add: subset)
-
 proposition (in UP_field_extension) genfield_singleton_explicit:
   "generate_field L (insert \<alpha> K) =
     {Eval f \<otimes>\<^bsub>L\<^esub>inv\<^bsub>L\<^esub> Eval g | f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-  unfolding generate_field_min_subfield2[OF insert_s_K] apply simp
-proof -
+proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
   (* to-do: replace by define? *)
   let ?L' = "{Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
   and ?\<M> = "{M. subfield M L \<and> \<alpha> \<in> M \<and> K \<subseteq> M}"
