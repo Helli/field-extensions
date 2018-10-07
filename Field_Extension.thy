@@ -303,9 +303,6 @@ proof -
     by (simp_all add: trivial_extension.finite_def trivial_extension.degree_def)
 qed
 
-lemma (in module) id_module_hom: "id \<in> module_hom R M M"
-  unfolding module_hom_def by simp
-
 lemma (in linear_map) emb_image_dim:
   assumes "inj_on T (carrier V)"
   assumes V.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
@@ -313,7 +310,7 @@ lemma (in linear_map) emb_image_dim:
   using assms inj_imp_dim_ker0 rank_nullity by linarith
 
 lemma (in linear_map) iso_preserves_dim:
-  assumes "bij_betw T (carrier V) (carrier W)"
+  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>a module-isomorphism\<close>
   assumes V.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
   shows "W.fin_dim" "V.dim = W.dim"
   using assms apply (simp add: bij_betw_def rank_nullity_main(2))
@@ -352,8 +349,8 @@ corollary (in linear_map) linear_map_the_inv:
   by (meson linear_map_axioms linear_map_def mod_hom_the_inv)
 
 lemma (in linear_map) iso_imports_dim:
-  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>A module-isomorphism\<close>
-  assumes W.fin_dim \<comment> \<open>Needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  assumes "bij_betw T (carrier V) (carrier W)"
+  assumes W.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined\<close>
   shows "V.fin_dim" "V.dim = W.dim"
   by (simp_all add: linear_map.iso_preserves_dim[OF linear_map_the_inv] assms bij_betw_the_inv_into)
 
