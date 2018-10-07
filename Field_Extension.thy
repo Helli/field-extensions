@@ -1269,53 +1269,6 @@ lemma (in vectorspace)
   "fin_dim \<Longrightarrow> finite B"
   by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
 
-text \<open>In @{thm[source] ring.ring_hom_imp_img_ring} and its follow-ups, a self update could be
- avoided due to @{thm ring_hom_one} (the latter may be a good simp rule?):\<close>
-lemma (in ring) ring_hom_imp_img_ring':
-  assumes "h \<in> ring_hom R S"
-  shows "ring (S \<lparr> carrier := h ` carrier R, zero := h \<zero> \<rparr>)" (is "ring ?h_img")
-proof -
-  from assms have [simp]: "?h_img = (S \<lparr> carrier := h ` (carrier R), one := h \<one>, zero := h \<zero> \<rparr>)"
-    by (simp add: ring_hom_one)
-  have "h \<in> hom (add_monoid R) (add_monoid S)"
-    using assms unfolding hom_def ring_hom_def by auto
-  hence "comm_group ((add_monoid S) \<lparr>  carrier := h ` (carrier R), one := h \<zero> \<rparr>)"
-    using add.hom_imp_img_comm_group[of h "add_monoid S"] by simp
-  hence comm_group: "comm_group (add_monoid ?h_img)"
-    by (auto intro: comm_monoidI simp add: monoid.defs)
-
-  moreover have "h \<in> hom R S"
-    using assms unfolding ring_hom_def hom_def by auto
-  hence "monoid (S \<lparr>  carrier := h ` (carrier R), one := h \<one> \<rparr>)"
-    using hom_imp_img_monoid[of h S] by simp
-  hence monoid: "monoid ?h_img"
-    unfolding monoid_def by (simp add: monoid.defs)
-
-  show ?thesis
-  proof (rule ringI, simp_all add: comm_group_abelian_groupI[OF comm_group, simplified] monoid[simplified])
-    fix x y z assume "x \<in> h ` carrier R" "y \<in> h ` carrier R" "z \<in> h ` carrier R"
-    then obtain r1 r2 r3
-      where r1: "r1 \<in> carrier R" "x = h r1"
-        and r2: "r2 \<in> carrier R" "y = h r2"
-        and r3: "r3 \<in> carrier R" "z = h r3" by blast
-    hence "(x \<oplus>\<^bsub>S\<^esub> y) \<otimes>\<^bsub>S\<^esub> z = h ((r1 \<oplus> r2) \<otimes> r3)"
-      using ring_hom_memE[OF assms] by auto
-    also have " ... = h ((r1 \<otimes> r3) \<oplus> (r2 \<otimes> r3))"
-      using l_distr[OF r1(1) r2(1) r3(1)] by simp
-    also have " ... = (x \<otimes>\<^bsub>S\<^esub> z) \<oplus>\<^bsub>S\<^esub> (y \<otimes>\<^bsub>S\<^esub> z)"
-      using ring_hom_memE[OF assms] r1 r2 r3 by auto
-    finally show "(x \<oplus>\<^bsub>S\<^esub> y) \<otimes>\<^bsub>S\<^esub> z = (x \<otimes>\<^bsub>S\<^esub> z) \<oplus>\<^bsub>S\<^esub> (y \<otimes>\<^bsub>S\<^esub> z)" .
-
-    have "z \<otimes>\<^bsub>S\<^esub> (x \<oplus>\<^bsub>S\<^esub> y) = h (r3 \<otimes> (r1 \<oplus> r2))"
-      using ring_hom_memE[OF assms] r1 r2 r3 by auto
-    also have " ... =  h ((r3 \<otimes> r1) \<oplus> (r3 \<otimes> r2))"
-      using r_distr[OF r1(1) r2(1) r3(1)] by simp
-    also have " ... = (z \<otimes>\<^bsub>S\<^esub> x) \<oplus>\<^bsub>S\<^esub> (z \<otimes>\<^bsub>S\<^esub> y)"
-      using ring_hom_memE[OF assms] r1 r2 r3 by auto
-    finally show "z \<otimes>\<^bsub>S\<^esub> (x \<oplus>\<^bsub>S\<^esub> y) = (z \<otimes>\<^bsub>S\<^esub> x) \<oplus>\<^bsub>S\<^esub> (z \<otimes>\<^bsub>S\<^esub> y)" .
-  qed
-qed
-
 text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
 find_theorems name: "subspace."
 find_theorems name: "submodule."
