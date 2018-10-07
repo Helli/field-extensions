@@ -5,12 +5,4 @@ move the subgoals as lemmas into a context 'assumes "basis B"'
 Why are the current locales (e.g. subgroup) so conservative in importing other locales? Are there
 good reasons for that?
 
-After proving an interpretation of ring:
-Duplicate fact declaration "Examples.rsr.add.finprod_one" vs. "Examples.rsr.add.finprod_one"\<^here>
-The above error(s) occurred while activating locale instance
-rsr.add :
-  Group.comm_monoid
-    "\<lparr>carrier = carrier (standard_ring (range rat_of_int)), monoid.mult = (\<oplus>\<^bsub>standard_ring (range rat_of_int)\<^esub>),
-        one = \<zero>\<^bsub>standard_ring (range rat_of_int)\<^esub>\<rparr>"
-
 How to simplify facts during interpretation or locale definition?
