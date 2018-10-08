@@ -10,8 +10,6 @@ adjusted VectorSpace to better use the new HOL-Algebra:
 - In LinearCombinations, I replaced the definition "submodule" by "Module.submodule". Careful: The latter does not
 assume the superstructure to be a module. This may affect statements in descendant theories. Furthermore, I removed some
 confusing junk from within the definition of func_space.
-- In SumSpaces, I once again clarify a definition (as one particular German would say, "Es ist besser, nicht zu
-definieren, als falsch zu definieren"). All jesting aside, the theory of algebras is developed elsewhere, and the
-definition was wrong anyway. I also slightly relaxed the type constrain on inj1 and inj2, one could further relax it to
-ring_scheme.
+- In SumSpaces, I once again clarify a definition. I also slightly relaxed the type constrain on inj1 and inj2, one
+could further relax it to ring_scheme.
 - In VectorSpace, I only remove two superseded lemmas.
