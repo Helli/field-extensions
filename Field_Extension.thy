@@ -10,9 +10,8 @@ subsection \<open>Definition\<close>
 
 locale field_extension = K?: subfield K L + L?: field L for L K
 
-sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close> \<comment> \<open>to-do: The only relevant bit is the vectorspace?\<close>
-  rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
-  by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
+lemma (in field) trivial_extension: "field_extension R (carrier R)"
+  by (simp add: field_extension.intro field_axioms subfield_iff(1))
 
 locale UP_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
@@ -265,6 +264,9 @@ lemma vectorspace: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
 interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
 (*  rewrites 436: "carrier (L\<lparr>carrier := K\<rparr>) = K"
     and 346: "carrier (vs_of L) = carrier L"
+    and "zero (vs_of R) = zero R"
+    and "smult (vs_of R) = monoid.mult R"
+    and "add (vs_of R) = add R"
     and 3478: "(\<Oplus>\<^bsub>vs_of L\<^esub>v\<in>A. a v) = (\<Oplus>\<^bsub>L\<^esub>v\<in>A. a v)"
     and 34690: "(\<odot>\<^bsub>vs_of L\<^esub>) = (\<otimes>\<^bsub>L\<^esub>)"  *)
   by (fact vectorspace) (*(simp_all add: finsum_def finprod_def)*)
@@ -284,23 +286,24 @@ corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
 
 end
 
-lemma (in field) trivial_extension_size:
-  shows trivial_extension_finite: trivial_extension.finite
-    and trivial_extension_degree: "trivial_extension.degree = 1"
+sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
+  rewrites "carrier (vs_of R) = carrier R"
+  using field_extension.vectorspace trivial_extension by force+
+
+lemma (in field) self_vs_size:
+  shows self_vs_fin_dim: "self_vs.fin_dim"
+    and self_vs_dim: "self_vs.dim = 1"
 proof -
-  interpret vectorspace R \<open>vs_of R\<close> by (fact trivial_extension.vectorspace)
   let ?A = "{\<one>}"
-  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> gen_set ?A"
+  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> self_vs.gen_set ?A"
   proof auto
-    show "x \<in> span {\<one>}" if "x \<in> carrier R" for x
-      unfolding span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
-      by (rule exI[of _ ?A]) (auto simp: that lincomb_def)
-  qed (metis empty_subsetI insert_subset one_closed partial_object.select_convs(1) span_closed)
-  then have fin_dim "dim \<le> 1"
-    using fin_dim_def apply force
-    using A_generates_R dim_le1I by auto
-  with trivial_extension.degree_0_iff show trivial_extension.finite "trivial_extension.degree = 1"
-    by (simp_all add: trivial_extension.finite_def trivial_extension.degree_def)
+    show "x \<in> self_vs.span {\<one>}" if "x \<in> carrier R" for x
+      unfolding self_vs.span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
+      by (rule exI[of _ ?A]) (auto simp: that self_vs.lincomb_def)
+  qed (metis empty_subsetI insert_subset one_closed self_vs.span_closed)
+  then show self_vs.fin_dim "self_vs.dim = 1"
+    using self_vs.fin_dim_def apply force
+    using A_generates_R self_vs.dim1I by auto
 qed
 
 lemma (in subring) module_wrt_subring:
@@ -377,10 +380,9 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding linear_map_def apply auto
     apply (simp add: vectorspace_axioms)
     unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
-    using direct_sum_is_vs trivial_extension.vectorspace vs_span_B.vectorspace_axioms apply blast
+    using direct_sum_is_vs self_vs.vectorspace_axioms vs_span_B.vectorspace_axioms apply blast
     apply (simp add: module.module_axioms)
-    using direct_sum_is_module trivial_extension.vectorspace vectorspace_def
-      vs_span_B.module_axioms apply blast
+    apply (simp add: direct_sum_is_module self_vs.module_axioms vs_span_B.module_axioms)
     unfolding direct_sum_def apply auto
     using \<open>b \<in> B\<close> okese(1) apply fastforce
     using vs_span_B.lincomb_closed apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring
@@ -488,17 +490,14 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding linmap.ker_def by auto
   then have goal_2a: "inj_on ?T (carrier V)"
     by (simp add: linmap.Ke0_imp_inj)
-  from trivial_extension_size have "vectorspace.fin_dim K (vs_of K)" "vectorspace.dim K (vs_of K) = 1"
-    by (simp_all add: trivial_extension.finite_def trivial_extension.degree_def)
-  with \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
-    by (simp add: direct_sum_dim(2) trivial_extension.vectorspace vs_span_B.vectorspace_axioms)
+  from self_vs_size \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
+    by (simp add: direct_sum_dim(2) self_vs.vectorspace_axioms vs_span_B.vectorspace_axioms)
   also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
   also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
     using assms(1) linmap.emb_image_dim goal_2a by blast
   finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
-    using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vectorspace.fin_dim K (vs_of K)\<close>
-      \<open>vs_span_B.fin_dim\<close> direct_sum_dim(1) trivial_extension.vectorspace vs_span_B.vectorspace_axioms
-    by auto
+    using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vs_span_B.fin_dim\<close>
+      direct_sum_dim(1) self_vs.vectorspace_axioms self_vs_fin_dim vs_span_B.vectorspace_axioms by auto
   note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
   from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
     unfolding bij_betw_def by blast
@@ -1021,7 +1020,7 @@ lemma (in UP_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarro
   by (simp add: example_16_8_3)
 
 corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
-  using trivial_extension.algebraic_def trivial_extension.example_16_8_3 by blast
+  using field_extension.algebraic_def field_extension.example_16_8_3 trivial_extension by fast
 (* move these up as far as possible *)
 
 
@@ -1046,5 +1045,5 @@ text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule}
 find_theorems name: "subspace."
 find_theorems name: "submodule."
 text\<open>Also, the different argument order is somewhat annoying.\<close>
-
+thm trivial_extension
 end
