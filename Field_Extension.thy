@@ -735,11 +735,20 @@ corollary gen_of_a_kernel_Eval_unique:
   by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval UP_zero_closed ex1_monic_associated
       insert_Diff insert_iff irr_in_P monic_irr)
 
-corollary irr_unique: "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g \<Longrightarrow> g = irr"
-  by (smt P.a_coset_add_zero P.in_PIdl_impl_divided PIdl_irr_a_kernel_Eval UP_zero_closed
-      additive_subgroup.a_subset arg_min_nat_lemma degree_le_divides_associated ex1_monic_associated
-      insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
-      ring.hom_zero ring.homeq_imp_rcos)
+corollary irr_unique:
+  assumes "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g" shows "g = irr"
+proof -
+  from assms have degree_g_le: "degree g \<le> degree irr"
+    by (simp add: Eval_irr irr_in_P is_arg_min_linorder monic_irr)
+  from assms have g: "g \<in> carrier P" "monic g" "Eval g = \<zero>\<^bsub>L\<^esub>"
+    by (simp_all add: is_arg_min_linorder)
+  then have g': "g \<in> carrier P - {\<zero>}" "g \<in> a_kernel P L Eval"
+    unfolding a_kernel_def' by (simp_all add: monic_nonzero a_kernel_def)
+  with PIdl_irr_a_kernel_Eval have "irr divides g"
+    using P.in_PIdl_impl_divided irr_in_P by blast
+  with irr_in_P degree_g_le degree_le_divides_associated g'(1) show ?thesis
+    by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2) gen_of_a_kernel_Eval_unique)
+qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
