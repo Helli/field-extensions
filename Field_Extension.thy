@@ -6,7 +6,7 @@ theory Field_Extension
     Missing
 begin
 
-subsection \<open>Definition\<close>
+subsection \<open>Locale Setup\<close>
 
 locale field_extension = K?: subfield K L + L?: field L for L K
 
@@ -56,6 +56,9 @@ proof unfold_locales
     using R.carrier_one_not_zero by auto
 qed
 
+
+subsection \<open>Evaluation of Polynomials in Field Extensions\<close>
+
 lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c \<otimes>\<^bsub>L\<^esub> \<alpha>"
   by (simp add: Eval_monom id_def)
 
@@ -88,7 +91,7 @@ qed
 end
 
 
-subsection \<open>Finitely generated field extensions\<close>
+subsection \<open>Finitely Generated Field Extensions\<close>
 
 lemma (in field) sum_of_fractions:
   "n1 \<in> carrier R \<Longrightarrow> n2 \<in> carrier R \<Longrightarrow> d1 \<in> carrier R \<Longrightarrow> d2 \<in> carrier R \<Longrightarrow>
@@ -267,7 +270,7 @@ end
 *)
 
 
-subsection \<open>Degree of a field extension\<close>
+subsection \<open>Degree of a Field Extension\<close>
 
 context field_extension begin
 
@@ -461,7 +464,7 @@ proof -
 qed
 
 
-subsection \<open>Polynomial Divisibility\<close>
+subsection \<open>Algebraic Field Extensions\<close>
 
 definition (in UP_field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
@@ -478,16 +481,13 @@ lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lco
   by (cases "a = \<zero>") auto
 
 context UP_field_extension begin
-
-definition irr where (* mv into algebraic context? *)
-  "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
-
 lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
 lemmas coeff_monom_mult = coeff_monom_mult[simplified]
 lemmas coeff_mult = coeff_mult[simplified]
 lemmas lcoeff_monom = lcoeff_monom[simplified]
 lemmas deg_monom = deg_monom[simplified] (* rm all *)
+end
 
 lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
   assumes "\<alpha> \<in> K" shows "UP_field_extension.algebraic L K \<alpha>"
@@ -508,6 +508,12 @@ lemma (in UP_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarro
 
 corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
   using field_extension.algebraic_def field_extension.example_16_8_3 trivial_extension by fast
+
+
+subsection \<open>Divisibility of Polynomials in Field Extensions\<close>
+
+context UP_field_extension
+begin
 
 lemma Units_poly: "Units P = {monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
@@ -624,6 +630,14 @@ proof
     by blast
 qed
 
+
+subsection \<open>The Minimal Polynomial\<close>
+
+definition irr where (* move into algebraic context? *)
+  "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+
+subsubsection \<open>Existence\<close>
+
 context
   assumes algebraic
 begin
@@ -665,6 +679,8 @@ proof (rule ccontr)
   then show False
     using Eval_irr by simp
 qed
+
+subsubsection \<open>Uniqueness\<close>
 
 lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
@@ -724,6 +740,8 @@ corollary irr_unique: "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> m
       additive_subgroup.a_subset arg_min_nat_lemma degree_le_divides_associated ex1_monic_associated
       insertE insert_Diff irr_def is_arg_min_linorder monic_nonzero ring.additive_subgroup_a_kernel
       ring.hom_zero ring.homeq_imp_rcos)
+
+subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
 abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
 
