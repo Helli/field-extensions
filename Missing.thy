@@ -8,6 +8,20 @@ theory Missing
 begin
 
 
+subsection \<open>Subrings\<close>
+
+lemma (in ring) subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
+  unfolding ring_hom_ring_def ring_hom_ring_axioms_def
+  by (auto simp: subring_is_ring ring_axioms intro!: ring_hom_memI) (use subringE(1) in blast)
+
+lemma (in cring) subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
+  using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
+
+lemma (in subring) cring_ring_hom_cring:
+  "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
+  by (simp add: RingHom.ring_hom_cringI cring.subring_cring cring.axioms(1) ring.subring_ring_hom_ring subring_axioms)
+
+
 subsection \<open>Ring Divisibility\<close>
 
 lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{thm[source] to_contain_is_to_divide}\<close>
@@ -321,21 +335,239 @@ lemma (in vectorspace) dim_0_trivial:
   "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
   using dim_greater_0 by linarith
 
+subsubsection \<open>The Field Itself as Vector Space\<close>
+
+abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>monoid.mult K\<close> as \<^const>\<open>smult\<close>)\<close>
+  \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
+  smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
+
+sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
+  rewrites "carrier (vs_of R) = carrier R"
+   apply (rule vs_criteria) apply auto
+       apply (simp add: local.field_axioms)
+      apply (fact add.m_comm)
+     apply (fact add.m_assoc)
+    apply (fact m_assoc)
+   apply (fact l_distr)
+  by (simp add: r_distr)
+
+lemma (in field) self_vs_size:
+  shows self_vs_fin_dim: "self_vs.fin_dim"
+    and self_vs_dim: "self_vs.dim = 1"
+proof -
+  let ?A = "{\<one>}"
+  have A_generates_R: "finite ?A \<and> ?A \<subseteq> carrier R \<and> self_vs.gen_set ?A"
+  proof auto
+    show "x \<in> self_vs.span {\<one>}" if "x \<in> carrier R" for x
+      unfolding self_vs.span_def apply auto apply (rule exI[of _ "\<lambda>_. x"]) \<comment> \<open>coefficient \<^term>\<open>x\<close>\<close>
+      by (rule exI[of _ ?A]) (auto simp: that self_vs.lincomb_def)
+  qed (metis empty_subsetI insert_subset one_closed self_vs.span_closed)
+  then show self_vs.fin_dim "self_vs.dim = 1"
+    using self_vs.fin_dim_def apply force
+    using A_generates_R self_vs.dim1I by auto
+qed
+
 subsubsection \<open>Finite-Dimensional Vector Spaces\<close>
 
+text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
+lemma (in vectorspace) decompose_step:
+  assumes fin_dim
+  assumes "dim > 0"
+  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (vs V')) h
+    \<and> bij_betw h (carrier V) (carrier K \<times> V')
+    \<and> subspace K V' V
+    \<and> vectorspace.dim K (vs V') = dim - 1"
+proof - \<comment> \<open>Possibly easier if the map definition is swapped as in Kemper's proof.\<close>
+  from assms obtain B where B: "basis B" "card B > 0"
+    using dim_basis finite_basis_exists by auto
+  then obtain b where "b \<in> B"
+    by fastforce
+  let ?B = "B - {b}"
+  have liB: "lin_indpt ?B" and BiV: "?B \<subseteq> carrier V" "finite ?B"
+    apply (meson B(1) Diff_subset basis_def supset_ld_is_ld)
+    using B(1) basis_def apply blast using B
+    using card_infinite neq0_conv by blast
+  let ?V = "vs (span ?B)"
+  note goal_3 = span_is_subspace[OF BiV(1)]
+  then interpret vs_span_B: vectorspace K ?V
+    rewrites "carrier (vs (span ?B)) = span ?B"
+    using subspace_is_vs by blast simp
+  from liB have liB': "vs_span_B.lin_indpt ?B"
+    by (simp add: BiV in_own_span span_is_subspace span_li_not_depend(2))
+  then have new_basis: "vs_span_B.basis ?B"
+    by (simp add: BiV(1) in_own_span span_is_submodule span_li_not_depend(1) vs_span_B.basis_def)
+  moreover have "card ?B = dim - 1"
+    using B(1) BiV(2) \<open>b \<in> B\<close> dim_basis by auto
+  ultimately have "vs_span_B.fin_dim" and goal_4: "vs_span_B.dim = dim - 1"
+    unfolding vs_span_B.fin_dim_def apply -
+    apply (metis BiV(2) new_basis vs_span_B.basis_def)
+    using BiV(2) vs_span_B.dim_basis by presburger
+  define coeffs where "coeffs = the_inv_into (B \<rightarrow>\<^sub>E carrier K) (\<lambda>a. lincomb a B)"
+  have coeffs_unique: "\<exists>!c. c \<in> B \<rightarrow>\<^sub>E carrier K \<and> lincomb c B = v" if "v \<in> carrier V" for v
+    using basis_criterion by (metis (full_types) B basis_def card_ge_0_finite that)
+  have okese: "coeffs v \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb (coeffs v) B" if "v \<in> carrier V" for v
+    using that theI'[OF coeffs_unique] by (simp_all add: coeffs_def the_inv_into_def)
+  have c_sum: "coeffs (v1\<oplus>\<^bsub>V\<^esub>v2) \<in> B \<rightarrow>\<^sub>E carrier K"
+    "v1\<oplus>\<^bsub>V\<^esub>v2 = lincomb (coeffs (v1\<oplus>\<^bsub>V\<^esub>v2)) B" if "v1 \<in> carrier V" "v2 \<in> carrier V" for v1 v2
+    apply (simp add: okese(1) that(1) that(2))
+    apply (simp add: okese(2) that(1) that(2))
+    done
+  have c_sum': "lincomb (\<lambda>v. coeffs v1 v \<oplus>\<^bsub>K\<^esub> coeffs v2 v) B = lincomb (coeffs (v1\<oplus>\<^bsub>V\<^esub>v2)) B" if "v1 \<in> carrier V" "v2 \<in> carrier V" for v1 v2
+  proof -
+    note b = okese(2)[OF that(1)] okese(2)[OF that(2)]
+    note a = okese(1)[OF that(1)] okese(1)[OF that(2)]
+    then have "coeffs v1 \<in> B \<rightarrow> carrier K" "coeffs v2 \<in> B \<rightarrow> carrier K"
+      by blast+
+    note lincomb_sum[OF _ _ this, folded b]
+    then show ?thesis
+      using B(1) B(2) basis_def c_sum(2) that(1) that(2) by force
+  qed
+  let ?T = "\<lambda>v. (coeffs v b, lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs v bv) (B - {b}))"
+  have goal_1: "linear_map K V (direct_sum (vs_of K) ?V) ?T"
+    unfolding linear_map_def apply auto
+    apply (simp add: vectorspace_axioms)
+    unfolding mod_hom_def module_hom_def mod_hom_axioms_def apply auto
+    using direct_sum_is_vs self_vs.vectorspace_axioms vs_span_B.vectorspace_axioms apply blast
+    apply (simp add: module.module_axioms)
+    apply (simp add: direct_sum_is_module self_vs.module_axioms vs_span_B.module_axioms)
+    unfolding direct_sum_def apply auto
+    using \<open>b \<in> B\<close> okese(1) apply fastforce
+    using vs_span_B.lincomb_closed apply (smt BiV DiffE finite_span PiE_mem Pi_I coeff_in_ring
+        insertCI mem_Collect_eq module_axioms okese(1))
+  proof -
+    fix m1 m2
+    assume mcV: "m1 \<in> carrier V" "m2 \<in> carrier V"
+    then have B_to_K_map: "(\<lambda>bv. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv) \<in> B \<rightarrow> carrier K"
+      by (smt PiE_mem Pi_I R.add.m_closed okese(1))
+    let ?restricted = "\<lambda>bv\<in>B. coeffs m1 bv \<oplus>\<^bsub>K\<^esub> coeffs m2 bv"
+    have "lincomb (coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2)) B = lincomb ?restricted B"
+      using mcV B(1) basis_def c_sum' B_to_K_map by auto
+    moreover have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K"
+      "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
+       apply (simp add: mcV c_sum(1))
+      by (simp add: B_to_K_map)
+    ultimately
+      have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) = ?restricted"
+      using basis_criterion
+      by (metis (no_types, lifting) mcV B(1) B(2) M.add.m_closed basis_def c_sum(2)
+          card_ge_0_finite)
+    then have distr: "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) b = coeffs m1 b \<oplus>\<^bsub>K\<^esub> coeffs m2 b" if "b \<in> B" for b
+      by (simp add: that)
+    then show "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) b = coeffs m1 b \<oplus>\<^bsub>K\<^esub> coeffs m2 b"
+      by (simp add: \<open>b \<in> B\<close>)
+    have [simp]: "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else xyz bv) (B-{b})
+      = lincomb xyz (B-{b})" if "xyz \<in> B \<rightarrow> carrier K" for xyz
+      using that
+      by (smt BiV(1) Diff_not_in Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong)
+    have "coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow> carrier K"
+      "coeffs m1 \<in> B \<rightarrow> carrier K"
+      "coeffs m2 \<in> B \<rightarrow> carrier K"
+      using \<open>coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) \<in> B \<rightarrow>\<^sub>E carrier K\<close> apply auto[1]
+      using mcV okese(1) by fastforce+
+    with distr show "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs (m1 \<oplus>\<^bsub>V\<^esub> m2) bv) (B-{b})
+      = lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m1 bv) (B-{b})
+      \<oplus>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m2 bv) (B-{b})" apply simp
+      by (smt BiV DiffE Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong lincomb_sum)
+    fix r m
+    assume rK: "r \<in> carrier K" and mV: "m \<in> carrier V"
+    have sane: "(\<lambda>bv. r \<otimes>\<^bsub>K\<^esub> coeffs m bv) \<in> B \<rightarrow> carrier K"
+      using mV okese(1) rK by fastforce
+    let ?restricted = "\<lambda>bv\<in>B. r \<otimes>\<^bsub>K\<^esub> coeffs m bv"
+    have "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) B = lincomb ?restricted B"
+      by (metis B(1) PiE_restrict basis_def lincomb_distrib lincomb_restrict_simp mV okese rK
+          restrict_PiE sane smult_closed)
+    moreover have "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K" "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
+       apply (simp add: mV okese(1) rK)
+      by (simp add: sane)
+    ultimately have "coeffs (r \<odot>\<^bsub>V\<^esub> m) = ?restricted"
+      by (metis coeffs_unique mV okese(2) rK smult_closed)
+    then have scale: "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b" if "b \<in> B" for b
+      by (simp add: that)
+    then show "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b"
+      using \<open>b \<in> B\<close> by blast
+    have "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow> carrier K"
+      "coeffs m \<in> B \<rightarrow> carrier K"
+      using \<open>coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K\<close> apply auto[1]
+      using mV okese(1) by fastforce
+    with scale \<open>r \<in> carrier K\<close> show "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs (r \<odot>\<^bsub>V\<^esub> m) bv) (B-{b}) =
+    r \<odot>\<^bsub>V\<^esub> lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else coeffs m bv) (B-{b})"
+    proof simp
+      assume a1: "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow> carrier K"
+      assume a2: "r \<in> carrier K"
+      assume a3: "coeffs m \<in> B \<rightarrow> carrier K"
+      assume a4: "\<And>b. b \<in> B \<Longrightarrow> coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b"
+      have f5: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> (\<exists>c. c \<in> C \<and> f c \<noteq> fa c) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
+        by (metis (no_types) lincomb_cong)
+      obtain cc :: "('c \<Rightarrow> 'a) \<Rightarrow> ('c \<Rightarrow> 'a) \<Rightarrow> 'c set \<Rightarrow> 'c" where
+        "\<forall>x0 x1 x3. (\<exists>v4. v4 \<in> x3 \<and> x1 v4 \<noteq> x0 v4) = (cc x0 x1 x3 \<in> x3 \<and> x1 (cc x0 x1 x3) \<noteq> x0 (cc x0 x1 x3))"
+        by moura
+      then have f6: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> cc fa f C \<in> C \<and> f (cc fa f C) \<noteq> fa (cc fa f C) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
+        using f5 by presburger
+      have f7: "insert b (B - {b}) = B"
+        using \<open>b \<in> B\<close> by blast
+      have f8: "\<forall>f c C fa. (f \<in> Pi (insert (c::'c) C) fa) = (f \<in> Pi C fa \<and> (f c::'a) \<in> fa c)"
+        by blast
+      then have f9: "cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) \<in> B - {b} \<and> r \<otimes>\<^bsub>K\<^esub> coeffs m (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<noteq> coeffs (r \<odot>\<^bsub>V\<^esub> m) (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<or> lincomb (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) = lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b})"
+        using f7 f6 a1 by (metis (no_types) \<open>B - {b} \<subseteq> carrier V\<close>)
+      have "coeffs m \<in> B - {b} \<rightarrow> carrier K \<and> coeffs m b \<in> carrier K"
+        using f8 f7 a3 by (metis (no_types))
+      then show "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b}) = r \<odot>\<^bsub>V\<^esub> lincomb (coeffs m) (B - {b})"
+        using f9 a4 a2 \<open>B - {b} \<subseteq> carrier V\<close> lincomb_distrib by fastforce
+    qed
+  qed
+  then interpret linmap: linear_map K V \<open>direct_sum (vs_of K) ?V\<close> ?T .
+  {
+    fix v
+    assume "v \<in> carrier V"
+    let ?c = "coeffs v"
+    have a: "?c \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb ?c B"
+      using okese by (simp add: \<open>v \<in> carrier V\<close>)+
+    have c0s: "v = \<zero>\<^bsub>V\<^esub> \<Longrightarrow> coeffs v \<in> B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
+      by (metis (no_types, lifting) B(1) B(2) Diff_cancel Diff_eq_empty_iff PiE_mem Pi_I a(1) a(2) basis_def card_ge_0_finite not_lindepD)
+    have "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else ?c bv) ?B = \<zero>\<^bsub>V\<^esub> \<longleftrightarrow> ?c \<in> ?B\<rightarrow>{\<zero>\<^bsub>K\<^esub>}"
+      apply standard
+      using not_lindepD
+       apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I a(1) liB lin_dep_crit singletonI)
+      by (smt BiV(1) Diff_not_in Pi_cong lincomb_zero)
+    then have "?T v = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longrightarrow> v = \<zero>\<^bsub>V\<^esub>"
+      unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) insertCI
+          insert_Diff lincomb_zero vectorspace.basis_def vectorspace_axioms)
+  }
+  then have "linmap.kerT = {\<zero>\<^bsub>V\<^esub>}"
+    unfolding linmap.ker_def by auto
+  then have goal_2a: "inj_on ?T (carrier V)"
+    by (simp add: linmap.Ke0_imp_inj)
+  from self_vs_size \<open>vs_span_B.fin_dim\<close> have "linmap.W.dim = 1 + vs_span_B.dim"
+    by (simp add: direct_sum_dim(2) self_vs.vectorspace_axioms vs_span_B.vectorspace_axioms)
+  also from goal_4 have "\<dots> = dim" using \<open>dim > 0\<close> by force
+  also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
+    using assms(1) linmap.emb_image_dim goal_2a by blast
+  finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
+    using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vs_span_B.fin_dim\<close>
+      direct_sum_dim(1) self_vs.vectorspace_axioms self_vs_fin_dim vs_span_B.vectorspace_axioms by auto
+  note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
+  from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
+    unfolding bij_betw_def by blast
+qed
 
-subsection \<open>Subrings\<close>
 
-lemma (in ring) subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
-  unfolding ring_hom_ring_def ring_hom_ring_axioms_def
-  by (auto simp: subring_is_ring ring_axioms intro!: ring_hom_memI) (use subringE(1) in blast)
+subsection \<open>Linear Maps\<close>
 
-lemma (in cring) Subring_cring: "subring S R \<Longrightarrow> cring (R\<lparr>carrier:=S\<rparr>)"
-  using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
+lemma (in subring) module_wrt_subring:
+  "module R M \<Longrightarrow> module (R\<lparr>carrier:=H\<rparr>) M"
+  unfolding module_def module_axioms_def by (simp add: cring.subring_cring subring_axioms)
 
-lemma (in subring) cring_ring_hom_cring:
-  "cring R \<Longrightarrow> ring_hom_cring (R\<lparr>carrier:=H\<rparr>) R id"
-  by (simp add: RingHom.ring_hom_cringI cring.Subring_cring cring.axioms(1) ring.subring_ring_hom_ring subring_axioms)
+lemma (in subfield) vectorspace_wrt_subfield:
+  "vectorspace R V \<Longrightarrow> vectorspace (R\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
+  by (auto simp: module_wrt_subring ring.subfield_iff(2) cring.axioms(1) module.axioms(1) subfield_axioms)
+
+lemma (in subring) hom_wrt_subring:
+  "h \<in> module_hom R M N \<Longrightarrow> h \<in> module_hom (R\<lparr>carrier:=H\<rparr>) M N"
+  by (simp add: LinearCombinations.module_hom_def)
+
+lemma (in subfield) linear_wrt_subfield:
+  "linear_map R M N T \<Longrightarrow> linear_map (R\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
+  by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
 
 
 subsection \<open>Fields\<close>
