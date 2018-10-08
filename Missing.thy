@@ -15,28 +15,21 @@ lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{
   unfolding factor_def cgenideal_def using m_comm by blast
 
 
-subsection \<open>Vector Spaces\<close>
+subsection \<open>Linear Combinations\<close>
+
+lemma (in module) lincomb_restrict_simp[simp, intro]:
+  assumes U: "U \<subseteq> carrier M"
+      and a: "a : U \<rightarrow> carrier R" (* needed? *)
+  shows "lincomb (restrict a U) U = lincomb a U"
+  by (meson U a lincomb_cong restrict_apply')
 
 lemma (in module) lin_indpt_empty: "lin_indpt {}"
   by (simp add: lin_dep_def)
 
-lemma (in vectorspace) dim_greater_0:
-  assumes fin_dim
-  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
-  shows "dim > 0"
-proof (rule ccontr, simp)
-  assume "dim = 0"
-  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
-    using assms basis_def dim_basis finite_basis_exists by auto
-  then have "gen_set {}"
-    by force
-  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
-    using assms(2) by blast
-  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
-    unfolding span_def by auto
-  then show False unfolding lincomb_def
-    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
-qed
+
+subsection \<open>Vector Spaces\<close>
+
+subsubsection \<open>Subspaces\<close>
 
 text\<open>The next two lemmas formalise
   \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LA_info_no_dates.pdf#chapter.5\<close>\<close>
@@ -272,6 +265,8 @@ txt \<open>I had planned to adapt the proof above to also show that @{term ?Bds}
     by simp
 qed (* to-do: use \<^sub> in part 1*)
 
+subsubsection \<open>Zero Vector Space\<close>
+
 lemma (in module) submodule_zsm: "submodule {\<zero>\<^bsub>M\<^esub>} R M"
   using M.r_neg submoduleI by fastforce
 
@@ -302,18 +297,29 @@ corollary (in vectorspace) zss_dim:
   using basis_zss vectorspace.basis_def vectorspace.fin_dim_def vectorspace_zss apply fastforce
   using basis_zss vectorspace.dim_basis vectorspace_zss by fastforce
 
+lemma (in vectorspace) dim_greater_0:
+  assumes fin_dim
+  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
+  shows "dim > 0"
+proof (rule ccontr, simp)
+  assume "dim = 0"
+  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
+    using assms basis_def dim_basis finite_basis_exists by auto
+  then have "gen_set {}"
+    by force
+  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
+    using assms(2) by blast
+  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
+    unfolding span_def by auto
+  then show False unfolding lincomb_def
+    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
+qed
+
 lemma (in vectorspace) dim_0_trivial:
   "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
   using dim_greater_0 by linarith
 
-
-subsection \<open>Linear Combinations\<close>
-
-lemma (in module) lincomb_restrict_simp[simp, intro]:
-  assumes U: "U \<subseteq> carrier M"
-      and a: "a : U \<rightarrow> carrier R" (* needed? *)
-  shows "lincomb (restrict a U) U = lincomb a U"
-  by (meson U a lincomb_cong restrict_apply')
+subsubsection \<open>Finite-Dimensional Vector Spaces\<close>
 
 
 subsection \<open>Subrings\<close>
