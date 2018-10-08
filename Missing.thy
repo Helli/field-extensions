@@ -84,6 +84,8 @@ proof -
         vectorspace.axioms(1) vectorspace.basis_def vectorspace.dim_li_is_basis vectorspace.gen_ge_dim vs)
 qed
 
+subsubsection \<open>Direct Sum of Vector Spaces\<close>
+
 lemma (in linear_map) emb_image_dim:
   assumes "inj_on T (carrier V)"
   assumes V.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
