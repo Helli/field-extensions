@@ -10,7 +10,7 @@ subsection \<open>Definition\<close>
 
 locale field_extension = K?: subfield K L + L?: field L for L K
 
-sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close>
+sublocale field \<subseteq> trivial_extension: field_extension R \<open>carrier R\<close> \<comment> \<open>to-do: The only relevant bit is the vectorspace?\<close>
   rewrites "R\<lparr>carrier := carrier R\<rparr> = R"
   by (simp_all add: field_extension.intro field_axioms subfield_iff(1))
 
