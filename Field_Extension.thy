@@ -62,6 +62,29 @@ lemma Eval_cx[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 1) = c \<otime
 lemma Eval_constant[simp]: "c \<in> K \<Longrightarrow> Eval (monom P c 0) = c"
   unfolding Eval_monom by simp
 
+lemma eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed to non-id homomorphisms?\<close>
+  assumes a: "a \<in> K"
+  shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P a 0) = \<zero>\<^bsub>L\<^esub>"
+  (is "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
+proof -
+  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
+  have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
+    using eval_ring_hom a by (simp add: eval_ring_hom)
+  interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
+  have mon1_closed: "monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
+    and mon0_closed: "monom P a 0 \<in> carrier P"
+    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> monom P a 0 \<in> carrier P"
+    using a R.a_inv_closed by auto
+  have "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> eval
+    (L\<lparr>carrier:=K\<rparr>) L id a (monom P a 0)"
+    by (simp add: a_minus_def mon0_closed)
+  also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
+    using assms eval_const eval_monom1 by simp
+  also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
+    using a by simp
+  finally show ?thesis by simp
+qed
+
 end
 
 
@@ -282,6 +305,11 @@ corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
 
 end
 
+lemma (in field) trivial_extension_size:
+  shows trivial_extension_finite: "field_extension.finite R (carrier R)"
+    and trivial_extension_degree: "field_extension.degree R (carrier R) = 1"
+  using self_vs_size by (simp_all add: field_extension.finite_def field_extension.degree_def trivial_extension)
+
 proposition tower_rule: \<comment> \<open>Maybe this is easier when following the comment on line 500 here: @{url
   "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}.
   Or wikipedia.\<close>
@@ -460,6 +488,26 @@ lemmas coeff_monom_mult = coeff_monom_mult[simplified]
 lemmas coeff_mult = coeff_mult[simplified]
 lemmas lcoeff_monom = lcoeff_monom[simplified]
 lemmas deg_monom = deg_monom[simplified] (* rm all *)
+
+lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
+  assumes "\<alpha> \<in> K" shows "UP_field_extension.algebraic L K \<alpha>"
+proof -
+  define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
+  interpret \<alpha>?: UP_field_extension L K P
+    by unfold_locales (simp_all add: assms P_def)
+  let ?x_minus_\<alpha> = "monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P \<alpha> 0"
+  have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
+    unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast
+  have "?x_minus_\<alpha> \<noteq> \<zero>\<^bsub>P\<^esub>"
+    by simp (metis r_right_minus_eq deg_monom assms deg_const monom_closed nat.simps(3) sub_one_not_zero K.one_closed)
+  with goal1 show ?thesis unfolding algebraic_def
+    using assms by fastforce
+qed
+lemma (in UP_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarrow> algebraic"
+  by (simp add: example_16_8_3)
+
+corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
+  using field_extension.algebraic_def field_extension.example_16_8_3 trivial_extension by fast
 
 lemma Units_poly: "Units P = {monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   apply auto
@@ -757,51 +805,6 @@ end
 
 end
 
-lemma (in UP_field_extension) eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further relaxed
-  to non-id homomorphisms?\<close>
-  assumes a: "a \<in> K"
-  shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P a 0) = \<zero>\<^bsub>L\<^esub>"
-  (is "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
-proof -
-  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
-  have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
-    using eval_ring_hom a by (simp add: eval_ring_hom)
-  interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
-  have mon1_closed: "monom P \<one>\<^bsub>L\<^esub> 1 \<in> carrier P"
-    and mon0_closed: "monom P a 0 \<in> carrier P"
-    and min_mon0_closed: "\<ominus>\<^bsub>P\<^esub> monom P a 0 \<in> carrier P"
-    using a R.a_inv_closed by auto
-  have "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1) \<ominus>\<^bsub>L\<^esub> eval
-    (L\<lparr>carrier:=K\<rparr>) L id a (monom P a 0)"
-    by (simp add: a_minus_def mon0_closed)
-  also have "\<dots> = a \<ominus>\<^bsub>L\<^esub> a"
-    using assms eval_const eval_monom1 by simp
-  also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
-    using a by simp
-  finally show ?thesis by simp
-qed
-
-lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
-  assumes "\<alpha> \<in> K" shows "UP_field_extension.algebraic L K \<alpha>"
-proof -
-  define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
-  interpret \<alpha>?: UP_field_extension L K P
-    by unfold_locales (simp_all add: assms P_def)
-  let ?x_minus_\<alpha> = "monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P \<alpha> 0"
-  have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
-    unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast
-  have "?x_minus_\<alpha> \<noteq> \<zero>\<^bsub>P\<^esub>"
-    by simp (metis r_right_minus_eq deg_monom assms deg_const monom_closed nat.simps(3) sub_one_not_zero K.one_closed)
-  with goal1 show ?thesis unfolding algebraic_def
-    using assms by fastforce
-qed
-lemma (in UP_field_extension) example_16_8_3': "\<alpha> \<in> K \<Longrightarrow> algebraic"
-  by (simp add: example_16_8_3)
-
-corollary (in field) trivial_extension_algebraic: "field_extension.algebraic R (carrier R)"
-  using field_extension.algebraic_def field_extension.example_16_8_3 trivial_extension by fast
-(* move these up as far as possible *)
-
 
 section \<open>Observations (*rm*)\<close>
 
@@ -824,5 +827,5 @@ text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule}
 find_theorems name: "subspace."
 find_theorems name: "submodule."
 text\<open>Also, the different argument order is somewhat annoying.\<close>
-thm trivial_extension
+
 end
