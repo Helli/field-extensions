@@ -754,14 +754,7 @@ qed
 subsubsection \<open>Irreducibility\<close>
 
 abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
-(*
-lemma aux: (*inline*)
-  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) im_Eval"
-  unfolding PIdl_irr_a_kernel_Eval using ring.FactRing_iso_set_aux .
 
-lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> im_Eval"
-  using aux is_ring_iso_def by auto
-*)
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
   Quot PIdl irr)\<close> anyways:\<close>
 lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
@@ -777,14 +770,18 @@ proof -
     using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ rings] by fastforce
 qed
 
-subsubsection \<open>Factoring out the Minimal Polynomial\<close>
-
-lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
-  unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
-  using ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal, simplified] .
-
+text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives us a shorter proof:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
-  using primeideal_PIdl_irr irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by blast
+proof -
+  txt "As the preimage of the zero ideal under evaluation, \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
+  have "primeideal (PIdl irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
+    using ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
+  txt "This immediately gives the desired result, as \<^term>\<open>P\<close> is a principal ideal domain:"
+  then show "ring_irreducible\<^bsub>P\<^esub> irr"
+    using irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by auto
+qed
+
+subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
 lemma maximalideal_PIdl_irr: "maximalideal (PIdl irr) P"
   by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
