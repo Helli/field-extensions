@@ -516,27 +516,36 @@ context UP_field_extension
 begin
 
 lemma Units_poly: "Units P = {monom P u 0 | u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
-  apply auto
-proof goal_cases
-  case (1 x)
-  then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
-    using P.Units_l_inv by blast
-  then have "degree inv_x + degree x = degree \<one>"
-    using deg_mult by (smt "1" P.Units_closed integral_iff zero_not_one)
-  then have "degree x = 0"
-    unfolding deg_one by blast
-  then show ?case
-    by (metis "1" P.Units_closed P.Units_r_inv_ex L.l_null coeff_closed deg_zero_impl_monom
-        Eval_smult monom_mult_is_smult ring.hom_closed ring.hom_one sub_one_not_zero)
+proof
+  show "Units P \<subseteq> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+  proof
+    fix x assume "x \<in> Units P"
+    then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
+      using P.Units_l_inv by blast
+    then have "degree inv_x + degree x = degree \<one>"
+      using deg_mult by (metis P.Units_closed P.Units_r_inv_ex P.l_null \<open>x \<in> Units P\<close> zero_not_one)
+    then have "degree x = 0"
+      unfolding deg_one by blast
+    then have "\<exists>u. x = monom P u 0 \<and> u \<in> K \<and> u \<noteq> \<zero>\<^bsub>L\<^esub>"
+      by (metis Eval_constant P.Units_closed R.zero_closed \<open>x \<in> Units P\<close> deg_zero_impl_monom inv_x
+          lcoeff_closed local.integral_iff local.zero_not_one monom_zero ring.hom_zero)
+    then show "x \<in> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+      by simp
+  qed
 next
-  case (2 u)
-  then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
-    using monom_mult_smult monom_mult_is_smult subfield_axioms L.subfield_m_inv(1) by auto
-  also have "\<dots> = \<one>"
-    using "2" L.subfield_m_inv(3) monom_one subfield_axioms by auto
-  finally show ?case
-    by (metis (no_types, lifting) "2" Diff_iff P.Units_one_closed P.prod_unit_l P.unit_factor
-        L.ring_axioms monom_closed ring.subfield_m_inv(1) singletonD subfield_axioms)
+  show "{monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}} \<subseteq> Units P"
+  proof
+    fix x assume "x \<in> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
+    then obtain u where u: "x = monom P u 0" "u \<in> K-{\<zero>\<^bsub>L\<^esub>}"
+      by blast
+    then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
+      using monom_mult_smult monom_mult_is_smult subfield_axioms L.subfield_m_inv(1) by auto
+    also have "\<dots> = \<one>\<^bsub>P\<^esub>"
+      using L.subfield_m_inv(3) u(2) subfield_axioms monom_one by auto
+    finally show "x \<in> Units P"
+      by (metis (no_types, lifting) u Diff_iff P.Units_one_closed P.prod_unit_l P.unit_factor
+          L.ring_axioms monom_closed ring.subfield_m_inv(1) subfield_axioms)
+  qed
 qed
 
 corollary Units_poly': "Units P = (\<lambda>u. monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
