@@ -754,14 +754,14 @@ qed
 subsubsection \<open>Irreducibility\<close>
 
 abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
-
+(*
 lemma aux: (*inline*)
   "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) im_Eval"
   unfolding PIdl_irr_a_kernel_Eval using ring.FactRing_iso_set_aux .
 
 lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> im_Eval"
   using aux is_ring_iso_def by auto
-
+*)
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
   Quot PIdl irr)\<close> anyways:\<close>
 lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
@@ -771,10 +771,10 @@ proof -
   have rings: "ring im_Eval" "ring (P Quot PIdl irr)"
     by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
   then obtain inv_h where inv_h: "inv_h \<in> ring_iso im_Eval (P Quot PIdl irr)"
-    using ring_iso_sym theorem_16_9b_left unfolding is_ring_iso_def by blast
+    using ring_iso_set_sym ring.FactRing_iso_set_aux PIdl_irr_a_kernel_Eval by auto
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
   then show ?thesis
-    using inv_h[unfolded ring_iso_def] ring_hom_one ring_hom_zero[OF _ rings] by fastforce
+    using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ rings] by fastforce
 qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
@@ -792,18 +792,17 @@ lemma maximalideal_PIdl_irr: "maximalideal (PIdl irr) P"
 lemma rings: "ring (P Quot PIdl irr)"
   by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
 
-lemma field_im_Eval: "field im_Eval"
+lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
 proof -
-  from theorem_16_9b_left obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
-    by (auto simp: is_ring_iso_def)
+  from ring.FactRing_iso_set_aux obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
+    by (auto simp: PIdl_irr_a_kernel_Eval)
   from maximalideal_PIdl_irr have "field (P Quot PIdl irr)"
     using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
-  from field.ring_iso_imp_img_field[OF this h] show ?thesis
+  from field.ring_iso_imp_img_field[OF this h] have "field im_Eval"
     using h[unfolded ring_iso_def] ring_hom_zero[OF _ rings ring.img_is_ring] ring_hom_one by force
+  then show "subfield (Eval ` carrier P) L"
+    by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
 qed
-
-lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
-  by (rule ring.subfield_iff(1)) (simp_all add: L.ring_axioms field_im_Eval image_subsetI)
 
 lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   apply (rule L.generate_field_min_subfield1) apply auto
@@ -826,7 +825,7 @@ qed
 
 theorem the_elem_ring_iso_Quot_irr_generate_field:
   "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
-  using aux 1 2 by force
+  using 1 2 ring.FactRing_iso_set_aux by (auto simp: PIdl_irr_a_kernel_Eval)
 
 corollary simple_algebraic_extension:
   "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
