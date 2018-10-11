@@ -374,12 +374,12 @@ proof -
     assume fin: "field_extension.finite M L" "field_extension.finite ?L K"
     define cM where "cM = carrier M"
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
-    have m_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
+    have cM_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
         apply (simp add: assms(2-3) cM_def field_extension.intro field_extension.vectorspace)
       using assms(2) assms(3) cM_def field_extension.finite_def field_extension_def fin(1) apply auto[1]
       by (simp add: M_over_K.vectorspace_axioms cM_def)
-    from m_facts \<comment> \<open>The assumptions with \<^term>\<open>M\<close> in it. to-do: remove TrueI\<close>
+    from cM_facts \<comment> \<open>the assumptions with \<^term>\<open>cM\<close> in it\<close>
     have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) \<and> vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) =
       vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>) * vectorspace.dim ?K (vs_of ?L)"
     proof (induction "vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)" arbitrary: cM)

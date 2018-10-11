@@ -33,7 +33,7 @@ subsection \<open>Linear Combinations\<close>
 
 lemma (in module) lincomb_restrict_simp[simp, intro]:
   assumes U: "U \<subseteq> carrier M"
-      and a: "a : U \<rightarrow> carrier R" (* needed? *)
+      and a: "a : U \<rightarrow> carrier R"
   shows "lincomb (restrict a U) U = lincomb a U"
   by (meson U a lincomb_cong restrict_apply')
 
