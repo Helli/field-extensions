@@ -733,15 +733,12 @@ proof -
     using P.associated_iff_same_ideal by auto
 qed
 
-corollary gen_of_a_kernel_Eval_unique:
-  assumes "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval"
-  shows "p = irr" using assms
-  by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval UP_zero_closed ex1_monic_associated
-      insert_Diff insert_iff irr_in_P monic_irr)
-
-corollary irr_unique:
+lemma irr_unique:
   assumes "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g" shows "g = irr"
 proof -
+  have irr_is_unique_gen: "p = irr" if "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval" for p
+    using that PIdl_irr_a_kernel_Eval associated_iff_same_ideal ex1_monic_associated
+    by (metis UP_zero_closed insert_Diff insert_iff irr_in_P monic_irr)
   from assms have degree_g_le: "degree g \<le> degree irr"
     by (simp add: Eval_irr irr_in_P is_arg_min_linorder monic_irr)
   from assms have g: "g \<in> carrier P" "monic g" "Eval g = \<zero>\<^bsub>L\<^esub>"
@@ -751,7 +748,7 @@ proof -
   with PIdl_irr_a_kernel_Eval have "irr divides g"
     using P.in_PIdl_impl_divided irr_in_P by blast
   with irr_in_P degree_g_le degree_le_divides_associated g'(1) show ?thesis
-    by (metis P.associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2) gen_of_a_kernel_Eval_unique)
+    by (metis associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2) irr_is_unique_gen)
 qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
