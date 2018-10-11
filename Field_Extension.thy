@@ -747,11 +747,11 @@ proof -
     unfolding a_kernel_def' by (simp_all add: monic_nonzero a_kernel_def)
   with PIdl_irr_a_kernel_Eval have "irr divides g"
     using P.in_PIdl_impl_divided irr_in_P by blast
-  with irr_in_P degree_g_le degree_le_divides_associated g'(1) show ?thesis
-    by (metis associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2) irr_is_unique_gen)
+  with irr_is_unique_gen degree_g_le g'(1) degree_le_divides_associated show ?thesis
+    by (metis irr_in_P associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2))
 qed
 
-subsubsection \<open>Factoring out the Minimal Polynomial\<close>
+subsubsection \<open>Irreducibility\<close>
 
 abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
 
@@ -762,11 +762,12 @@ lemma aux: (*inline*)
 lemma theorem_16_9b_left: "P Quot PIdl irr \<simeq> im_Eval"
   using aux is_ring_iso_def by auto
 
-lemma domain_im_Eval: "domain im_Eval" (* unused *)
-  by (simp add: ring.img_is_domain L.domain_axioms)
-
-lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" (* unused *)
+text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
+  Quot PIdl irr)\<close> anyways:\<close>
+lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
 proof -
+  have domain_im_Eval: "domain im_Eval"
+    by (simp add: ring.img_is_domain L.domain_axioms)
   have rings: "ring im_Eval" "ring (P Quot PIdl irr)"
     by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
   then obtain inv_h where inv_h: "inv_h \<in> ring_iso im_Eval (P Quot PIdl irr)"
@@ -775,6 +776,8 @@ proof -
   then show ?thesis
     using inv_h[unfolded ring_iso_def] ring_hom_one ring_hom_zero[OF _ rings] by fastforce
 qed
+
+subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
 lemma primeideal_PIdl_irr: "primeideal (PIdl irr) P"
   unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
