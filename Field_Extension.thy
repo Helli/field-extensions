@@ -548,9 +548,6 @@ next
   qed
 qed
 
-corollary Units_poly': "Units P = (\<lambda>u. monom P u 0) ` (K-{\<zero>\<^bsub>L\<^esub>})"
-  using Units_poly by auto
-
 lemma lcoeff_mult:
   assumes "p \<in> carrier P" "q \<in> carrier P"
   shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
