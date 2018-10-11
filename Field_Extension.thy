@@ -775,7 +775,7 @@ lemma irr_irreducible_polynomial: "ring_irreducible irr"
 proof -
   txt "As the preimage of the zero ideal under evaluation, \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
   have "primeideal (PIdl irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
-    using ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
+    using pol.ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
   txt "This immediately gives the desired result, as \<^term>\<open>P\<close> is a principal ideal domain:"
   then show "ring_irreducible\<^bsub>P\<^esub> irr"
     using irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by auto
