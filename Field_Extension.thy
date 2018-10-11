@@ -630,6 +630,27 @@ proof
     by blast
 qed
 
+lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
+  using deg_zero_impl_monom[of p] Units_poly lcoeff_nonzero_nonzero by auto
+
+lemma degree_le_divides_associated:
+  assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
+  and "degree p \<le> degree q" "q divides p"
+  shows "p \<sim> q"
+proof (cases "q = \<zero>")
+  case False
+  note assms(4)[unfolded factor_def]
+  then obtain c where c: "c \<in> carrier P" "p = q \<otimes> c" by auto
+  with assms(1) have "c \<noteq> \<zero>"
+    using P.r_null assms(2) by blast
+  with assms(1-3) c have "degree p = degree q"
+    by (simp add: False)
+  with \<open>c \<noteq> \<zero>\<close> c have "degree c = 0"
+    by (simp add: False assms(2))
+  then show ?thesis
+    by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<close> assms(2) c nonzero_constant_is_Unit)
+qed (use assms(4) in auto)
+
 
 subsection \<open>The Minimal Polynomial\<close>
 
@@ -642,7 +663,7 @@ context
   assumes algebraic
 begin
 
-lemma is_arg_min_irr:
+lemma irr_is_arg_min:
   "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
 proof -
   from \<open>algebraic\<close> obtain p where p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}" "Eval p = \<zero>\<^bsub>L\<^esub>"
@@ -666,7 +687,7 @@ qed
 corollary irr_sane:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
   and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y"
-  using is_arg_min_irr[unfolded is_arg_min_linorder] by auto
+  using irr_is_arg_min[unfolded is_arg_min_linorder] by auto
 
 corollary irr_nonzero: "irr \<noteq> \<zero>"
   by (simp add: monic_irr monic_nonzero)
@@ -684,29 +705,6 @@ subsubsection \<open>Uniqueness\<close>
 
 lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
-
-lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
-  using deg_zero_impl_monom[of p]
-  by (metis (mono_tags, lifting) Diff_iff R.zero_closed Units_poly coeff_closed coeff_zero
-      insert_iff lcoeff_Unit_nonzero lcoeff_nonzero mem_Collect_eq singletonD subfield_Units)
-
-lemma degree_le_divides_associated:
-  assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
-  and "degree p \<le> degree q" "q divides p"
-  shows "p \<sim> q"
-proof (cases "q = \<zero>")
-  case False
-  note assms(4)[unfolded factor_def]
-  then obtain c where c: "c \<in> carrier P" "p = q \<otimes> c" by auto
-  with assms(1) have "c \<noteq> \<zero>"
-    using P.r_null assms(2) by blast
-  with assms(1-3) c have "degree p = degree q"
-    by (simp add: False)
-  with \<open>c \<noteq> \<zero>\<close> c have "degree c = 0"
-    by (simp add: False assms(2))
-  then show ?thesis
-    by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<close> assms(2) c nonzero_constant_is_Unit)
-qed (use assms(4) in auto)
 
 lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
 proof -
