@@ -783,8 +783,8 @@ qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
-lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
-proof -
+lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
+proof (rule L.generate_field_min_subfield1)
   have Quot_is_ring: "ring (P Quot PIdl irr)"
     by (simp add: PIdl_irr_a_kernel_Eval ideal.quotient_is_ring ring.kernel_is_ideal)
   from ring.FactRing_iso_set_aux obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
@@ -797,13 +797,22 @@ proof -
     using h[unfolded ring_iso_def] ring_hom_zero[OF _ Quot_is_ring ring.img_is_ring] by fastforce
   then show "subfield (Eval ` carrier P) L"
     by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
-qed
-
-lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
-  apply (rule L.generate_field_min_subfield1) apply auto
-  using subfield_im_Eval apply blast
-  using Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] monom_closed apply (metis image_eqI K.one_closed)
-  using Eval_constant monom_closed by (metis image_eqI)
+next
+  have "x \<in> Eval ` carrier P" if "x \<in> insert \<alpha> K" for x
+  proof (cases "x = \<alpha>")
+    case True
+    with Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] show ?thesis
+      using monom_closed by (metis K.one_closed image_eqI)
+  next
+    case False
+    then have "x \<in> K"
+      using that by simp
+    then show ?thesis
+      using Eval_constant monom_closed by (metis imageI)
+  qed
+  then show "insert \<alpha> K \<subseteq> Eval ` carrier P"
+    by fast
+qed fast
 
 lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)"
 proof -
