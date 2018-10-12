@@ -783,20 +783,18 @@ qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
-lemma maximalideal_PIdl_irr: "maximalideal (PIdl irr) P"
-  by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
-
-lemma rings: "ring (P Quot PIdl irr)"
-  by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
-
 lemma subfield_im_Eval: "subfield (Eval ` carrier P) L"
 proof -
+  have Quot_is_ring: "ring (P Quot PIdl irr)"
+    by (simp add: PIdl_irr_a_kernel_Eval ideal.quotient_is_ring ring.kernel_is_ideal)
   from ring.FactRing_iso_set_aux obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
     by (auto simp: PIdl_irr_a_kernel_Eval)
-  from maximalideal_PIdl_irr have "field (P Quot PIdl irr)"
+  have "maximalideal (PIdl irr) P"
+    by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+  then have "field (P Quot PIdl irr)"
     using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
-  from field.ring_iso_imp_img_field[OF this h] have "field im_Eval"
-    using h[unfolded ring_iso_def] ring_hom_zero[OF _ rings ring.img_is_ring] by force
+  with field.ring_iso_imp_img_field[OF this h] have "field im_Eval"
+    using h[unfolded ring_iso_def] ring_hom_zero[OF _ Quot_is_ring ring.img_is_ring] by fastforce
   then show "subfield (Eval ` carrier P) L"
     by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
 qed
