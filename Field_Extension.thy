@@ -783,53 +783,56 @@ qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
-lemma 1: "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
-proof (rule L.generate_field_min_subfield1)
-  have Quot_is_ring: "ring (P Quot PIdl irr)"
-    by (simp add: PIdl_irr_a_kernel_Eval ideal.quotient_is_ring ring.kernel_is_ideal)
-  from ring.FactRing_iso_set_aux obtain h where h: "h \<in> ring_iso (P Quot PIdl irr) im_Eval"
-    by (auto simp: PIdl_irr_a_kernel_Eval)
-  have "maximalideal (PIdl irr) P"
-    by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
-  then have "field (P Quot PIdl irr)"
-    using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
-  with field.ring_iso_imp_img_field[OF this h] have "field im_Eval"
-    using h[unfolded ring_iso_def] ring_hom_zero[OF _ Quot_is_ring ring.img_is_ring] by fastforce
-  then show "subfield (Eval ` carrier P) L"
-    by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
-next
-  have "x \<in> Eval ` carrier P" if "x \<in> insert \<alpha> K" for x
-  proof (cases "x = \<alpha>")
-    case True
-    with Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] show ?thesis
-      using monom_closed by (metis K.one_closed image_eqI)
-  next
-    case False
-    then have "x \<in> K"
-      using that by simp
-    then show ?thesis
-      using Eval_constant monom_closed by (metis imageI)
-  qed
-  then show "insert \<alpha> K \<subseteq> Eval ` carrier P"
-    by fast
-qed fast
-
-lemma 2: "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)"
-proof -
-  have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
-    by fast
-  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
-    by force
-  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-    by fastforce
-  also have "\<dots> = generate_field L (insert \<alpha> K)"
-    by (fact genfield_singleton_explicit[symmetric])
-  finally show ?thesis .
-qed
-
 theorem the_elem_ring_iso_Quot_irr_generate_field:
   "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
-  using 1 2 ring.FactRing_iso_set_aux by (auto simp: PIdl_irr_a_kernel_Eval)
+    (is "?Eval_repr \<in> \<dots>")
+proof -
+  from ring.FactRing_iso_set_aux have iso_E_r: "?Eval_repr \<in> ring_iso (P Quot PIdl irr) im_Eval"
+    by (auto simp: PIdl_irr_a_kernel_Eval)
+  moreover have "Eval ` carrier P = generate_field L (insert \<alpha> K)"
+  proof
+    have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
+      by fast
+    also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
+      by force
+    also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+      by fastforce
+    also have "\<dots> = generate_field L (insert \<alpha> K)"
+      by (fact genfield_singleton_explicit[symmetric])
+    finally show "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)" .
+  next
+    show "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
+    proof (rule L.generate_field_min_subfield1)
+      have Quot_is_ring: "ring (P Quot PIdl irr)"
+        by (simp add: PIdl_irr_a_kernel_Eval ideal.quotient_is_ring ring.kernel_is_ideal)
+      have "maximalideal (PIdl irr) P"
+        by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+      then have "field (P Quot PIdl irr)"
+        using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
+      with field.ring_iso_imp_img_field[OF this iso_E_r] have "field im_Eval"
+        using iso_E_r ring_hom_zero[OF _ Quot_is_ring ring.img_is_ring] by (force simp: ring_iso_def)
+      then show "subfield (Eval ` carrier P) L"
+        by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
+    next
+      have "x \<in> Eval ` carrier P" if "x \<in> insert \<alpha> K" for x
+      proof (cases "x = \<alpha>")
+        case True
+        with Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] show ?thesis
+          using monom_closed by (metis K.one_closed image_eqI)
+      next
+        case False
+        then have "x \<in> K"
+          using that by simp
+        then show ?thesis
+          using Eval_constant monom_closed by (metis imageI)
+      qed
+      then show "insert \<alpha> K \<subseteq> Eval ` carrier P"
+        by fast
+    qed fast
+  qed
+  ultimately show ?thesis
+    by simp
+qed
 
 corollary simple_algebraic_extension:
   "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
