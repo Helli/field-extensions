@@ -796,7 +796,7 @@ proof -
   from maximalideal_PIdl_irr have "field (P Quot PIdl irr)"
     using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
   from field.ring_iso_imp_img_field[OF this h] have "field im_Eval"
-    using h[unfolded ring_iso_def] ring_hom_zero[OF _ rings ring.img_is_ring] ring_hom_one by force
+    using h[unfolded ring_iso_def] ring_hom_zero[OF _ rings ring.img_is_ring] by force
   then show "subfield (Eval ` carrier P) L"
     by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
 qed
