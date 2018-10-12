@@ -753,7 +753,7 @@ qed
 
 subsubsection \<open>Irreducibility\<close>
 
-abbreviation "im_Eval \<equiv> (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+abbreviation im_Eval where "im_Eval \<equiv> L\<lparr>carrier := Eval ` carrier P\<rparr>"
 
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
   Quot PIdl irr)\<close> anyways:\<close>
@@ -770,7 +770,7 @@ proof -
     using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ rings] by fastforce
 qed
 
-text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives us a shorter proof:\<close>
+text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
 proof -
   txt "As the preimage of the zero ideal under evaluation, \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
