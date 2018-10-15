@@ -761,19 +761,19 @@ lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<cl
 proof -
   have domain_im_Eval: "domain im_Eval"
     by (simp add: ring.img_is_domain L.domain_axioms)
-  have rings: "ring im_Eval" "ring (P Quot PIdl irr)"
-    by (simp_all add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P ring.img_is_ring)
+  have ring: "ring (P Quot PIdl irr)"
+    by (simp add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P)
   then obtain inv_h where inv_h: "inv_h \<in> ring_iso im_Eval (P Quot PIdl irr)"
     using ring_iso_set_sym ring.FactRing_iso_set_aux PIdl_irr_a_kernel_Eval by auto
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
   then show ?thesis
-    using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ rings] by fastforce
+    using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ ring.img_is_ring ring] by fastforce
 qed
 
 text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
 proof -
-  txt "As the preimage of the zero ideal under evaluation, \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
+  txt "As preimage of the zero ideal under evaluation \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
   have "primeideal (PIdl irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
     using pol.ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
   txt "This immediately gives the desired result, as \<^term>\<open>P\<close> is a principal ideal domain:"
@@ -783,56 +783,58 @@ qed
 
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
-theorem the_elem_ring_iso_Quot_irr_generate_field:
-  "(\<lambda>Y. the_elem (Eval`Y)) \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
-    (is "?Eval_repr \<in> \<dots>")
-proof -
-  from ring.FactRing_iso_set_aux have iso_E_r: "?Eval_repr \<in> ring_iso (P Quot PIdl irr) im_Eval"
-    by (auto simp: PIdl_irr_a_kernel_Eval)
-  moreover have "Eval ` carrier P = generate_field L (insert \<alpha> K)"
-  proof
-    have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
-      by fast
-    also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
-      by force
-    also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
-      by fastforce
-    also have "\<dots> = generate_field L (insert \<alpha> K)"
-      by (fact genfield_singleton_explicit[symmetric])
-    finally show "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)" .
+text \<open>Representative evaluation is a well-defined, injective homomorphism:\<close>
+lemma repr_Eval_wd_inj: "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) im_Eval"
+  using ring.FactRing_iso_set_aux by (simp add: o_def PIdl_irr_a_kernel_Eval)
+
+text \<open>Its image is \<open>K(\<alpha>)\<close>:\<close>
+lemma img_Eval_is_generate_field: "Eval ` carrier P = generate_field L (insert \<alpha> K)"
+proof
+  have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
+    by fast
+  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
+    by force
+  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
+    by fastforce
+  also have "\<dots> = generate_field L (insert \<alpha> K)"
+    by (fact genfield_singleton_explicit[symmetric])
+  finally show "Eval ` carrier P \<subseteq> generate_field L (insert \<alpha> K)" .
+next
+  show "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
+  proof (rule L.generate_field_min_subfield1)
+    interpret irr: maximalideal \<open>PIdl irr\<close> P
+      by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+    from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl irr\<^esub> = \<zero>\<^bsub>im_Eval\<^esub>"
+      using ring_hom_zero[OF _ irr.quotient_is_ring ring.img_is_ring] by (auto simp: ring_iso_def)
+    from irr.quotient_is_field have "field (P Quot PIdl irr)"
+      by (simp add: P.cring)
+    from field.ring_iso_imp_img_field[OF this repr_Eval_wd_inj] have "field im_Eval"
+      using zero_ok by fastforce
+    then show "subfield (Eval ` carrier P) L"
+      by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
   next
-    show "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
-    proof (rule L.generate_field_min_subfield1)
-      have Quot_is_ring: "ring (P Quot PIdl irr)"
-        by (simp add: PIdl_irr_a_kernel_Eval ideal.quotient_is_ring ring.kernel_is_ideal)
-      have "maximalideal (PIdl irr) P"
-        by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
-      then have "field (P Quot PIdl irr)"
-        using maximalideal.quotient_is_field ring_hom_cring_axioms ring_hom_cring_def by blast
-      with field.ring_iso_imp_img_field[OF this iso_E_r] have "field im_Eval"
-        using iso_E_r ring_hom_zero[OF _ Quot_is_ring ring.img_is_ring] by (force simp: ring_iso_def)
-      then show "subfield (Eval ` carrier P) L"
-        by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
+    have "x \<in> Eval ` carrier P" if "x \<in> insert \<alpha> K" for x
+    proof (cases "x = \<alpha>")
+      case True
+      with Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] show ?thesis
+        using monom_closed by (metis K.one_closed image_eqI)
     next
-      have "x \<in> Eval ` carrier P" if "x \<in> insert \<alpha> K" for x
-      proof (cases "x = \<alpha>")
-        case True
-        with Eval_cx[of "\<one>\<^bsub>L\<^esub>", simplified] show ?thesis
-          using monom_closed by (metis K.one_closed image_eqI)
-      next
-        case False
-        then have "x \<in> K"
-          using that by simp
-        then show ?thesis
-          using Eval_constant monom_closed by (metis imageI)
-      qed
-      then show "insert \<alpha> K \<subseteq> Eval ` carrier P"
-        by fast
-    qed fast
-  qed
-  ultimately show ?thesis
-    by simp
+      case False
+      then have "x \<in> K"
+        using that by simp
+      then show ?thesis
+        using Eval_constant monom_closed by (metis imageI)
+    qed
+    then show "insert \<alpha> K \<subseteq> Eval ` carrier P"
+      by fast
+  qed fast
 qed
+
+text \<open>Theorem 16.9b of @{cite "Algebra1"}.\<close>
+
+theorem the_elem_ring_iso_Quot_irr_generate_field:
+  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
+  by (fact repr_Eval_wd_inj[unfolded img_Eval_is_generate_field])
 
 corollary simple_algebraic_extension:
   "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
