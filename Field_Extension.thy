@@ -313,9 +313,7 @@ lemma (in field) trivial_extension_size:
     and trivial_extension_degree: "field_extension.degree R (carrier R) = 1"
   using self_vs_size by (simp_all add: field_extension.finite_def field_extension.degree_def trivial_extension)
 
-proposition tower_rule: \<comment> \<open>Maybe this is easier when following the comment on line 500 here: @{url
-  "https://bitbucket.org/isa-afp/afp-devel/src/d41812ff2a3f59079e08709845d64deed6e2fe15/thys/VectorSpace/LinearCombinations.thy"}.
-  Or wikipedia.\<close>
+proposition tower_rule:
   assumes "subfield K (M\<lparr>carrier:=L\<rparr>)" "subfield L M" "field M" \<comment> \<open>Relax to ring?\<close>
   shows degree_multiplicative:
     "field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
@@ -337,47 +335,59 @@ proof -
     rewrites "carrier (M\<lparr>carrier:=K\<rparr>) = K"
     by (simp_all add: field_extension.vectorspace)
 
-  have "\<not>M_over_K.fin_dim" if "\<not>field_extension.finite ?L K"
-  proof -
+  have "ring M" (* rm *)
+    using assms(3) cring.axioms(1) domain_def field_def by blast
+  consider
+    (L_over_K_infinite) "\<not>field_extension.finite ?L K" |
+    (M_over_L_infinite) "\<not>field_extension.finite M L" |
+    (both_finite) "field_extension.finite M L" "field_extension.finite ?L K"
+    by blast
+  then show ?thesis
+  proof cases
+    case L_over_K_infinite
     have subspace: "subspace ?K L (vs_of M)"
       unfolding subspace_def apply (simp add: M_over_K.vectorspace_axioms)
       apply (rule M_over_K.module.module_incl_imp_submodule)
        apply (simp add: assms(2) subfieldE(3)) \<comment> \<open>to-do: use more \<^theory_text>\<open>interpret\<close>\<close>
       by (metis (no_types, lifting) assms(1) assms(2) assms(3) field_extension.intro field_extension.vectorspace monoid.simps(1) partial_object.select_convs(1) partial_object.update_convs(1) ring.surjective ring_record_simps(11) ring_record_simps(12) vectorspace_def)
-    with that show ?thesis
+    with L_over_K_infinite have "\<not>M_over_K.fin_dim"
       using subspace.corollary_5_16(1)[OF subspace]
-      using M_over_K.fin_dim_def assms(1) assms(2) assms(3) cring.axioms(1) domain_def field_def
+      using M_over_K.fin_dim_def assms cring.axioms(1) domain_def field_def
         field_extension.finite_def field_extension.intro ring.subfield_iff(2) by fastforce
-  qed
-
-  moreover have "\<not>M_over_K.fin_dim" if "\<not>field_extension.finite M L"
-  proof
+    then show ?thesis
+      by (simp add: L_over_K_infinite \<open>field_extension M K\<close> \<open>ring M\<close> assms(1,2) field_extension.degree_def field_extension.finite_def field_extension.intro ring.subfield_iff(2))
+  next
+    case M_over_L_infinite
     interpret a: vectorspace ?L \<open>vs_of M\<close>
       rewrites "carrier (M\<lparr>carrier:=L\<rparr>) = L"
       by (simp_all add: assms(2-3) field_extension.vectorspace field_extension_def)
-    from that have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
+    from M_over_L_infinite have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
       using a.fin_dim_def assms(2) assms(3) field_extension.finite_def field_extension_def by auto
     then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
       using a.span_is_subset2 by auto
     note 1 = this[unfolded a.span_def a.lincomb_def]
-    assume M_over_K.fin_dim
-    then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> M_over_K.span B = carrier M"
-      by (simp add: M_over_K.fin_dim_def)
-    note 2 = this[unfolded M_over_K.span_def M_over_K.lincomb_def]
-    from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f and A::"'a set"
-      using that by auto
-    with 1 2 show False
-      by (smt mem_Collect_eq psubsetE subsetI)
-  qed
-
-  moreover {
-    assume fin: "field_extension.finite M L" "field_extension.finite ?L K"
+    have "\<not>M_over_K.fin_dim"
+    proof
+      assume M_over_K.fin_dim
+      then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> M_over_K.span B = carrier M"
+        by (simp add: M_over_K.fin_dim_def)
+      note 2 = this[unfolded M_over_K.span_def M_over_K.lincomb_def]
+      from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f and A::"'a set"
+        using that by auto
+      with 1 2 show False
+        by (smt mem_Collect_eq psubsetE subsetI)
+    qed
+    then show ?thesis
+      by (simp add: M_over_L_infinite \<open>field_extension M K\<close> assms(2,3) field_extension.degree_def
+          field_extension.finite_def field_extension.intro)
+  next
+    case both_finite
     define cM where "cM = carrier M"
       \<comment> \<open>This definition is needed: Only the carrier should be "arbitrary" in the induction.\<close>
     have cM_facts: "vectorspace ?L (vs_of M\<lparr>carrier := cM\<rparr>)" "vectorspace.fin_dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)"
       "vectorspace ?K (vs_of M\<lparr>carrier := cM\<rparr>)"
         apply (simp add: assms(2-3) cM_def field_extension.intro field_extension.vectorspace)
-      using assms(2) assms(3) cM_def field_extension.finite_def field_extension_def fin(1) apply auto[1]
+      using assms(2) assms(3) both_finite(1) cM_def field_extension.finite_def field_extension.intro apply auto[1]
       by (simp add: M_over_K.vectorspace_axioms cM_def)
     from cM_facts \<comment> \<open>the assumptions with \<^term>\<open>cM\<close> in it\<close>
     have "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) \<and> vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) =
@@ -417,7 +427,7 @@ proof -
         have "vectorspace (M\<lparr>carrier := K\<rparr>) (M_over_K.vs cM')"
           using Suc.prems(1) assms(1) hM'(3) subfield.vectorspace_wrt_subfield vectorspace.subspace_is_vs by fastforce
         then show ?thesis
-          using f1 by (metis Suc.prems(1) applied_IH assms(1) direct_sum_dim(1) field_extension.finite_def field_extension.intro field_extension.vectorspace fin(2) vectorspace.axioms(2))
+          using f1 by (metis Suc.prems(1) applied_IH assms(1) direct_sum_dim(1) field_extension.finite_def field_extension.intro field_extension.vectorspace both_finite(2) vectorspace.axioms(2))
       qed
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
         using linear_map.iso_imports_dim(1)[OF lin_K_map] by (simp add: direct_sum_def hM'(2))
@@ -436,7 +446,7 @@ proof -
         have "vectorspace (M\<lparr>carrier := K\<rparr>) (M_over_K.vs cM')"
           using Suc(3) assms(1) hM'(3) subfield.vectorspace_wrt_subfield vectorspace.subspace_is_vs by fastforce
         then show ?thesis
-          using f1 by (metis (no_types) Suc(3) applied_IH assms(1) direct_sum_dim(2) field_extension.finite_def field_extension.intro field_extension.vectorspace fin(2) vectorspace.axioms(2))
+          using f1 by (metis Suc(3) applied_IH assms(1) direct_sum_dim(2) field_extension.finite_def field_extension.intro field_extension.vectorspace both_finite(2) vectorspace.axioms(2))
       qed
       finally show ?case apply safe using goal1 apply simp
       proof -
@@ -450,16 +460,9 @@ proof -
       qed
     qed
     note this[unfolded cM_def, simplified]
-  }
-
-  moreover \<comment> \<open>to-do: use \<^theory_text>\<open>consider\<close>\<close>
-  show ?thesis
-  proof -
-    have "ring M"
-      using assms(3) cring.axioms(1) domain_def field_def by blast
-    with assms(1) show ?thesis
-      using \<open>field_extension M K\<close> assms(2-3) calculation subfieldE(3)
-      by (simp add: field_extension.degree_def field_extension.finite_def field_extension.intro ring.subfield_iff(2))
+    then show ?thesis
+      by (simp add: \<open>field_extension M K\<close> \<open>ring M\<close> assms both_finite field_extension.degree_def
+          field_extension.finite_def field_extension.intro ring.subfield_iff(2))
   qed
 qed
 
