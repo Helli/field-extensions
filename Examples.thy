@@ -6,61 +6,36 @@ begin
 abbreviation standard_ring
   where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-definition univ_ring
-  where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
-
-lemma ring_univ_ring: "Ring.ring (univ_ring::_::Rings.ring_1 ring)"
-  unfolding univ_ring_def
-  apply (intro ringI abelian_groupI monoidI)
-  apply (auto simp: ring_distribs mult.assoc)
-  using ab_group_add_class.ab_left_minus apply blast
-  done
-
-lemma field_univ_ring: "Ring.field (univ_ring::_::Fields.field ring)"
-  apply unfold_locales apply (auto intro: right_inverse simp: univ_ring_def Units_def field_simps)
-  by (metis ab_group_add_class.ab_left_minus add.commute)
-
 definition rat_field where "rat_field = standard_ring \<rat>"
 definition real_field where "real_field = standard_ring \<real>"
-definition complex_field :: "complex ring" where "complex_field = univ_ring"
+txt \<open>For \<open>\<complex>\<close>, there seems to be no constant available. However, restricting the type is no problem
+  here since it is the largest example anyway.\<close>
+definition complex_field :: "complex ring"
+  where "complex_field = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-lemma field_examples: "field rat_field" "field real_field" "field complex_field"
+lemma examples: "cring (standard_ring \<int>)" "field rat_field" "field real_field" "field complex_field"
   unfolding rat_field_def real_field_def complex_field_def
-    apply unfold_locales[2]
-                      apply (auto intro: right_inverse simp: Units_def algebra_simps)
-  using Rats_minus_iff add.right_inverse apply blast
-  using add.right_inverse apply fastforce
-  apply (smt Reals_cases Reals_of_real mult_scaleR_right of_real_def of_real_diff of_real_mult
-      scaleR_conv_of_real semiring_normalization_rules(12))
-  apply (smt Reals_cases Reals_minus_iff div_0 nonzero_mult_div_cancel_left of_real_def
-      of_real_eq_0_iff of_real_mult)
-  apply (metis (no_types, hide_lams) Reals_cases Reals_of_real divide_inverse_commute divide_self_if
-      mult.right_neutral mult_scaleR_right of_real_0 of_real_1 of_real_mult scaleR_conv_of_real)
-  by (fact field_univ_ring)
-
-lemma cring_example: "cring (standard_ring \<int>)"
-  unfolding rat_field_def
-  apply standard
-               apply auto unfolding Units_def apply auto
-  using Ints_minus add.left_inverse add.right_inverse apply blast
-  using mult.assoc apply blast
-  using distrib_right apply blast
-  using ring_class.ring_distribs(1) apply blast
-  apply (metis Ints_cases mult_of_int_commute)
-  done
+     apply unfold_locales
+                      apply (auto intro: add.right_inverse right_inverse simp: Units_def algebra_simps)
+  apply (metis (full_types) Ints_cases mult_of_int_commute)
+    apply (metis (full_types) Reals_cases linordered_field_class.sign_simps(24) of_real_mult)
+   apply (metis (full_types) Reals_cases mult_eq_0_iff of_real_eq_0_iff of_real_mult)
+  by (metis (no_types, hide_lams) Reals_cases Reals_of_real left_inverse mult.left_neutral
+      mult.right_neutral mult_scaleR_left mult_scaleR_right of_real_0 of_real_1 of_real_def
+      of_real_mult scaleR_conv_of_real)
 
 text \<open>\<open>\<int>\<close> is a subdomain of \<open>\<rat>\<close>:\<close>
 
 lemma subdomain_example: "subdomain \<int> rat_field"
 proof -
-  interpret field rat_field by (fact field_examples(1))
+  interpret field rat_field by (fact examples(2))
   show ?thesis
     apply (rule subdomainI)
     apply (rule subcringI')
     apply (rule ring.ring_incl_imp_subring)
       apply (simp add: ring_axioms)
     unfolding rat_field_def apply (simp add: Ints_subset_Rats)
-    using cring_example unfolding cring_def by auto
+    using examples(1) unfolding cring_def by auto
 qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
@@ -100,53 +75,49 @@ lemma Rats_subset_Reals: "\<rat> \<subseteq> \<real>"
 
 lemma subfield_example: "subfield \<rat> real_field" (* to-do: inline *)
   apply (rule ring.subfield_iff(1))
-  apply (simp add: cring.axioms(1) fieldE(1) field_examples(2))
-proof -
-  have "rat_field = \<lparr>carrier = \<rat>::'a set, monoid.mult = (*), one = 1::'a, zero = 0::'a, add = (+)\<rparr>"
-    by (simp add: rat_field_def)
-  then show "field (real_field\<lparr>carrier := \<rat>::'a set\<rparr>)"
-    by (simp add: field_examples(1) real_field_def)
-qed (simp add: Rats_subset_Reals real_field_def)
+  apply (simp add: cring.axioms(1) examples(3) fieldE(1))
+  apply (metis examples(2) partial_object.update_convs(1) rat_field_def real_field_def)
+  by (simp add: Rats_subset_Reals real_field_def)
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
 lemma subfield_example': "subfield \<real> complex_field" (* to-do: rename *)
   apply (rule ring.subfield_iff(1))
-    apply (simp add: complex_field_def ring_univ_ring)
-  unfolding complex_field_def univ_ring_def by (auto simp: field_examples(2)[unfolded real_field_def])
+  apply (simp add: cring.axioms(1) examples(4) fieldE(1))
+  unfolding complex_field_def by (auto simp: examples(3)[unfolded real_field_def])
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> \<real>) = UNIV"
 proof -
   define P where "P = UP (complex_field\<lparr>carrier := \<real>\<rparr>)"
   interpret UP_field_extension complex_field \<real> P \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
-       apply (simp add: field_examples(3) field_extension_def subfield_example')
-      apply (simp_all add: complex_field_def univ_ring_def P_def)
+       apply (simp add: examples(4) field_extension_def subfield_example')
+      apply (simp_all add: complex_field_def P_def)
     done
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
-      unfolding complex_field_def univ_ring_def m_inv_def by simp
+      unfolding complex_field_def m_inv_def by simp
     have "x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
-      unfolding complex_field_def univ_ring_def apply (simp del: One_nat_def)
-      unfolding complex_field_def univ_ring_def using add.commute complex_eq mult.commute
-      by (metis Reals_of_real Eval_cx complex_field_def monoid.simps(1) univ_ring_def)
+      unfolding complex_field_def apply (simp del: One_nat_def)
+      unfolding complex_field_def using add.commute complex_eq mult.commute
+      by (metis Reals_of_real Eval_cx complex_field_def monoid.simps(1))
     show ?case
       apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
       apply (rule exI[of _ "monom P 1 0"])
       apply auto
-      unfolding complex_field_def univ_ring_def apply auto apply (fold One_nat_def) using
+      unfolding complex_field_def apply auto apply (fold One_nat_def) using
         \<open>x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
-        complex_field_def ring.simps(2) univ_ring_def by metis
+        complex_field_def ring.simps(2) by metis
   qed
 qed
 
 corollary finitely_generated_field_extension_complex_over_real:
   "finitely_generated_field_extension complex_field \<real>"
   unfolding finitely_generated_field_extension_def using generate_field_\<i>_UNIV
-  by (metis complex_field_def field_examples(3) field_extension_def finite.emptyI finite.insertI
-      insert_is_Un partial_object.select_convs(1) subfield_example' univ_ring_def)
+  by (metis complex_field_def examples(4) field_extension_def finite.emptyI finite.insertI
+      insert_is_Un partial_object.select_convs(1) subfield_example')
 
 
 end
