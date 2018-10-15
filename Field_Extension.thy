@@ -801,13 +801,13 @@ proof
 next
   show "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   proof (rule L.generate_field_min_subfield1)
-    interpret irr: maximalideal \<open>PIdl irr\<close> P
-      by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
+    from irreducible_imp_maximalideal interpret irr: maximalideal \<open>PIdl irr\<close> P
+      by (simp add: irr_in_P irr_irreducible_polynomial)
+    from irr.quotient_is_field interpret Quot: field \<open>P Quot PIdl irr\<close>
+      by (simp add: P.cring)
     from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl irr\<^esub> = \<zero>\<^bsub>L\<^esub>"
       using ring_hom_zero[OF _ irr.quotient_is_ring ring.img_is_ring] by (auto simp: ring_iso_def)
-    from irr.quotient_is_field have "field (P Quot PIdl irr)"
-      by (simp add: P.cring)
-    from field.ring_iso_imp_img_field[OF this repr_Eval_wd_inj] have "field (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+    from Quot.ring_iso_imp_img_field[OF repr_Eval_wd_inj] have "field (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
       using zero_ok by fastforce
     then show "subfield (Eval ` carrier P) L"
       by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
