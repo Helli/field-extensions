@@ -119,10 +119,9 @@ qed
 
 corollary finitely_generated_field_extension_complex_over_real:
   "finitely_generated_field_extension complex_field (range complex_of_real)"
-  unfolding finitely_generated_field_extension_def finitely_generated_field_extension_axioms_def
-  by (simp add: field_examples(3) field_extension_def subfield_example')
-    (metis Un_commute Un_insert_left complex_field_def finite.emptyI finite.insertI
-      generate_field_\<i>_UNIV partial_object.select_convs(1) sup_bot.right_neutral univ_ring_def)
+  unfolding finitely_generated_field_extension_def using generate_field_\<i>_UNIV
+  by (metis complex_field_def field_examples(3) field_extension_def finite.emptyI finite.insertI
+      insert_is_Un partial_object.select_convs(1) subfield_example' univ_ring_def)
 
 
 end

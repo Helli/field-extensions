@@ -260,14 +260,8 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
     by (meson cInf_eq_minimum)
 qed
 
-locale finitely_generated_field_extension = field_extension +
-  assumes "\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L"
-(*  \<comment> \<open>Maybe remove quantifier by fixing \<open>S\<close>? Or replace locale by a simple predicate?\<close>
-or simply add this:
-begin
-definition "S = (SOME L. finite S \<and> generate_field L (S \<union> K) = carrier L)"
-end
-*)
+definition "finitely_generated_field_extension L K \<longleftrightarrow>
+  field_extension L K \<and> (\<exists>S. finite S \<and> generate_field L (S \<union> K) = carrier L)"
 
 
 subsection \<open>Degree of a Field Extension\<close>
