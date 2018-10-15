@@ -6,7 +6,7 @@ begin
 abbreviation standard_ring
   where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-definition rat_field where "rat_field = standard_ring \<rat>"
+definition rat_field where "rat_field = standard_ring \<rat>" (* to-do: name Ints_ring etc? *)
 definition real_field where "real_field = standard_ring \<real>"
 txt \<open>For \<open>\<complex>\<close>, there seems to be no constant available. However, restricting the type is no problem
   here since it is the largest example anyway.\<close>
@@ -39,7 +39,6 @@ proof -
 qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
-(* rename section? to-do *)
 
 lemma of_real_of_rat_eq[simp]: "of_real (of_rat q) = of_rat q"
 proof (cases q)
@@ -73,15 +72,18 @@ lemma Reals_of_rat[simp]: "of_rat z \<in> \<real>"
 lemma Rats_subset_Reals: "\<rat> \<subseteq> \<real>"
   using Rats_cases by force
 
-lemma subfield_example: "subfield \<rat> real_field" (* to-do: inline *)
-  apply (rule ring.subfield_iff(1))
-  apply (simp add: cring.axioms(1) examples(3) fieldE(1))
-  apply (metis examples(2) partial_object.update_convs(1) rat_field_def real_field_def)
-  by (simp add: Rats_subset_Reals real_field_def)
+lemma "field_extension real_field \<rat>"
+proof (auto simp add: field_extension_def)
+  show "subfield \<rat> real_field"
+    apply (rule ring.subfield_iff(1))
+      apply (simp add: cring.axioms(1) examples(3) fieldE(1))
+     apply (metis examples(2) partial_object.update_convs(1) rat_field_def real_field_def)
+    by (simp add: Rats_subset_Reals real_field_def)
+qed (fact examples(3))
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
-lemma subfield_example': "subfield \<real> complex_field" (* to-do: rename *)
+lemma subfield_Rats_complex_field: "subfield \<real> complex_field"
   apply (rule ring.subfield_iff(1))
   apply (simp add: cring.axioms(1) examples(4) fieldE(1))
   unfolding complex_field_def by (auto simp: examples(3)[unfolded real_field_def])
@@ -91,7 +93,7 @@ proof -
   define P where "P = UP (complex_field\<lparr>carrier := \<real>\<rparr>)"
   interpret UP_field_extension complex_field \<real> P \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
-       apply (simp add: examples(4) field_extension_def subfield_example')
+       apply (simp add: examples(4) field_extension_def subfield_Rats_complex_field)
       apply (simp_all add: complex_field_def P_def)
     done
   show ?thesis unfolding genfield_singleton_explicit apply auto
@@ -117,7 +119,7 @@ corollary finitely_generated_field_extension_complex_over_real:
   "finitely_generated_field_extension complex_field \<real>"
   unfolding finitely_generated_field_extension_def using generate_field_\<i>_UNIV
   by (metis complex_field_def examples(4) field_extension_def finite.emptyI finite.insertI
-      insert_is_Un partial_object.select_convs(1) subfield_example')
+      insert_is_Un partial_object.select_convs(1) subfield_Rats_complex_field)
 
 
 end
