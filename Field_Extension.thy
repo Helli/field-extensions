@@ -753,21 +753,19 @@ qed
 
 subsubsection \<open>Irreducibility\<close>
 
-abbreviation im_Eval where "im_Eval \<equiv> L\<lparr>carrier := Eval ` carrier P\<rparr>"
-
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
   Quot PIdl irr)\<close> anyways:\<close>
 lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
 proof -
-  have domain_im_Eval: "domain im_Eval"
+  have domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
     by (simp add: ring.img_is_domain L.domain_axioms)
   have ring: "ring (P Quot PIdl irr)"
     by (simp add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P)
-  then obtain inv_h where inv_h: "inv_h \<in> ring_iso im_Eval (P Quot PIdl irr)"
+  then obtain h where iso_h: "h \<in> ring_iso (L\<lparr>carrier := Eval ` carrier P\<rparr>) (P Quot PIdl irr)"
     using ring_iso_set_sym ring.FactRing_iso_set_aux PIdl_irr_a_kernel_Eval by auto
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
   then show ?thesis
-    using inv_h[unfolded ring_iso_def] ring_hom_zero[OF _ ring.img_is_ring ring] by fastforce
+    using iso_h[unfolded ring_iso_def] ring_hom_zero[OF _ ring.img_is_ring ring] by fastforce
 qed
 
 text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
@@ -784,7 +782,8 @@ qed
 subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
 text \<open>Representative evaluation is a well-defined, injective homomorphism:\<close>
-lemma repr_Eval_wd_inj: "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) im_Eval"
+lemma repr_Eval_wd_inj:
+  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
   using ring.FactRing_iso_set_aux by (simp add: o_def PIdl_irr_a_kernel_Eval)
 
 text \<open>Its image is \<open>K(\<alpha>)\<close>:\<close>
@@ -804,11 +803,11 @@ next
   proof (rule L.generate_field_min_subfield1)
     interpret irr: maximalideal \<open>PIdl irr\<close> P
       by (simp add: irr_in_P irr_irreducible_polynomial irreducible_imp_maximalideal)
-    from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl irr\<^esub> = \<zero>\<^bsub>im_Eval\<^esub>"
+    from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl irr\<^esub> = \<zero>\<^bsub>L\<^esub>"
       using ring_hom_zero[OF _ irr.quotient_is_ring ring.img_is_ring] by (auto simp: ring_iso_def)
     from irr.quotient_is_field have "field (P Quot PIdl irr)"
       by (simp add: P.cring)
-    from field.ring_iso_imp_img_field[OF this repr_Eval_wd_inj] have "field im_Eval"
+    from field.ring_iso_imp_img_field[OF this repr_Eval_wd_inj] have "field (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
       using zero_ok by fastforce
     then show "subfield (Eval ` carrier P) L"
       by (auto intro: ring.subfield_iff(1) simp: L.ring_axioms)
@@ -830,7 +829,7 @@ next
   qed fast
 qed
 
-text \<open>Theorem 16.9b of @{cite "Algebra1"}.\<close>
+text \<open>Theorem 16.9b of @{cite "Algebra1"}:\<close>
 
 theorem the_elem_ring_iso_Quot_irr_generate_field:
   "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
