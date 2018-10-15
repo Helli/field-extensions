@@ -477,7 +477,7 @@ from 0 show ?thesis
       by (auto simp add: m_assoc l_distr r_distr)
 qed
 
-text {*Note: one can define $M^n$ from this.*}
+text {*Note: one can define $M^n$ from this. to-do*}
 
 text {*A linear combination is a module homomorphism from the space of coefficients to the module,
  $(a_v)\mapsto \sum_{v\in S} a_vv$.*}
