@@ -3,8 +3,8 @@ subsection \<open>Example instantiations\<close>
 theory Examples imports Field_Extension
 begin
 
-definition standard_ring (* to-do: replace by abbreviation, it is never used on its own *)
-  where "standard_ring carr = \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
+abbreviation standard_ring
+  where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition univ_ring
   where "univ_ring = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
@@ -25,7 +25,7 @@ definition real_field where "real_field = standard_ring \<real>"
 definition complex_field :: "complex ring" where "complex_field = univ_ring"
 
 lemma field_examples: "field rat_field" "field real_field" "field complex_field"
-  unfolding rat_field_def standard_ring_def real_field_def complex_field_def
+  unfolding rat_field_def real_field_def complex_field_def
     apply unfold_locales[2]
                       apply (auto intro: right_inverse simp: Units_def algebra_simps)
   using Rats_minus_iff add.right_inverse apply blast
@@ -39,7 +39,7 @@ lemma field_examples: "field rat_field" "field real_field" "field complex_field"
   by (fact field_univ_ring)
 
 lemma cring_example: "cring (standard_ring \<int>)"
-  unfolding rat_field_def standard_ring_def
+  unfolding rat_field_def
   apply standard
                apply auto unfolding Units_def apply auto
   using Ints_minus add.left_inverse add.right_inverse apply blast
@@ -59,8 +59,8 @@ proof -
     apply (rule subcringI')
     apply (rule ring.ring_incl_imp_subring)
       apply (simp add: ring_axioms)
-    unfolding rat_field_def apply (simp add: Ints_subset_Rats standard_ring_def)
-    using cring_example unfolding standard_ring_def cring_def by auto
+    unfolding rat_field_def apply (simp add: Ints_subset_Rats)
+    using cring_example unfolding cring_def by auto
 qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
@@ -103,17 +103,17 @@ lemma subfield_example: "subfield \<rat> real_field" (* to-do: inline *)
   apply (simp add: cring.axioms(1) fieldE(1) field_examples(2))
 proof -
   have "rat_field = \<lparr>carrier = \<rat>::'a set, monoid.mult = (*), one = 1::'a, zero = 0::'a, add = (+)\<rparr>"
-    by (simp add: rat_field_def standard_ring_def)
+    by (simp add: rat_field_def)
   then show "field (real_field\<lparr>carrier := \<rat>::'a set\<rparr>)"
-    by (simp add: field_examples(1) real_field_def standard_ring_def)
-qed (simp add: Rats_subset_Reals real_field_def standard_ring_def)
+    by (simp add: field_examples(1) real_field_def)
+qed (simp add: Rats_subset_Reals real_field_def)
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
 lemma subfield_example': "subfield \<real> complex_field" (* to-do: rename *)
   apply (rule ring.subfield_iff(1))
     apply (simp add: complex_field_def ring_univ_ring)
-  unfolding complex_field_def univ_ring_def by (auto simp: field_examples(2)[unfolded real_field_def standard_ring_def])
+  unfolding complex_field_def univ_ring_def by (auto simp: field_examples(2)[unfolded real_field_def])
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> \<real>) = UNIV"
 proof -
