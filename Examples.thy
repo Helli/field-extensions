@@ -9,12 +9,16 @@ abbreviation standard_ring
 definition Ints_ring where "Ints_ring = standard_ring \<int>"
 definition rat_field where "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
 definition real_field where "real_field = standard_ring \<real>"
-txt \<open>For \<open>\<complex>\<close>, there seems to be no constant available. However, restricting the type is no problem
-  here since it is the largest example anyway.\<close>
+txt \<open>There seems to be no \<open>of_complex\<close> available. However, restricting the type is no problem here
+  since it is the largest example anyway.\<close>
 definition complex_field :: "complex ring"
   where "complex_field = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-lemma examples: "cring Ints_ring" "field rat_field" "field real_field" "field complex_field"
+lemma examples:
+  shows cring_Ints_ring: "cring Ints_ring"
+    and field_rat_field: "field rat_field"
+    and field_real_field: "field real_field"
+    and field_complex_field: "field complex_field"
   unfolding Ints_ring_def rat_field_def real_field_def complex_field_def
      apply unfold_locales
                       apply (auto intro: add.right_inverse right_inverse simp: Units_def algebra_simps)
