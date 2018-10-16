@@ -206,7 +206,7 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
       fix k
       assume "k \<in> ?L' - {\<zero>\<^bsub>L\<^esub>}"
       then show "inv\<^bsub>L\<^esub> k \<in> ?L'" by auto (use L.integral_iff in auto)
-    qed force+ (* to-do: When did this become so slow? *)
+    qed force+
   next
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       apply (rule exI[where x = "monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
@@ -655,7 +655,7 @@ proof (cases "q = \<zero>")
 qed (use assms(4) in auto)
 
 
-subsection \<open>The Minimal Polynomial\<close>
+subsection \<open>Minimal Polynomial\<close>
 
 definition irr where (* move into algebraic context? *)
   "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
@@ -839,28 +839,5 @@ corollary simple_algebraic_extension:
 end
 
 end
-
-
-section \<open>Observations (*rm*)\<close>
-
-text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
-locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
-
-thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
-text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
-
-value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
-
-(* idea: *)
-definition (in vectorspace) B where
-  "B = (SOME B. basis B)"
-lemma (in vectorspace)
-  "fin_dim \<Longrightarrow> finite B"
-  by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
-
-text\<open>neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
-find_theorems name: "subspace."
-find_theorems name: "submodule."
-text\<open>Also, the different argument order is somewhat annoying.\<close>
 
 end

@@ -335,11 +335,11 @@ lemma (in vectorspace) dim_0_trivial:
   "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
   using dim_greater_0 by linarith
 
-subsubsection \<open>The Field Itself as Vector Space\<close>
+subsubsection \<open>Field Itself as Vector Space\<close>
 
 abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>monoid.mult K\<close> as \<^const>\<open>smult\<close>)\<close>
-  \<lparr>carrier = carrier K, monoid.mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>),
-  smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
+  \<lparr>carrier = carrier K, monoid.mult = undefined, monoid.one = undefined,
+     zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
 sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
   rewrites "carrier (vs_of R) = carrier R"

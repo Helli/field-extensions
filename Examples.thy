@@ -11,8 +11,7 @@ definition "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
 definition "real_field = standard_ring \<real>"
 txt \<open>There seems to be no \<open>of_complex\<close> available. However, restricting the type is no problem here
   since it is the largest example anyway.\<close>
-definition complex_field :: "complex ring"
-  where "complex_field = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
+definition complex_field :: "complex ring" where "complex_field = standard_ring UNIV"
 
 lemma examples:
   shows cring_Ints_ring: "cring Ints_ring"
@@ -125,6 +124,29 @@ corollary finitely_generated_field_extension_complex_over_real:
   unfolding finitely_generated_field_extension_def using generate_field_\<i>_UNIV
   by (metis complex_field_def examples(4) field_extension_def finite.emptyI finite.insertI
       insert_is_Un partial_object.select_convs(1) subfield_Rats_complex_field)
+
+
+section \<open>Observations (*rm*)\<close>
+
+text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
+locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
+
+thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
+text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
+
+value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
+
+(* idea: *)
+definition (in vectorspace) B where
+  "B = (SOME B. basis B)"
+lemma (in vectorspace)
+  "fin_dim \<Longrightarrow> finite B"
+  by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
+
+text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
+find_theorems name: "subspace."
+find_theorems name: "submodule."
+text \<open>Also, the different argument order is somewhat annoying.\<close>
 
 
 end
