@@ -6,9 +6,9 @@ begin
 abbreviation standard_ring
   where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-definition Ints_ring where "Ints_ring = standard_ring \<int>"
-definition rat_field where "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
-definition real_field where "real_field = standard_ring \<real>"
+definition "Ints_ring = standard_ring \<int>"
+definition "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
+definition "real_field = standard_ring \<real>"
 txt \<open>There seems to be no \<open>of_complex\<close> available. However, restricting the type is no problem here
   since it is the largest example anyway.\<close>
 definition complex_field :: "complex ring"
