@@ -6,15 +6,16 @@ begin
 abbreviation standard_ring
   where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-definition rat_field where "rat_field = standard_ring \<rat>" (* to-do: name Ints_ring etc? *)
+definition Ints_ring where "Ints_ring = standard_ring \<int>"
+definition rat_field where "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
 definition real_field where "real_field = standard_ring \<real>"
 txt \<open>For \<open>\<complex>\<close>, there seems to be no constant available. However, restricting the type is no problem
   here since it is the largest example anyway.\<close>
 definition complex_field :: "complex ring"
   where "complex_field = \<lparr>carrier = UNIV, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
-lemma examples: "cring (standard_ring \<int>)" "field rat_field" "field real_field" "field complex_field"
-  unfolding rat_field_def real_field_def complex_field_def
+lemma examples: "cring Ints_ring" "field rat_field" "field real_field" "field complex_field"
+  unfolding Ints_ring_def rat_field_def real_field_def complex_field_def
      apply unfold_locales
                       apply (auto intro: add.right_inverse right_inverse simp: Units_def algebra_simps)
   apply (metis (full_types) Ints_cases mult_of_int_commute)
@@ -35,7 +36,7 @@ proof -
     apply (rule ring.ring_incl_imp_subring)
       apply (simp add: ring_axioms)
     unfolding rat_field_def apply (simp add: Ints_subset_Rats)
-    using examples(1) unfolding cring_def by auto
+    using examples(1)[unfolded Ints_ring_def] unfolding cring_def by auto
 qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
@@ -90,7 +91,7 @@ lemma subfield_Rats_complex_field: "subfield \<real> complex_field"
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> \<real>) = UNIV"
 proof -
-  define P where "P = UP (complex_field\<lparr>carrier := \<real>\<rparr>)"
+  define P where "P = UP (standard_ring \<real> :: complex ring)"
   interpret UP_field_extension complex_field \<real> P \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
        apply (simp add: examples(4) field_extension_def subfield_Rats_complex_field)
@@ -103,8 +104,8 @@ proof -
       unfolding complex_field_def m_inv_def by simp
     have "x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
       unfolding complex_field_def apply (simp del: One_nat_def)
-      unfolding complex_field_def using add.commute complex_eq mult.commute
-      by (metis Reals_of_real Eval_cx complex_field_def monoid.simps(1))
+      using add.commute complex_eq mult.commute
+      by (metis Eval_cx Reals_of_real complex_field_def monoid.simps(1))
     show ?case
       apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
       apply (rule exI[of _ "monom P 1 0"])
