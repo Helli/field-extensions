@@ -126,12 +126,12 @@ proof -
 qed
 
 text {*For any set $S$, the space of functions $S\to K$ forms a vector space.*}
-lemma (in vectorspace) func_space_is_vs:
+lemma (in field) func_space_is_vs:
   fixes S
-  shows "vectorspace K (func_space S)" 
+  shows "vectorspace R (func_space S)"
 proof -
-  have 0: "field K"..
-  have 1: "module K (func_space S)" by (rule func_space_is_module)
+  have 0: "field R"..
+  have 1: "module R (func_space S)" by (rule func_space_is_module)
   from 0 1 show ?thesis by (unfold vectorspace_def module_def, auto)
 qed
 

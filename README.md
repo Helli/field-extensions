@@ -13,4 +13,5 @@ order is swapped, which might be easier to fix in Module.thy. Furthermore, I rem
 definition of func_space.
 - In SumSpaces, I once again clarify a definition. I also slightly relaxed the type constraint on inj1 and inj2, one
 could further relax it to ring_scheme.
-- In VectorSpace, I only remove two superseded lemmas.
+- In VectorSpace, I remove two superseded lemmas and change the premise of func_space_is_vs to make it consistent with
+ring.func_space_is_module.

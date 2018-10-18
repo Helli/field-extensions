@@ -555,6 +555,9 @@ definition (in ring) nspace where "nspace n = func_space {..<n}"
 lemma (in cring) nspace_is_module: "module R (nspace n)"
   unfolding nspace_def by (fact func_space_is_module)
 
+lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
+  unfolding nspace_def by (fact func_space_is_vs)
+
 find_theorems ring.func_space
 
 
