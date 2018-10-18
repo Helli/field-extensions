@@ -751,8 +751,8 @@ qed
 subsubsection \<open>Irreducibility\<close>
 
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
-  Quot PIdl irr)\<close> anyways:\<close>
-lemma domain_P_Quot_irr: "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
+  Quot PIdl irr)\<close> anyway:\<close>
+lemma "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
 proof -
   have domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
     by (simp add: ring.img_is_domain L.domain_axioms)
@@ -783,7 +783,7 @@ lemma repr_Eval_wd_inj:
   "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
   using ring.FactRing_iso_set_aux by (simp add: o_def PIdl_irr_a_kernel_Eval)
 
-text \<open>Its image is \<open>K(\<alpha>)\<close>:\<close>
+text \<open>Its image (= \<^term>\<open>Eval\<close>'s image) is \<open>K(\<alpha>)\<close>:\<close>
 lemma img_Eval_is_generate_field: "Eval ` carrier P = generate_field L (insert \<alpha> K)"
 proof
   have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
