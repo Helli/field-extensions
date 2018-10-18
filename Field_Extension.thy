@@ -15,10 +15,15 @@ lemma (in field) trivial_extension: "field_extension R (carrier R)"
 
 locale UP_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
-  assumes indet_img_carrier: "\<alpha> \<in> carrier L"
+  assumes \<alpha>_in_L: "\<alpha> \<in> carrier L"
 begin
 
 definition "Eval = eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
+
+txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
+  \<^term>\<open>K\<close>, which \<^const>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>\<alpha>\<close>.\<close>
+
+text \<open>Since @{thm \<alpha>_in_L}, \<^const>\<open>Eval\<close> is a homomorphism:\<close>
 
 sublocale pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
@@ -29,11 +34,8 @@ proof -
   show "UP_univ_prop (L\<lparr>carrier := K\<rparr>) L id \<alpha>"
     apply unfold_locales
      apply (simp add: ring_hom_ring.homh subring_axioms L.subring_ring_hom_ring)
-    by (simp add: indet_img_carrier)
+    by (simp add: \<alpha>_in_L)
 qed (simp_all add: P_def Eval_def)
-
-txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
-  \<^term>\<open>K\<close>, which \<^term>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>\<alpha>\<close>.\<close>
 
 sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close>
 proof (simp_all add: P_def UP_domain_def)
@@ -96,7 +98,7 @@ subsection \<open>Finitely Generated Field Extensions\<close>
 lemma (in field) sum_of_fractions:
   "n1 \<in> carrier R \<Longrightarrow> n2 \<in> carrier R \<Longrightarrow> d1 \<in> carrier R \<Longrightarrow> d2 \<in> carrier R \<Longrightarrow>
     d1\<noteq>\<zero> \<Longrightarrow> d2\<noteq>\<zero> \<Longrightarrow> n1 \<otimes> inv d1 \<oplus> n2 \<otimes> inv d2 = (n1\<otimes>d2\<oplus>n2\<otimes>d1) \<otimes> inv (d1\<otimes>d2)"
-  by (smt comm_inv_char has_inverse l_distr m_lcomm monoid.m_closed monoid_axioms r_one)
+  by (smt comm_inv_char nonzero_has_inv l_distr m_lcomm m_closed monoid_axioms r_one)
 
 corollary (in field) fraction_sumE:
   assumes "n1 \<in> carrier R" "n2 \<in> carrier R" "d1 \<in> carrier R" "d2 \<in> carrier R"
@@ -190,9 +192,8 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
       proof goal_cases
         case (1 f1 f2 g1 g2)
         show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
-            auto
-          apply (smt L.comm_inv_char L.m_lcomm L.one_closed L.r_null L.r_one L.ring_axioms
-              inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
+            auto apply (smt L.comm_inv_char L.m_lcomm L.one_closed L.r_null L.r_one L.ring_axioms
+              nonzero_inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
           using L.integral by blast
       qed
       from \<open>h1 \<in> ?L'\<close> \<open>h2 \<in> ?L'\<close> show "h1 \<oplus>\<^bsub>L\<^esub>h2 \<in> ?L'"
@@ -343,7 +344,7 @@ proof -
       unfolding subspace_def apply (simp add: M_over_K.vectorspace_axioms)
       apply (rule M_over_K.module.module_incl_imp_submodule)
        apply (simp add: assms(2) subfieldE(3)) \<comment> \<open>to-do: use more \<^theory_text>\<open>interpret\<close>\<close>
-      by (metis (no_types, lifting) assms(1) assms(2) assms(3) field_extension.intro field_extension.vectorspace monoid.simps(1) partial_object.select_convs(1) partial_object.update_convs(1) ring.surjective ring_record_simps(11) ring_record_simps(12) vectorspace_def)
+      using assms cring.axioms(1) domain_def field_def field_extension.intro field_extension.vectorspace ring.subfield_iff(2) vectorspace.axioms(1) by fastforce
     with L_over_K_infinite have "\<not>M_over_K.fin_dim"
       using subspace.corollary_5_16(1)[OF subspace]
       using M_over_K.fin_dim_def assms cring.axioms(1) domain_def field_def
@@ -768,7 +769,7 @@ qed
 text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
 proof -
-  txt "As preimage of the zero ideal under evaluation \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
+  txt "As the zero ideal's preimage under evaluation \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
   have "primeideal (PIdl irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
     using pol.ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
   txt "This immediately gives the desired result, as \<^term>\<open>P\<close> is a principal ideal domain:"
@@ -783,7 +784,7 @@ lemma repr_Eval_wd_inj:
   "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
   using ring.FactRing_iso_set_aux by (simp add: o_def PIdl_irr_a_kernel_Eval)
 
-text \<open>Its image (= \<^term>\<open>Eval\<close>'s image) is \<open>K(\<alpha>)\<close>:\<close>
+text \<open>Its image (= \<^const>\<open>Eval\<close>'s image) is \<open>K(\<alpha>)\<close>:\<close>
 lemma img_Eval_is_generate_field: "Eval ` carrier P = generate_field L (insert \<alpha> K)"
 proof
   have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"

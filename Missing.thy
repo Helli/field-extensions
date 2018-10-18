@@ -100,18 +100,21 @@ qed
 
 subsubsection \<open>Direct Sum of Vector Spaces\<close>
 
+text \<open>These lemmas cannot avoid the \<^const>\<open>vectorspace.fin_dim\<close> assumption because
+  \<^const>\<open>vectorspace.dim\<close> is only defined in this case.\<close>
+
 lemma (in linear_map) emb_image_dim:
   assumes "inj_on T (carrier V)"
-  assumes V.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  assumes V.fin_dim
   shows "V.dim = vectorspace.dim K (vs imT)"
   using assms inj_imp_dim_ker0 rank_nullity by linarith
 
 lemma (in linear_map) iso_preserves_dim:
-  assumes "bij_betw T (carrier V) (carrier W)" \<comment> \<open>a module-isomorphism\<close>
-  assumes V.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined...\<close>
+  assumes "bij_betw T (carrier V) (carrier W)"
+  assumes V.fin_dim
   shows "W.fin_dim" "V.dim = W.dim"
   using assms apply (simp add: bij_betw_def rank_nullity_main(2))
-  using assms by (simp add: bij_betw_def dim_eq) \<comment> \<open>uses Missing\_VectorSpace (*rm*)\<close>
+  using assms by (simp add: bij_betw_def dim_eq)
 
 lemma (in mod_hom) mod_hom_the_inv:
   assumes bij: "bij_betw f (carrier M) (carrier N)"
@@ -147,7 +150,7 @@ corollary (in linear_map) linear_map_the_inv:
 
 lemma (in linear_map) iso_imports_dim:
   assumes "bij_betw T (carrier V) (carrier W)"
-  assumes W.fin_dim \<comment> \<open>needed because otherwise \<^term>\<open>dim\<close> is not defined\<close>
+  assumes W.fin_dim
   shows "V.fin_dim" "V.dim = W.dim"
   by (simp_all add: linear_map.iso_preserves_dim[OF linear_map_the_inv] assms bij_betw_the_inv_into)
 
@@ -337,9 +340,8 @@ lemma (in vectorspace) dim_0_trivial:
 
 subsubsection \<open>Field Itself as Vector Space\<close>
 
-abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>monoid.mult K\<close> as \<^const>\<open>smult\<close>)\<close>
-  \<lparr>carrier = carrier K, monoid.mult = undefined, monoid.one = undefined,
-     zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
+abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>mult K\<close> as \<^const>\<open>smult\<close>)\<close>
+  \<lparr>carrier = carrier K, mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
 sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
   rewrites "carrier (vs_of R) = carrier R"
@@ -584,10 +586,10 @@ subsection \<open>Fields\<close>
 
 context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
 
-lemma has_inverse: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+lemma nonzero_has_inv: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
   by (simp add: Units_r_inv_ex field_Units)
 
-lemma inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
+lemma nonzero_inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
   using Units_inv_Units field_Units by simp
 
 end
@@ -604,9 +606,9 @@ proof (induction A rule: infinite_finite_induct)
 next
   case empty
   have "\<zero> \<in> K"
-    by (metis monoid.select_convs(2) subgroup_axioms subgroup_def)
+    by (simp add: subdomainE(2) subdomain_axioms)
   then show ?case
-      by (simp add: finprod_def)
+    by (simp add: finprod_def)
 next
   case (insert x F)
   have a: "v \<in> F \<rightarrow> K"
@@ -621,7 +623,7 @@ next
     using \<open>K \<subseteq> carrier R\<close> by blast
   have "abelian_monoid (R\<lparr>carrier := K\<rparr>)" using assms(1)
     using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
-  then have f: "comm_monoid \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
+  then have f: "comm_monoid \<lparr>carrier = K, mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
     by (simp add: abelian_monoid_def)
   note comm_monoid.finprod_insert[of "add_monoid R", simplified, OF _ insert.hyps b e, simplified]
   then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
@@ -648,7 +650,7 @@ lemma (in UP_cring) Unit_scale_deg[simp]:
   "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> degree (c \<odot>\<^bsub>P\<^esub> r) = degree r"
   by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
 
-lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Useful to prove \<^term>\<open>euclidean_domain P degree\<close>.\<close>
+lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Used to prove \<^term>\<open>euclidean_domain (UP K) degree\<close>.\<close>
   assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
   and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
   shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g)"
