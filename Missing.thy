@@ -550,6 +550,13 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding bij_betw_def by blast
 qed
 
+definition (in ring) nspace where "nspace n = func_space {..<n}"
+
+lemma (in cring) nspace_is_module: "module R (nspace n)"
+  unfolding nspace_def by (fact func_space_is_module)
+
+find_theorems ring.func_space
+
 
 subsection \<open>Linear Maps\<close>
 
