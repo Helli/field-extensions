@@ -23,7 +23,7 @@ definition "Eval = eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the s
 txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
   \<^term>\<open>K\<close>, which \<^const>\<open>Eval\<close> evaluates in the superfield \<^term>\<open>L\<close> at a fixed \<^term>\<open>\<alpha>\<close>.\<close>
 
-text \<open>Since @{thm \<alpha>_in_L}, \<^const>\<open>Eval\<close> is a homomorphism:\<close>
+text \<open>Since @{thm \<alpha>_in_L}, \<^const>\<open>Eval\<close> is a homomorphism \<open>P \<rightarrow> L\<close>:\<close>
 
 sublocale pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
