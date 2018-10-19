@@ -552,16 +552,6 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
     unfolding bij_betw_def by blast
 qed
 
-definition (in ring) nspace where "nspace n = func_space {..<n}"
-
-lemma (in cring) nspace_is_module: "module R (nspace n)"
-  unfolding nspace_def by (fact func_space_is_module)
-
-lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
-  unfolding nspace_def by (fact func_space_is_vs)
-
-find_theorems ring.func_space
-
 
 subsection \<open>Linear Maps\<close>
 
@@ -696,5 +686,19 @@ thm \<comment> \<open>recover @{thm comm_monoid.finprod_singleton} from this\<cl
   comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
+
+
+subsection "Temp"
+
+definition (in ring) nspace where "nspace n = func_space {..<n}"
+
+lemma (in cring) nspace_is_module: "module R (nspace n)"
+  unfolding nspace_def by (fact func_space_is_module)
+
+lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
+  unfolding nspace_def by (fact func_space_is_vs)
+
+find_theorems ring.func_space
+
 
 end
