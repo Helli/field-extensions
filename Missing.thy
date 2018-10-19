@@ -689,7 +689,7 @@ lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
 
 
 subsection "Temp"
-
+(* maybe fix n if that is not too confusing? *)
 definition (in ring) nspace where "nspace n = func_space {..<n}"
 
 lemma (in cring) nspace_is_module: "module R (nspace n)"
@@ -698,7 +698,20 @@ lemma (in cring) nspace_is_module: "module R (nspace n)"
 lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
   unfolding nspace_def by (fact func_space_is_vs)
 
-find_theorems ring.func_space
+lemma (in ring) nspace_simps[simp]:
+  "carrier (nspace n) = {..<n} \<rightarrow>\<^sub>E carrier R"
+  "mult (nspace n) = undefined"
+  "one (nspace n) = undefined"
+  "add (nspace n) = (\<lambda>f g. \<lambda>i\<in>{..<n}. f i \<oplus> g i)"
+  "zero (nspace n) = (\<lambda>_\<in>{..<n}. \<zero>)"
+  "smult (nspace n) = (\<lambda>c f. \<lambda>i\<in>{..<n}. c \<otimes> f i)"
+  unfolding nspace_def func_space_def by simp_all
+
+lemma (in cring) nspace_neg:
+  "v \<in> carrier (nspace n) \<Longrightarrow> \<ominus>\<^bsub>nspace n\<^esub> v = (\<lambda>i\<in>{..<n}. \<ominus>\<^bsub>R\<^esub> v i)" unfolding nspace_def
+  using func_space_neg \<comment> \<open>Why suddenly \<^const>\<open>If\<close> and not \<^const>\<open>restrict\<close>?\<close> by fastforce
+
+thm module.lincomb_is_mod_hom
 
 
 end
