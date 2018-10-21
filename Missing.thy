@@ -711,7 +711,7 @@ lemma (in cring) nspace_neg:
   "v \<in> carrier (nspace n) \<Longrightarrow> \<ominus>\<^bsub>nspace n\<^esub> v = (\<lambda>i\<in>{..<n}. \<ominus>\<^bsub>R\<^esub> v i)" unfolding nspace_def
   using func_space_neg \<comment> \<open>Why suddenly \<^const>\<open>If\<close> and not \<^const>\<open>restrict\<close>?\<close> by fastforce
 
-sublocale field \<subseteq> nspace?: vectorspace R \<open>nspace n\<close>
+sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
   by (fact nspace_is_vs)
 
 lemma (in field) "nspace.fin_dim 0"
@@ -720,7 +720,7 @@ proof -
     by auto
   moreover have "carrier (nspace 0) = {\<lambda>_. undefined}"
     by simp
-  ultimately have "gen_set 0 {}"
+  ultimately have "nspace.gen_set 0 {}"
     by (simp add: nspace.span_empty)
   then show ?thesis
     unfolding nspace.fin_dim_def by blast
