@@ -690,7 +690,7 @@ lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
 
 subsection "Temp"
 (* maybe fix n in this section if that is not too confusing? *)
-definition (in ring) nspace where "nspace n = func_space {..<n}"
+definition (in ring) nspace where "nspace n = func_space {..<n::nat}"
 
 lemma (in cring) nspace_is_module: "module R (nspace n)"
   unfolding nspace_def by (fact func_space_is_module)
@@ -711,18 +711,25 @@ lemma (in cring) nspace_neg:
   "v \<in> carrier (nspace n) \<Longrightarrow> \<ominus>\<^bsub>nspace n\<^esub> v = (\<lambda>i\<in>{..<n}. \<ominus>\<^bsub>R\<^esub> v i)" unfolding nspace_def
   using func_space_neg \<comment> \<open>Why suddenly \<^const>\<open>If\<close> and not \<^const>\<open>restrict\<close>?\<close> by fastforce
 
-sublocale field \<subseteq> nspace?: vectorspace R \<open>nspace n\<close> for n::nat
+sublocale field \<subseteq> nspace?: vectorspace R \<open>nspace n\<close>
   by (fact nspace_is_vs)
 
 lemma (in field) "nspace.fin_dim 0"
 proof -
-  have "zero (nspace 0) = (\<lambda>_. undefined)" try0
-    then show ?thesis
-  unfolding nspace.fin_dim_def apply simp
+  have "zero (nspace 0) = (\<lambda>_. undefined)"
+    by auto
+  moreover have "carrier (nspace 0) = {\<lambda>_. undefined}"
+    by simp
+  ultimately have "gen_set 0 {}"
+    by (simp add: nspace.span_empty)
+  then show ?thesis
+    unfolding nspace.fin_dim_def by blast
+qed
 
   term the_elem
   find_theorems "SOME x . x \<in> _"
 
+(*
 lemma (in field) fin_dim_nspace:
   "nspace.fin_dim n" "nspace.dim n = n"
 proof (induction n)
@@ -733,6 +740,7 @@ next
   then show ?thesis sorry
 qed
 qed
+*)
 
 thm module.lincomb_is_mod_hom
 
