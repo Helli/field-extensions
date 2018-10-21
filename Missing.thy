@@ -714,16 +714,22 @@ lemma (in cring) nspace_neg:
 sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
   by (fact nspace_is_vs)
 
-lemma (in field) "nspace.fin_dim 0"
+lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0"
 proof -
   have "zero (nspace 0) = (\<lambda>_. undefined)"
     by auto
-  moreover have "carrier (nspace 0) = {\<lambda>_. undefined}"
+  then have "carrier (nspace 0) = {zero (nspace 0)}"
     by simp
-  ultimately have "nspace.gen_set 0 {}"
+  then have "nspace.gen_set 0 {}"
     by (simp add: nspace.span_empty)
-  then show ?thesis
-    unfolding nspace.fin_dim_def by blast
+  then show "nspace.fin_dim 0" "nspace.dim 0 = 0"
+    unfolding nspace.fin_dim_def apply blast unfolding nspace.dim_def
+  proof -
+    have "\<exists>F. finite F \<and> card F = 0 \<and> F \<subseteq> carrier (nspace 0) \<and> nspace.gen_set 0 F"
+      using \<open>nspace.gen_set 0 {}\<close> card_empty by blast
+    then show "(LEAST n. \<exists>F. finite F \<and> card F = n \<and> F \<subseteq> carrier (nspace 0) \<and> nspace.gen_set 0 F) = 0"
+      using Least_eq_0 by presburger
+  qed
 qed
 
   term the_elem
