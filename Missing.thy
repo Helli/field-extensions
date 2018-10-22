@@ -693,7 +693,7 @@ lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
 
 
-subsection "Temp"
+subsection \<open>Temp\<close>
 (* maybe fix n in this section if that is not too confusing? *)
 definition (in ring) nspace where "nspace n = func_space {..<n::nat}"
 
@@ -737,31 +737,39 @@ proof -
   qed
 qed
 
-
-thm direct_sum_dim
 lemma (in vectorspace) nspace_map: (* to-do: better name *)
-  assumes fin_dim
-  shows "\<exists>\<phi>.
-    bij_betw \<phi> ({..<n} \<rightarrow>\<^sub>E carrier R) (carrier V) \<and>
-    linear_map K (nspace dim) V \<phi>"
-  oops
-  term the_elem
-  find_theorems "SOME x . x \<in> _"
+  assumes fin_dim "basis (set B_list)" "distinct B_list"
+  shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
+    bij_betw \<phi> ({..<dim} \<rightarrow>\<^sub>E carrier R) (carrier V)"
+proof
+  have set_B_list: "set B_list \<subseteq> carrier V"
+    using assms(2) basis_def by auto
+  have length_B: "length B_list = dim"
+    using assms(2,3) dim_basis distinct_card by fastforce
+  define ind where "ind b = (THE i. i < dim \<and> B_list!i = b)" for b
+  then have "ind b < dim \<and> B_list!(ind b) = b" if "b \<in> set B_list" for b
+    using that by (smt assms(3) distinct_Ex1 length_B that the_equality)
+  then have ind: "ind b < dim" "B_list!(ind b) = b" if "b \<in> set B_list" for b
+    using that by simp_all
+  have v_o_ind: "v \<circ> ind \<in> set B_list \<rightarrow> carrier K" if "v \<in> carrier (nspace dim)" for v
+    using that ind(1) by auto
+  define linmap where "linmap v = lincomb (v \<circ> ind) (set B_list)" for v
+  have goal1: "linear_map K (nspace dim) V linmap"
+    apply unfold_locales
+    unfolding module_hom_def apply safe
+    apply (simp add: linmap_def)
+    using assms(2) basis_def v_o_ind apply auto[1]
+     apply (simp add: linmap_def)
+    using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lessThan_iff lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
+    apply (simp add: linmap_def)
+    by (smt Pi_iff ind(1) lessThan_iff lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
 
-(*
+  oops
+
+
 lemma (in field) fin_dim_nspace:
   "nspace.fin_dim n" "nspace.dim n = n"
-proof (induction n)
-  case 0
-  then show ?thesis sorry
-next
-  case (Suc n)
-  then show ?thesis sorry
-qed
-qed
-*)
-
-thm module.lincomb_is_mod_hom
+  oops
 
 
 end
