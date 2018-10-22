@@ -276,30 +276,32 @@ lemma vectorspace: "vectorspace (L\<lparr>carrier:=K\<rparr>) (vs_of L)"
      apply (simp add: add.m_assoc)
     apply (simp add: m_assoc)
    apply (simp add: l_distr)
-  by (simp add: semiring.semiring_simprules(13) semiring_axioms)
+  by (simp add: r_distr)
 
 interpretation vs: vectorspace \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>vs_of L\<close>
-(*  rewrites 436: "carrier (L\<lparr>carrier := K\<rparr>) = K"
-    and 346: "carrier (vs_of L) = carrier L"
-    and "zero (vs_of R) = zero R"
-    and "smult (vs_of R) = monoid.mult R"
-    and "add (vs_of R) = add R"
-    and 3478: "(\<Oplus>\<^bsub>vs_of L\<^esub>v\<in>A. a v) = (\<Oplus>\<^bsub>L\<^esub>v\<in>A. a v)"
-    and 34690: "(\<odot>\<^bsub>vs_of L\<^esub>) = (\<otimes>\<^bsub>L\<^esub>)"  *)
+\<^cancel>\<open>rewrites 1: "carrier (L\<lparr>carrier := K\<rparr>) = K"
+    and 2: "carrier (vs_of L) = carrier L"
+    and 3: "zero (vs_of R) = zero R"
+    and 4: "smult (vs_of R) = monoid.mult R"
+    and 5: "add (vs_of R) = add R"
+    and 6: "(\<Oplus>\<^bsub>vs_of L\<^esub>v\<in>A. a v) = (\<Oplus>\<^bsub>L\<^esub>v\<in>A. a v)"
+    and 7: "(\<odot>\<^bsub>vs_of L\<^esub>) = (\<otimes>\<^bsub>L\<^esub>)"\<close>
   by (fact vectorspace) (*(simp_all add: finsum_def finprod_def)*)
 
 definition finite where "finite = vs.fin_dim"
 
-lemma finite_dim_nonzero: "finite \<Longrightarrow> vs.dim > 0"
-  by (rule vs.dim_greater_0) (auto dest: one_zeroI simp: finite_def)
-
+text\<open>I encode the infinite degree as \<open>0\<close>.\<close>
 definition degree where
   "degree = (if finite then vs.dim else 0)"
- \<comment> \<open>Here, \<open>\<infinity>\<close> is encoded as \<open>0\<close>. Adapting it to another notion of cardinality
- (ecard / enat) should not be too difficult.\<close>
 
-corollary degree_0_iff[simp]: "degree \<noteq> 0 \<longleftrightarrow> finite"
-  by (simp add: degree_def finite_dim_nonzero)
+text\<open>Adapting this to another notion of cardinality (ecard / enat) should not be too difficult
+ because the actual 0 does not occur as degree:\<close>
+
+lemma finite_nonzero_dim: "finite \<Longrightarrow> vs.dim > 0"
+  by (rule vs.dim_greater_0) (auto dest: one_zeroI simp: finite_def)
+
+corollary degree_nonzero_iff_finite: "degree \<noteq> 0 \<longleftrightarrow> finite"
+  by (simp add: degree_def finite_nonzero_dim)
 
 end
 

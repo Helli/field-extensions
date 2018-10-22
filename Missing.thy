@@ -382,7 +382,7 @@ lemma (in vectorspace) decompose_step:
     \<and> bij_betw h (carrier V) (carrier K \<times> V')
     \<and> subspace K V' V
     \<and> vectorspace.dim K (vs V') = dim - 1"
-proof - \<comment> \<open>Possibly easier if the map definition is swapped as in Kemper's proof.\<close>
+proof - \<comment> \<open>Possibly easier if the map definition were swapped as in Kemper's proof.\<close>
   from assms obtain B where B: "basis B" "card B > 0"
     using dim_basis finite_basis_exists by auto
   then obtain b where "b \<in> B"
@@ -721,7 +721,7 @@ sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
 
 lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0"
 proof -
-  have "carrier (nspace 0) = {zero (nspace 0)}"
+  have "carrier (nspace 0) = {\<zero>\<^bsub>nspace 0\<^esub>}"
     by (auto simp: nspace_simps)
   then have "nspace.gen_set 0 {}"
     by (simp add: nspace.span_empty)
