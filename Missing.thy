@@ -374,7 +374,7 @@ qed
 
 subsubsection \<open>Finite-Dimensional Vector Spaces\<close>
 
-text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS_no_dates.pdf#section.0.11\<close>\<close>
+text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf#section.0.11\<close>\<close>
 lemma (in vectorspace) decompose_step:
   assumes fin_dim
   assumes "dim > 0"
@@ -765,7 +765,7 @@ proof
     using basis_def by blast
   have rule: "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
     using that by fastforce
-  have "linmap.ker = {\<zero>\<^bsub>nspace local.dim\<^esub>}"
+  have "linmap.ker = {\<zero>\<^bsub>nspace dim\<^esub>}"
     apply (auto simp: linmap.ker_def linmap_def)
      apply (simp add: nspace_simps)
      apply (rule rule) apply safe using li ind(1)

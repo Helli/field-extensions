@@ -136,12 +136,12 @@ text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<clo
 
 value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
 
-(* idea: *)
+txt\<open>Idea:\<close>
 definition (in vectorspace) B where
-  "B = (SOME B. basis B)"
+  "B = (SOME B. distinct B \<and> basis (set B))"
 lemma (in vectorspace)
-  "fin_dim \<Longrightarrow> finite B"
-  by (metis B_def basis_def fin_dim_li_fin finite_basis_exists someI_ex)
+  assumes fin_dim shows "distinct B" "basis (set B)" unfolding B_def
+  using assms by (metis (no_types, lifting) finite_basis_exists finite_distinct_list someI)+
 
 text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
 find_theorems name: "subspace."
