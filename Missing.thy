@@ -703,7 +703,7 @@ lemma (in cring) nspace_is_module: "module R (nspace n)"
 lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
   unfolding nspace_def by (fact func_space_is_vs)
 
-lemma (in ring) nspace_simps[simp]:
+lemma (in ring) nspace_simps:
   "carrier (nspace n) = {..<n} \<rightarrow>\<^sub>E carrier R"
   "mult (nspace n) = undefined"
   "one (nspace n) = undefined"
@@ -721,10 +721,8 @@ sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
 
 lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0"
 proof -
-  have "zero (nspace 0) = (\<lambda>_. undefined)"
-    by auto
-  then have "carrier (nspace 0) = {zero (nspace 0)}"
-    by simp
+  have "carrier (nspace 0) = {zero (nspace 0)}"
+    by (auto simp: nspace_simps)
   then have "nspace.gen_set 0 {}"
     by (simp add: nspace.span_empty)
   then show "nspace.fin_dim 0" "nspace.dim 0 = 0"
@@ -752,20 +750,27 @@ proof
   then have ind: "ind b < dim" "B_list!(ind b) = b" if "b \<in> set B_list" for b
     using that by simp_all
   have v_o_ind: "v \<circ> ind \<in> set B_list \<rightarrow> carrier K" if "v \<in> carrier (nspace dim)" for v
-    using that ind(1) by auto
+    using that ind(1) by (auto simp: nspace_simps)
   define linmap where "linmap v = lincomb (v \<circ> ind) (set B_list)" for v
-  have goal1: "linear_map K (nspace dim) V linmap"
+  interpret linmap: linear_map K \<open>nspace dim\<close> V linmap
     apply unfold_locales
-    unfolding module_hom_def apply safe
+    unfolding module_hom_def apply auto
     apply (simp add: linmap_def)
     using assms(2) basis_def v_o_ind apply auto[1]
-     apply (simp add: linmap_def)
+     apply (simp add: linmap_def nspace_simps)
     using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lessThan_iff lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
-    apply (simp add: linmap_def)
+    apply (simp add: linmap_def nspace_simps)
     by (smt Pi_iff ind(1) lessThan_iff lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
-
-  oops
-
+  from assms(2) have li: "lin_indpt (set B_list)"
+    using basis_def by blast
+  have rule: "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
+    using that by fastforce
+  have "linmap.ker = {\<zero>\<^bsub>nspace local.dim\<^esub>}"
+    apply (auto simp: linmap.ker_def linmap_def)
+     apply (simp add: nspace_simps)
+     apply (rule rule) apply safe using li ind(1)
+    oops
+(*to-do: use \<phi> as name*)
 
 lemma (in field) fin_dim_nspace:
   "nspace.fin_dim n" "nspace.dim n = n"
