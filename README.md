@@ -13,7 +13,7 @@ order is swapped, which might be easier to fix in Module.thy. Furthermore, I rem
 definition of func_space.
 - In SumSpaces, I once again clarified a definition. I also slightly relaxed the type constraint on inj1 and inj2, one
 could further relax it to ring_scheme.
-- In VectorSpace, I removed two superseded lemmas and change the premise of func_space_is_vs to make it consistent with
+- In VectorSpace, I removed two superseded lemmas and changed the premise of func_space_is_vs to make it consistent with
 ring.func_space_is_module.
 - In Missing_VectorSpace, I removed vectorspace.lincomb_distrib which is just the symmetric of
 LinearCombinations.module.lincomb_smult.
