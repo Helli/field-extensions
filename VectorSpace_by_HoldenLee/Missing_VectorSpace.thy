@@ -195,30 +195,6 @@ proof (rule,intro exI conjI)
   show "{u} \<subseteq> E" using uE by auto
 qed auto
 
-lemma lincomb_distrib:
-  assumes U: "U \<subseteq> carrier V"
-      and a: "a : U \<rightarrow> carrier K"
-      and c: "c : carrier K"
-  shows "c \<odot>\<^bsub>V\<^esub> lincomb a U = lincomb (\<lambda>u. c \<otimes>\<^bsub>K\<^esub> a u) U"
-    (is "_ = lincomb ?b U")
-  using U a
-proof (induct U rule: infinite_finite_induct)
-  case empty show ?case unfolding lincomb_def using c by simp next
-  case (insert u U)
-    then have U: "U \<subseteq> carrier V"
-          and u: "u : carrier V"
-          and a: "a : insert u U \<rightarrow> carrier K"
-          and finU: "finite U" by auto
-    hence aU: "a : U \<rightarrow> carrier K" by auto
-    have b: "?b : insert u U \<rightarrow> carrier K" using a c by auto
-    show ?case
-      unfolding lincomb_insert2[OF finU U a `u\<notin>U` u]
-      unfolding lincomb_insert2[OF finU U b `u\<notin>U` u]
-      using insert U aU c u smult_r_distr smult_assoc1 by auto next
-  case (infinite U)
-    thus ?case unfolding lincomb_def using assms by simp
-qed
-
 lemma span_swap:
   assumes finE[simp]: "finite E"
       and E[simp]: "E \<subseteq> carrier V"
@@ -276,7 +252,7 @@ proof -
       also have "xa u \<odot>\<^bsub>V\<^esub> ... = xa u \<odot>\<^bsub>V\<^esub> (ua v \<odot>\<^bsub>V\<^esub> v) \<oplus>\<^bsub>V\<^esub> xa u \<odot>\<^bsub>V\<^esub> lincomb ua E"
         using smult_r_distr by auto
       also have "xa u \<odot>\<^bsub>V\<^esub> lincomb ua E = lincomb a E"
-        unfolding a_def using lincomb_distrib[OF E] by auto
+        unfolding a_def using lincomb_smult[OF E] by auto
       finally have "x = xa u \<odot>\<^bsub>V\<^esub> (ua v \<odot>\<^bsub>V\<^esub> v) \<oplus>\<^bsub>V\<^esub> (lincomb a E \<oplus>\<^bsub>V\<^esub> lincomb xa E)"
         using a_assoc xau v aE xaE by auto
       also have "lincomb a E \<oplus>\<^bsub>V\<^esub> lincomb xa E = lincomb a' E"
@@ -355,7 +331,7 @@ proof (intro conjI)
     also have "ua v \<odot>\<^bsub>V\<^esub> v = ua v \<odot>\<^bsub>V\<^esub> (lincomb va E)"
       using vva by auto
     also have "... = lincomb va' E"
-      unfolding va'_def using lincomb_distrib by auto
+      unfolding va'_def using lincomb_smult by auto
     finally have "u = lincomb va'' E"
       unfolding va''_def
       using lincomb_sum[OF finE E] by auto
@@ -515,7 +491,7 @@ proof -
   have "\<ominus>\<^bsub>V\<^esub> v = \<ominus>\<^bsub>K\<^esub> one K \<odot>\<^bsub>V\<^esub> v" using smult_minus_1_back[OF v].
   also have "... = \<ominus>\<^bsub>K\<^esub> one K \<odot>\<^bsub>V\<^esub> lincomb a A" using va by simp
   finally have main: "\<ominus>\<^bsub>V\<^esub> v = lincomb ?a A"
-    unfolding lincomb_distrib[OF A a R.a_inv_closed[OF R.one_closed]] by auto
+    unfolding lincomb_smult[OF A a R.a_inv_closed[OF R.one_closed]] by auto
   show ?thesis
     unfolding span_def
     apply rule

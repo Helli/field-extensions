@@ -479,7 +479,7 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
       using mV okese(1) rK by fastforce
     let ?restricted = "\<lambda>bv\<in>B. r \<otimes>\<^bsub>K\<^esub> coeffs m bv"
     have "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) B = lincomb ?restricted B"
-      by (metis B(1) PiE_restrict basis_def lincomb_distrib lincomb_restrict_simp mV okese rK
+      by (metis B(1) PiE_restrict basis_def lincomb_smult lincomb_restrict_simp mV okese rK
           restrict_PiE sane smult_closed)
     moreover have "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K" "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
        apply (simp add: mV okese(1) rK)
@@ -508,16 +508,18 @@ proof - \<comment> \<open>Possibly easier if the map definition is swapped as in
         by moura
       then have f6: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> cc fa f C \<in> C \<and> f (cc fa f C) \<noteq> fa (cc fa f C) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
         using f5 by presburger
-      have f7: "insert b (B - {b}) = B"
+      have f7: "B - {b} \<subseteq> carrier V"
+        by (metis (no_types) B(1) Diff_subset rev_subsetD subsetI vectorspace.basis_def vectorspace_axioms)
+      have f8: "insert b (B - {b}) = B"
         using \<open>b \<in> B\<close> by blast
-      have f8: "\<forall>f c C fa. (f \<in> Pi (insert (c::'c) C) fa) = (f \<in> Pi C fa \<and> (f c::'a) \<in> fa c)"
+      have "\<forall>f c C fa. (f \<in> Pi (insert (c::'c) C) fa) = (f \<in> Pi C fa \<and> (f c::'a) \<in> fa c)"
         by blast
       then have f9: "cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) \<in> B - {b} \<and> r \<otimes>\<^bsub>K\<^esub> coeffs m (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<noteq> coeffs (r \<odot>\<^bsub>V\<^esub> m) (cc (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b})) \<or> lincomb (\<lambda>c. r \<otimes>\<^bsub>K\<^esub> coeffs m c) (B - {b}) = lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b})"
-        using f7 f6 a1 by (metis (no_types) \<open>B - {b} \<subseteq> carrier V\<close>)
+        using f8 f7 f6 a1 by (metis (no_types))
       have "coeffs m \<in> B - {b} \<rightarrow> carrier K \<and> coeffs m b \<in> carrier K"
-        using f8 f7 a3 by (metis (no_types))
+        using f8 a3 by auto
       then show "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) (B - {b}) = r \<odot>\<^bsub>V\<^esub> lincomb (coeffs m) (B - {b})"
-        using f9 a4 a2 \<open>B - {b} \<subseteq> carrier V\<close> lincomb_distrib by fastforce
+        using f9 f7 a4 a2 lincomb_smult by fastforce
     qed
   qed
   then interpret linmap: linear_map K V \<open>direct_sum (vs_of K) ?V\<close> ?T .
