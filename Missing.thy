@@ -101,7 +101,10 @@ qed
 subsubsection \<open>Direct Sum of Vector Spaces\<close>
 
 text \<open>These lemmas cannot avoid the \<^const>\<open>vectorspace.fin_dim\<close> assumption because
-  \<^const>\<open>vectorspace.dim\<close> is only defined in this case.\<close>
+  \<^const>\<open>vectorspace.dim\<close> is only defined in this case:\<close>
+
+lemma (in vectorspace) dim_deficient: "fin_dim \<or> dim = (THE _. False)"
+  unfolding fin_dim_def dim_def Least_def by meson
 
 lemma (in linear_map) emb_image_dim:
   assumes "inj_on T (carrier V)"
@@ -732,6 +735,14 @@ proof -
   qed
 qed
 
+
+thm direct_sum_dim
+lemma (in vectorspace) nspace_map: (* to-do: better name *)
+  assumes fin_dim
+  shows "\<exists>\<phi>.
+    bij_betw \<phi> ({..<n} \<rightarrow>\<^sub>E carrier R) (carrier V) \<and>
+    linear_map K (nspace dim) V \<phi>"
+  oops
   term the_elem
   find_theorems "SOME x . x \<in> _"
 
