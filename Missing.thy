@@ -319,27 +319,13 @@ corollary (in vectorspace) zss_dim:
   using basis_zss vectorspace.basis_def vectorspace.fin_dim_def vectorspace_zss apply fastforce
   using basis_zss vectorspace.dim_basis vectorspace_zss by fastforce
 
-lemma (in vectorspace) dim_greater_0:
-  assumes fin_dim
-  assumes "carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>}"
-  shows "dim > 0"
-proof (rule ccontr, simp)
-  assume "dim = 0"
-  with \<open>fin_dim\<close> have "\<exists>A. finite A \<and> card A = 0 \<and> A \<subseteq> carrier V \<and> gen_set A"
-    using assms basis_def dim_basis finite_basis_exists by auto
-  then have "gen_set {}"
-    by force
-  then obtain v where "v \<in> carrier V" "v \<in> span {}" "v \<noteq> \<zero>\<^bsub>V\<^esub>"
-    using assms(2) by blast
-  then have "\<exists>a. lincomb a {} = v \<and> a\<in> ({}\<rightarrow>carrier K)"
-    unfolding span_def by auto
-  then show False unfolding lincomb_def
-    using M.finsum_empty \<open>v \<noteq> \<zero>\<^bsub>V\<^esub>\<close> by blast
-qed
-
-lemma (in vectorspace) dim_0_trivial:
+lemma (in vectorspace) dim_0_implies_zvs:
   "fin_dim \<Longrightarrow> dim = 0 \<Longrightarrow> carrier V = {\<zero>\<^bsub>V\<^esub>}"
-  using dim_greater_0 by linarith
+  by (metis basis_def card_0_eq dim_basis finite_basis_exists span_empty)
+
+lemma (in vectorspace) nonzvs_implies_dim_greater_0:
+  "fin_dim \<Longrightarrow> carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>} \<Longrightarrow> dim > 0"
+  using dim_0_implies_zvs by blast
 
 subsubsection \<open>Field Itself as Vector Space\<close>
 

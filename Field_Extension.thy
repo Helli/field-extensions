@@ -298,7 +298,7 @@ text\<open>Adapting this to another notion of cardinality (ecard / enat) should 
  because the actual 0 does not occur as degree:\<close>
 
 lemma finite_nonzero_dim: "finite \<Longrightarrow> vs.dim > 0"
-  by (rule vs.dim_greater_0) (auto dest: one_zeroI simp: finite_def)
+  by (rule vs.nonzvs_implies_dim_greater_0) (auto dest: one_zeroI simp: finite_def)
 
 corollary degree_nonzero_iff_finite: "degree \<noteq> 0 \<longleftrightarrow> finite"
   by (simp add: degree_def finite_nonzero_dim)
@@ -392,7 +392,7 @@ proof -
     proof (induction "vectorspace.dim ?L (vs_of M\<lparr>carrier := cM\<rparr>)" arbitrary: cM)
       case 0
       then have "carrier (vs_of M\<lparr>carrier := cM\<rparr>) = {\<zero>\<^bsub>M\<^esub>}"
-        using vectorspace.dim_0_trivial by fastforce
+        using vectorspace.dim_0_implies_zvs by fastforce
       moreover from calculation have "vectorspace.fin_dim (M\<lparr>carrier := K\<rparr>) (vs_of M\<lparr>carrier := cM\<rparr>)"
         using "0.prems"(3) vectorspace.zss_dim(1) by fastforce
       ultimately show "?case"
