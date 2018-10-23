@@ -826,24 +826,24 @@ lemma (in domain) unit_vector_eq_iff[simp]:
 lemma (in domain) inj_unit_vector: "inj_on (unit_vector n) {..<n}"
   apply (rule inj_onI) by simp
 
-abbreviation (in ring) "unit_vector_set n \<equiv> unit_vector n ` {..<n}"
+abbreviation (in ring) "standard_basis n \<equiv> unit_vector n ` {..<n}"
 
-lemma (in domain) genset_unit_vector_set: "module.gen_set R (nspace n) (unit_vector_set n)"
+lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
-  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vector_set n)"
+  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (standard_basis n)"
   proof
     fix v
     assume v: "v \<in> carrier (nspace n)"
     define ind where "ind = the_inv_into {..<n} (unit_vector n)"
-    have ind[simp]: "ind uv \<in> {..<n}" "unit_vector n (ind uv) = uv" if "uv \<in> unit_vector_set n" for uv
+    have ind[simp]: "ind uv \<in> {..<n}" "unit_vector n (ind uv) = uv" if "uv \<in> standard_basis n" for uv
       unfolding ind_def apply (meson inj_unit_vector subsetI that the_inv_into_into)
       using that by (simp add: f_the_inv_into_f inj_unit_vector)
     let ?c = "v \<circ> ind"
-    have "?c \<in> unit_vector_set n \<rightarrow> carrier R"
+    have "?c \<in> standard_basis n \<rightarrow> carrier R"
       using v ind(1) nspace_simps(1) by auto(*
-    then have "v = module.lincomb (nspace n) ?c (unit_vector_set n)"
+    then have "v = module.lincomb (nspace n) ?c (standard_basis n)"
       unfolding o_def module.lincomb_def[OF nspace_is_module]*)
-    then show "v \<in> module.span R (nspace n) (unit_vector_set n)"
+    then show "v \<in> module.span R (nspace n) (standard_basis n)"
       unfolding module.span_def[OF nspace_is_module] apply auto
       apply (rule exI[of _ "\<lambda>uv. uv i"])
 (*
