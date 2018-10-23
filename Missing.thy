@@ -823,12 +823,17 @@ lemma (in domain) unit_vector_eq_iff[simp]:
   "i < n \<Longrightarrow> i' < n \<Longrightarrow> unit_vector n i = unit_vector n i' \<longleftrightarrow> i = i'"
   unfolding unit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
 
-lemma (in domain) genset_unit_vectors: "module.gen_set R (nspace n) (unit_vector n ` {..<n})"
+abbreviation (in ring) "unit_vectors n \<equiv> unit_vector n ` {..<n}"
+
+lemma (in domain) genset_unit_vectors: "module.gen_set R (nspace n) (unit_vectors n)"
 proof
-  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vector n ` {..<n})"
+  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vectors n)"
   proof
     fix v
     assume "v \<in> carrier (nspace n)"
+    then show "v \<in> module.span R (nspace n) (unit_vectors n)"
+      unfolding module.span_def[OF nspace_is_module] apply auto
+      apply (rule exI[of _ "\<lambda>v. v i"])
 (*
   qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module unit_vector_in_carrier)
 *) oops
