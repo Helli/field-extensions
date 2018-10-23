@@ -686,8 +686,16 @@ definition (in ring) nspace where "nspace n = func_space {..<n::nat}"
 lemma (in cring) nspace_is_module: "module R (nspace n)"
   unfolding nspace_def by (fact func_space_is_module)
 
+(*
+sublocale cring \<subseteq> nspace: module R \<open>nspace n\<close>
+  by (fact nspace_is_module)
+*)
+
 lemma (in field) nspace_is_vs: "vectorspace R (nspace n)"
   unfolding nspace_def by (fact func_space_is_vs)
+
+sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
+  by (fact nspace_is_vs)
 
 lemma (in ring) nspace_simps:
   "carrier (nspace n) = {..<n} \<rightarrow>\<^sub>E carrier R"
@@ -701,9 +709,6 @@ lemma (in ring) nspace_simps:
 lemma (in cring) nspace_neg:
   "v \<in> carrier (nspace n) \<Longrightarrow> \<ominus>\<^bsub>nspace n\<^esub> v = (\<lambda>i\<in>{..<n}. \<ominus>\<^bsub>R\<^esub> v i)" unfolding nspace_def
   using func_space_neg \<comment> \<open>Why suddenly \<^const>\<open>If\<close> and not \<^const>\<open>restrict\<close>?\<close> by fastforce
-
-sublocale field \<subseteq> nspace: vectorspace R \<open>nspace n\<close>
-  by (fact nspace_is_vs)
 
 lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0"
 proof -
@@ -788,8 +793,28 @@ proof -
 qed
 (*to-do: use \<phi> as name*)
 
+definition (in ring) "unit_vector n = (\<lambda>i\<in>{..<n}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+
+lemma (in ring) unit_vector_in_carrier[simp]: "i < n \<Longrightarrow> unit_vector n i \<in> carrier (nspace n)"
+  by (simp add: unit_vector_def nspace_simps)
+
+lemma (in domain) unit_vector_eq_iff[simp]:
+  "i < n \<Longrightarrow> i' < n \<Longrightarrow> unit_vector n i = unit_vector n i' \<longleftrightarrow> i = i'"
+  unfolding unit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
+
+lemma (in domain) genset_unit_vectors: "module.gen_set R (nspace n) (unit_vector n ` {..<n})"
+proof
+  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vector n ` {..<n})"
+  proof
+    fix v
+    assume "v \<in> carrier (nspace n)"
+(*
+  qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module unit_vector_in_carrier)
+*) oops
+
 lemma (in field) fin_dim_nspace:
   "nspace.fin_dim n" "nspace.dim n = n"
+proof -
   oops
 
 
