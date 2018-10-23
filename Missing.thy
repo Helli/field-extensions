@@ -823,17 +823,29 @@ lemma (in domain) unit_vector_eq_iff[simp]:
   "i < n \<Longrightarrow> i' < n \<Longrightarrow> unit_vector n i = unit_vector n i' \<longleftrightarrow> i = i'"
   unfolding unit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
 
-abbreviation (in ring) "unit_vectors n \<equiv> unit_vector n ` {..<n}"
+lemma (in domain) inj_unit_vector: "inj_on (unit_vector n) {..<n}"
+  apply (rule inj_onI) by simp
 
-lemma (in domain) genset_unit_vectors: "module.gen_set R (nspace n) (unit_vectors n)"
+abbreviation (in ring) "unit_vector_set n \<equiv> unit_vector n ` {..<n}"
+
+lemma (in domain) genset_unit_vector_set: "module.gen_set R (nspace n) (unit_vector_set n)"
 proof
-  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vectors n)"
+  show "carrier (nspace n) \<subseteq> module.span R (nspace n) (unit_vector_set n)"
   proof
     fix v
-    assume "v \<in> carrier (nspace n)"
-    then show "v \<in> module.span R (nspace n) (unit_vectors n)"
+    assume v: "v \<in> carrier (nspace n)"
+    define ind where "ind = the_inv_into {..<n} (unit_vector n)"
+    have ind[simp]: "ind uv \<in> {..<n}" "unit_vector n (ind uv) = uv" if "uv \<in> unit_vector_set n" for uv
+      unfolding ind_def apply (meson inj_unit_vector subsetI that the_inv_into_into)
+      using that by (simp add: f_the_inv_into_f inj_unit_vector)
+    let ?c = "v \<circ> ind"
+    have "?c \<in> unit_vector_set n \<rightarrow> carrier R"
+      using v ind(1) nspace_simps(1) by auto(*
+    then have "v = module.lincomb (nspace n) ?c (unit_vector_set n)"
+      unfolding o_def module.lincomb_def[OF nspace_is_module]*)
+    then show "v \<in> module.span R (nspace n) (unit_vector_set n)"
       unfolding module.span_def[OF nspace_is_module] apply auto
-      apply (rule exI[of _ "\<lambda>v. v i"])
+      apply (rule exI[of _ "\<lambda>uv. uv i"])
 (*
   qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module unit_vector_in_carrier)
 *) oops
