@@ -21,7 +21,7 @@ lemma examples:
   unfolding Ints_ring_def rat_field_def real_field_def complex_field_def
      apply unfold_locales
                       apply (auto intro: add.right_inverse right_inverse simp: Units_def algebra_simps)
-  apply (metis (full_types) Ints_cases mult_of_int_commute)
+     apply (metis (full_types) Ints_cases mult_of_int_commute)
     apply (metis (full_types) Reals_cases linordered_field_class.sign_simps(24) of_real_mult)
    apply (metis (full_types) Reals_cases mult_eq_0_iff of_real_eq_0_iff of_real_mult)
   by (metis (no_types, hide_lams) Reals_cases Reals_of_real left_inverse mult.left_neutral

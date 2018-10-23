@@ -721,10 +721,13 @@ proof -
   qed
 qed
 
-lemma (in vectorspace) nspace_map: (* to-do: better name *)
+lemma simple: "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
+  by auto
+
+lemma (in vectorspace) nspace_iso: (* to-do: better name *)
   assumes fin_dim "basis (set B_list)" "distinct B_list"
   shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
-    bij_betw \<phi> ({..<dim} \<rightarrow>\<^sub>E carrier R) (carrier V)"
+    bij_betw \<phi> (carrier (nspace dim)) (carrier V)"
 proof
   have set_B_list: "set B_list \<subseteq> carrier V"
     using assms(2) basis_def by auto
@@ -737,6 +740,10 @@ proof
     using that by simp_all
   have v_o_ind: "v \<circ> ind \<in> set B_list \<rightarrow> carrier K" if "v \<in> carrier (nspace dim)" for v
     using that ind(1) by (auto simp: nspace_simps)
+  from ind have "ind ` set B_list = {..<dim}" unfolding image_def apply auto
+    by (metis assms(3) length_B nth_eq_iff_index_eq nth_mem)
+  from simple[OF this] have important: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set B_list \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
+    using that by blast
   define linmap where "linmap v = lincomb (v \<circ> ind) (set B_list)" for v
   interpret linmap: linear_map K \<open>nspace dim\<close> V linmap
     apply unfold_locales
@@ -754,7 +761,12 @@ proof
   have "linmap.ker = {\<zero>\<^bsub>nspace dim\<^esub>}"
     apply (auto simp: linmap.ker_def linmap_def)
      apply (simp add: nspace_simps)
-     apply (rule rule) apply safe using li ind(1)
+     apply (rule rule) apply safe using not_lindepD[OF li _ _ v_o_ind, unfolded nspace_simps,
+        simplified] important
+     apply (meson PiE lessThan_iff singletonD)
+    using linmap.f0_is_0 linmap_def by auto
+  then have "inj_on linmap (carrier (nspace dim))"
+    using linmap.Ke0_iff_inj by simp
     oops
 (*to-do: use \<phi> as name*)
 
