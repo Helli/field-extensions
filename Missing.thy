@@ -751,47 +751,46 @@ proof -
     by (metis B(2) length_B nth_eq_iff_index_eq nth_mem)
   from simple[OF this] have important: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set B_list \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
     using that by blast
-  define linmap where "linmap v = lincomb (v \<circ> ind) (set B_list)" for v
-  interpret linmap: linear_map K \<open>nspace dim\<close> V linmap
+  define \<phi> where "\<phi> v = lincomb (v \<circ> ind) (set B_list)" for v
+  interpret \<phi>: linear_map K \<open>nspace dim\<close> V \<phi>
     apply unfold_locales
     unfolding module_hom_def apply auto
-    apply (simp add: linmap_def)
+    apply (simp add: \<phi>_def)
     using B(1) basis_def v_o_ind apply auto[1]
-     apply (simp add: linmap_def nspace_simps)
+     apply (simp add: \<phi>_def nspace_simps)
     using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lessThan_iff lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
-    apply (simp add: linmap_def nspace_simps)
+    apply (simp add: \<phi>_def nspace_simps)
     by (smt Pi_iff ind(1) lessThan_iff lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
   from B(1) have li: "lin_indpt (set B_list)"
     using basis_def by blast
   have rule: "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
     using that by fastforce
-  have "linmap.ker = {\<zero>\<^bsub>nspace dim\<^esub>}"
-    apply (auto simp: linmap.ker_def linmap_def)
+  have "\<phi>.ker = {\<zero>\<^bsub>nspace dim\<^esub>}"
+    apply (auto simp: \<phi>.ker_def \<phi>_def)
      apply (simp add: nspace_simps)
      apply (rule rule) apply safe using not_lindepD[OF li _ _ v_o_ind, unfolded nspace_simps,
         simplified] important
      apply (meson PiE lessThan_iff singletonD)
-    using linmap.f0_is_0 linmap_def by auto
-  then have "inj_on linmap (carrier (nspace dim))"
-    using linmap.Ke0_iff_inj by simp
+    using \<phi>.f0_is_0 \<phi>_def by auto
+  then have "inj_on \<phi> (carrier (nspace dim))"
+    using \<phi>.Ke0_iff_inj by simp
   from B(1) have gs: "gen_set (set B_list)"
     by (simp add: basis_def)
-  have "linmap.im = carrier V"
-    unfolding linmap.im_def apply auto
+  have "\<phi>.im = carrier V"
+    unfolding \<phi>.im_def apply auto
   proof goal_cases
     case (1 x)
     with gs obtain c where c: "x = lincomb c (set B_list)" "c \<in> set B_list \<rightarrow> carrier K"
       using finite_in_span set_B_list by blast
     define vec where "vec = (\<lambda>i\<in>{..<dim}. c (B_list!i))"
     with c have "vec \<in> carrier (nspace dim)" by (simp add: nspace_simps Pi_iff length_B)
-    moreover have "linmap vec = x"
-      unfolding linmap_def vec_def using c ind lincomb_cong set_B_list by fastforce
+    moreover have "\<phi> vec = x"
+      unfolding \<phi>_def vec_def using c ind lincomb_cong set_B_list by fastforce
     ultimately show ?case by blast
   qed
-  with \<open>inj_on linmap (carrier (nspace dim))\<close> show ?thesis
-    using inj_on_imp_bij_betw linmap.im_def linmap.linear_map_axioms by fastforce
+  with \<open>inj_on \<phi> (carrier (nspace dim))\<close> show ?thesis
+    using inj_on_imp_bij_betw \<phi>.im_def \<phi>.linear_map_axioms by fastforce
 qed
-(*to-do: use \<phi> as name*)
 
 definition (in ring) "unit_vector n = (\<lambda>i\<in>{..<n}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
 
