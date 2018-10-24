@@ -792,10 +792,12 @@ proof -
     using inj_on_imp_bij_betw \<phi>.im_def \<phi>.linear_map_axioms by fastforce
 qed
 
-definition (in ring) "unit_vector n = (\<lambda>i\<in>{..<n}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+subsubsection \<open>Canonical Unit Vectors\<close>
 
-lemma (in ring) unit_vector_in_carrier[simp]: "i < n \<Longrightarrow> unit_vector n i \<in> carrier (nspace n)"
-  by (simp add: unit_vector_def nspace_simps)
+definition (in ring) "cunit_vector n = (\<lambda>i\<in>{..<n}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+
+lemma (in ring) cunit_vector_in_carrier[simp]: "i < n \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
+  by (simp add: cunit_vector_def nspace_simps)
 
 lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
   assumes "i < n" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
@@ -818,14 +820,14 @@ lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional
 corollary (in field) coo_linear_map: "i < n \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
   unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
-lemma (in domain) unit_vector_eq_iff[simp]:
-  "i < n \<Longrightarrow> i' < n \<Longrightarrow> unit_vector n i = unit_vector n i' \<longleftrightarrow> i = i'"
-  unfolding unit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
+lemma (in domain) cunit_vector_eq_iff[simp]:
+  "i < n \<Longrightarrow> i' < n \<Longrightarrow> cunit_vector n i = cunit_vector n i' \<longleftrightarrow> i = i'"
+  unfolding cunit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
 
-lemma (in domain) inj_unit_vector: "inj_on (unit_vector n) {..<n}"
+lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
 
-abbreviation (in ring) "standard_basis n \<equiv> unit_vector n ` {..<n}"
+abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
 
 lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
@@ -833,10 +835,10 @@ proof
   proof
     fix v
     assume v: "v \<in> carrier (nspace n)"
-    define ind where "ind = the_inv_into {..<n} (unit_vector n)"
-    have ind[simp]: "ind uv \<in> {..<n}" "unit_vector n (ind uv) = uv" if "uv \<in> standard_basis n" for uv
-      unfolding ind_def apply (meson inj_unit_vector subsetI that the_inv_into_into)
-      using that by (simp add: f_the_inv_into_f inj_unit_vector)
+    define ind where "ind = the_inv_into {..<n} (cunit_vector n)"
+    have ind[simp]: "ind uv \<in> {..<n}" "cunit_vector n (ind uv) = uv" if "uv \<in> standard_basis n" for uv
+      unfolding ind_def apply (meson inj_cunit_vector subsetI that the_inv_into_into)
+      using that by (simp add: f_the_inv_into_f inj_cunit_vector)
     let ?c = "v \<circ> ind"
     have "?c \<in> standard_basis n \<rightarrow> carrier R"
       using v ind(1) nspace_simps(1) by auto(*
@@ -846,7 +848,7 @@ proof
       unfolding module.span_def[OF nspace_is_module] apply auto
       apply (rule exI[of _ "\<lambda>uv. uv i"])
 (*
-  qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module unit_vector_in_carrier)
+  qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module cunit_vector_in_carrier)
 *) oops
 
 lemma (in field) fin_dim_nspace:
