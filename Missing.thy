@@ -829,6 +829,28 @@ lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
 
 abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
 
+lemma (in domain) finsum_components:
+  assumes "m \<in> A \<rightarrow> carrier (nspace n)"
+  shows "finsum (nspace n) m A = (\<lambda>i\<in>{..<n}. finsum R (\<lambda>v. m v i) A)"
+  using assms
+proof (induction A rule: infinite_finite_induct)
+  case (infinite A)
+  then show ?case
+    by (simp add: finsum_def finprod_def nspace_simps)
+next
+  case empty
+  then show ?case
+    by (simp add: finsum_def finprod_def nspace_simps)
+next
+  case (insert x F)
+  have "abelian_monoid (nspace n)"
+    using abelian_group.axioms(1) module.axioms(2) nspace_is_module by auto
+  note abelian_monoid.finsum_insert[OF this, unfolded nspace_simps, OF insert(1-2)]
+  with insert(3-) show ?case
+    thm finprod_insert
+    apply auto
+    oops
+
 lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
   show "carrier (nspace n) \<subseteq> module.span R (nspace n) (standard_basis n)"
@@ -841,12 +863,12 @@ proof
       using that by (simp add: f_the_inv_into_f inj_cunit_vector)
     let ?c = "v \<circ> ind"
     have "?c \<in> standard_basis n \<rightarrow> carrier R"
-      using v ind(1) nspace_simps(1) by auto(*
+      using v ind(1) nspace_simps(1) by auto
+    note finsum_reindex[OF this inj_cunit_vector]
     then have "v = module.lincomb (nspace n) ?c (standard_basis n)"
-      unfolding o_def module.lincomb_def[OF nspace_is_module]*)
-    then show "v \<in> module.span R (nspace n) (standard_basis n)"
-      unfolding module.span_def[OF nspace_is_module] apply auto
-      apply (rule exI[of _ "\<lambda>uv. uv i"])
+      unfolding module.lincomb_def[OF nspace_is_module] apply (auto simp: o_def)
+      thm finprod_reindex
+
 (*
   qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module cunit_vector_in_carrier)
 *) oops
