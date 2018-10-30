@@ -862,14 +862,25 @@ proof
     have ind[simp]: "ind uv \<in> {..<n}" "cunit_vector n (ind uv) = uv" if "uv \<in> standard_basis n" for uv
       unfolding ind_def apply (meson inj_cunit_vector subsetI that the_inv_into_into)
       using that by (simp add: f_the_inv_into_f inj_cunit_vector)
-    let ?c = "v \<circ> ind"
-    have "?c \<in> standard_basis n \<rightarrow> carrier R"
-      using v ind(1) nspace_simps(1) by auto
-    note finsum_reindex[OF this inj_cunit_vector]
-    then have "v = module.lincomb (nspace n) ?c (standard_basis n)" find_theorems intro
-      unfolding module.lincomb_def[OF nspace_is_module] apply (auto simp: o_def)
-      thm finprod_reindex
-
+    have ind': "ind (cunit_vector n i) = i" if "i \<in> {..<n}" for i
+      using that by (simp add: ind_def inj_cunit_vector the_inv_into_f_eq)
+    note [simp] = nspace_simps(6)
+    define c where "c i = (\<lambda>uv. v (ind uv) \<otimes> uv i)" for i
+    have a: "c i \<in> standard_basis n \<rightarrow> carrier R" if "i \<in> {..<n}" for i
+      unfolding nspace_simps(1) c_def using v ind(1) that
+      by (smt PiE_restrict Pi_I' coeff_in_ring cunit_vector_in_carrier ind(2) lessThan_iff m_closed nspace_simps(1) restrict_PiE)
+    note rm_this = finsum_reindex[OF this inj_cunit_vector]
+    from a have b: "(\<lambda>uv. (v \<circ> ind) uv \<odot>\<^bsub>nspace n\<^esub> uv) \<in> standard_basis n \<rightarrow> carrier (nspace n)"
+      by (smt PiE_restrict Pi_I' coeff_in_ring comp_def cunit_vector_in_carrier ind(1) ind(2) lessThan_iff module.smult_closed nspace_is_module nspace_simps(1) restrict_PiE v)
+    note finsum_components[OF this, simplified]
+    then have "module.lincomb (nspace n) (v\<circ>ind) (standard_basis n) =
+      (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. if i < n then v (ind uv) \<otimes> uv i else undefined)"
+      unfolding module.lincomb_def[OF nspace_is_module] by simp
+    also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. v (ind uv) \<otimes> uv i)"
+      by fastforce
+    also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)"
+      using finsum_reindex[OF a[unfolded c_def] inj_cunit_vector] by auto
+    also from ind' have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)"
 (*
   qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module cunit_vector_in_carrier)
 *) oops
