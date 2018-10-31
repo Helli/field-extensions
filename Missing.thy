@@ -852,6 +852,11 @@ proof (induction A rule: infinite_finite_induct)
   finally show ?case.
 qed (simp_all add: finsum_def finprod_def nspace_simps)
 
+lemma (in abelian_monoid) trivial:
+  assumes "\<And>i. i \<in> A \<Longrightarrow> b i = c i" shows "(\<Oplus>i\<in>A. b i) = (\<Oplus>i\<in>A. c i)"
+  using assms apply (induction A rule: infinite_finite_induct)
+    apply auto unfolding finsum_def finprod_def foldD_def apply auto oops
+
 lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
   show "carrier (nspace n) \<subseteq> module.span R (nspace n) (standard_basis n)"
@@ -880,7 +885,17 @@ proof
       by fastforce
     also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)"
       using finsum_reindex[OF a[unfolded c_def] inj_cunit_vector] by auto
-    also from ind' have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)"
+    also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)"
+    proof -
+      have "(\<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)
+      = (\<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" for i
+      proof -
+        have "v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i =
+          v j \<otimes> cunit_vector n j i" if "j\<in>{..<n}" for j
+          using ind' that by auto
+        then have "(\<lambda>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i) =
+          (\<lambda>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" by fastforce
+        then show ?thesis
 (*
   qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module cunit_vector_in_carrier)
 *) oops
