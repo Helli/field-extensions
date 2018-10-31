@@ -461,16 +461,16 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
       by (smt BiV DiffE Pi_split_insert_domain \<open>b \<in> B\<close> insert_Diff lincomb_cong lincomb_sum)
     fix r m
     assume rK: "r \<in> carrier K" and mV: "m \<in> carrier V"
-    have sane: "(\<lambda>bv. r \<otimes>\<^bsub>K\<^esub> coeffs m bv) \<in> B \<rightarrow> carrier K"
-      using mV okese(1) rK by fastforce
     let ?restricted = "\<lambda>bv\<in>B. r \<otimes>\<^bsub>K\<^esub> coeffs m bv"
-    have "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) B = lincomb ?restricted B"
-      by (metis B(1) PiE_restrict basis_def lincomb_smult lincomb_restrict_simp mV okese rK
-          restrict_PiE sane smult_closed)
-    moreover have "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K" "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
-       apply (simp add: mV okese(1) rK)
-      by (simp add: sane)
-    ultimately have "coeffs (r \<odot>\<^bsub>V\<^esub> m) = ?restricted"
+    have "(\<lambda>bv. r \<otimes>\<^bsub>K\<^esub> coeffs m bv) \<in> B \<rightarrow> carrier K"
+      using mV okese(1) rK by fastforce
+    then have
+      "lincomb (coeffs (r \<odot>\<^bsub>V\<^esub> m)) B = lincomb ?restricted B"
+      "coeffs (r \<odot>\<^bsub>V\<^esub> m) \<in> B \<rightarrow>\<^sub>E carrier K"
+      "?restricted \<in> B \<rightarrow>\<^sub>E carrier K"
+        by (simp_all add: mV okese(1) rK, metis B(1) PiE_restrict lincomb_restrict_simp
+            lincomb_smult mV okese rK restrict_PiE smult_closed basis_def)
+    then have "coeffs (r \<odot>\<^bsub>V\<^esub> m) = ?restricted"
       by (metis coeffs_unique mV okese(2) rK smult_closed)
     then have scale: "coeffs (r \<odot>\<^bsub>V\<^esub> m) b = r \<otimes>\<^bsub>K\<^esub> coeffs m b" if "b \<in> B" for b
       by (simp add: that)
