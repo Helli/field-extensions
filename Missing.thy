@@ -710,7 +710,7 @@ lemma (in cring) nspace_neg:
   "v \<in> carrier (nspace n) \<Longrightarrow> \<ominus>\<^bsub>nspace n\<^esub> v = (\<lambda>i\<in>{..<n}. \<ominus>\<^bsub>R\<^esub> v i)" unfolding nspace_def
   using func_space_neg \<comment> \<open>Why suddenly \<^const>\<open>If\<close> and not \<^const>\<open>restrict\<close>?\<close> by fastforce
 
-lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0"
+lemma (in field) nspace_0_size: "nspace.fin_dim 0" "nspace.dim 0 = 0" \<comment> \<open>rm\<close>
 proof -
   have "carrier (nspace 0) = {\<zero>\<^bsub>nspace 0\<^esub>}"
     by (auto simp: nspace_simps)
@@ -726,7 +726,7 @@ proof -
   qed
 qed
 
-lemma simple: "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
+lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
   by auto
 
 lemma (in vectorspace) nspace_iso: (* to-do: better name *)
@@ -749,7 +749,7 @@ proof -
     using that ind(1) by (auto simp: nspace_simps)
   from ind have "ind ` set bs = {..<dim}" unfolding image_def apply auto
     by (metis bs(2) length_B nth_eq_iff_index_eq nth_mem)
-  from simple[OF this] have important: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set bs \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
+  from funcset_compose'[OF this] have important: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set bs \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
     using that by blast
   define \<phi> where "\<phi> v = lincomb (v \<circ> ind) (set bs)" for v
   interpret \<phi>: linear_map K \<open>nspace dim\<close> V \<phi>
@@ -828,6 +828,12 @@ lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
 
 abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
+
+lemma (in ring) finite_standard_basis: "finite (standard_basis n)" "card (standard_basis n) \<le> n"
+  by simp (use card_image_le in force)
+
+lemma (in domain) card_standard_basis: "card (standard_basis n) = n"
+  by (simp add: card_image inj_cunit_vector)
 
 lemma (in domain) finsum_nspace_components:
   assumes "m \<in> A \<rightarrow> carrier (nspace n)"
@@ -921,9 +927,18 @@ proof
   qed
 qed (meson cunit_vector_in_carrier image_subsetI lessThan_iff module.span_is_subset2 nspace_is_module)
 
-lemma (in field) fin_dim_nspace:
-  "nspace.fin_dim n" "nspace.dim n = n"
+lemma (in field) nspace_dim:
+  "nspace.fin_dim n" "nspace.dim n \<le> n"
+  using genset_standard_basis[of n]
+   apply (meson cunit_vector_in_carrier finite_standard_basis(1) image_subsetI lessThan_iff
+      nspace.fin_dim_def, metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1)
+      image_subsetI lessThan_iff nspace.gen_ge_dim)
+  done
+
+lemma (in field) nspace_dim:
+  "nspace.dim n = n"
 proof -
+  from linear_map.rank_nullity show "nspace.dim n = n"
   oops
 
 
