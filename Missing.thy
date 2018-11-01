@@ -794,7 +794,7 @@ qed
 
 subsubsection \<open>Canonical Unit Vectors\<close>
 
-definition (in ring) "cunit_vector n = (\<lambda>i\<in>{..<n}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+definition (in ring) "cunit_vector n = (\<lambda>i\<in>{..<n::nat}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
 
 lemma (in ring) cunit_vector_in_carrier[simp]: "i < n \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
   by (simp add: cunit_vector_def nspace_simps)
@@ -829,7 +829,7 @@ lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
 
 abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
 
-lemma (in domain) finsum_components:
+lemma (in domain) finsum_nspace_components:
   assumes "m \<in> A \<rightarrow> carrier (nspace n)"
   shows "finsum (nspace n) m A = (\<lambda>i\<in>{..<n}. finsum R (\<lambda>v. m v i) A)"
   using assms
@@ -852,10 +852,11 @@ proof (induction A rule: infinite_finite_induct)
   finally show ?case.
 qed (simp_all add: finsum_def finprod_def nspace_simps)
 
-lemma (in abelian_monoid) trivial:
-  assumes "\<And>i. i \<in> A \<Longrightarrow> b i = c i" shows "(\<Oplus>i\<in>A. b i) = (\<Oplus>i\<in>A. c i)"
-  using assms apply (induction A rule: infinite_finite_induct)
-    apply auto unfolding finsum_def finprod_def foldD_def apply auto oops
+lemma (in comm_monoid) finprod_not_depend':
+  assumes "f \<in> A \<rightarrow> carrier G" and "\<And>a. a \<in> A \<Longrightarrow> f a = g a"
+  shows "(\<Otimes>v\<in>A. f v) = (\<Otimes>v\<in>A. g v)"
+  by (simp add: assms finprod_cong2)
+lemmas (in abelian_monoid) finsum_not_depend' = add.finprod_not_depend'
 
 lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
@@ -877,7 +878,7 @@ proof
     note rm_this = finsum_reindex[OF this inj_cunit_vector]
     from a have b: "(\<lambda>uv. (v \<circ> ind) uv \<odot>\<^bsub>nspace n\<^esub> uv) \<in> standard_basis n \<rightarrow> carrier (nspace n)"
       by (smt PiE_restrict Pi_I' coeff_in_ring comp_def cunit_vector_in_carrier ind(1) ind(2) lessThan_iff module.smult_closed nspace_is_module nspace_simps(1) restrict_PiE v)
-    note finsum_components[OF this, simplified]
+    note finsum_nspace_components[OF this, simplified]
     then have "module.lincomb (nspace n) (v\<circ>ind) (standard_basis n) =
       (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. if i < n then v (ind uv) \<otimes> uv i else undefined)"
       unfolding module.lincomb_def[OF nspace_is_module] by simp
@@ -885,20 +886,40 @@ proof
       by fastforce
     also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)"
       using finsum_reindex[OF a[unfolded c_def] inj_cunit_vector] by auto
-    also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)"
+    also have "\<dots> = v"
     proof -
       have "(\<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)
-      = (\<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" for i
-      proof -
-        have "v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i =
-          v j \<otimes> cunit_vector n j i" if "j\<in>{..<n}" for j
-          using ind' that by auto
-        then have "(\<lambda>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i) =
-          (\<lambda>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" by fastforce
-        then show ?thesis
-(*
-  qed (simp add: image_subsetI module.span_is_subset2 nspace_is_module cunit_vector_in_carrier)
-*) oops
+      = (\<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" if "i\<in>{..<n}" for i
+        apply (intro finsum_not_depend'[symmetric])
+        using nspace_simps(1) that v apply fastforce
+        by (simp add: ind')
+      also have "\<dots> i = (\<Oplus>j\<in>{..<n}. v j \<otimes> (if i=j then \<one> else \<zero>))" if "i\<in>{..<n}" for i
+        unfolding cunit_vector_def
+        apply (intro finsum_not_depend')
+        using that nspace_simps(1) v by auto
+      also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if i=j then v j else \<zero>)" if "i\<in>{..<n}" for i
+        apply (intro finsum_not_depend')
+        using that nspace_simps(1) v apply fastforce
+        by (metis (full_types) PiE_mem nspace_simps(1) r_null r_one v)
+      also have "\<dots> i = v i" if "i\<in>{..<n}" for i
+        apply (intro finsum_singleton)
+        using that nspace_simps(1) v by auto
+      finally show ?thesis
+        using nspace_simps(1) v by fastforce
+    qed
+    finally have "v = module.lincomb (nspace n) (v \<circ> ind) (standard_basis n)"
+      unfolding module.lincomb_def[OF nspace_is_module]..
+    then show "v \<in> module.span R (nspace n) (standard_basis n)"
+      unfolding module.span_def[OF nspace_is_module] apply auto
+    proof -
+      assume a1: "v = module.lincomb (nspace n) (v \<circ> ind) (standard_basis n)"
+      have "v \<circ> ind \<in> standard_basis n \<rightarrow> carrier R"
+        using ind(1) nspace_simps(1) v by auto
+      then show "\<exists>f F. v = module.lincomb (nspace n) f F \<and> finite F \<and> F \<subseteq> standard_basis n \<and> f \<in> F \<rightarrow> carrier R"
+        using a1 by blast
+    qed
+  qed
+qed (meson cunit_vector_in_carrier image_subsetI lessThan_iff module.span_is_subset2 nspace_is_module)
 
 lemma (in field) fin_dim_nspace:
   "nspace.fin_dim n" "nspace.dim n = n"
