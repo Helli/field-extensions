@@ -82,7 +82,8 @@ proof -
 qed 
 
 lemma foldSetD_not_depend': \<comment> \<open>mv\<close>
-  assumes "\<And>x y. y \<in> D \<Longrightarrow> f x y = g x y" shows "foldSetD D f e = foldSetD D g e"
+  assumes "\<And>x y. y \<in> D \<Longrightarrow> f x y \<in> D \<or> g x y \<in> D \<comment> \<open>rm?\<close> \<Longrightarrow> f x y = g x y"
+  shows "foldSetD D f e = foldSetD D g e"
 proof
   have "(A, x) \<in> foldSetD D g e" if "(A, x) \<in> foldSetD D f e" for A x
     using that apply (induction rule: foldSetD.induct)
@@ -115,6 +116,11 @@ proof -
 (*(A,y)\<in>f*)
   from 3 6 show ?thesis by auto
 qed
+
+lemma foldD_not_depend':
+  assumes "\<And>x y. y \<in> D \<Longrightarrow> f x y \<in> D \<or> g x y \<in> D \<comment> \<open>rm?\<close> \<Longrightarrow> f x y = g x y"
+  shows "foldD D f e A = foldD D g e A"
+  unfolding foldD_def by (simp add: foldSetD_not_depend'[OF assms])
 
 lemmas (in comm_monoid) [simp] = finprod_one_eqI
 

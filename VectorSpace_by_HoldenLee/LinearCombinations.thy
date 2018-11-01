@@ -702,10 +702,10 @@ This lemma requires a somewhat annoying lemma foldD-not-depend. Then we show tha
 linear independence, span do not depend on the ambient module.*}
 lemma (in module) finsum_not_depend:
   fixes a A N
-  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule N R M" and h4: "f:A\<rightarrow>N"
+  assumes "A\<subseteq>N" and "submodule N R M" and "f:A\<rightarrow>N"
   shows "(\<Oplus>\<^bsub>(md N)\<^esub> v\<in>A. f v) = (\<Oplus>\<^bsub>M\<^esub> v\<in>A. f v)"
-proof -
-  from h1 h2 h3 h4 show ?thesis
+  using assms
+    apply (cases "finite A")
     apply (unfold finsum_def finprod_def)
     apply simp
     apply (intro foldD_not_depend[where ?B="A"])
@@ -716,17 +716,16 @@ proof -
     apply (meson M.add.m_lcomm Pi_iff contra_subsetD submoduleE(1))
     using submoduleE(1) apply force
     by (simp add: M.add.one_in_subset submoduleE(1) submoduleE(2) submoduleE(5) submoduleE(6))
-qed
 
 lemma (in module) lincomb_not_depend:
   fixes a A N
-  assumes h1: "finite A" and h2: "A\<subseteq>N" and h3: "submodule N R M" and h4: "a:A\<rightarrow>carrier R"
+  assumes h2: "A\<subseteq>N" and h3: "submodule N R M" and h4: "a:A\<rightarrow>carrier R"
   shows "lincomb a A = module.lincomb (md N) a A"
 proof - 
   from h3 interpret N: module R "(md N)" by (rule submodule_is_module)
   have 3: "N=carrier (md N)" by auto
   have 4: "(smult M ) = (smult (md N))" by auto 
-  from h1 h2 h3 h4 have "(\<Oplus>\<^bsub>(md N)\<^esub>v\<in>A. a v \<odot>\<^bsub>M\<^esub> v) = (\<Oplus>\<^bsub>M\<^esub>v\<in>A. a v \<odot>\<^bsub>M\<^esub> v)"
+  from h2 h3 h4 have "(\<Oplus>\<^bsub>(md N)\<^esub>v\<in>A. a v \<odot>\<^bsub>M\<^esub> v) = (\<Oplus>\<^bsub>M\<^esub>v\<in>A. a v \<odot>\<^bsub>M\<^esub> v)"
     apply (intro finsum_not_depend)
     using N.summands_valid by auto
   from this show ?thesis by (unfold lincomb_def N.lincomb_def, simp)
@@ -741,11 +740,10 @@ proof -
   from h3 interpret w: module R "(md N)" by (rule submodule_is_module)
   from h2 have 1:"submodule (module.span R (md N) S) R (md N)"
     by (intro w.span_is_submodule, simp)
-  have 3: "\<And>a A. (finite A \<and> A\<subseteq>S \<and> a \<in> A \<rightarrow> carrier R \<Longrightarrow> 
-    module.lincomb M a A = module.lincomb (md N) a A)"
+  have 3: "\<And>a A. (A\<subseteq>S \<and> a \<in> A \<rightarrow> carrier R \<Longrightarrow> module.lincomb M a A = module.lincomb (md N) a A)"
   proof - 
     fix a A
-    assume 31: "finite A \<and> A\<subseteq>S \<and> a \<in> A \<rightarrow> carrier R"
+    assume 31: "A\<subseteq>S \<and> a \<in> A \<rightarrow> carrier R"
     from assms 31 show "?thesis a A"
       by (intro lincomb_not_depend, auto)
   qed
