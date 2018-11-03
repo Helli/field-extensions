@@ -672,9 +672,18 @@ lemma (in comm_monoid) finprod_singleton':
     fin_A x_in_G finprod_one [of "A-{i}"]
     finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
   unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-thm \<comment> \<open>recover @{thm comm_monoid.finprod_singleton} from this\<close>
-  comm_monoid.finprod_singleton[of _ i _ f for i f]
-  comm_monoid.finprod_singleton'[of _ i _ \<open>f i\<close> for f i]
+lemma (in comm_monoid) \<comment> \<open>From this, one can almost recover @{thm finprod_singleton}, which is more
+  useful in some cases:\<close>
+  assumes "i \<in> A" "finite A" "f \<in> A \<rightarrow> carrier G"
+  shows "(\<Otimes>\<^bsub>G\<^esub>j\<in>A. if i = j then f j else \<one>\<^bsub>G\<^esub>) = f i"
+proof -
+  from assms(2) have "f j \<in> carrier G" if "j \<in> A" for j
+    using assms(3) that by auto
+  from finprod_singleton'[OF assms(1-2) this[OF assms(1)]]
+  show ?thesis
+    by (smt Pi_I' \<open>\<And>j. j \<in> A \<Longrightarrow> f j \<in> carrier G\<close> finprod_cong' one_closed)
+qed
+
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
 
@@ -794,7 +803,9 @@ qed
 
 subsubsection \<open>Canonical Unit Vectors\<close>
 
-definition (in ring) "cunit_vector n = (\<lambda>i\<in>{..<n::nat}. \<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+definition (in ring) "cunit_vector n i = (\<lambda>i'\<in>{..<n::nat}. if i=i' then \<one> else \<zero>)"
+lemma (in ring) cunit_vector_def': "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+  by (auto simp: cunit_vector_def)
 
 lemma (in ring) cunit_vector_in_carrier[simp]: "i < n \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
   by (simp add: cunit_vector_def nspace_simps)
@@ -820,9 +831,13 @@ lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional
 corollary (in field) coo_linear_map: "i < n \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
   unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
+lemma (in ring) cunit_vector_swap:
+  "i\<in>{..<n} \<Longrightarrow> j\<in>{..<n} \<Longrightarrow> cunit_vector n i j = cunit_vector n j i"
+  unfolding cunit_vector_def by simp
+
 lemma (in domain) cunit_vector_eq_iff[simp]:
-  "i < n \<Longrightarrow> i' < n \<Longrightarrow> cunit_vector n i = cunit_vector n i' \<longleftrightarrow> i = i'"
-  unfolding cunit_vector_def by (smt lessThan_iff one_not_zero restrict_apply')
+  "i\<in>{..<n} \<Longrightarrow> cunit_vector n i = cunit_vector n i' \<longleftrightarrow> i = i'"
+  unfolding cunit_vector_def by (smt restrict_apply' restrict_ext zero_not_one)
 
 lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
@@ -910,7 +925,7 @@ proof
       also have "\<dots> i = v i" if "i\<in>{..<n}" for i
         apply (intro finsum_singleton)
         using that nspace_simps(1) v by auto
-      finally show ?thesis
+      finally \<comment> \<open>fixme: remove redundancy. The same at linear independence\<close> show ?thesis
         using nspace_simps(1) v by fastforce
     qed
     finally have "v = module.lincomb (nspace n) (v \<circ> ind) (standard_basis n)"
@@ -934,6 +949,58 @@ lemma (in field) nspace_dim:
       nspace.fin_dim_def, metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1)
       image_subsetI lessThan_iff nspace.gen_ge_dim)
   done
+
+lemma (in abelian_monoid) finsum_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Oplus>i\<in>A. f i) = (\<Oplus>i\<in>A. g i)"
+  by presburger
+
+lemma (in domain) lin_indpt_standard_basis:
+  "module.lin_indpt R (nspace n) (standard_basis n)"
+proof (rule module.finite_lin_indpt2[OF nspace_is_module])
+  fix a
+  assume a_is_coefficient: "a \<in> standard_basis n \<rightarrow> carrier R"
+  and "module.lincomb (nspace n) a (standard_basis n) = \<zero>\<^bsub>nspace n\<^esub>"
+  then have finsum_is_zero: "(\<Oplus>\<^bsub>nspace n\<^esub>uv\<in>standard_basis n. (\<lambda>i\<in>{..<n}. a uv \<otimes> uv i)) = \<zero>\<^bsub>nspace n\<^esub>"
+    by (simp add: module.lincomb_def[OF nspace_is_module] nspace_simps)
+  show "\<forall>uv\<in>standard_basis n. a uv = \<zero>"
+  proof -
+    have scaling: "(\<lambda>uv. \<lambda>i\<in>{..<n}. a uv \<otimes> uv i) \<in> standard_basis n \<rightarrow> (carrier (nspace n))"
+      using a_is_coefficient nspace_simps(1) by fastforce
+    note finsum_nspace_components[OF scaling]
+    then have "(\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. a uv \<otimes> uv i) = \<zero>\<^bsub>nspace n\<^esub>"
+      using finsum_is_zero by auto
+    then have "\<zero> = (\<Oplus>uv\<in>standard_basis n. a uv \<otimes> uv i)" if "i\<in>{..<n}" for i
+      by (simp add: nspace_simps(5), metis (mono_tags) restrict_apply' that)
+    also have "\<dots> i = (\<Oplus>uv\<in>standard_basis n. a uv \<otimes> uv i)" if "i\<in>{..<n}" for i
+      using that by (simp add: nspace_simps(6))
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. a (cunit_vector n j) \<otimes> cunit_vector n j i)" if "i\<in>{..<n}" for i
+    proof -
+      have "(\<lambda>uv. a uv \<otimes> uv i) \<in> standard_basis n \<rightarrow> carrier R" if "i\<in>{..<n}" for i
+        using a_is_coefficient nspace_simps(1) that by fastforce
+      note finsum_reindex[OF this inj_cunit_vector[of n]]
+      with that show ?thesis
+        by blast
+    qed
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. a (cunit_vector n j) \<otimes> (if j=i then \<one> else \<zero>))" if "i\<in>{..<n}" for i
+      using that by (simp add: cunit_vector_def)
+    thm finsum_singleton
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) \<otimes> \<one> else a (cunit_vector n j) \<otimes> \<zero>)" for i
+    proof -
+      have "(\<forall>na. (a (cunit_vector n na) \<otimes> \<zero> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i = na) \<and> (a (cunit_vector n na) \<otimes> \<one> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i \<noteq> na)) \<or> (\<Oplus>na\<in>{..<n}. a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>)) = (\<Oplus>na\<in>{..<n}. if na = i then a (cunit_vector n na) \<otimes> \<one> else a (cunit_vector n na) \<otimes> \<zero>)"
+        by presburger
+      then show ?thesis
+        by (metis (no_types))
+    qed
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) else a (cunit_vector n j) \<otimes> \<zero>)" if "i\<in>{..<n}" for i
+      using a_is_coefficient coeff_in_ring that by fastforce
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) else \<zero>)" if "i\<in>{..<n}" for i
+      by (smt Pi_iff a_is_coefficient finsum_cong2 image_eqI r_null zero_closed)
+    also have "\<dots> i = a (cunit_vector n i)" if "i\<in>{..<n}" for i
+      using finsum_singleton'[OF that]
+      by (smt PiE a_is_coefficient finite_lessThan finsum_eqI image_eqI that)
+    finally show ?thesis
+      by force
+  qed
+qed fastforce+
 
 lemma (in field) nspace_dim:
   "nspace.dim n = n"
