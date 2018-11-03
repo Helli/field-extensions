@@ -672,17 +672,6 @@ lemma (in comm_monoid) finprod_singleton':
     fin_A x_in_G finprod_one [of "A-{i}"]
     finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
   unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-lemma (in comm_monoid) \<comment> \<open>From this, one can almost recover @{thm finprod_singleton}, which is more
-  useful in some cases:\<close>
-  assumes "i \<in> A" "finite A" "f \<in> A \<rightarrow> carrier G"
-  shows "(\<Otimes>\<^bsub>G\<^esub>j\<in>A. if i = j then f j else \<one>\<^bsub>G\<^esub>) = f i"
-proof -
-  from assms(2) have "f j \<in> carrier G" if "j \<in> A" for j
-    using assms(3) that by auto
-  from finprod_singleton'[OF assms(1-2) this[OF assms(1)]]
-  show ?thesis
-    by (smt Pi_I' \<open>\<And>j. j \<in> A \<Longrightarrow> f j \<in> carrier G\<close> finprod_cong' one_closed)
-qed
 
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
