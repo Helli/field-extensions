@@ -837,27 +837,6 @@ lemma finite_standard_basis: "finite (standard_basis n)" "card (standard_basis n
 
 end
 
-lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
-  assumes "i\<in>{..<n}" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
-  unfolding mod_hom_def apply auto
-    apply (simp add: nspace_is_module)
-   apply (rule module_criteria) \<comment> \<open>to-do: duplicates work from above\<close>
-              apply auto
-        apply (simp add: is_cring)
-       apply (fact add.m_comm)
-      apply (fact add.m_assoc)
-     apply (fact m_assoc)
-    apply (fact l_distr)
-   apply (simp add: r_distr)
-  unfolding mod_hom_axioms_def module_hom_def apply auto
-    apply (simp add: nspace_simps) using assms apply blast
-   apply (simp add: nspace_simps) using assms apply blast
-  apply (simp add: nspace_simps) using assms apply blast
-  done
-
-corollary (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
-  unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
-
 context domain \<comment> \<open>actually, \<^locale>\<open>cring\<close> + \<^prop>\<open>\<zero>\<noteq>\<one>\<close> is enough for much of this\<close>
 begin
 
