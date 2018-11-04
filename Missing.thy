@@ -693,7 +693,8 @@ lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
 
 
 subsection \<open>Temp\<close>
-(* maybe fix n in this section if that is not too confusing? *)
+
+txt "Use the existing \<^const>\<open>ring.func_space\<close>. Sadly, there are almost no lemmas for it."
 definition (in ring) nspace where "nspace n = func_space {..<n::nat}"
 
 lemma (in cring) nspace_is_module: "module R (nspace n)"
@@ -753,16 +754,16 @@ proof -
     using bs(1) basis_def by auto
   have length_B: "length bs = dim"
     using bs dim_basis distinct_card by fastforce
-  define ind where "ind b = (THE i. i < dim \<and> bs!i = b)" for b
-  then have "ind b < dim \<and> bs!(ind b) = b" if "b \<in> set bs" for b
-    using that by (smt bs(2) distinct_Ex1 length_B that the_equality)
-  then have ind: "ind b < dim" "bs!(ind b) = b" if "b \<in> set bs" for b
+  define ind where "ind b = (THE i. i\<in>{..<dim} \<and> bs!i = b)" for b
+  then have "ind b \<in> {..<dim} \<and> bs!(ind b) = b" if "b \<in> set bs" for b
+    using that by (smt bs(2) distinct_Ex1 length_B lessThan_iff the_equality)
+  then have ind: "ind b \<in> {..<dim}" "bs!(ind b) = b" if "b \<in> set bs" for b
     using that by simp_all
   have v_o_ind: "v \<circ> ind \<in> set bs \<rightarrow> carrier K" if "v \<in> carrier (nspace dim)" for v
     using that ind(1) by (auto simp: nspace_simps)
   from ind have "ind ` set bs = {..<dim}" unfolding image_def apply auto
-    by (metis bs(2) length_B nth_eq_iff_index_eq nth_mem)
-  from funcset_compose'[OF this] have important: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set bs \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
+    by (metis bs(2) distinct_Ex1 length_B nth_mem)
+  from funcset_compose'[OF this] have v_is_zero: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set bs \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
     using that by blast
   define \<phi> where "\<phi> v = lincomb (v \<circ> ind) (set bs)" for v
   interpret \<phi>: linear_map K \<open>nspace dim\<close> V \<phi>
@@ -771,19 +772,19 @@ proof -
     apply (simp add: \<phi>_def)
     using bs(1) basis_def v_o_ind apply auto[1]
      apply (simp add: \<phi>_def nspace_simps)
-    using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lessThan_iff lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
+    using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
     apply (simp add: \<phi>_def nspace_simps)
-    by (smt Pi_iff ind(1) lessThan_iff lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
+    by (smt Pi_iff ind(1) lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
   from bs(1) have li: "lin_indpt (set bs)"
     using basis_def by blast
-  have rule: "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
+  have v_is_zero': "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
     using that by fastforce
   have "\<phi>.ker = {\<zero>\<^bsub>nspace dim\<^esub>}"
     apply (auto simp: \<phi>.ker_def \<phi>_def)
      apply (simp add: nspace_simps)
-     apply (rule rule) apply safe using not_lindepD[OF li _ _ v_o_ind, unfolded nspace_simps,
-        simplified] important
-     apply (meson PiE lessThan_iff singletonD)
+     apply (rule v_is_zero') apply blast
+    using not_lindepD[OF li _ _ v_o_ind, unfolded nspace_simps] apply simp
+     apply (smt List.finite_set \<open>ind ` set bs = {..<local.dim}\<close> comp_apply imageE li lin_dep_crit nspace_simps(1) order_refl v_o_ind)
     using \<phi>.f0_is_0 \<phi>_def by auto
   then have "inj_on \<phi> (carrier (nspace dim))"
     using \<phi>.Ke0_iff_inj by simp
@@ -796,7 +797,8 @@ proof -
     with gs obtain c where c: "x = lincomb c (set bs)" "c \<in> set bs \<rightarrow> carrier K"
       using finite_in_span set_B_list by blast
     define vec where "vec = (\<lambda>i\<in>{..<dim}. c (bs!i))"
-    with c have "vec \<in> carrier (nspace dim)" by (simp add: nspace_simps Pi_iff length_B)
+    with c have "vec \<in> carrier (nspace dim)"
+      by (simp add: Pi_iff length_B nspace_simps(1))
     moreover have "\<phi> vec = x"
       unfolding \<phi>_def vec_def using c ind lincomb_cong set_B_list by fastforce
     ultimately show ?case by blast
@@ -805,17 +807,22 @@ proof -
     using inj_on_imp_bij_betw \<phi>.im_def \<phi>.linear_map_axioms by fastforce
 qed
 
-subsubsection \<open>Canonical Unit Vectors\<close>
+subsubsection \<open>Canonical Unit Vectors, Standard Basis\<close>
+
+txt (in module) "\<^const>\<open>lincomb\<close>, \<^const>\<open>lin_dep\<close> etc are set-based."
+lemmas [iff del] = lessThan_iff
 
 definition (in ring) "cunit_vector n i = (\<lambda>i'\<in>{..<n::nat}. if i=i' then \<one> else \<zero>)"
 lemma (in ring) cunit_vector_def': "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
   by (auto simp: cunit_vector_def)
 
-lemma (in ring) cunit_vector_in_carrier[simp]: "i < n \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
+abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
+
+lemma (in ring) cunit_vector_in_carrier[simp, intro]: "i\<in>{..<n} \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
   by (simp add: cunit_vector_def nspace_simps)
 
 lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
-  assumes "i < n" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
+  assumes "i\<in>{..<n}" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
   unfolding mod_hom_def apply auto
     apply (simp add: nspace_is_module)
    apply (rule module_criteria) \<comment> \<open>to-do: duplicates work from above\<close>
@@ -832,7 +839,7 @@ lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional
   apply (simp add: nspace_simps) using assms apply blast
   done
 
-corollary (in field) coo_linear_map: "i < n \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
+corollary (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
   unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
 lemma (in ring) cunit_vector_swap:
@@ -845,8 +852,6 @@ lemma (in domain) cunit_vector_eq_iff[simp]:
 
 lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
-
-abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
 
 lemma (in ring) finite_standard_basis: "finite (standard_basis n)" "card (standard_basis n) \<le> n"
   by simp (use card_image_le in force)
@@ -899,13 +904,13 @@ proof
     define c where "c i = (\<lambda>uv. v (ind uv) \<otimes> uv i)" for i
     have a: "c i \<in> standard_basis n \<rightarrow> carrier R" if "i \<in> {..<n}" for i
       unfolding nspace_simps(1) c_def using v ind(1) that
-      by (smt PiE_restrict Pi_I' coeff_in_ring cunit_vector_in_carrier ind(2) lessThan_iff m_closed nspace_simps(1) restrict_PiE)
+      by (smt PiE_restrict Pi_I' coeff_in_ring cunit_vector_in_carrier ind(2) m_closed nspace_simps(1) restrict_PiE)
     note rm_this = finsum_reindex[OF this inj_cunit_vector]
     from a have b: "(\<lambda>uv. (v \<circ> ind) uv \<odot>\<^bsub>nspace n\<^esub> uv) \<in> standard_basis n \<rightarrow> carrier (nspace n)"
-      by (smt PiE_restrict Pi_I' coeff_in_ring comp_def cunit_vector_in_carrier ind(1) ind(2) lessThan_iff module.smult_closed nspace_is_module nspace_simps(1) restrict_PiE v)
+      by (smt PiE_restrict Pi_I' coeff_in_ring comp_def cunit_vector_in_carrier ind module.smult_closed nspace_is_module nspace_simps(1) restrict_PiE v)
     note finsum_nspace_components[OF this, simplified]
     then have "module.lincomb (nspace n) (v\<circ>ind) (standard_basis n) =
-      (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. if i < n then v (ind uv) \<otimes> uv i else undefined)"
+      (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. if i\<in>{..<n} then v (ind uv) \<otimes> uv i else undefined)"
       unfolding module.lincomb_def[OF nspace_is_module] by simp
     also have "\<dots> = (\<lambda>i\<in>{..<n}. \<Oplus>uv\<in>standard_basis n. v (ind uv) \<otimes> uv i)"
       by fastforce
@@ -944,14 +949,13 @@ proof
         using a1 by blast
     qed
   qed
-qed (meson cunit_vector_in_carrier image_subsetI lessThan_iff module.span_is_subset2 nspace_is_module)
+qed (meson cunit_vector_in_carrier image_subsetI module.span_is_subset2 nspace_is_module)
 
 lemma (in field) nspace_dim:
-  "nspace.fin_dim n" "nspace.dim n \<le> n"
+  "nspace.fin_dim n" "nspace.dim n \<le> n" \<comment> \<open>rm\<close>
   using genset_standard_basis[of n]
-   apply (meson cunit_vector_in_carrier finite_standard_basis(1) image_subsetI lessThan_iff
-      nspace.fin_dim_def, metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1)
-      image_subsetI lessThan_iff nspace.gen_ge_dim)
+   apply (meson cunit_vector_in_carrier finite_standard_basis(1) image_subsetI nspace.fin_dim_def,
+      metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1) image_subsetI nspace.gen_ge_dim)
   done
 
 lemma (in domain) lin_indpt_standard_basis:
@@ -1009,5 +1013,6 @@ proof -
   from linear_map.rank_nullity show "nspace.dim n = n"
   oops
 
+lemmas [iff] = lessThan_iff
 
 end
