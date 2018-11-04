@@ -847,10 +847,10 @@ lemma cunit_vector_eq_iff[simp]:
 lemma inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
 
-lemma card_standard_basis: "card (standard_basis n) = n"
+lemma card_standard_basis[simp]: "card (standard_basis n) = n"
   by (simp add: card_image inj_cunit_vector)
 
-lemma finsum_nspace_components:
+lemma (in cring) finsum_nspace_components:
   assumes "m \<in> A \<rightarrow> carrier (nspace n)"
   shows "finsum (nspace n) m A = (\<lambda>i\<in>{..<n}. finsum R (\<lambda>v. m v i) A)"
   using assms
@@ -942,13 +942,6 @@ proof
   qed
 qed (meson cunit_vector_in_carrier image_subsetI module.span_is_subset2 nspace_is_module)
 
-lemma (in field) nspace_dim:
-  "nspace.fin_dim n" "nspace.dim n \<le> n" \<comment> \<open>rm\<close>
-  using genset_standard_basis[of n]
-   apply (meson cunit_vector_in_carrier finite_standard_basis(1) image_subsetI nspace.fin_dim_def,
-      metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1) image_subsetI nspace.gen_ge_dim)
-  done
-
 lemma lin_indpt_standard_basis:
   "module.lin_indpt R (nspace n) (standard_basis n)"
 proof (rule module.finite_lin_indpt2[OF nspace_is_module])
@@ -1000,11 +993,12 @@ qed fastforce+
 
 end
 
-lemma (in field) nspace_dim:
-  "nspace.dim n = n"
-proof -
-  from linear_map.rank_nullity show "nspace.dim n = n"
-  oops
+lemma (in field) basis_standard_basis: "nspace.basis n (standard_basis n)"
+  using genset_standard_basis lin_indpt_standard_basis by (simp add: image_subsetI nspace.basis_def)
+
+lemma (in field) nspace_dim[simp]: "nspace.fin_dim n" "nspace.dim n = n"
+  unfolding nspace.fin_dim_def using genset_standard_basis finite_standard_basis(1)
+  by (fast, simp add: nspace.dim_basis[OF _ basis_standard_basis])
 
 lemmas [iff] = lessThan_iff
 
