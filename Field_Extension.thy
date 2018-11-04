@@ -51,7 +51,7 @@ proof unfold_locales
   fix g assume g: "g \<in> carrier P - {\<zero>}"
   then have "lcoeff g \<in> Units (L\<lparr>carrier:=K\<rparr>)"
     unfolding field.field_Units[OF \<open>field (L\<lparr>carrier:=K\<rparr>)\<close>]
-    using coeff_closed lcoeff_nonzero2 by auto
+    using lcoeff_nonzero2 by auto
   from f g weak_long_div_theorem[OF _ _ this] show
     "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes> q \<oplus> r \<and>
       (r = \<zero> \<or> deg (L\<lparr>carrier := K\<rparr>) r < deg (L\<lparr>carrier := K\<rparr>) g)"
@@ -149,7 +149,7 @@ proof -
     fix i
     assume "i \<le> degree p"
     then have "coeff P p i \<in> M" and "\<alpha> [^]\<^bsub>L\<^esub> i \<in> M"
-      using assms coeff_closed that
+      using assms that
       apply (auto intro!: monoid.nat_pow_closed[of "L\<lparr>carrier:=M\<rparr>",
             simplified]) using \<open>field (L\<lparr>carrier:=M\<rparr>)\<close>
       apply (simp add: cring_def domain_def field_def ring.is_monoid)
@@ -528,7 +528,7 @@ proof
       unfolding deg_one by blast
     then have "\<exists>u. x = monom P u 0 \<and> u \<in> K \<and> u \<noteq> \<zero>\<^bsub>L\<^esub>"
       by (metis Eval_constant P.Units_closed R.zero_closed \<open>x \<in> Units P\<close> deg_zero_impl_monom inv_x
-          lcoeff_closed local.integral_iff local.zero_not_one monom_zero ring.hom_zero)
+          lcoeff_closed integral_iff zero_not_one monom_zero hom_zero)
     then show "x \<in> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
       by simp
   qed
@@ -561,7 +561,7 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
     then have "coeff P p i = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(1) deg_aboveD)
     then show ?thesis
-      using assms(2) coeff_closed by auto
+      using assms(2) by auto
   qed
   moreover have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {..< degree p}" for i
   proof -
@@ -570,35 +570,27 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
     then have "coeff P q (degree p + degree q - i) = \<zero>\<^bsub>L\<^esub>"
       by (simp add: assms(2) deg_aboveD)
     then show ?thesis
-      using assms(1) coeff_closed by auto
+      using assms(1) by auto
   qed
   moreover have "?coeff i = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q" if "i = degree p" for i
     by (simp add: that)
   ultimately have "(\<lambda>i\<in>{..degree p + degree q}. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i))
     = (\<lambda>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)"
     by auto (smt add_diff_cancel_left' atMost_iff le_eq_less_or_eq nat_le_linear restrict_ext)
-  then have a: "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<^esub>)
-    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{..degree p + degree q}. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i))"
-    using R.finsum_restrict[of _ "{..degree p + degree q}"] assms coeff_closed by auto
-  have "degree p \<in> {..degree p + degree q}"
-    by fastforce
-  note b = R.finsum_singleton'[OF this, simplified]
-  show "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
-  proof -
-    have f1: "\<zero>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub> = \<zero>\<^bsub>L\<^esub>"
-      by simp
-    have "lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q \<in> K"
-      using \<open>p \<in> carrier P\<close> \<open>q \<in> carrier P\<close> coeff_closed by auto
-    then show ?thesis
-      using f1 b a \<open>p \<noteq> \<zero>\<close> \<open>q \<noteq> \<zero>\<close> assms deg_mult coeff_mult by presburger
-  qed
-qed (use coeff_closed in \<open>simp_all add: assms\<close>)
+  then have "(\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{.. degree p + degree q}. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i))
+    = (\<Oplus>\<^bsub>L\<lparr>carrier := K\<rparr>\<^esub>i\<in>{.. degree p + degree q}. if degree p = i then lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q else \<zero>\<^bsub>L\<lparr>carrier:=K\<rparr>\<^esub>)"
+    using R.finsum_restrict[of _ "{.. degree p + degree q}"] assms by fastforce
+  also have "\<dots> = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+    by (simp add: R.finsum_singleton' assms(1) assms(2))
+  finally show "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+    by (simp add: \<open>p \<noteq> \<zero>\<close> \<open>q \<noteq> \<zero>\<close> assms)
+qed (simp_all add: assms)
 
 lemma ex1_monic_associated:
   assumes "p \<in> carrier P - {\<zero>}" shows "\<exists>!q \<in> carrier P. q \<sim> p \<and> monic q"
 proof
   from assms have p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}"
-    using lcoeff_nonzero coeff_closed by auto
+    using lcoeff_nonzero by auto
   then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K"
     using L.subfield_m_inv(1) subfield_axioms by auto
   let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
@@ -673,7 +665,7 @@ lemma irr_is_arg_min:
   "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) irr"
 proof -
   from \<open>algebraic\<close> obtain p where p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}" "Eval p = \<zero>\<^bsub>L\<^esub>"
-    unfolding algebraic_def using lcoeff_nonzero2 coeff_closed by auto
+    unfolding algebraic_def using lcoeff_nonzero2 by auto
   then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K-{\<zero>\<^bsub>L\<^esub>}"
     using L.subfield_m_inv(1) subfield_axioms by auto
   let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
