@@ -556,7 +556,7 @@ lemma (in subfield) vectorspace_wrt_subfield:
 
 lemma (in subring) hom_wrt_subring:
   "h \<in> module_hom R M N \<Longrightarrow> h \<in> module_hom (R\<lparr>carrier:=H\<rparr>) M N"
-  by (simp add: LinearCombinations.module_hom_def)
+  by (simp add: module_hom_def)
 
 lemma (in subfield) linear_wrt_subfield:
   "linear_map R M N T \<Longrightarrow> linear_map (R\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
@@ -819,7 +819,7 @@ lemmas [iff del] = lessThan_iff
 context ring
 begin
 
-definition "cunit_vector n i = (\<lambda>i'\<in>{..<n::nat}. if i=i' then \<one> else \<zero>)"
+definition "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i=i' then \<one> else \<zero>)"
 
 lemma cunit_vector_def': "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
   by (auto simp: cunit_vector_def)
