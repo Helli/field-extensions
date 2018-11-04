@@ -754,15 +754,15 @@ proof -
     using bs(1) basis_def by auto
   have length_B: "length bs = dim"
     using bs dim_basis distinct_card by fastforce
-  define ind where "ind b = (THE i. i\<in>{..<dim} \<and> bs!i = b)" for b
-  then have "ind b \<in> {..<dim} \<and> bs!(ind b) = b" if "b \<in> set bs" for b
-    using that by (smt bs(2) distinct_Ex1 length_B lessThan_iff the_equality)
-  then have ind: "ind b \<in> {..<dim}" "bs!(ind b) = b" if "b \<in> set bs" for b
-    using that by simp_all
+  define ind where "ind = the_inv_into {..<dim} ((!) bs)"
+  have inj_on_inds: "inj_on ((!) bs) {..<dim}"
+    by (simp add: bs(2) inj_on_nth length_B)
+  then have ind_less_dim: "ind b \<in> {..<dim}" if "b \<in> set bs" for b
+    unfolding ind_def by (rule the_inv_into_into; use bs(2) distinct_Ex1 length_B that in fastforce)
   have v_o_ind: "v \<circ> ind \<in> set bs \<rightarrow> carrier K" if "v \<in> carrier (nspace dim)" for v
-    using that ind(1) by (auto simp: nspace_simps)
-  from ind have "ind ` set bs = {..<dim}" unfolding image_def apply auto
-    by (metis bs(2) distinct_Ex1 length_B nth_mem)
+    using that ind_less_dim by (auto simp: nspace_simps)
+  from ind_less_dim have "ind ` set bs = {..<dim}" unfolding image_def apply auto
+    by (metis ind_def inj_on_inds length_B lessThan_iff nth_mem the_inv_into_f_f)
   from funcset_compose'[OF this] have v_is_zero: "v \<in> {..<dim} \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" if "v \<circ> ind \<in> set bs \<rightarrow> {\<zero>\<^bsub>K\<^esub>}" for v
     using that by blast
   define \<phi> where "\<phi> v = lincomb (v \<circ> ind) (set bs)" for v
@@ -772,9 +772,9 @@ proof -
     apply (simp add: \<phi>_def)
     using bs(1) basis_def v_o_ind apply auto[1]
      apply (simp add: \<phi>_def nspace_simps)
-    using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind(1) lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
+    using lincomb_sum apply (smt finite_set Pi_iff R.add.m_closed ind_less_dim lincomb_cong nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
     apply (simp add: \<phi>_def nspace_simps)
-    by (smt Pi_iff ind(1) lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
+    by (smt Pi_iff ind_less_dim lincomb_cong lincomb_smult m_closed nspace_simps(1) o_apply restrict_apply' set_B_list v_o_ind)
   from bs(1) have li: "lin_indpt (set bs)"
     using basis_def by blast
   have v_is_zero': "v = (\<lambda>_\<in>{..<dim}. \<zero>\<^bsub>K\<^esub>)" if "v \<in> {..<dim} \<rightarrow>\<^sub>E carrier K" "\<forall>i\<in>{..<dim}. v i = \<zero>\<^bsub>K\<^esub>" for v
@@ -791,17 +791,21 @@ proof -
   from bs(1) have gs: "gen_set (set bs)"
     by (simp add: basis_def)
   have "\<phi>.im = carrier V"
-    unfolding \<phi>.im_def apply auto
-  proof goal_cases
-    case (1 x)
-    with gs obtain c where c: "x = lincomb c (set bs)" "c \<in> set bs \<rightarrow> carrier K"
+  proof (auto simp: \<phi>.im_def)
+    fix vec_im
+    assume "vec_im \<in> carrier V"
+    with gs obtain c where c: "vec_im = lincomb c (set bs)" "c \<in> set bs \<rightarrow> carrier K"
       using finite_in_span set_B_list by blast
     define vec where "vec = (\<lambda>i\<in>{..<dim}. c (bs!i))"
     with c have "vec \<in> carrier (nspace dim)"
       by (simp add: Pi_iff length_B nspace_simps(1))
-    moreover have "\<phi> vec = x"
-      unfolding \<phi>_def vec_def using c ind lincomb_cong set_B_list by fastforce
-    ultimately show ?case by blast
+    moreover
+    have "bs!(ind b) = b" if "b \<in> set bs" for b
+      using that bs(2) distinct_Ex1 ind_def inj_on_inds length_B the_inv_into_f_f by fastforce
+    then have "\<phi> vec = vec_im"
+      unfolding \<phi>_def vec_def using c ind_less_dim lincomb_cong set_B_list by fastforce
+    ultimately show "vec_im \<in> \<phi> ` carrier (nspace local.dim)"
+      by blast
   qed
   with \<open>inj_on \<phi> (carrier (nspace dim))\<close> show ?thesis
     using inj_on_imp_bij_betw \<phi>.im_def \<phi>.linear_map_axioms by fastforce
