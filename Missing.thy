@@ -812,14 +812,26 @@ subsubsection \<open>Canonical Unit Vectors, Standard Basis\<close>
 txt (in module) "\<^const>\<open>lincomb\<close>, \<^const>\<open>lin_dep\<close> etc are set-based."
 lemmas [iff del] = lessThan_iff
 
-definition (in ring) "cunit_vector n i = (\<lambda>i'\<in>{..<n::nat}. if i=i' then \<one> else \<zero>)"
-lemma (in ring) cunit_vector_def': "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
+context ring
+begin
+
+definition "cunit_vector n i = (\<lambda>i'\<in>{..<n::nat}. if i=i' then \<one> else \<zero>)"
+
+lemma cunit_vector_def': "cunit_vector n i = (\<lambda>i'\<in>{..<n}. if i'=i then \<one> else \<zero>)"
   by (auto simp: cunit_vector_def)
 
-abbreviation (in ring) "standard_basis n \<equiv> cunit_vector n ` {..<n}"
+abbreviation "standard_basis n \<equiv> cunit_vector n ` {..<n}"
 
-lemma (in ring) cunit_vector_in_carrier[simp, intro]: "i\<in>{..<n} \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
+lemma cunit_vector_in_carrier[simp, intro]: "i\<in>{..<n} \<Longrightarrow> cunit_vector n i \<in> carrier (nspace n)"
   by (simp add: cunit_vector_def nspace_simps)
+
+lemma cunit_vector_swap: "i\<in>{..<n} \<Longrightarrow> j\<in>{..<n} \<Longrightarrow> cunit_vector n i j = cunit_vector n j i"
+  unfolding cunit_vector_def by simp
+
+lemma finite_standard_basis: "finite (standard_basis n)" "card (standard_basis n) \<le> n"
+  by simp (use card_image_le in force)
+
+end
 
 lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
   assumes "i\<in>{..<n}" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
@@ -842,24 +854,20 @@ lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional
 corollary (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
   unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
-lemma (in ring) cunit_vector_swap:
-  "i\<in>{..<n} \<Longrightarrow> j\<in>{..<n} \<Longrightarrow> cunit_vector n i j = cunit_vector n j i"
-  unfolding cunit_vector_def by simp
+context domain \<comment> \<open>actually, \<^locale>\<open>cring\<close> + \<^prop>\<open>\<zero>\<noteq>\<one>\<close> is enough for much of this\<close>
+begin
 
-lemma (in domain) cunit_vector_eq_iff[simp]:
+lemma cunit_vector_eq_iff[simp]:
   "i\<in>{..<n} \<Longrightarrow> cunit_vector n i = cunit_vector n i' \<longleftrightarrow> i = i'"
   unfolding cunit_vector_def by (smt restrict_apply' restrict_ext zero_not_one)
 
-lemma (in domain) inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
+lemma inj_cunit_vector: "inj_on (cunit_vector n) {..<n}"
   apply (rule inj_onI) by simp
 
-lemma (in ring) finite_standard_basis: "finite (standard_basis n)" "card (standard_basis n) \<le> n"
-  by simp (use card_image_le in force)
-
-lemma (in domain) card_standard_basis: "card (standard_basis n) = n"
+lemma card_standard_basis: "card (standard_basis n) = n"
   by (simp add: card_image inj_cunit_vector)
 
-lemma (in domain) finsum_nspace_components:
+lemma finsum_nspace_components:
   assumes "m \<in> A \<rightarrow> carrier (nspace n)"
   shows "finsum (nspace n) m A = (\<lambda>i\<in>{..<n}. finsum R (\<lambda>v. m v i) A)"
   using assms
@@ -888,7 +896,7 @@ lemma (in comm_monoid) finprod_not_depend':
   by (simp add: assms finprod_cong2)
 lemmas (in abelian_monoid) finsum_not_depend' = add.finprod_not_depend'
 
-lemma (in domain) genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
+lemma genset_standard_basis: "module.gen_set R (nspace n) (standard_basis n)"
 proof
   show "carrier (nspace n) \<subseteq> module.span R (nspace n) (standard_basis n)"
   proof
@@ -958,7 +966,7 @@ lemma (in field) nspace_dim:
       metis card_standard_basis cunit_vector_in_carrier finite_standard_basis(1) image_subsetI nspace.gen_ge_dim)
   done
 
-lemma (in domain) lin_indpt_standard_basis:
+lemma lin_indpt_standard_basis:
   "module.lin_indpt R (nspace n) (standard_basis n)"
 proof (rule module.finite_lin_indpt2[OF nspace_is_module])
   fix a
@@ -1006,6 +1014,8 @@ proof (rule module.finite_lin_indpt2[OF nspace_is_module])
       by force
   qed
 qed fastforce+
+
+end
 
 lemma (in field) nspace_dim:
   "nspace.dim n = n"
