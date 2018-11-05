@@ -7,25 +7,6 @@ theory Missing
     "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
-subsection \<open>Finite Products / Finite Sums\<close>
-
-lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
-  by presburger
-lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
-\<comment> \<open>to-do: wrong subsection.\<close>
-
-lemma (in comm_monoid) finprod_singleton': \<comment> \<open>a variation of @{thm finprod_singleton}\<close>
-  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
-  shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
-  using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
-    fin_A x_in_G finprod_one [of "A-{i}"]
-    finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
-  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-
-lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
-  \<comment> \<open>compare @{thm finsum_singleton}\<close>
-
-
 subsection \<open>Function Sets\<close>
 
 lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
@@ -71,6 +52,25 @@ subsection \<open>Ring Divisibility\<close>
 lemma (in cring) in_PIdl_impl_divided: \<comment> \<open>proof extracted from @{thm[source] to_contain_is_to_divide}\<close>
   "a \<in> carrier R \<Longrightarrow> b \<in> PIdl a \<Longrightarrow> a divides b"
   unfolding factor_def cgenideal_def using m_comm by blast
+
+
+subsection \<open>Finite Products / Finite Sums\<close>
+
+lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
+  by presburger
+lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
+\<comment> \<open>to-do: wrong subsection.\<close>
+
+lemma (in comm_monoid) finprod_singleton': \<comment> \<open>a variation of @{thm finprod_singleton}\<close>
+  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
+  shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
+  using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
+    fin_A x_in_G finprod_one [of "A-{i}"]
+    finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
+  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
+
+lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
+  \<comment> \<open>compare @{thm finsum_singleton}\<close>
 
 
 subsection \<open>Linear Combinations\<close>
