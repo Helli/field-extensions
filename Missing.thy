@@ -341,6 +341,8 @@ lemma (in cring) self_module: "module R (module_of R)"
    apply (fact l_distr)
   by (simp add: r_distr)
 
+subsubsection \<open>Field Itself as Vector Space\<close>
+
 abbreviation (input) "vs_of \<equiv> module_of" \<comment> \<open>This is not yet optimal...\<close>
 
 sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
@@ -947,6 +949,9 @@ proof
   qed
 qed (meson cunit_vector_in_carrier image_subsetI module.span_is_subset2 nspace_is_module)
 
+text \<open>In @{locale field}, one could now use @{thm linear_map.rank_nullity}, @{thm
+  vectorspace.nspace_iso}, the Koordinatenfunktional and induction to show linear independence, but
+  it also hold in @{locale cring}:\<close>
 lemma lin_indpt_standard_basis:
   "module.lin_indpt R (nspace n) (standard_basis n)"
 proof (rule module.finite_lin_indpt2[OF nspace_is_module])
