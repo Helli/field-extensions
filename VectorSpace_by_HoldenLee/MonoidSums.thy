@@ -81,24 +81,6 @@ proof -
   from 1 show ?thesis by auto
 qed 
 
-lemma foldSetD_not_depend': \<comment> \<open>mv\<close>
-  assumes "\<And>x y. y \<in> D \<Longrightarrow> f x y \<in> D \<or> g x y \<in> D \<comment> \<open>rm?\<close> \<Longrightarrow> f x y = g x y"
-  shows "foldSetD D f e = foldSetD D g e"
-proof
-  have "(A, x) \<in> foldSetD D g e" if "(A, x) \<in> foldSetD D f e" for A x
-    using that apply (induction rule: foldSetD.induct)
-    apply (simp add: foldSetD.emptyI)
-    by (metis assms foldSetD.insertI foldSetD_closed)
-  then show "foldSetD D f e \<subseteq> foldSetD D g e"
-    by auto
-  have "(A, x) \<in> foldSetD D f e" if "(A, x) \<in> foldSetD D g e" for A x
-    using that apply (induction rule: foldSetD.induct)
-    apply (simp add: foldSetD.emptyI)
-    by (metis assms foldSetD.insertI foldSetD_closed)
-  then show "foldSetD D g e \<subseteq> foldSetD D f e"
-    by auto
-qed
-
 lemma foldD_not_depend:
   fixes D E B f e A
   assumes h1: "LCD B D f" and h2: "LCD B E f" and h3: "D\<subseteq>E" and h4: "e\<in>D" and h5: "A\<subseteq>B" and h6: "finite B"
@@ -116,11 +98,6 @@ proof -
 (*(A,y)\<in>f*)
   from 3 6 show ?thesis by auto
 qed
-
-lemma foldD_not_depend':
-  assumes "\<And>x y. y \<in> D \<Longrightarrow> f x y \<in> D \<or> g x y \<in> D \<comment> \<open>rm?\<close> \<Longrightarrow> f x y = g x y"
-  shows "foldD D f e A = foldD D g e A"
-  unfolding foldD_def by (simp add: foldSetD_not_depend'[OF assms])
 
 lemmas (in comm_monoid) [simp] = finprod_one_eqI
 
