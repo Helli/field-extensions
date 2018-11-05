@@ -1000,6 +1000,66 @@ lemma (in field) nspace_dim[simp]: "nspace.fin_dim n" "nspace.dim n = n"
   unfolding nspace.fin_dim_def using genset_standard_basis finite_standard_basis(1)
   by (fast, simp add: nspace.dim_basis[OF _ basis_standard_basis])
 
-lemmas [iff] = lessThan_iff
+lemmas [iff] = lessThan_iff \<comment> \<open>reverse the declaration from above. to-do: use context?\<close>
+
+subsubsection \<open>Rings\<close>
+
+lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
+  assumes "i<n" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
+  unfolding mod_hom_def apply auto
+    apply (simp add: nspace_is_module)
+   apply (rule module_criteria) \<comment> \<open>to-do: duplicates work from above\<close>
+              apply auto
+        apply (simp add: is_cring)
+       apply (fact add.m_comm)
+      apply (fact add.m_assoc)
+     apply (fact m_assoc)
+    apply (fact l_distr)
+   apply (simp add: r_distr)
+  unfolding mod_hom_axioms_def module_hom_def apply auto
+    apply (simp add: nspace_simps) using assms apply blast
+   apply (simp add: nspace_simps) using assms apply blast
+  apply (simp add: nspace_simps) using assms apply blast
+  done
+
+lemma singleton_PiE_bij: \<comment>\<open>mv\<close>
+  "bij_betw (\<lambda>m. m a) ({a} \<rightarrow>\<^sub>E B) B"
+proof (rule bij_betw_imageI)
+  show "inj_on (\<lambda>m. m a) ({a} \<rightarrow>\<^sub>E B)"
+    by standard fastforce
+next
+  {
+    fix b
+    assume "b\<in>B"
+    then have "(\<lambda>_\<in>{a}. b) \<in> {a} \<rightarrow>\<^sub>E B"
+      by simp
+    moreover have "b = (\<lambda>m. m a) (\<lambda>_\<in>{a}. b)"
+      by simp
+    ultimately have "b \<in> (\<lambda>m. m a) ` ({a} \<rightarrow>\<^sub>E B)"
+      by blast
+  }
+  then show "(\<lambda>m. m a) ` ({a} \<rightarrow>\<^sub>E B) = B"
+    by blast
+qed
+
+lemma (in cring) nspace_1_iso_self:
+  "mod_hom R (nspace 1) (vs_of R) (\<lambda>v. v 0)" "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
+proof (rule coo_mod_hom)
+  have "{..< 1::nat} = {0}"
+    by auto
+  then show "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
+    by (simp add: nspace_simps singleton_PiE_bij)
+qed simp
+
+subsubsection \<open>Fields\<close>
+
+lemma (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
+  unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
+
+lemma (in field) nspace_1_iso_self:
+  "linear_map R (nspace 1) (vs_of R) (\<lambda>v. v 0)" "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
+  unfolding linear_map_def
+  by (simp_all add: nspace_1_iso_self nspace_is_vs self_vs.vectorspace_axioms del: One_nat_def)
+
 
 end
