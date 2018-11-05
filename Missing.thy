@@ -7,13 +7,41 @@ theory Missing
     "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
+subsection \<open>Generalisations\<close>
+
+lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
+  by presburger
+lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
+\<comment> \<open>to-do: wrong subsection.\<close>
+
+lemma (in comm_monoid) finprod_singleton':
+  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
+  shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
+  using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
+    fin_A x_in_G finprod_one [of "A-{i}"]
+    finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
+  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
+text \<open>From this, one can recover @{thm comm_monoid.finprod_singleton}, which is more useful in some cases:\<close>
+lemma (in comm_monoid)
+  assumes "i \<in> A" "finite A" "f \<in> A \<rightarrow> carrier G"
+  shows "(\<Otimes>\<^bsub>G\<^esub>j\<in>A. if i=j then f j else \<one>\<^bsub>G\<^esub>) = f i"
+proof -
+  from assms(1,3) have "f i \<in> carrier G"
+    by blast
+  from finprod_singleton'[OF assms(1-2) this] show ?thesis
+    by (smt finprod_eqI)
+qed
+
+lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
+  \<comment> \<open>compare @{thm finsum_singleton}\<close>
+
 
 subsection \<open>Function Sets\<close>
 
 lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
   by auto
 
-lemma singleton_PiE_bij: \<comment>\<open>mv\<close>
+lemma singleton_PiE_bij:
   "bij_betw (\<lambda>m. m a) ({a} \<rightarrow>\<^sub>E B) B"
 proof (rule bij_betw_imageI)
   show "inj_on (\<lambda>m. m a) ({a} \<rightarrow>\<^sub>E B)"
@@ -577,154 +605,6 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
 qed
 
 
-subsection \<open>Linear Maps\<close>
-
-lemma (in subring) module_wrt_subring:
-  "module R M \<Longrightarrow> module (R\<lparr>carrier:=H\<rparr>) M"
-  unfolding module_def module_axioms_def by (simp add: cring.subring_cring subring_axioms)
-
-lemma (in subfield) vectorspace_wrt_subfield:
-  "vectorspace R V \<Longrightarrow> vectorspace (R\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
-  by (auto simp: module_wrt_subring ring.subfield_iff(2) cring.axioms(1) module.axioms(1) subfield_axioms)
-
-lemma (in subring) hom_wrt_subring:
-  "h \<in> module_hom R M N \<Longrightarrow> h \<in> module_hom (R\<lparr>carrier:=H\<rparr>) M N"
-  by (simp add: module_hom_def)
-
-lemma (in subfield) linear_wrt_subfield:
-  "linear_map R M N T \<Longrightarrow> linear_map (R\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
-  by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
-
-
-subsection \<open>Fields\<close>
-
-context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
-
-lemma nonzero_has_inv: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
-  by (simp add: Units_r_inv_ex field_Units)
-
-lemma nonzero_inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
-  using Units_inv_Units field_Units by simp
-
-end
-
-lemma (in subfield) finsum_simp:
-  assumes \<open>ring R\<close>
-  assumes "v ` A \<subseteq> K"
-  shows "(\<Oplus>\<^bsub>R\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>R\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto using assms
-proof (induction A rule: infinite_finite_induct)
-  case (infinite A)
-  then show ?case
-    by (simp add: finprod_def)
-next
-  case empty
-  have "\<zero> \<in> K"
-    by (simp add: subdomainE(2) subdomain_axioms)
-  then show ?case
-    by (simp add: finprod_def)
-next
-  case (insert x F)
-  have a: "v \<in> F \<rightarrow> K"
-    using insert.prems(2) by auto
-  moreover have "K \<subseteq> carrier R"
-    by (simp add: subset)
-  ultimately have b: "v \<in> F \<rightarrow> carrier R"
-    by fast
-  have d: "v x \<in> K"
-    using insert.prems(2) by auto
-  then have e: "v x \<in> carrier R"
-    using \<open>K \<subseteq> carrier R\<close> by blast
-  have "abelian_monoid (R\<lparr>carrier := K\<rparr>)" using assms(1)
-    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
-  then have f: "comm_monoid \<lparr>carrier = K, mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
-    by (simp add: abelian_monoid_def)
-  note comm_monoid.finprod_insert[of "add_monoid R", simplified, OF _ insert.hyps b e, simplified]
-  then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
-    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
-  with comm_monoid.finprod_insert[of "add_monoid (R\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
-  show ?case
-    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
-qed
-
-
-subsection \<open>Univariate Polynomials\<close>
-
-lemma (in UP_ring) lcoeff_Unit_nonzero:
-  "carrier R \<noteq> {\<zero>} \<Longrightarrow> lcoeff p \<in> Units R \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
-  by (metis R.Units_r_inv_ex R.l_null R.one_zeroD coeff_zero)
-
-lemma (in UP_cring) Unit_scale_zero:
-  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
-  by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)
-
-abbreviation (in UP) degree where "degree \<equiv> deg R" \<comment> \<open>Why is \<^term>\<open>R\<close> not part of the definition?\<close>
-
-lemma (in UP_cring) Unit_scale_deg[simp]:
-  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> degree (c \<odot>\<^bsub>P\<^esub> r) = degree r"
-  by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
-
-lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Used to prove \<^term>\<open>euclidean_domain (UP K) degree\<close>.\<close>
-  assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
-  and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
-  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g)"
-proof -
-  from long_div_theorem[OF g_in_P f_in_P] obtain q r and k::nat where qrk: "q \<in> carrier P"
-    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g"
-    using R_not_trivial lcoeff_Unit_nonzero lcoeff_g by auto
-  from lcoeff_g have inv: "lcoeff g [^] k \<in> Units R"
-    by (induction k) simp_all
-  let ?inv = "inv (lcoeff g [^] k)"
-  have inv_ok: "?inv \<in> Units R" "?inv \<in> carrier R"
-    using inv by simp_all
-  from inv have "f = ?inv \<otimes> lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f"
-    by simp
-  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f)"
-    by (simp add: inv smult_assoc_simp)
-  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r)"
-    by (simp add: qrk)
-  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
-    by (simp add: UP_smult_assoc2 UP_smult_r_distr inv_ok qrk(1-2))
-  also have "\<dots> = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
-    using UP_m_comm inv_ok qrk(1) smult_assoc2 by auto
-  finally have "f = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r" .
-  moreover have "?inv \<odot>\<^bsub>P\<^esub> q \<in> carrier P" "?inv \<odot>\<^bsub>P\<^esub> r \<in> carrier P"
-    by (simp_all add: inv_ok qrk(1-2))
-  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> degree (?inv \<odot>\<^bsub>P\<^esub> r) < degree (?inv \<odot>\<^bsub>P\<^esub> g)"
-    using Unit_scale_deg inv_ok(1) qrk(2,4) by auto
-  ultimately show ?thesis using inv_ok(1) by auto
-qed
-
-
-subsection \<open>Generalisations\<close>
-
-lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
-  by presburger
-lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
-\<comment> \<open>to-do: wrong subsection.\<close>
-
-lemma (in comm_monoid) finprod_singleton':
-  assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
-  shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
-  using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
-    fin_A x_in_G finprod_one [of "A-{i}"]
-    finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
-  unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-text \<open>From this, one can recover @{thm comm_monoid.finprod_singleton}, which is more useful in some cases:\<close>
-lemma (in comm_monoid)
-  assumes "i \<in> A" "finite A" "f \<in> A \<rightarrow> carrier G"
-  shows "(\<Otimes>\<^bsub>G\<^esub>j\<in>A. if i=j then f j else \<one>\<^bsub>G\<^esub>) = f i"
-proof -
-  from assms(1,3) have "f i \<in> carrier G"
-    by blast
-  from finprod_singleton'[OF assms(1-2) this] show ?thesis
-    by (smt finprod_eqI)
-qed
-
-lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
-  \<comment> \<open>compare @{thm finsum_singleton}\<close>
-
-
 subsection \<open>Vectors\<close>
 
 txt "Use the existing \<^const>\<open>ring.func_space\<close>. Sadly, there are almost no lemmas for it."
@@ -988,7 +868,6 @@ proof (rule module.finite_lin_indpt2[OF nspace_is_module])
     qed
     also have "\<dots> i = (\<Oplus>j\<in>{..<n}. a (cunit_vector n j) \<otimes> (if j=i then \<one> else \<zero>))" if "i\<in>{..<n}" for i
       using that by (simp add: cunit_vector_def)
-    thm finsum_singleton
     also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) \<otimes> \<one> else a (cunit_vector n j) \<otimes> \<zero>)" for i
     proof -
       have "(\<forall>na. (a (cunit_vector n na) \<otimes> \<zero> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i = na) \<and> (a (cunit_vector n na) \<otimes> \<one> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i \<noteq> na)) \<or> (\<Oplus>na\<in>{..<n}. a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>)) = (\<Oplus>na\<in>{..<n}. if na = i then a (cunit_vector n na) \<otimes> \<one> else a (cunit_vector n na) \<otimes> \<zero>)"
@@ -1044,6 +923,125 @@ lemma (in field) nspace_1_iso_self:
   "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
   unfolding linear_map_def
   by (simp_all add: nspace_1_iso_self nspace_is_vs self_vs.vectorspace_axioms del: One_nat_def)
+
+
+subsection \<open>Linear Maps\<close>
+
+lemma (in subring) module_wrt_subring:
+  "module R M \<Longrightarrow> module (R\<lparr>carrier:=H\<rparr>) M"
+  unfolding module_def module_axioms_def by (simp add: cring.subring_cring subring_axioms)
+
+lemma (in subfield) vectorspace_wrt_subfield:
+  "vectorspace R V \<Longrightarrow> vectorspace (R\<lparr>carrier:=K\<rparr>) V" unfolding vectorspace_def
+  by (auto simp: module_wrt_subring ring.subfield_iff(2) cring.axioms(1) module.axioms(1) subfield_axioms)
+
+lemma (in subring) hom_wrt_subring:
+  "h \<in> module_hom R M N \<Longrightarrow> h \<in> module_hom (R\<lparr>carrier:=H\<rparr>) M N"
+  by (simp add: module_hom_def)
+
+lemma (in subfield) linear_wrt_subfield:
+  "linear_map R M N T \<Longrightarrow> linear_map (R\<lparr>carrier:=K\<rparr>) M N T" unfolding linear_map_def
+  by (auto simp: vectorspace_wrt_subfield hom_wrt_subring mod_hom_axioms_def mod_hom_def module_wrt_subring)
+
+
+subsection \<open>Fields\<close>
+
+context field begin \<comment> \<open>"Let @{term R} be a field."\<close>
+
+lemma nonzero_has_inv: "a \<in> carrier R \<Longrightarrow> a \<noteq> \<zero> \<Longrightarrow> \<exists>b\<in>carrier R. a\<otimes>b = \<one>"
+  by (simp add: Units_r_inv_ex field_Units)
+
+lemma nonzero_inv_nonzero: "x \<in> carrier R \<Longrightarrow> x \<noteq> \<zero> \<Longrightarrow> inv x \<noteq> \<zero>"
+  using Units_inv_Units field_Units by simp
+
+end
+
+lemma (in subfield) finsum_simp:
+  assumes \<open>ring R\<close>
+  assumes "v ` A \<subseteq> K"
+  shows "(\<Oplus>\<^bsub>R\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>R\<^esub>i \<in> A. v i)"
+  unfolding finsum_def apply auto using assms
+proof (induction A rule: infinite_finite_induct)
+  case (infinite A)
+  then show ?case
+    by (simp add: finprod_def)
+next
+  case empty
+  have "\<zero> \<in> K"
+    by (simp add: subdomainE(2) subdomain_axioms)
+  then show ?case
+    by (simp add: finprod_def)
+next
+  case (insert x F)
+  have a: "v \<in> F \<rightarrow> K"
+    using insert.prems(2) by auto
+  moreover have "K \<subseteq> carrier R"
+    by (simp add: subset)
+  ultimately have b: "v \<in> F \<rightarrow> carrier R"
+    by fast
+  have d: "v x \<in> K"
+    using insert.prems(2) by auto
+  then have e: "v x \<in> carrier R"
+    using \<open>K \<subseteq> carrier R\<close> by blast
+  have "abelian_monoid (R\<lparr>carrier := K\<rparr>)" using assms(1)
+    using abelian_group_def ring.subring_iff ring_def subring_axioms subset by auto
+  then have f: "comm_monoid \<lparr>carrier = K, mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr>"
+    by (simp add: abelian_monoid_def)
+  note comm_monoid.finprod_insert[of "add_monoid R", simplified, OF _ insert.hyps b e, simplified]
+  then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
+    using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
+  with comm_monoid.finprod_insert[of "add_monoid (R\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
+  show ?case
+    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
+qed
+
+
+subsection \<open>Univariate Polynomials\<close>
+
+lemma (in UP_ring) lcoeff_Unit_nonzero:
+  "carrier R \<noteq> {\<zero>} \<Longrightarrow> lcoeff p \<in> Units R \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_r_inv_ex R.l_null R.one_zeroD coeff_zero)
+
+lemma (in UP_cring) Unit_scale_zero:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
+  by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)
+
+abbreviation (in UP) degree where "degree \<equiv> deg R" \<comment> \<open>Why is \<^term>\<open>R\<close> not part of the definition?\<close>
+
+lemma (in UP_cring) Unit_scale_deg[simp]:
+  "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> degree (c \<odot>\<^bsub>P\<^esub> r) = degree r"
+  by (metis R.Units_closed R.Units_l_inv_ex deg_smult_decr le_antisym smult_assoc_simp smult_closed smult_one)
+
+lemma (in UP_cring) weak_long_div_theorem: \<comment> \<open>barely weaker. Used to prove \<^term>\<open>euclidean_domain (UP K) degree\<close>.\<close>
+  assumes g_in_P [simp]: "g \<in> carrier P" and f_in_P [simp]: "f \<in> carrier P"
+  and lcoeff_g: "lcoeff g \<in> Units R" and R_not_trivial: "carrier R \<noteq> {\<zero>}"
+  shows "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and> (r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g)"
+proof -
+  from long_div_theorem[OF g_in_P f_in_P] obtain q r and k::nat where qrk: "q \<in> carrier P"
+    "r \<in> carrier P" "lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r" "r = \<zero>\<^bsub>P\<^esub> \<or> degree r < degree g"
+    using R_not_trivial lcoeff_Unit_nonzero lcoeff_g by auto
+  from lcoeff_g have inv: "lcoeff g [^] k \<in> Units R"
+    by (induction k) simp_all
+  let ?inv = "inv (lcoeff g [^] k)"
+  have inv_ok: "?inv \<in> Units R" "?inv \<in> carrier R"
+    using inv by simp_all
+  from inv have "f = ?inv \<otimes> lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f"
+    by simp
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (lcoeff g [^] k \<odot>\<^bsub>P\<^esub> f)"
+    by (simp add: inv smult_assoc_simp)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> (g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r)"
+    by (simp add: qrk)
+  also have "\<dots> = ?inv \<odot>\<^bsub>P\<^esub> g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    by (simp add: UP_smult_assoc2 UP_smult_r_distr inv_ok qrk(1-2))
+  also have "\<dots> = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r"
+    using UP_m_comm inv_ok qrk(1) smult_assoc2 by auto
+  finally have "f = g \<otimes>\<^bsub>P\<^esub> (?inv \<odot>\<^bsub>P\<^esub> q) \<oplus>\<^bsub>P\<^esub> ?inv \<odot>\<^bsub>P\<^esub> r" .
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> q \<in> carrier P" "?inv \<odot>\<^bsub>P\<^esub> r \<in> carrier P"
+    by (simp_all add: inv_ok qrk(1-2))
+  moreover have "?inv \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<or> degree (?inv \<odot>\<^bsub>P\<^esub> r) < degree (?inv \<odot>\<^bsub>P\<^esub> g)"
+    using Unit_scale_deg inv_ok(1) qrk(2,4) by auto
+  ultimately show ?thesis using inv_ok(1) by auto
+qed
 
 
 end
