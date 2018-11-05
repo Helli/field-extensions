@@ -911,7 +911,7 @@ proof
     proof -
       have "(\<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)
       = (\<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" if "i\<in>{..<n}" for i
-        apply (intro finsum_not_depend'[symmetric])
+        apply (intro finsum_not_depend')
         using nspace_simps(1) that v apply fastforce
         by (simp add: ind')
       also have "\<dots> i = (\<Oplus>j\<in>{..<n}. v j \<otimes> (if i=j then \<one> else \<zero>))" if "i\<in>{..<n}" for i
