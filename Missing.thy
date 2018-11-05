@@ -327,20 +327,25 @@ lemma (in vectorspace) nonzvs_implies_dim_greater_0:
   "fin_dim \<Longrightarrow> carrier V \<noteq> {\<zero>\<^bsub>V\<^esub>} \<Longrightarrow> dim > 0"
   using dim_0_implies_zvs by blast
 
-subsubsection \<open>Field Itself as Vector Space\<close>
+subsubsection \<open>Ring Itself as Module\<close>
 
-abbreviation "vs_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>mult K\<close> as \<^const>\<open>smult\<close>)\<close>
+abbreviation "module_of K \<equiv> \<comment> \<open>\<^term>\<open>K\<close>, viewed as a module (i.e. \<^term>\<open>mult K\<close> as \<^const>\<open>smult\<close>)\<close>
   \<lparr>carrier = carrier K, mult = undefined, one = undefined, zero = \<zero>\<^bsub>K\<^esub>, add = (\<oplus>\<^bsub>K\<^esub>), smult = (\<otimes>\<^bsub>K\<^esub>)\<rparr>"
 
-sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
-  rewrites "carrier (vs_of R) = carrier R"
-   apply (rule vs_criteria) apply auto
-       apply (simp add: local.field_axioms)
+lemma (in cring) self_module: "module R (module_of R)"
+  apply (rule module_criteria) apply auto
+       apply (fact cring_axioms)
       apply (fact add.m_comm)
      apply (fact add.m_assoc)
     apply (fact m_assoc)
    apply (fact l_distr)
   by (simp add: r_distr)
+
+abbreviation (input) "vs_of \<equiv> module_of" \<comment> \<open>This is not yet optimal...\<close>
+
+sublocale field \<subseteq> self_vs: vectorspace R \<open>vs_of R\<close>
+  rewrites "carrier (vs_of R) = carrier R"
+  by (simp_all add: vectorspace_def self_module field_axioms)
 
 lemma (in field) self_vs_size:
   shows self_vs_fin_dim: "self_vs.fin_dim"
@@ -743,7 +748,7 @@ qed
 lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
   by auto
 
-lemma (in vectorspace) nspace_iso: (* to-do: better name *)
+lemma (in vectorspace) nspace_iso:
   assumes fin_dim
   shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
     bij_betw \<phi> (carrier (nspace dim)) (carrier V)"
@@ -1005,22 +1010,9 @@ lemmas [iff] = lessThan_iff \<comment> \<open>reverse the declaration from above
 subsubsection \<open>Rings\<close>
 
 lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
-  assumes "i<n" shows coo_mod_hom: "mod_hom R (nspace n) (vs_of R) (\<lambda>v. v i)"
-  unfolding mod_hom_def apply auto
-    apply (simp add: nspace_is_module)
-   apply (rule module_criteria) \<comment> \<open>to-do: duplicates work from above\<close>
-              apply auto
-        apply (simp add: is_cring)
-       apply (fact add.m_comm)
-      apply (fact add.m_assoc)
-     apply (fact m_assoc)
-    apply (fact l_distr)
-   apply (simp add: r_distr)
-  unfolding mod_hom_axioms_def module_hom_def apply auto
-    apply (simp add: nspace_simps) using assms apply blast
-   apply (simp add: nspace_simps) using assms apply blast
-  apply (simp add: nspace_simps) using assms apply blast
-  done
+  assumes "i<n" shows coo_mod_hom: "mod_hom R (nspace n) (module_of R) (\<lambda>v. v i)"
+  apply (simp add: mod_hom_def nspace_is_module self_module)
+  unfolding mod_hom_axioms_def module_hom_def by (simp add: nspace_simps, use assms in blast)
 
 lemma singleton_PiE_bij: \<comment>\<open>mv\<close>
   "bij_betw (\<lambda>m. m a) ({a} \<rightarrow>\<^sub>E B) B"
@@ -1043,7 +1035,8 @@ next
 qed
 
 lemma (in cring) nspace_1_iso_self:
-  "mod_hom R (nspace 1) (vs_of R) (\<lambda>v. v 0)" "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
+  "mod_hom R (nspace 1) (module_of R) (\<lambda>v. v 0)"
+  "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
 proof (rule coo_mod_hom)
   have "{..< 1::nat} = {0}"
     by auto
@@ -1057,7 +1050,8 @@ lemma (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (n
   unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
 lemma (in field) nspace_1_iso_self:
-  "linear_map R (nspace 1) (vs_of R) (\<lambda>v. v 0)" "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
+  "linear_map R (nspace 1) (vs_of R) (\<lambda>v. v 0)"
+  "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
   unfolding linear_map_def
   by (simp_all add: nspace_1_iso_self nspace_is_vs self_vs.vectorspace_axioms del: One_nat_def)
 
