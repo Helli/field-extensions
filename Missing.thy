@@ -7,30 +7,20 @@ theory Missing
     "VectorSpace_by_HoldenLee/Missing_VectorSpace"
 begin
 
-subsection \<open>Generalisations\<close>
+subsection \<open>Finite Products / Finite Sums\<close>
 
 lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
   by presburger
 lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
 \<comment> \<open>to-do: wrong subsection.\<close>
 
-lemma (in comm_monoid) finprod_singleton':
+lemma (in comm_monoid) finprod_singleton': \<comment> \<open>a variation of @{thm finprod_singleton}\<close>
   assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
   shows "(\<Otimes>j\<in>A. if i=j then x else \<one>) = x"
   using i_in_A finprod_insert [of "A-{i}" i "\<lambda>j. if i=j then x else \<one>"]
     fin_A x_in_G finprod_one [of "A-{i}"]
     finprod_cong [of "A-{i}" "A-{i}" "\<lambda>j. if i=j then x else \<one>" "\<lambda>_. \<one>"]
   unfolding Pi_def simp_implies_def by (force simp add: insert_absorb)
-text \<open>From this, one can recover @{thm comm_monoid.finprod_singleton}, which is more useful in some cases:\<close>
-lemma (in comm_monoid)
-  assumes "i \<in> A" "finite A" "f \<in> A \<rightarrow> carrier G"
-  shows "(\<Otimes>\<^bsub>G\<^esub>j\<in>A. if i=j then f j else \<one>\<^bsub>G\<^esub>) = f i"
-proof -
-  from assms(1,3) have "f i \<in> carrier G"
-    by blast
-  from finprod_singleton'[OF assms(1-2) this] show ?thesis
-    by (smt finprod_eqI)
-qed
 
 lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
