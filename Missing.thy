@@ -8,6 +8,12 @@ theory Missing
 begin
 
 
+subsection \<open>Function Sets\<close>
+
+lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
+  by auto
+
+
 subsection \<open>Subrings\<close>
 
 lemma (in ring) subring_ring_hom_ring: "subring S R \<Longrightarrow> ring_hom_ring (R\<lparr>carrier:=S\<rparr>) R id"
@@ -699,7 +705,7 @@ lemmas (in abelian_monoid) finsum_singleton' = add.finprod_singleton'
   \<comment> \<open>compare @{thm finsum_singleton}\<close>
 
 
-subsection \<open>Temp\<close>
+subsection \<open>Vectors\<close>
 
 txt "Use the existing \<^const>\<open>ring.func_space\<close>. Sadly, there are almost no lemmas for it."
 definition (in ring) nspace where "nspace n = func_space {..<n::nat}"
@@ -746,9 +752,6 @@ proof -
       using Least_eq_0 by presburger
   qed
 qed
-
-lemma funcset_compose': "f ` A = B \<Longrightarrow> g \<circ> f \<in> A \<rightarrow> C \<Longrightarrow> g \<in> B \<rightarrow> C"
-  by auto
 
 lemma (in vectorspace) nspace_iso:
   assumes fin_dim
