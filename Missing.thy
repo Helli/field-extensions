@@ -158,8 +158,7 @@ lemma (in linear_map) iso_preserves_dim:
   assumes "bij_betw T (carrier V) (carrier W)"
   assumes V.fin_dim
   shows "W.fin_dim" "V.dim = W.dim"
-  using assms apply (simp add: bij_betw_def rank_nullity_main(2))
-  using assms by (simp add: bij_betw_def dim_eq)
+  using assms by (simp_all add: bij_betw_def rank_nullity_main(2) dim_eq)
 
 lemma (in mod_hom) mod_hom_the_inv:
   assumes bij: "bij_betw f (carrier M) (carrier N)"
@@ -233,45 +232,51 @@ proof -
     unfolding direct_sum_def by (auto simp: inj1_def inj2_def)
       (meson assms vectorspace.span_closed vectorspace.span_zero)+
   moreover have "module.gen_set K (direct_sum V W) ?Bds"
-    apply auto using calculation(2) ds.span_closed apply blast
-  proof goal_cases
-    case (1 a b)
-    then have in_carrier: "a \<in> carrier V" "b \<in> carrier W"
-      by (simp_all add: direct_sum_def)
-    then obtain f A g B where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
-      and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
-      by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
-    have f: "f = f\<circ>fst \<circ> inj1 V W" and g: "g = g\<circ>snd \<circ> inj2 V W"
-      unfolding inj1_def inj2_def by fastforce+
-    note im_lincomb =
-      linear_map.lincomb_linear_image[OF lin1 inj1, where a="f\<circ>fst" and A=A]
-      linear_map.lincomb_linear_image[OF lin2 inj2, where a="g\<circ>snd" and A=B]
-    let ?A = "inj1 V W ` A" and ?B = "inj2 V W ` B"
-    have
-      "ds.lincomb (f\<circ>fst) ?A = inj1 V W (module.lincomb V (f\<circ>fst \<circ> inj1 V W) A)"
-      "ds.lincomb (g\<circ>snd) ?B = inj2 V W (module.lincomb W (g\<circ>snd \<circ> inj2 V W) B)"
-      apply (auto intro!: im_lincomb)
-      using Bv(2) lincomb1(3) apply blast
-      apply (simp add: ds.coeff_in_ring2 inj1_def lincomb1(4))
-      apply (simp add: lincomb1(2))
-      using Bw(2) lincomb2(3) apply blast
-      apply (simp add: ds.coeff_in_ring2 inj2_def lincomb2(4))
-      by (simp add: lincomb2(2))
-    moreover have "?A \<subseteq> ?Bv" "?B \<subseteq> ?Bw"
-      by (simp_all add: image_mono lincomb1(3) lincomb2(3))
-    moreover have "finite ?A" "finite ?B"
-      by (simp_all add: lincomb1(2) lincomb2(2))
-    moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" "g\<circ>snd \<in> ?B \<rightarrow> carrier K"
-      unfolding inj1_def inj2_def using lincomb1(4) lincomb2(4)by auto
-    ultimately have "inj1 V W a \<in> ds.span ?Bv" "inj2 V W b \<in> ds.span ?Bw"
-      by (auto simp flip: f g simp: ds.span_def lincomb1(1) lincomb2(1)) metis+
-    then have "inj1 V W a \<in> ds.span ?Bds" "inj2 V W b \<in> ds.span ?Bds"
-      by (meson contra_subsetD ds.span_is_monotone le_sup_iff order_refl)+
-    then have "inj1 V W a \<oplus>\<^bsub>direct_sum V W\<^esub> inj2 V W b \<in> ds.span ?Bds"
-      using ds.span_add1[OF \<open>?Bds \<subseteq> carrier (direct_sum V W)\<close>] by simp
-    then show ?case unfolding inj1_def inj2_def
-      unfolding direct_sum_def using assms(1,3)[unfolded vectorspace_def] in_carrier
-      by (simp add: module_def abelian_group_def abelian_monoid.l_zero abelian_monoid.r_zero)
+  proof
+    show "ds.span ?Bds \<subseteq> carrier (direct_sum V W)"
+      using calculation(2) by (simp add: ds.span_is_subset2)
+  next
+    {
+      fix a b
+      assume in_carrier: "a \<in> carrier V" "b \<in> carrier W"
+      then obtain f A g B
+        where lincomb1: "module.lincomb V f A = a" "finite A" "A\<subseteq>Bv" "f \<in> A\<rightarrow>carrier K"
+        and lincomb2: "module.lincomb W g B = b" "finite B" "B\<subseteq>Bw" "g \<in> B\<rightarrow>carrier K"
+        by (metis Bv Bw assms(1,3) module.finite_in_span subsetI vectorspace_def)
+      have f: "f = f\<circ>fst \<circ> inj1 V W" and g: "g = g\<circ>snd \<circ> inj2 V W"
+        unfolding inj1_def inj2_def by fastforce+
+      note im_lincomb =
+        linear_map.lincomb_linear_image[OF lin1 inj1, where a="f\<circ>fst" and A=A]
+        linear_map.lincomb_linear_image[OF lin2 inj2, where a="g\<circ>snd" and A=B]
+      let ?A = "inj1 V W ` A" and ?B = "inj2 V W ` B"
+      have
+        "ds.lincomb (f\<circ>fst) ?A = inj1 V W (module.lincomb V (f\<circ>fst \<circ> inj1 V W) A)"
+        "ds.lincomb (g\<circ>snd) ?B = inj2 V W (module.lincomb W (g\<circ>snd \<circ> inj2 V W) B)"
+        apply (auto intro!: im_lincomb)
+        using Bv(2) lincomb1(3) apply blast
+        apply (simp add: ds.coeff_in_ring2 inj1_def lincomb1(4))
+        apply (simp add: lincomb1(2))
+        using Bw(2) lincomb2(3) apply blast
+        apply (simp add: ds.coeff_in_ring2 inj2_def lincomb2(4))
+        by (simp add: lincomb2(2))
+      moreover have "?A \<subseteq> ?Bv" "?B \<subseteq> ?Bw"
+        by (simp_all add: image_mono lincomb1(3) lincomb2(3))
+      moreover have "finite ?A" "finite ?B"
+        by (simp_all add: lincomb1(2) lincomb2(2))
+      moreover have "f\<circ>fst \<in> ?A \<rightarrow> carrier K" "g\<circ>snd \<in> ?B \<rightarrow> carrier K"
+        unfolding inj1_def inj2_def using lincomb1(4) lincomb2(4)by auto
+      ultimately have "inj1 V W a \<in> ds.span ?Bv" "inj2 V W b \<in> ds.span ?Bw"
+        by (auto simp flip: f g simp: ds.span_def lincomb1(1) lincomb2(1)) metis+
+      then have "inj1 V W a \<in> ds.span ?Bds" "inj2 V W b \<in> ds.span ?Bds"
+        by (meson contra_subsetD ds.span_is_monotone le_sup_iff order_refl)+
+      then have "inj1 V W a \<oplus>\<^bsub>direct_sum V W\<^esub> inj2 V W b \<in> ds.span ?Bds"
+        using ds.span_add1[OF \<open>?Bds \<subseteq> carrier (direct_sum V W)\<close>] by simp
+      then have "(a, b) \<in> ds.span (inj1 V W ` Bv \<union> inj2 V W ` Bw)"
+        unfolding inj1_def inj2_def direct_sum_def using assms[unfolded vectorspace_def] in_carrier
+        by (simp add: module_def abelian_group_def abelian_monoid.l_zero abelian_monoid.r_zero)
+    }
+    then show "carrier (direct_sum V W) \<subseteq> ds.span ?Bds"
+      by (auto simp: direct_sum_def)
   qed
   ultimately show "ds.fin_dim" unfolding ds.fin_dim_def
     by meson
