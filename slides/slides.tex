@@ -1,0 +1,464 @@
+\documentclass[%handout,
+	sans,
+	12pt,
+	%slidescentered,% center text on slide
+	%draft,			% compile as draft version
+	%notes,			% include nodes in slides
+	%compress		% compress navigation bar
+]{beamer}
+
+\beamertemplatenavigationsymbolsempty
+
+\usetheme{default}
+\usecolortheme{orchid}
+\setbeamertemplate{frametitle}
+{
+    \vspace*{1.5em}\insertframetitle\vspace*{-1.5em}
+}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+
+\usepackage{mathpazo}
+\usepackage[british]{babel}
+\usepackage{csquotes}
+
+\newcommand{\high}[1]{{\usebeamercolor[fg]{structure} #1}}
+\newcommand{\bad}[1]{\textcolor{red}{#1}}
+\newcommand{\gray}[1]{\textcolor{darkgray}{#1}}
+\newcommand{\black}[1]{\textcolor{black}{#1}}
+
+\usepackage{amsmath,amssymb}
+\usepackage{upgreek}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{default}
+\usepackage{graphicx}
+\usepackage{colortbl}
+\usepackage{url}
+\usepackage{setspace}
+\usepackage{wrapfig}
+\usepackage{tabularx}
+\usepackage{xspace}
+\usepackage{mathpartir}
+
+\usepackage{tikz}
+\usetikzlibrary{trees, positioning}
+\usetikzlibrary{shapes.geometric}
+
+
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\renewcommand{\epsilon}{\varepsilon}
+\renewcommand{\phi}{\varphi}
+\def\braces#1{[#1]}
+\newcommand{\wrt}{w.\,r.\,t.\xspace}
+\newcommand{\eg}{e.\,g.\xspace}
+\newcommand{\ie}{i.\,e.\xspace}
+\DeclareMathOperator\caret{\char`\^}
+
+\newcommand{\hastype}{\,:\,}
+\newcommand{\cons}{::}
+\newcommand{\corrto}{\overset{\scriptscriptstyle\wedge}{=}}
+\newcommand{\listapp}{\mathbin{@}}
+\newcommand{\listnil}{[\hskip0.3mm]}
+\newcommand{\listnth}{\mathbin{!}}
+\newcommand{\expectation}{\text{\upshape E}}
+
+\usepackage{manfnt}
+\newenvironment{danger}{\medbreak\noindent\hangindent=2pc\hangafter=-2%
+  \clubpenalty=10000%
+  \hbox to0pt{\hskip-\hangindent\hskip0.25em\raisebox{-0.25em}[0pt][0pt]{\dbend}\hfill}\small\ignorespaces}%
+  {\medbreak\par}
+  %\raisebox{-1.05em}[0pt][0pt]{\Huge\hskip.15em \stixdanger}
+
+\newcommand{\etAl}{\textit{et al.}\xspace}
+
+%\definecolor{mybg}{rgb}{0.9,0.9,0.9}
+\definecolor{mybg}{rgb}{1,1,1}
+\setbeamercolor{background canvas}{bg=mybg}
+
+\title{Verified Analysis of\\ Random Binary Tree Structures \vspace*{-0.5em}}
+\author{\normalsize \underline{Manuel Eberl}, Max W.\ Haslbeck, Tobias Nipkow \vspace*{-0.3em}}
+\institute[]{\footnotesize Technische Universität München}
+\date{\footnotesize 6 June 2018}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=5cm]{isabelle.pdf}
+\end{center}
+\end{frame}
+
+
+\newcommand{\pivot}[1]{{\color{red}#1}}
+\newcommand{\ltpiv}[1]{{\color{blue}#1}}
+\newcommand{\gtpiv}[1]{{\color{olive}#1}}
+
+\begin{frame}{Contributions}
+\begin{itemize}
+\item Quicksort\pause
+\item Random Binary Search Trees\pause
+\item Treaps
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge\high{Discrete distributions in Isabelle/HOL}
+\end{center}
+\end{frame}
+
+\begin{frame}
+Probability distributions with countable support are modelled as \emph{probability mass function} [Hölzl 2011]:\pause
+\begin{itemize}
+\item Type $\alpha\ \textit{pmf}$ represents a probability distribution of values of type $\alpha$\pause
+\item Isomorphic to the set of functions $f : \alpha\to\mathbb{R}$ with $f(x) \geq 0$ and $\sum_{x :: \alpha} f(x) = 1$\pause
+\item Giry monad allows composing PMFs: $\textbf{do}\ \{x\leftarrow A;\ y \leftarrow B\ x;\ \textbf{return}\ (f\ x\ y)\}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge\high{Quicksort}
+\end{center}
+\end{frame}
+
+\begin{frame}
+Deterministic quicksort with first element as pivot:
+\[\text{qs} :: \alpha\ \text{list} \to \alpha\ \text{list}\pause \times \mathbb{N}\]\pause
+Quicksort with random pivot:
+\[\text{rqs} :: \alpha\ \text{list} \to (\alpha\ \text{list} \times \mathbb{N})\ \text{pmf}\]\pause
+Average-case of det.\ quicksort:
+\[\text{avqs}\ \textit{xs} = \textbf{do}\ \{\textit{xs'} \leftarrow \text{rperm}\ \textit{xs}\hskip0.2mm;\ \textbf{return}\ (\text{qs}\ \textit{xs'}\hskip0.2mm)\}\]\pause
+\vspace*{-1.5em}
+\begin{theorem}
+\upshape
+\begin{itemize}
+\item $\expectation[\text{snd}(\text{rqs}\ \text{xs})] = 2(n+1) H_n - 4n \sim 2 n \ln n$\pause
+\item $\text{avqs} = \text{rqs}$
+\end{itemize}
+\end{theorem}
+\end{frame}
+
+%\begin{frame}
+%General QuickSort to sort a list $\textit{xs}$:\pause
+%\begin{center}
+%\parbox{0cm}{\begin{tabbing}
+%$\text{qs}\ \textit{xs} = {}$\\\pause
+%\hskip5mm $\textbf{do}\ $\= $x \leftarrow \text{find\_pivot}\ \textit{xs}$\\\pause
+%\> $\textbf{let}\ \textit{xs'} = \text{delete}\ x\ \textit{xs}$\\\pause
+%\> $\textbf{let}\ (\textit{ls}, \textit{gs}) = \text{partition}\ (\uplambda y.\ y \leq x)\ \textit{xs'}$\\\pause
+%\> $\textbf{return}\ (\text{qs}\ \textit{ls} \listapp [x] \listapp \text{qs}\ \textit{gs})$
+%\end{tabbing}}
+%\end{center}
+%\end{frame}
+
+%\begin{frame}{Randomised QuickSort}
+%\begin{center}
+%\parbox{0cm}{\begin{tabbing}
+%$\text{rqs} :: \alpha\ \text{list} \to \alpha\ \text{list}\ \text{pmf} \times \mathbb{N}$\\\pause
+%$\text{rqs}\ \textit{xs} = {}$\\\pause
+%\hskip5mm $\textbf{do}\ $\= $i \leftarrow \text{uniform}\ \{0..|\textit{xs}|-1\}$\\\pause
+%\> $\textbf{let}\ \textit{x} = \textit{xs} \listnth i$\\\pause
+%\> $\textbf{let}\ \textit{xs'} = \text{delete\_index}\ i\ \textit{xs}$\\\pause
+%\> $\textbf{let}\ (\textit{ls}, \textit{gs}) = \text{partition}\ (\uplambda y.\ y \leq x)\ \textit{xs'}$\\\pause
+%\> $(\textit{ls'}, n_1) \leftarrow \text{rqs}\ \text{ls}$\\\pause
+%\> $(\textit{gs'}, n_2) \leftarrow \text{rqs}\ \text{gs}$\\\pause
+%\> $\textbf{return}\ (\textit{ls'} \listapp [x] \listapp \textit{gs'}, |xs| - 1 + n_1 + n_2)$\pause
+%\end{tabbing}}
+%\end{center}
+%\end{frame}
+
+%\begin{frame}{Deterministic QuickSort}
+%Deterministic QuickSort $\text{qs}$ simply chooses some fixed list element as a pivot, \eg the first one.\pause
+%\begin{theorem}[Average case of deterministic QuickSort]
+%\vspace*{-1em}\upshape
+%\[\textbf{do}\ \{\textit{ys} \leftarrow \text{rperm}\ \textit{xs}; \text{qs}\ \textit{ys}\} = \text{rqs}\ \textit{xs}\]
+%Average-case behaviour of $\text{qs}$ is exactly the behaviour of $\text{rqs}$.
+%\end{theorem}\pause
+%
+%Key steps:
+%\begingroup
+%\small
+%\begin{tabular}{cc}
+%\begin{minipage}{0.35\textwidth}
+%\begin{tabbing}
+%$\text{rperm}\ A = {}$\\
+%\hskip5mm $\textbf{do}$\ \= $x \leftarrow \text{uniform}\ A$\\
+%\> $\textit{xs} \leftarrow \text{rperm}\ (A\setminus\{x\})$\\
+%\> $\textbf{return}\ ([x] \listapp \textit{xs})$
+%\end{tabbing}
+%\end{minipage}\pause
+%&
+%\begin{minipage}{0.35\textwidth}
+%\begin{tabbing}
+%$\textbf{do}$\ \=$\textit{xs} \leftarrow \textit{rperm}\ A$\\
+%\> $\textbf{return}\ (\text{partition}\ P\ \textit{xs})\} = {}$\\[1mm]
+%$\textbf{do}$\ \>$\text{ys} \leftarrow \text{rperm}\ \{x\in A\mid P\ x\}$\\
+%\> $\text{zs} \leftarrow \text{rperm}\ \{x\in A\mid \neg P\ x\}$\\
+%\> $\textbf{return}\ (\textit{ys}, \textit{zs})$
+%\end{tabbing}
+%\end{minipage}
+%\end{tabular}
+%\endgroup
+%\end{frame}
+
+%\begin{frame}{QuickSort cost}
+%The cost of $\text{rqs}$ fulfils the following recurrence:\pause
+%\vspace*{-1.6em}
+%\begin{center}
+%\parbox{0cm}{\begin{tabbing}
+%$\text{rqs\_cost} :: \mathbb{N} \to \mathbb{N}\ \text{pmf}$\\\pause
+%$\text{rqs\_cost}\ n = {}$\\\pause
+%\hskip5mm $\textbf{do}\ $\= $i \leftarrow \text{uniform}\ \{0..n - 1\}$\\\pause
+%\> $a \leftarrow \text{rqs\_cost}\ i$\\\pause
+%\> $b \leftarrow \text{rqs\_cost}\ (n - i - 1)$\\\pause
+%\> $\textbf{return}\ (n - 1 + a + b)$\pause
+%\end{tabbing}}
+%\end{center}\vspace*{-1.6em}
+%\[E(\text{rqs\_cost}\ n) = n - 1 + \frac{2}{n - 1} \sum_{i=0}^{n-1} E(\text{rqs\_cost}\ i)\]\pause
+%\[E(\text{rqs\_cost}\ n) = 2(n+1) H_n - 4n \sim 2 n \log n\]
+%\end{frame}
+
+
+%\begin{frame}
+%\begin{center}
+%\begin{tikzpicture}[sibling distance=5mm, level distance=15mm, every node/.style = {shape=rectangle, draw, align=center, inner sep=1.5mm}]
+%\node[draw=none]{\Tree [.\node{$[\pivot 4,\gtpiv 9,\ltpiv 2,\gtpiv 8,\gtpiv 5,\ltpiv 3,\ltpiv 1,\gtpiv 6]$}; [.\node{$[\pivot 2,\gtpiv 3,\ltpiv 1]$}; [.\node{$[\pivot 2]$}; ] [.\node{$[\pivot 1]$}; ] ]   
+%[.\node{$[\pivot 9,\ltpiv 8,\ltpiv 5,\ltpiv 6]$}; [.\node{$[\pivot 8,\ltpiv 5,\ltpiv 6]$}; [.\node{$[\pivot 5, \gtpiv 6]$}; [.\node{$[]$}; ] [.\node{$[\pivot 6]$}; ] ] ] [.\node{$[]$}; ] ]  ]};
+%\end{tikzpicture}
+%\end{center}
+%\end{frame}
+
+
+\begin{frame}
+\begin{center}
+\huge\high{Random Binary Search Trees}
+\end{center}
+\end{frame}
+
+\begin{frame}
+What happens when we insert distinct elements $x_1, \ldots, x_n$ into an empty BST?\\[2em]
+\begin{center}
+\begin{tikzpicture}[level distance = 1cm, sibling distance=2.5cm]
+\action<1>{
+\node[shape=circle,draw] {$x_1$};}
+\action<2>{
+\node[shape=circle,draw] {$x_1$}
+  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${<}x_1$} [child anchor=north]}
+  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_1$} [child anchor=north]};}
+%\action<3->{
+%\node[shape=circle,draw] {$x_1$}
+%  child {node[shape=circle,draw]{$x_2$}
+%         [child anchor=border]
+%         child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${<}x_2$} [child anchor=north]}
+%         child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_2$} [child anchor=north]}}
+%  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_1$} [child anchor=north]};}
+\end{tikzpicture}\hspace*{2em}
+\end{center}
+\end{frame}
+
+\begin{frame}
+$\small\text{mk\_bst}\ \listnil = \hskip2.64cm \bullet$\\[1em]\pause
+$\small\text{mk\_bst}\ ([x] \listapp \text{xs}) =$\\
+{
+\vskip-1.5em\hskip3em
+\begin{tikzpicture}[level distance = 1.2cm, sibling distance=4cm]
+\small
+\node[shape=circle,draw] {$x$}
+  child {node[shape=rectangle,draw]{$\text{mk\_bst}\ [xs\mid y < x]$}}
+  child {node[shape=rectangle,draw]{$\text{mk\_bst}\ [xs\mid y > x]$}};
+\end{tikzpicture}
+}\pause\\[0.5em]
+Let us now add elements from a set $A$ in random order:
+\vspace*{-0.5em}
+\[\text{rbst}\ A := \textbf{do}\ \{\textit{xs} \leftarrow \text{rperm}\ A;\ \textbf{return}\ (\text{mk\_bst}\ \textit{xs})\}\]\pause
+\vspace*{-1.5em}
+\begin{lemma}
+\upshape
+\vspace*{-1em}
+\begin{tabbing}
+\hskip2em $\text{rbst}\ A = \textbf{do}\ $\= $x \leftarrow \text{uniform}\ A$\hspace*{5.1cm}\\
+\> $l \leftarrow \text{rbst}\ \{y\in A\mid y < x\}$\\
+\> $r \leftarrow \text{rbst}\ \{y\in A\mid y > x\}$\\[1mm]
+\> $\textbf{return}$\ \bigg(\resizebox{1.7cm}{!}{\raisebox{-5mm}{\begin{tikzpicture}[level distance=7mm, sibling distance=12mm]\small\node[shape=circle,draw] {$x$} 
+child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1mm}{$l$}}} child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1mm}{$r$}}};\end{tikzpicture}}}\bigg)
+\end{tabbing}
+\vspace*{-1em}
+\end{lemma}
+\end{frame}
+
+\begin{frame}
+\high{Internal Path Length:}\\ Sum of length of all paths from root to a node\\\pause
+$\Longrightarrow$ Average access time${} = \frac{1}{n} \text{IPL}$\pause\\[1em]
+
+What is the IPL for a random BST?\pause\\
+Exactly the same recurrence as for cost of \textit{rqs}, thus:
+\[\textbf{do}\ \{t \leftarrow \text{rbst}\ A;\ \textbf{return}\ (\text{ipl}\ t)\} = \text{rqs\_cost}\ |A|\]\pause
+$\Longrightarrow$ Hence average access time is\,${}\sim 2 \ln n$.
+\end{frame}
+
+\begin{frame}
+The height is somewhat more difficult: [CLRS]\pause
+\[\text{eheight\_rbst}\ A := \textbf{do}\ \{t \leftarrow \text{rbst}\ A; \textbf{return}\ 2^{\text{height}\ t - 1}\}\]\pause
+\vspace*{-1.5em}
+\begin{theorem}\upshape
+\vspace*{-0.4em}
+\begin{itemize}
+\item 
+\begin{tabbing}
+$\text{eheight\_rbst}\ A = \textbf{do}\ $\= $x \leftarrow \text{uniform}\ A$\\
+\> $l \leftarrow \text{eheight\_rbst}\ \{y\in A\mid y < x\}$\\
+\> $r \leftarrow \text{eheight\_rbst}\ \{y\in A\mid y > x\}$\\
+\> $\textbf{return}\ (2 \cdot \text{max}\ l\ r)$
+\end{tabbing}
+\pause
+\item
+$\expectation[\text{eheight\_rbst}(n)] \leq \frac{4}{n}\cdot \sum_{i=0}^{n-1} \expectation[\text{eheight\_rbst}(i)]$\pause\\[3mm]
+\item
+$\expectation[\text{eheight\_rbst}(n)] \leq \frac{1}{4} {{n + 3} \choose 3}$\\[2mm]\pause% = \frac{1}{24}(n+1)(n+2)(n+3)$\\[2mm]
+\item
+$\expectation[\text{height}(\text{rbst}(n))] \leq \log_2 {{n + 3} \choose 3} - 1\pause \sim 3 \log_2 n$\pause
+\end{itemize}
+\end{theorem}
+The actual behaviour is $\approx 2.988 \log_2 n$ [Reed 2003].
+\end{frame}
+
+%\begin{frame}
+%\[\expectation[\text{eheight\_rbst}(n)] \leq \frac{1}{4} {{n + 3} \choose 3}\]\pause
+%By Jensen's inequality:
+%\[\expectation[\text{height}(\text{rbst}(n))] \leq \log_2 {{n + 3} \choose 3} - 1\pause \sim 3 \log_2 n\]\pause
+%This is a relatively good bound:\\ The real coefficient is $\approx 2.988$ [Reed 2003].
+%\end{frame}
+
+\begin{frame}
+\begin{center}
+\huge\high{Treaps}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\high{Random BSTs have nice logarithmic height/IPL}\\[1em]\pause
+\bad{But BSTs can degenerate if inputs are \emph{not} in random order}\\[1em]\pause
+\high{A Nice Solution:}\ Treaps\ [Aragon \& Seidel 1989]
+\end{center}
+\end{frame}
+
+\begin{frame}
+A \emph{treap} is a binary tree where every node stores a \emph{key} and a \emph{priority}. It is a BST \wrt the keys and a heap \wrt the priorities.\pause
+\begin{itemize}
+\item The root of any subtree has lowest priority\pause
+\item Elements in a left subtree have a smaller key than the root\pause
+\item Elements in a right subtree have a greater key than the root\pause
+\end{itemize}
+\high{If priorities are distinct, the shape of a treap is thus uniquely defined by its entries.}\\[1em]
+\end{frame}
+
+\begin{frame}
+\high{If priorities are distinct, the shape of a treap is thus uniquely defined by its entries.}\pause\\[1em]
+\begin{tabbing}
+$\Longrightarrow$\ \= Insert list of elements into a treap in \emph{any} order ${\simeq}$\\
+\> Insert elements into a BST by increasing priority
+\end{tabbing}\pause
+\high{Idea:} Choose priority randomly from $[0;1] \subseteq \mathbb{R}$ upon insertion\\\pause
+$\Longrightarrow$\ Treap behaves like a random BST\\\pause
+\begin{center}
+\high{Randomised Treap}
+\end{center}
+\end{frame}
+
+\begin{frame}{Definition of some operations on treaps}
+\begin{tabbing}
+$\text{ins} :: (\alpha \times \mathbb{R}) \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[4mm]\pause
+$\text{rins} :: \alpha \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[0.5mm]
+$\text{rins}\ x\ t = \textbf{do}\ \{p \leftarrow \mathcal U;\ \textbf{return}\ (\text{ins}\ (x, p)\ t)\}$\\[4mm]\pause
+$\text{rinss} :: \alpha\ \text{list} \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[0.5mm]
+$\text{rinss}\ \listnil\ t = \textbf{return}\ t$\\
+$\text{rinss}\ ([x]\listapp \textit{xs})\ t = \textbf{do}\ \{t' \leftarrow \text{rins}\ x\ t;\ \text{rinss}\ \textit{xs}\ t'\}$
+\end{tabbing}
+\end{frame}
+
+\begin{frame}{Proof of the main result on treaps:}
+\begin{center}
+\parbox{0cm}{
+\small
+\begin{tabbing}
+$\text{rinss}\ \textit{xs} $\=${}= \textbf{do}\ \{p \leftarrow \mathcal U^{\textit{xs}}; \textbf{return}\ \text{treap\_of}\ [(x, p(x))\mid x\leftarrow \textit{xs}]\}$\\[2mm]\pause
+\>${}\hskip-1.8mm\stackrel{\text{\tiny project}}\simeq \hskip-1.8mm\textbf{do}\ \{p \leftarrow \mathcal U^{\textit{xs}}; \textbf{return}\ \text{mk\_bst}\ (\text{sort\_key}\ p\ \textit{xs})\}$\\[2mm]\pause
+\>${}= \textbf{do}\ \{$\=$R \leftarrow \text{rel\_from\_prios}\ \mathcal U^{\textit{xs}};$\\\>\> $\textbf{return}\ \text{mk\_bst}\ (\text{sort\_rel}\ R\ \textit{xs})\}$\\[2mm]\pause
+\>${}= \textbf{do}\ \{$\=$R \leftarrow \text{uniform}\ (\text{linorder\_on}\ R);$\\\>\> $\textbf{return}\ \text{mk\_bst}\ (\text{sort\_rel}\ R\ \textit{xs})\}$\\[2mm]\pause
+\>${}= \textbf{do}\ \{$\=$\textit{xs'} \leftarrow \text{rperm}\ \textit{xs};\ \textbf{return}\ \text{mk\_bst}\ \textit{xs'}\}$\\[2mm]\pause
+\>${}= \text{random\_bst}\ \textit{xs}$
+\end{tabbing}}\\[-2em]\pause
+\mbox{}\hspace*{\fill}$\square$\hspace*{1em}
+\end{center}
+\end{frame}
+
+\begin{frame}{Measures}
+\bad{Problem:} Random treaps are a \emph{continuous} distribution\\ $\Longrightarrow$ cannot use PMFs\\[1em]\pause
+
+Instead we have to use general measures $(\Omega, \Sigma, \mu)$\\[1em]\pause
+
+\bad{But what does a suitable $\Sigma$-algebra for trees look like?}\pause
+\begin{itemize}
+\item Functor $\mathcal T$ that maps a $\Sigma$-algebra over a set $A$ to a $\Sigma$-algebra of trees with elements from $A$\pause
+\item The \enquote{Node} constructor is a measurable function from $\mathcal T(M)\otimes M\otimes \mathcal T(M)$ to $\mathcal T(M)$\pause
+\item Other tree operations (projections, primitive recursion) are similarly measurable
+\end{itemize}
+\end{frame}
+
+\tikzstyle{bag} = [align=center]
+\begin{frame}
+\begin{center}
+\begin{tikzpicture}[level distance = 2cm, sibling distance=5cm]
+\node[shape=rectangle,draw,align=center] {Randomised Quicksort\\ 700 LOC}
+  child { node[shape=rectangle,draw,align=center] {Average-case det.\ Quicksort\\ 200 LOC} }
+  child { node[shape=rectangle,draw,align=center] {Random BSTs\\ 800 LOC} 
+    child { node[shape=rectangle,draw,align=center] {Randomised Treaps\\ 1900 LOC} }
+  };
+\end{tikzpicture}\hspace*{2em}
+\end{center}
+\end{frame}
+
+\begin{frame}{Bonus: Executability}
+\small
+\textbf{value}\ random\_bst\ $\{1, 2, 3 :: \text{int}\}$\pause\\[-1em]
+\hskip1em \parbox{0cm}{
+\begin{tabbing}
+pmf\_of\_alist\\
+\hskip5mm $[$\=$(\langle\langle\langle\langle\rangle, 1, \langle\rangle\rangle, 2, \langle\rangle\rangle, 3, \langle\rangle\rangle, 1 / 6),$\\
+   \>$(\langle\langle\langle\rangle, 1, \langle\langle\rangle, 2, \langle\rangle\rangle\rangle, 3, \langle\rangle\rangle, 1 / 6),$\\
+   \>$(\langle\langle\rangle, 1, \langle\langle\langle\rangle, 2, \langle\rangle\rangle, 3, \langle\rangle\rangle\rangle, 1 / 6),$\\
+   \>$(\langle\langle\langle\rangle, 1, \langle\rangle\rangle, 2, \langle\langle\rangle, 3, \langle\rangle\rangle\rangle, 1 / 3),$\\
+   \>$(\langle\langle\rangle, 1, \langle\langle\rangle, 2, \langle\langle\rangle, 3, \langle\rangle\rangle\rangle\rangle, 1 / 6)]$\\
+   \>\hskip5mm int\ tree\ pmf
+\end{tabbing}}
+\pause\\
+\textbf{value}\ measure\_pmf.expectation\ $($random\_bst\ $\{1..6::\text{int}\})$\ height\pause\\[2mm]
+\hskip1.2em 65 / 15 :: real
+\end{frame}
+
+\begin{frame}{Conclusion}
+\begin{itemize}
+\item Formalisation of textbook randomised algorithms/data structures is feasible with Isabelle\pause
+\item PMF proofs are nice, high-level, and readable\pause
+\item Measure proofs can get ugly due to measurability issues\pause
+\end{itemize}
+Interesting related topics:\pause
+\begin{itemize}
+\item Tail bounds [Tassarotti \& Harper 2018]\pause
+\item Treaps can also use discrete distributions\pause
+\item Randomised BSTs [Martinez \& Roura 1997]\pause
+\item Skip Lists (already done, [Haslbeck \& E.\ 2018])
+\end{itemize}
+\end{frame}
+
+
+\end{document}
