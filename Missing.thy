@@ -59,7 +59,6 @@ subsection \<open>Finite Products / Finite Sums\<close>
 lemma (in monoid) finprod_eqI[intro]: "(\<And>i. f i = g i) \<Longrightarrow> (\<Otimes>i\<in>A. f i) = (\<Otimes>i\<in>A. g i)"
   by presburger
 lemmas (in abelian_monoid) finsum_eqI[intro] = add.finprod_eqI[folded finsum_def]
-\<comment> \<open>to-do: wrong subsection.\<close>
 
 lemma (in comm_monoid) finprod_singleton': \<comment> \<open>a variation of @{thm finprod_singleton}\<close>
   assumes i_in_A: "i \<in> A" and fin_A: "finite A" and x_in_G: "x \<in> carrier G"
@@ -89,10 +88,11 @@ subsection \<open>Vector Spaces\<close>
 
 subsubsection \<open>Subspaces\<close>
 
-text\<open>The next two lemmas formalise
+text \<open>The next two lemmas formalise
   \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LA_info_no_dates.pdf#chapter.5\<close>\<close>
 
-lemma (in vectorspace) corollary_5_14:
+text \<open>corollary 5.14\<close>
+lemma (in vectorspace) lin_indpt_extends_to_basis:
   assumes fin_dim
   assumes "S \<subseteq> carrier V" and "lin_indpt S"
   shows "\<exists>B. S \<subseteq> B \<and> basis B"
@@ -106,7 +106,8 @@ proof -
     by (smt dual_order.trans max_li_is_basis maximal_def)
 qed
 
-lemma (in subspace) corollary_5_16:
+text \<open>corollary 5.16\<close>
+lemma (in subspace) subspace_dim:
   assumes "vectorspace.fin_dim K V"
   shows "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
     and "vectorspace.dim K (V\<lparr>carrier := W\<rparr>) \<le> vectorspace.dim K V"
@@ -352,7 +353,7 @@ proof -
     by (simp add: subspace_axioms vectorspace.subspace_is_vs vs)
   assume "vectorspace.fin_dim K V" "vectorspace.dim K (V\<lparr>carrier:=W\<rparr>) = 0"
   with vs have "vectorspace.basis K (V\<lparr>carrier:=W\<rparr>) {}"
-    by (simp add: corollary_5_16(1) module.finite_lin_indpt2 vectorspace.dim_li_is_basis vectorspace_def)
+    by (simp add: subspace_dim(1) module.finite_lin_indpt2 vectorspace.dim_li_is_basis vectorspace_def)
   then show ?thesis
     using vectorspace.basis_def vectorspace.span_empty vs by fastforce
 qed
@@ -590,7 +591,7 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
   also have "\<dots> = vectorspace.dim K (linmap.W.vs linmap.im)"
     using assms(1) linmap.emb_image_dim goal_2a by blast
   finally have "carrier (direct_sum (vs_of K) ?V) = linmap.imT"
-    using subspace.corollary_5_16(3)[OF linmap.imT_is_subspace] \<open>vs_span_B.fin_dim\<close>
+    using subspace.subspace_dim(3)[OF linmap.imT_is_subspace] \<open>vs_span_B.fin_dim\<close>
       direct_sum_dim(1) self_vs.vectorspace_axioms self_vs_fin_dim vs_span_B.vectorspace_axioms by auto
   note goal_2b = this[unfolded linmap.im_def direct_sum_def, simplified]
   from goal_1 goal_2a goal_2b goal_3 goal_4 show ?thesis
