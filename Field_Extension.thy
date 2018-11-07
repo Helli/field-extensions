@@ -348,7 +348,7 @@ proof -
        apply (simp add: assms(2) subfieldE(3)) \<comment> \<open>to-do: use more \<^theory_text>\<open>interpret\<close>\<close>
       using assms cring.axioms(1) domain_def field_def field_extension.intro field_extension.vectorspace ring.subfield_iff(2) vectorspace.axioms(1) by fastforce
     with L_over_K_infinite have "\<not>M_over_K.fin_dim"
-      using subspace.corollary_5_16(1)[OF subspace]
+      using subspace.subspace_dim(1)[OF subspace]
       using M_over_K.fin_dim_def assms cring.axioms(1) domain_def field_def
         field_extension.finite_def field_extension.intro ring.subfield_iff(2) by fastforce
     then show ?thesis
@@ -412,7 +412,7 @@ proof -
            apply auto
         using Suc.hyps(2) hM'(4) apply simp
         using Suc.prems(1) hM'(3) partial_object.update_convs(1) vectorspace.subspace_is_vs apply fastforce
-        using Suc.prems(2) hM'(3) subspace.corollary_5_16(1) apply force
+        using Suc.prems(2) hM'(3) subspace.subspace_dim(1) apply force
         using hM'(3) assms(1) subfield.vectorspace_wrt_subfield[OF assms(1)] Suc(3)
         by (smt partial_object.surjective partial_object.update_convs(1) vectorspace.subspace_is_vs)
       from hM'(1) have lin_K_map: "linear_map ?K (vs_of M\<lparr>carrier:=cM\<rparr>) (direct_sum (vs_of ?L) ?M') h"
@@ -428,7 +428,7 @@ proof -
       qed
       then have goal1: "vectorspace.fin_dim ?K (vs_of M\<lparr>carrier:=cM\<rparr>)"
         using linear_map.iso_imports_dim(1)[OF lin_K_map] by (simp add: direct_sum_def hM'(2))
-      with linear_map.iso_imports_dim[OF lin_K_map] subspace.corollary_5_16(1) hM'(2) have
+      with linear_map.iso_imports_dim[OF lin_K_map] subspace.subspace_dim(1) hM'(2) have
         "vectorspace.dim ?K (vs_of M\<lparr>carrier := cM\<rparr>) = vectorspace.dim ?K (direct_sum (vs_of ?L) ?M')"
       proof -
         have "\<forall>A m p. carrier (p::\<lparr>carrier :: 'a set, monoid.mult :: _ \<Rightarrow> _ \<Rightarrow> _, one :: _, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: 'a \<Rightarrow> _ \<Rightarrow> _\<rparr>) \<times> A = carrier (direct_sum p \<lparr>carrier = A, \<dots> = m::\<lparr>monoid.mult :: 'a \<Rightarrow> 'a \<Rightarrow> 'a, one :: 'a, zero :: _, add :: _ \<Rightarrow> _ \<Rightarrow> _, smult :: _ \<Rightarrow> _ \<Rightarrow> _\<rparr>\<rparr>)"
