@@ -1,10 +1,22 @@
-﻿move the subgoals as lemmas into a context 'assumes "basis B"'
+tex editors:
+
+texmaker: seems ok, there is a quickbuild (F1) *
+texstudio:
+texworks:
+
+*uses odd tar.gz
+
+jump to/from document position?
+
+-------
+
+move the subgoals as lemmas into a context 'assumes "basis B"'
 
 koordinatenfunktional ~> projection
 
 improve line 957
 
------
+-------
 Presentation:
 
 What did I do?
