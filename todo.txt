@@ -1,12 +1,10 @@
 tex editors:
 
 texmaker: seems ok, there is a quickbuild (F1) *
-texstudio:
-texworks:
+texstudio: same (F5) *
+texworks: same (C+T), but odd defaults (no syntax highlighting) in rechnerhalle
 
 *uses odd tar.gz
-
-jump to/from document position?
 
 -------
 
