@@ -430,9 +430,9 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
     by fastforce
   let ?B = "B - {b}"
   have liB: "lin_indpt ?B" and BiV: "?B \<subseteq> carrier V" "finite ?B"
-    apply (meson B(1) Diff_subset basis_def supset_ld_is_ld)
-    using B(1) basis_def apply blast using B
-    using card_infinite neq0_conv by blast
+      apply (meson B(1) Diff_subset subset_li_is_li basis_def)
+    using B(1) basis_def apply blast
+    using B(2) card_infinite neq0_conv by blast
   let ?V = "vs (span ?B)"
   note goal_3 = span_is_subspace[OF BiV(1)]
   then interpret vs_span_B: vectorspace K ?V
@@ -550,7 +550,7 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
       then have f6: "\<forall>C Ca f fa. (C \<noteq> Ca \<or> \<not> C \<subseteq> carrier V \<or> cc fa f C \<in> C \<and> f (cc fa f C) \<noteq> fa (cc fa f C) \<or> fa \<notin> Ca \<rightarrow> carrier K) \<or> lincomb f C = lincomb fa Ca"
         using f5 by presburger
       have f7: "B - {b} \<subseteq> carrier V"
-        by (metis (no_types) B(1) Diff_subset rev_subsetD subsetI vectorspace.basis_def vectorspace_axioms)
+        by (simp add: BiV(1))
       have f8: "insert b (B - {b}) = B"
         using \<open>b \<in> B\<close> by blast
       have "\<forall>f c C fa. (f \<in> Pi (insert (c::'c) C) fa) = (f \<in> Pi C fa \<and> (f c::'a) \<in> fa c)"
@@ -568,17 +568,17 @@ proof - \<comment> \<open>Possibly easier if the map definition were swapped as 
     fix v
     assume "v \<in> carrier V"
     let ?c = "coeffs v"
-    have a: "?c \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb ?c B"
+    have c: "?c \<in> B \<rightarrow>\<^sub>E carrier K" "v = lincomb ?c B"
       using okese by (simp add: \<open>v \<in> carrier V\<close>)+
-    have c0s: "v = \<zero>\<^bsub>V\<^esub> \<Longrightarrow> coeffs v \<in> B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
-      by (metis (no_types, lifting) B(1) B(2) Diff_cancel Diff_eq_empty_iff PiE_mem Pi_I a(1) a(2) basis_def card_ge_0_finite not_lindepD)
+    then have c0s: "v = \<zero>\<^bsub>V\<^esub> \<Longrightarrow> coeffs v \<in> B \<rightarrow> {\<zero>\<^bsub>K\<^esub>}"
+      by (metis B(1) Diff_cancel Diff_eq_empty_iff PiE_restrict assms(1) li_le_dim(1) not_lindepD restrict_PiE basis_def)
     have "lincomb (\<lambda>bv. if bv = b then \<zero>\<^bsub>K\<^esub> else ?c bv) ?B = \<zero>\<^bsub>V\<^esub> \<longleftrightarrow> ?c \<in> ?B\<rightarrow>{\<zero>\<^bsub>K\<^esub>}"
       apply standard
       using not_lindepD
-       apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I a(1) liB lin_dep_crit singletonI)
+       apply (smt BiV(2) Diff_cancel Diff_eq_empty_iff Diff_iff PiE_mem Pi_I c(1) liB lin_dep_crit singletonI)
       by (smt BiV(1) Diff_not_in Pi_cong lincomb_zero)
     then have "?T v = \<zero>\<^bsub>direct_sum (vs_of K) (vs (span ?B))\<^esub> \<longrightarrow> v = \<zero>\<^bsub>V\<^esub>"
-      unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> a(2) insertCI
+      unfolding direct_sum_def by auto (smt B(1) Pi_split_insert_domain \<open>b \<in> B\<close> c(2) insertCI
           insert_Diff lincomb_zero vectorspace.basis_def vectorspace_axioms)
   }
   then have "linmap.kerT = {\<zero>\<^bsub>V\<^esub>}"

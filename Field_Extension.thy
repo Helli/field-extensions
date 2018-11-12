@@ -117,8 +117,7 @@ proof -
     have "\<forall>a aa ab. ((a \<otimes> ab \<otimes> aa = ab \<otimes> (a \<otimes> aa) \<or> aa \<notin> carrier R) \<or> a \<notin> carrier R) \<or> ab \<notin> carrier R"
       using m_assoc m_comm by force
     then have "(a \<otimes> (b \<otimes> inv a \<otimes> inv b) = \<one> \<and> b \<otimes> inv a \<in> carrier R) \<and> inv b \<in> carrier R"
-      by (metis (no_types) Diff_iff Units_inv_closed Units_one_closed Units_r_inv assms empty_iff
-          insert_iff inv_one field_Units m_assoc m_closed)
+      by (metis assms comm_inv_char m_closed nonzero_has_inv r_one)
     then show ?thesis
       by (metis (no_types) assms(1) m_assoc m_comm)
   qed
@@ -619,7 +618,7 @@ proof
   then have "\<one>\<^bsub>L\<^esub> = inv_c \<otimes>\<^bsub>L\<^esub> lcoeff p"
     using lcoeff_monom' inv_c unfolding inv_c'_def by force
   then have "inv_c = inv\<^bsub>L\<^esub> lcoeff p"
-    by (metis DiffD1 L.inv_char inv_c mem_carrier p(2) sub_m_comm)
+    by (simp add: L.inv_unique' inv_c p(1) sub_m_comm)
   then have "q = ?p"
     unfolding inv_c' inv_c'_def using monom_mult_is_smult
     using inv_c p(1) by blast
@@ -730,7 +729,7 @@ lemma irr_unique:
 proof -
   have irr_is_unique_gen: "p = irr" if "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval" for p
     using that PIdl_irr_a_kernel_Eval associated_iff_same_ideal ex1_monic_associated
-    by (metis UP_zero_closed insert_Diff insert_iff irr_in_P monic_irr)
+    by (metis UP_zero_closed insertE insert_Diff irr_in_P monic_irr)
   from assms have degree_g_le: "degree g \<le> degree irr"
     by (simp add: Eval_irr irr_in_P is_arg_min_linorder monic_irr)
   from assms have g: "g \<in> carrier P" "monic g" "Eval g = \<zero>\<^bsub>L\<^esub>"
