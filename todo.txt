@@ -1,1 +1,26 @@
+tex editors:
+
+texmaker: seems ok, there is a quickbuild (F1) *
+texstudio: same (F5) *
+texworks: same (C+T), but odd defaults (no syntax highlighting) in rechnerhalle
+
+*uses odd tar.gz
+
+-------
+
 move the subgoals as lemmas into a context 'assumes "basis B"'
+
+koordinatenfunktional ~> projection
+
+improve line 957
+
+-------
+Presentation:
+
+What did I do?
+
+What are the results?
+
+**What does it look like in HOL-Algebra?**
+
+Problems?
