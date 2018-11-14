@@ -88,10 +88,6 @@ subsection \<open>Vector Spaces\<close>
 
 subsubsection \<open>Subspaces\<close>
 
-text \<open>The next two lemmas formalise
-  \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LA_info_no_dates.pdf#chapter.5\<close>\<close>
-
-text \<open>corollary 5.14\<close>
 lemma (in vectorspace) lin_indpt_extends_to_basis:
   assumes fin_dim
   assumes "S \<subseteq> carrier V" and "lin_indpt S"
@@ -106,7 +102,8 @@ proof -
     by (smt dual_order.trans max_li_is_basis maximal_def)
 qed
 
-text \<open>corollary 5.16\<close>
+text \<open>Corollary 10.16 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf#section.0.10\<close>.\<close>
+
 lemma (in subspace) subspace_dim:
   assumes "vectorspace.fin_dim K V"
   shows "vectorspace.fin_dim K (V\<lparr>carrier := W\<rparr>)"
