@@ -412,7 +412,8 @@ qed
 
 subsubsection \<open>Finite-Dimensional Vector Spaces\<close>
 
-text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf#section.0.11\<close>\<close>
+text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf#section.0.11\<close>.
+  See further below for a variant which uses \<open>K^n\<close>.\<close>
 lemma (in vectorspace) decompose_step:
   assumes fin_dim
   assumes "dim > 0"
