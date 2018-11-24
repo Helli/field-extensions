@@ -145,8 +145,9 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \begin{itemize}
 	\item The degree is a vectorspace dimension.\pause%these *can* be zero (iff zvs)
 	\item However, it is always $\ge 1$.\pause
-	\item Thus one can use this encoding: %It could be adapted easily to use extended natural numbers
-	%to-do: paint definition of degree here
+	\item Thus, this encoding removes no information:\\%It could be adapted easily to use extended natural numbers
+	\textbf{definition} \textit{degree} \textbf{where}\\
+	\hskip1em\textit{degree = (if finite then vs.dim else 0)}
 \end{itemize}
 \end{frame}
 
