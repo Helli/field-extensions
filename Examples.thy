@@ -97,9 +97,8 @@ proof -
   define P where "P = UP (standard_ring \<real> :: complex ring)"
   interpret UP_field_extension complex_field \<real> P \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
-       apply (simp add: examples(4) field_extension_def subfield_Rats_complex_field)
-      apply (simp_all add: complex_field_def P_def)
-    done
+    by (simp add: examples(4) field_extension_def subfield_Rats_complex_field)
+      (simp_all add: complex_field_def P_def)
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
     case (1 x)
