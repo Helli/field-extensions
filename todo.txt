@@ -17,8 +17,6 @@ improve line 957
 -------
 Presentation:
 
-What did I do?
-
 What are the results?
 
 **What does it look like in HOL-Algebra?**
