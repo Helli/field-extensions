@@ -99,14 +99,6 @@
 \newcommand{\ltpiv}[1]{{\color{blue}#1}}
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
 
-\begin{frame}{Contributions}
-\begin{itemize}
-\item Vector Spaces\pause
-\item Field Extensions\pause
-\item Misc? to-do
-\end{itemize}
-\end{frame}
-
 \begin{frame}
 \begin{center}
 \huge\high{Algebraic Structures in HOL-Algebra}
@@ -116,6 +108,7 @@
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
 	\item record-based \pause%to-do: partial_object_def? how to explain to Prof. K.?
+	\item subscripts %to-do: do they even appear in an example?
 	\item locale-based \pause%INTEG as example?
 	% reasons
 	\item explicit carrier sets \pause
@@ -140,6 +133,12 @@
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Tower rule}
+If $M/L$ and $L/K$ are field extensions, then
+\[[M : K] = [M : L] \cdot [L : K]\]\pause %ask M.: good idea to use non-HOL notation?
+In particular, combining two finite field extensions yields a finite field extension. %(or combining finitely many)
+\end{frame}
+
 \begin{frame}{Encoding of $\infty$}
 Can we use type \emph{nat} for the degree of field extensions?\pause
 \begin{itemize}
@@ -151,10 +150,12 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Tower rule}
-If $M/L$ and $L/K$ are field extensions, then
-\[[M : K] = [M : L] \cdot [L : K]\] %ask M.: good idea to use Algebra notation?
-In particular, combining two finite field extensions yields a finite field extension. %(or combining finitely many)
+\begin{frame}{Contributions}
+\begin{itemize}
+	\item Vector Spaces\pause
+	\item Field Extensions\pause
+	\item Misc? to-do
+\end{itemize}
 \end{frame}
 
 \begin{frame}
