@@ -8,5 +8,12 @@ slides/slides.pdf
 slides/slides.snm
 slides/slides.toc
 slides/slides.synctex.gz
-slides/example_slides.pdf
+slides/tex_sample.aux
+slides/tex_sample.log
+slides/tex_sample.nav
+slides/tex_sample.out
+slides/tex_sample.pdf
+slides/tex_sample.snm
+slides/tex_sample.synctex.gz
+slides/tex_sample.toc
 
