@@ -250,30 +250,24 @@ $\expectation[\text{height}(\text{rbst}(n))] \leq \log_2 {{n + 3} \choose 3} - 1
 \end{itemize}
 \end{theorem}
 The actual behaviour is $\approx 2.988 \log_2 n$ [Reed 2003].
-\end{frame}
 
+\end{frame}
 \begin{frame}
 \begin{center}
-\huge\high{Treaps}
+\huge\high{Field Extensions}
 \end{center}
 \end{frame}
 
 \begin{frame}
-\begin{center}
-\high{Random BSTs have nice logarithmic height/IPL}\\[1em]\pause
-\bad{But BSTs can degenerate if inputs are \emph{not} in random order}\\[1em]\pause
-\high{A Nice Solution:}\ Treaps\ [Aragon \& Seidel 1989]
-\end{center}
-\end{frame}
+A \emph{field} is a nontrivial commutative ring where every nonzero element has a multiplicative inverse.
 
-\begin{frame}
-A \emph{treap} is a binary tree where every node stores a \emph{key} and a \emph{priority}. It is a BST \wrt the keys and a heap \wrt the priorities.\pause
+A \emph{field extension} ($L/K$) is a field $L$ where $K$ is a subset of $L$'s carrier set and $K$ together with $\otimes,1,\oplus,0$ is again a field.
+%to-do: use records?
 \begin{itemize}
-\item The root of any subtree has lowest priority\pause
-\item Elements in a left subtree have a smaller key than the root\pause
-\item Elements in a right subtree have a greater key than the root\pause
+\item If $K$ is a field, then $K/K$ is a field extension\pause
+%problem for a formalisation: K is often identified with its carrier set
+\item $\mathbb{R}/\mathbb{Q}$ is a field extension
 \end{itemize}
-\high{If priorities are distinct, the shape of a treap is thus uniquely defined by its entries.}\\[1em]
 \end{frame}
 
 \begin{frame}
