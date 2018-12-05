@@ -227,16 +227,6 @@ child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1
 \end{frame}
 
 \begin{frame}
-\high{Internal Path Length:}\\ Sum of length of all paths from root to a node\\\pause
-$\Longrightarrow$ Average access time${} = \frac{1}{n} \text{IPL}$\pause\\[1em]
-
-What is the IPL for a random BST?\pause\\
-Exactly the same recurrence as for cost of \textit{rqs}, thus:
-\[\textbf{do}\ \{t \leftarrow \text{rbst}\ A;\ \textbf{return}\ (\text{ipl}\ t)\} = \text{rqs\_cost}\ |A|\]\pause
-$\Longrightarrow$ Hence average access time is\,${}\sim 2 \ln n$.
-\end{frame}
-
-\begin{frame}
 The height is somewhat more difficult: [CLRS]\pause
 \[\text{eheight\_rbst}\ A := \textbf{do}\ \{t \leftarrow \text{rbst}\ A; \textbf{return}\ 2^{\text{height}\ t - 1}\}\]\pause
 \vspace*{-1.5em}
