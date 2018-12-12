@@ -138,11 +138,6 @@ Reasons:
 	% at least that's what it feels like
 	 to-do: details /example?}
 \end{itemize}
-\begin{itemize}
-\item Type $\alpha\ \textit{pmf}$ represents a probability distribution of values of type $\alpha$\pause
-\item Isomorphic to the set of functions $f : \alpha\to\mathbb{R}$ with $f(x) \geq 0$ and $\sum_{x :: \alpha} f(x) = 1$\pause
-\item Giry monad allows composing PMFs: $\textbf{do}\ \{x\leftarrow A;\ y \leftarrow B\ x;\ \textbf{return}\ (f\ x\ y)\}$
-\end{itemize}
 \end{frame}
 
 \begin{frame}{Tower rule}
@@ -168,44 +163,6 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 	\item Field Extensions\pause
 	\item Misc? to-do
 \end{itemize}
-\end{frame}
-
-\begin{frame}
-Deterministic quicksort with first element as pivot:
-\[\text{qs} :: \alpha\ \text{list} \to \alpha\ \text{list}\pause \times \mathbb{N}\]\pause
-Quicksort with random pivot:
-\[\text{rqs} :: \alpha\ \text{list} \to (\alpha\ \text{list} \times \mathbb{N})\ \text{pmf}\]\pause
-Average-case of det.\ quicksort:
-\[\text{avqs}\ \textit{xs} = \textbf{do}\ \{\textit{xs'} \leftarrow \text{rperm}\ \textit{xs}\hskip0.2mm;\ \textbf{return}\ (\text{qs}\ \textit{xs'}\hskip0.2mm)\}\]\pause
-\vspace*{-1.5em}
-\begin{theorem}
-\upshape
-\begin{itemize}
-\item $\expectation[\text{snd}(\text{rqs}\ \text{xs})] = 2(n+1) H_n - 4n \sim 2 n \ln n$\pause
-\item $\text{avqs} = \text{rqs}$
-\end{itemize}
-\end{theorem}
-\end{frame}
-
-\begin{frame}
-What happens when we insert distinct elements $x_1, \ldots, x_n$ into an empty BST?\\[2em]
-\begin{center}
-\begin{tikzpicture}[level distance = 1cm, sibling distance=2.5cm]
-\action<1>{
-\node[shape=circle,draw] {$x_1$};}
-\action<2>{
-\node[shape=circle,draw] {$x_1$}
-  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${<}x_1$} [child anchor=north]}
-  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_1$} [child anchor=north]};}
-%\action<3->{
-%\node[shape=circle,draw] {$x_1$}
-%  child {node[shape=circle,draw]{$x_2$}
-%         [child anchor=border]
-%         child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${<}x_2$} [child anchor=north]}
-%         child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_2$} [child anchor=north]}}
-%  child {node[draw, trapezium, trapezium angle=60, text height=3mm]{${>}x_1$} [child anchor=north]};}
-\end{tikzpicture}\hspace*{2em}
-\end{center}
 \end{frame}
 
 \begin{frame}
@@ -238,32 +195,6 @@ child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1
 \end{lemma}
 \end{frame}
 
-\begin{frame}
-The height is somewhat more difficult: [CLRS]\pause
-\[\text{eheight\_rbst}\ A := \textbf{do}\ \{t \leftarrow \text{rbst}\ A; \textbf{return}\ 2^{\text{height}\ t - 1}\}\]\pause
-\vspace*{-1.5em}
-\begin{theorem}\upshape
-\vspace*{-0.4em}
-\begin{itemize}
-\item 
-\begin{tabbing}
-$\text{eheight\_rbst}\ A = \textbf{do}\ $\= $x \leftarrow \text{uniform}\ A$\\
-\> $l \leftarrow \text{eheight\_rbst}\ \{y\in A\mid y < x\}$\\
-\> $r \leftarrow \text{eheight\_rbst}\ \{y\in A\mid y > x\}$\\
-\> $\textbf{return}\ (2 \cdot \text{max}\ l\ r)$
-\end{tabbing}
-\pause
-\item
-$\expectation[\text{eheight\_rbst}(n)] \leq \frac{4}{n}\cdot \sum_{i=0}^{n-1} \expectation[\text{eheight\_rbst}(i)]$\pause\\[3mm]
-\item
-$\expectation[\text{eheight\_rbst}(n)] \leq \frac{1}{4} {{n + 3} \choose 3}$\\[2mm]\pause% = \frac{1}{24}(n+1)(n+2)(n+3)$\\[2mm]
-\item
-$\expectation[\text{height}(\text{rbst}(n))] \leq \log_2 {{n + 3} \choose 3} - 1\pause \sim 3 \log_2 n$\pause
-\end{itemize}
-\end{theorem}
-The actual behaviour is $\approx 2.988 \log_2 n$ [Reed 2003].
-
-\end{frame}
 \begin{frame}
 \begin{center}
 \huge\high{Vector Spaces}
