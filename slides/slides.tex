@@ -265,49 +265,8 @@ $\text{rinss}\ ([x]\listapp \textit{xs})\ t = \textbf{do}\ \{t' \leftarrow \text
 \end{tabbing}
 \end{frame}
 
-\begin{frame}{Proof of the main result on treaps:}
-\begin{center}
-\parbox{0cm}{
-\small
-\begin{tabbing}
-$\text{rinss}\ \textit{xs} $\=${}= \textbf{do}\ \{p \leftarrow \mathcal U^{\textit{xs}}; \textbf{return}\ \text{treap\_of}\ [(x, p(x))\mid x\leftarrow \textit{xs}]\}$\\[2mm]\pause
-\>${}\hskip-1.8mm\stackrel{\text{\tiny project}}\simeq \hskip-1.8mm\textbf{do}\ \{p \leftarrow \mathcal U^{\textit{xs}}; \textbf{return}\ \text{mk\_bst}\ (\text{sort\_key}\ p\ \textit{xs})\}$\\[2mm]\pause
-\>${}= \textbf{do}\ \{$\=$R \leftarrow \text{rel\_from\_prios}\ \mathcal U^{\textit{xs}};$\\\>\> $\textbf{return}\ \text{mk\_bst}\ (\text{sort\_rel}\ R\ \textit{xs})\}$\\[2mm]\pause
-\>${}= \textbf{do}\ \{$\=$R \leftarrow \text{uniform}\ (\text{linorder\_on}\ R);$\\\>\> $\textbf{return}\ \text{mk\_bst}\ (\text{sort\_rel}\ R\ \textit{xs})\}$\\[2mm]\pause
-\>${}= \textbf{do}\ \{$\=$\textit{xs'} \leftarrow \text{rperm}\ \textit{xs};\ \textbf{return}\ \text{mk\_bst}\ \textit{xs'}\}$\\[2mm]\pause
-\>${}= \text{random\_bst}\ \textit{xs}$
-\end{tabbing}}\\[-2em]\pause
-\mbox{}\hspace*{\fill}$\square$\hspace*{1em}
-\end{center}
-\end{frame}
-
-\begin{frame}{Measures}
-\bad{Problem:} Random treaps are a \emph{continuous} distribution\\ $\Longrightarrow$ cannot use PMFs\\[1em]\pause
-
-Instead we have to use general measures $(\Omega, \Sigma, \mu)$\\[1em]\pause
-
-\bad{But what does a suitable $\Sigma$-algebra for trees look like?}\pause
-\begin{itemize}
-\item Functor $\mathcal T$ that maps a $\Sigma$-algebra over a set $A$ to a $\Sigma$-algebra of trees with elements from $A$\pause
-\item The \enquote{Node} constructor is a measurable function from $\mathcal T(M)\otimes M\otimes \mathcal T(M)$ to $\mathcal T(M)$\pause
-\item Other tree operations (projections, primitive recursion) are similarly measurable
-\end{itemize}
-\end{frame}
-
-\tikzstyle{bag} = [align=center]
-\begin{frame}
-\begin{center}
-\begin{tikzpicture}[level distance = 2cm, sibling distance=5cm]
-\node[shape=rectangle,draw,align=center] {Randomised Quicksort\\ 700 LOC}
-  child { node[shape=rectangle,draw,align=center] {Average-case det.\ Quicksort\\ 200 LOC} }
-  child { node[shape=rectangle,draw,align=center] {Random BSTs\\ 800 LOC} 
-    child { node[shape=rectangle,draw,align=center] {Randomised Treaps\\ 1900 LOC} }
-  };
-\end{tikzpicture}\hspace*{2em}
-\end{center}
-\end{frame}
-
 \begin{frame}{Bonus: Executability}
+%to-do: transform into "Example Instantiations"
 \small
 \textbf{value}\ random\_bst\ $\{1, 2, 3 :: \text{int}\}$\pause\\[-1em]
 \hskip1em \parbox{0cm}{
@@ -326,6 +285,7 @@ pmf\_of\_alist\\
 \end{frame}
 
 \begin{frame}{Conclusion}
+%to-do: adjust to Field Extensions if not enough slides
 \begin{itemize}
 \item Formalisation of textbook randomised algorithms/data structures is feasible with Isabelle\pause
 \item PMF proofs are nice, high-level, and readable\pause
