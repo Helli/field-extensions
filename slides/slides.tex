@@ -177,36 +177,6 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \end{frame}
 
 \begin{frame}
-$\small\text{mk\_bst}\ \listnil = \hskip2.64cm \bullet$\\[1em]\pause
-$\small\text{mk\_bst}\ ([x] \listapp \text{xs}) =$\\
-{
-\vskip-1.5em\hskip3em
-\begin{tikzpicture}[level distance = 1.2cm, sibling distance=4cm]
-\small
-\node[shape=circle,draw] {$x$}
-  child {node[shape=rectangle,draw]{$\text{mk\_bst}\ [xs\mid y < x]$}}
-  child {node[shape=rectangle,draw]{$\text{mk\_bst}\ [xs\mid y > x]$}};
-\end{tikzpicture}
-}\pause\\[0.5em]
-Let us now add elements from a set $A$ in random order:
-\vspace*{-0.5em}
-\[\text{rbst}\ A := \textbf{do}\ \{\textit{xs} \leftarrow \text{rperm}\ A;\ \textbf{return}\ (\text{mk\_bst}\ \textit{xs})\}\]\pause
-\vspace*{-1.5em}
-\begin{lemma}
-\upshape
-\vspace*{-1em}
-\begin{tabbing}
-\hskip2em $\text{rbst}\ A = \textbf{do}\ $\= $x \leftarrow \text{uniform}\ A$\hspace*{5.1cm}\\
-\> $l \leftarrow \text{rbst}\ \{y\in A\mid y < x\}$\\
-\> $r \leftarrow \text{rbst}\ \{y\in A\mid y > x\}$\\[1mm]
-\> $\textbf{return}$\ \bigg(\resizebox{1.7cm}{!}{\raisebox{-5mm}{\begin{tikzpicture}[level distance=7mm, sibling distance=12mm]\small\node[shape=circle,draw] {$x$} 
-child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1mm}{$l$}}} child {node[draw, trapezium, trapezium angle=60, text height=1.5mm]{\raisebox{-1mm}{$r$}}};\end{tikzpicture}}}\bigg)
-\end{tabbing}
-\vspace*{-1em}
-\end{lemma}
-\end{frame}
-
-\begin{frame}
 \begin{center}
 \huge\high{Vector Spaces}
 \end{center}
@@ -241,32 +211,8 @@ A \emph{field extension} ($L/K$) is a field $L$ where $K$ is a subset of $L$'s c
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\high{If priorities are distinct, the shape of a treap is thus uniquely defined by its entries.}\pause\\[1em]
-\begin{tabbing}
-$\Longrightarrow$\ \= Insert list of elements into a treap in \emph{any} order ${\simeq}$\\
-\> Insert elements into a BST by increasing priority
-\end{tabbing}\pause
-\high{Idea:} Choose priority randomly from $[0;1] \subseteq \mathbb{R}$ upon insertion\\\pause
-$\Longrightarrow$\ Treap behaves like a random BST\\\pause
-\begin{center}
-\high{Randomised Treap}
-\end{center}
-\end{frame}
-
-\begin{frame}{Definition of some operations on treaps}
-\begin{tabbing}
-$\text{ins} :: (\alpha \times \mathbb{R}) \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[4mm]\pause
-$\text{rins} :: \alpha \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[0.5mm]
-$\text{rins}\ x\ t = \textbf{do}\ \{p \leftarrow \mathcal U;\ \textbf{return}\ (\text{ins}\ (x, p)\ t)\}$\\[4mm]\pause
-$\text{rinss} :: \alpha\ \text{list} \Rightarrow (\alpha, \mathbb{R})\ \text{treap} \Rightarrow (\alpha, \mathbb{R})\ \text{treap}$\\[0.5mm]
-$\text{rinss}\ \listnil\ t = \textbf{return}\ t$\\
-$\text{rinss}\ ([x]\listapp \textit{xs})\ t = \textbf{do}\ \{t' \leftarrow \text{rins}\ x\ t;\ \text{rinss}\ \textit{xs}\ t'\}$
-\end{tabbing}
-\end{frame}
-
 \begin{frame}{Bonus: Executability}
-%to-do: transform into "Example Instantiations"
+%to-do: transform into "Bonus: Example Instantiations"
 \small
 \textbf{value}\ random\_bst\ $\{1, 2, 3 :: \text{int}\}$\pause\\[-1em]
 \hskip1em \parbox{0cm}{
