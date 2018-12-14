@@ -131,7 +131,7 @@ Isabelle enforces great precision, but also helps:
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
 	\item record-based \pause%to-do: partial_object_def? how to explain to Prof. K.?
-	\item subscripts \pause%to-do: do they even appear in an example?
+	\item verbose (subscripts, ...) \pause%to-do: do they even appear in an example?
 	\item locale-based \pause%INTEG as example?
 	% reasons
 	\item explicit carrier sets \pause
@@ -209,25 +209,6 @@ A \emph{field extension} ($L/K$) is a field $L$ where $K$ is a subset of $L$'s c
 %problem for a formalisation: K is often identified with its carrier set
 \item $\mathbb{R}/\mathbb{Q}$ is a field extension
 \end{itemize}
-\end{frame}
-
-\begin{frame}{Bonus: Executability}
-%to-do: transform into "Bonus: Example Instantiations"
-\small
-\textbf{value}\ random\_bst\ $\{1, 2, 3 :: \text{int}\}$\pause\\[-1em]
-\hskip1em \parbox{0cm}{
-\begin{tabbing}
-pmf\_of\_alist\\
-\hskip5mm $[$\=$(\langle\langle\langle\langle\rangle, 1, \langle\rangle\rangle, 2, \langle\rangle\rangle, 3, \langle\rangle\rangle, 1 / 6),$\\
-   \>$(\langle\langle\langle\rangle, 1, \langle\langle\rangle, 2, \langle\rangle\rangle\rangle, 3, \langle\rangle\rangle, 1 / 6),$\\
-   \>$(\langle\langle\rangle, 1, \langle\langle\langle\rangle, 2, \langle\rangle\rangle, 3, \langle\rangle\rangle\rangle, 1 / 6),$\\
-   \>$(\langle\langle\langle\rangle, 1, \langle\rangle\rangle, 2, \langle\langle\rangle, 3, \langle\rangle\rangle\rangle, 1 / 3),$\\
-   \>$(\langle\langle\rangle, 1, \langle\langle\rangle, 2, \langle\langle\rangle, 3, \langle\rangle\rangle\rangle\rangle, 1 / 6)]$\\
-   \>\hskip5mm int\ tree\ pmf
-\end{tabbing}}
-\pause\\
-\textbf{value}\ measure\_pmf.expectation\ $($random\_bst\ $\{1..6::\text{int}\})$\ height\pause\\[2mm]
-\hskip1.2em 65 / 15 :: real
 \end{frame}
 
 \begin{frame}{Conclusion}
