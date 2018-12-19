@@ -1,12 +1,3 @@
-tex editors:
-
-texmaker: seems ok, there is a quickbuild (F1) *
-texstudio: same (F5) *
-texworks: same (C+T), but odd defaults (no syntax highlighting) in rechnerhalle
-
-*uses odd tar.gz
-
--------
 
 move the subgoals as lemmas into a context 'assumes "basis B"'
 
@@ -23,3 +14,4 @@ What are the results?
 
 Problems?
 "wir entscheiden uns für eine Basis" ~> fix B assume "basis B". Right?
+subspace imports and argument order
