@@ -1,4 +1,4 @@
-section {* The direct sum of modules. *}
+section \<open>The direct sum of modules.\<close>
 
 theory SumSpaces
 imports Main
@@ -10,8 +10,8 @@ imports Main
   LinearCombinations
 begin
 
-text {* We define the direct sum $M_1\oplus M_2$ of 2 vector spaces as the set $M_1\times M_2$ under
-componentwise addition and scalar multiplication.*}
+text \<open>We define the direct sum $M_1\oplus M_2$ of 2 vector spaces as the set $M_1\times M_2$ under
+componentwise addition and scalar multiplication.\<close>
 definition direct_sum:: "('a,'b, 'd) module_scheme \<Rightarrow> ('a, 'c, 'e) module_scheme \<Rightarrow>('a, ('b\<times>'c)) module" (*(infixl "(\<oplus>)" 50)*)
   where  "direct_sum M1 M2 = \<lparr>carrier = carrier M1 \<times> carrier M2, 
                   mult = undefined,
@@ -72,8 +72,8 @@ proof -
       by (unfold direct_sum_def, auto)
 qed
 
-text {*For submodules $M_1,M_2\subseteq M$, the map $M_1\oplus M_2\to M$ given by $(m_1,m_2)\mapsto 
-m_1+m_2$ is linear.*}
+text \<open>For submodules $M_1,M_2\subseteq M$, the map $M_1\oplus M_2\to M$ given by $(m_1,m_2)\mapsto 
+m_1+m_2$ is linear.\<close>
 lemma (in module) sum_map_hom: 
   fixes M1 M2
   assumes h1: "submodule M1 R M" and h2: "submodule M2 R M"
@@ -135,8 +135,8 @@ proof -
     using M.add.m_comm M.add.subgroupE(1) by blast+
 qed
 
-text {*If $M_1,M_2\subseteq M$ are submodules, then $M_1+M_2$ is the minimal subspace such that 
-both $M_1\subseteq M$ and $M_2\subseteq M$.*}
+text \<open>If $M_1,M_2\subseteq M$ are submodules, then $M_1+M_2$ is the minimal subspace such that 
+both $M_1\subseteq M$ and $M_2\subseteq M$.\<close>
 lemma (in module) sum_is_minimal:
   fixes N N1 N2
   assumes h1: "submodule N1 R M" and h2: "submodule N2 R M" and h3: "submodule N R M"
@@ -169,7 +169,7 @@ proof -
   from 1 2 show ?thesis by metis
 qed
 
-text {* $\text{span} A\cup B = \text{span} A + \text{span} B$*}
+text \<open>$\text{span} A\cup B = \text{span} A + \text{span} B$\<close>
 lemma (in module) span_union_is_sum: 
   fixes A B
   assumes  h2: "A\<subseteq>carrier M" and h3: "B\<subseteq>carrier M"
