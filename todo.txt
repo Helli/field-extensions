@@ -3,15 +3,28 @@ move the subgoals as lemmas into a context 'assumes "basis B"'
 
 koordinatenfunktional ~> projection
 
-improve line 957
-
 -------
 Presentation:
+
+motivational example: polynomial equations of degree five or more cannot be solved using root
+expressions
+disclaimer: I won't get so far
+
+remove note about proof text markup?
+
+remove "coloring" (i.e. note about coloring?)
+
+to keep track of subproofs, solve simple ones automatically
 
 What are the results?
 
 **What does it look like in HOL-Algebra?**
 
+HOL-Algebra:
+What does it look like? Example
+Maybe mention HOL-Computational_Algebra
+
+mention Problems later
 Problems?
 "wir entscheiden uns für eine Basis" ~> fix B assume "basis B". Right?
 subspace imports and argument order

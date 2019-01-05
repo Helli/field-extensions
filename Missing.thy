@@ -952,7 +952,7 @@ lemma (in subfield) finsum_simp:
   assumes \<open>ring R\<close>
   assumes "v ` A \<subseteq> K"
   shows "(\<Oplus>\<^bsub>R\<lparr>carrier := K\<rparr>\<^esub>i \<in> A. v i) = (\<Oplus>\<^bsub>R\<^esub>i \<in> A. v i)"
-  unfolding finsum_def apply auto using assms
+  unfolding finsum_def using assms
 proof (induction A rule: infinite_finite_induct)
   case (infinite A)
   then show ?case
@@ -965,6 +965,9 @@ next
     by (simp add: finprod_def)
 next
   case (insert x F)
+  then have IH': "ring R \<Longrightarrow> v ` F \<subseteq> K \<Longrightarrow>
+    finprod \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr> v F = finprod (add_monoid R) v F"
+    by simp
   have a: "v \<in> F \<rightarrow> K"
     using insert.prems(2) by auto
   moreover have "K \<subseteq> carrier R"
@@ -983,8 +986,11 @@ next
   then have "finprod (add_monoid R) v (insert x F) = v x \<oplus> finprod (add_monoid R) v F"
     using abelian_group.a_comm_group assms(1) comm_group_def ring_def by blast
   with comm_monoid.finprod_insert[of "add_monoid (R\<lparr>carrier := K\<rparr>)", simplified, OF f insert.hyps a d, simplified]
-  show ?case
-    by (simp add: a image_subset_iff_funcset insert.IH insert.prems(1))
+  have "finprod \<lparr>carrier = K, monoid.mult = (\<oplus>), one = \<zero>, \<dots> = undefined::'b\<rparr> v (insert x F) =
+    finprod (add_monoid R) v (insert x F)"
+    by (simp add: a image_subset_iff_funcset IH' insert.prems(1))
+  then show ?case
+    by simp
 qed
 
 
