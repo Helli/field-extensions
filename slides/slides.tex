@@ -94,11 +94,13 @@
 \end{center}
 \end{frame}
 
+\tableofcontents
 
 \newcommand{\pivot}[1]{{\color{red}#1}}
 \newcommand{\ltpiv}[1]{{\color{blue}#1}}
 \newcommand{\gtpiv}[1]{{\color{olive}#1}}
 
+\section{Verification of Mathematics}
 \begin{frame}{Verification of Mathematics}%in particular widely accepted Mathematics like Linear Algebra
 Reasons:
 \begin{itemize}
@@ -111,10 +113,10 @@ Reasons:
 \end{itemize}
 \end{frame}
 
+\section{Proof text markup}
 \begin{frame}{Proof text markup}
 Isabelle enforces great precision, but also helps:
 \begin{itemize}
-	\item coloring of the Isabelle proof language vs. the term language\pause
 	\item information about previously defined objects \pause
 	\includegraphics[width=0.7\linewidth]{"type_error"}
 	%also with control+click
@@ -122,6 +124,7 @@ Isabelle enforces great precision, but also helps:
 \end{itemize}
 \end{frame}
 
+\section{HOL-Algebra}
 \begin{frame}
 \begin{center}
 \huge\high{Algebraic Structures in HOL-Algebra}%Isabelle's library of abstract algebra, where groups and rings are defined
@@ -140,6 +143,7 @@ Isabelle enforces great precision, but also helps:
 \end{itemize}
 \end{frame}
 
+\section{Problems}]
 \begin{frame}{Problems}
 \begin{itemize}
 \item Bases are sets.
@@ -151,12 +155,15 @@ Isabelle enforces great precision, but also helps:
 \end{itemize}
 \end{frame}
 
+\section{Results}
+\subsection{Tower rule}
 \begin{frame}{Tower rule}
 If $M/L$ and $L/K$ are field extensions, then
 \[[M : K] = [M : L] \cdot [L : K]\]\pause %ask M.: good idea to use non-HOL notation?
 In particular, combining two finite field extensions yields a finite field extension. %(or combining finitely many)
 \end{frame}
 
+\section{to-do}
 \begin{frame}{Encoding of $\infty$}
 Can we use type \emph{nat} for the degree of field extensions?\pause
 \begin{itemize}
@@ -168,6 +175,7 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \end{itemize}
 \end{frame}
 
+\section{Contributions}
 \begin{frame}{Contributions}
 \begin{itemize}
 	\item Vector Spaces\pause
@@ -176,6 +184,7 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \end{itemize}
 \end{frame}
 
+\section{Vector Spaces}
 \begin{frame}
 \begin{center}
 \huge\high{Vector Spaces}
@@ -193,6 +202,7 @@ Examples:
 \end{itemize}
 \end{frame}
 
+\section{Field Extensions}
 \begin{frame}
 \begin{center}
 \huge\high{Field Extensions}
@@ -211,6 +221,7 @@ A \emph{field extension} ($L/K$) is a field $L$ where $K$ is a subset of $L$'s c
 \end{itemize}
 \end{frame}
 
+\section{Conclusion}
 \begin{frame}{Conclusion}
 %to-do: adjust to Field Extensions if not enough slides
 \begin{itemize}

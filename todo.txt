@@ -12,9 +12,24 @@ disclaimer: I won't get so far
 
 remove note about proof text markup?
 
-remove "coloring" (i.e. note about coloring?)
-
 to keep track of subproofs, solve simple ones automatically
+
+better examples of vector spaces
+
+clarify contribution
+
+field extension:
+shorten explanation
+
+use Q(root of 3)/Q as example
+
+What did I do?
+definitions
+nontrivial results
+(indexed product), afterwards problems (e.g. missing lemmas?)
+isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
+
+mention how many lines were needed
 
 What are the results?
 
@@ -28,3 +43,19 @@ mention Problems later
 Problems?
 "wir entscheiden uns für eine Basis" ~> fix B assume "basis B". Right?
 subspace imports and argument order
+
+conclusion:
+Was it painfull?
+next steps
+personal opinion
+(What could be done better?)
+comparison to other formalisations
+
+move technical stuff towards the end
+
+--------------
+documentation:
+
+no proofs, but definitions and theorems
+environment tabbing maybe (if Isabelle document is not pretty enough?)
+Why this way and not differently
