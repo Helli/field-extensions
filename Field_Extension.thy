@@ -599,8 +599,9 @@ proof
     using L.subfield_m_inv(1) L.subfield_m_inv(3) p subfield_axioms by auto
   moreover have "?p = monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
     using inv_ok monom_mult_is_smult p(1) by auto
-  moreover from inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> monom P (lcoeff p) 0 = \<one>"
-    by (smt calculation(2) coeff_closed lcoeff_monom' lcoeff_mult monom_mult_smult monic_def monom_closed monom_mult_is_smult monom_one p(1))
+  moreover from p inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> monom P (lcoeff p) 0 = \<one>"
+    using L.subfield_m_inv(3)[OF subfield_axioms]
+    by (metis Diff_iff Eval_constant R.one_closed monom_mult_smult monom_closed monom_mult_is_smult monom_one hom_one)
   then have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
   ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
