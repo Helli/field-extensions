@@ -10,8 +10,6 @@ motivational example: polynomial equations of degree five or more cannot be solv
 expressions
 disclaimer: I won't get so far
 
-remove note about proof text markup?
-
 to keep track of subproofs, solve simple ones automatically
 
 better examples of vector spaces
