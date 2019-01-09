@@ -1,5 +1,6 @@
 *~
 output/*
+Doc/output/*
 slides/slides.aux
 slides/slides.log
 slides/slides.nav
@@ -16,4 +17,3 @@ slides/tex_sample.pdf
 slides/tex_sample.snm
 slides/tex_sample.synctex.gz
 slides/tex_sample.toc
-

@@ -1,0 +1,6 @@
+session Doc = Field_Extensions +
+  options [document = pdf, document_output = "output"]
+  theories
+    Doc
+  document_files
+    "root.tex"
