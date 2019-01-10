@@ -1,6 +1,8 @@
+(*<*)
 theory Doc
   imports Field_Extensions.Examples
 begin
+(*>*)
 
 text\<open>Test.\<close>
 
