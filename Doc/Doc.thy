@@ -8,4 +8,6 @@ text\<open>Test.\<close>
 
 definition "bla \<equiv> Suc"
 
+(*<*)
 end
+(*>*)
