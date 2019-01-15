@@ -1,5 +1,6 @@
 session Doc = Field_Extensions +
   options [document = pdf, document_output = "output"]
+  sessions VectorSpace
   theories
     Doc
   document_files
