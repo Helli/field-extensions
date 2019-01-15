@@ -57,3 +57,4 @@ documentation:
 no proofs, but definitions and theorems
 environment tabbing maybe (if Isabelle document is not pretty enough?)
 Why this way and not differently
+(maybe move the stuff from README.md here?)
