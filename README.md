@@ -1,6 +1,6 @@
 # field-extensions
-field extensions in Isabelle/HOL (interdisciplinary project), based on isabelle-dev.
-The theories in VectorSpace_by_HoldenLee stem from https://devel.isa-afp.org/entries/VectorSpace.html and
+Field extensions in Isabelle/HOL, an interdisciplinary project based on isabelle-dev.
+The theories in _VectorSpace_by_HoldenLee/_ stem from https://devel.isa-afp.org/entries/VectorSpace.html and
 https://devel.isa-afp.org/browser_info/current/AFP/Jordan_Normal_Form/Missing_VectorSpace.html. I have slightly
 adjusted them to better use the new HOL-Algebra:
 
@@ -17,3 +17,5 @@ could further relax it to ring_scheme.
 ring.func_space_is_module.
 - In Missing_VectorSpace, I removed vectorspace.lincomb_distrib which is just the symmetric of
 LinearCombinations.module.lincomb_smult.
+
+Documentation is available in _Doc/_. The session _Doc_ depends on the sessions in the main directory.
