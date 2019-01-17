@@ -18,4 +18,4 @@ ring.func_space_is_module.
 - In Missing_VectorSpace, I removed vectorspace.lincomb_distrib which is just the symmetric of
 LinearCombinations.module.lincomb_smult.
 
-Documentation is available in _Doc/_. The session _Doc_ depends on the sessions in the main directory.
+Documentation is available in _Doc/_. The session _Doc_ depends on the session in the main directory.

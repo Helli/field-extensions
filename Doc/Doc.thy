@@ -41,7 +41,7 @@ subsubsection\<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
-subsection \<open>\<^session>\<open>VectorSpace\<close>\<close>
+subsection \<open>\isatt{VectorSpace}\<close>
 
 subsubsection\<open>Side Notes\<close>
 

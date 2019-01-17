@@ -8,7 +8,3 @@ session Field_Extensions = "HOL-Algebra" +
   document_files
     root.tex
     root.bib
-
-session VectorSpace = Pure +
-  theories
-    VectorSpace_Dummy
