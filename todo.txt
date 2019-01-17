@@ -6,7 +6,7 @@ koordinatenfunktional ~> projection
 -------
 Presentation:
 
-motivational example: polynomial equations of degree five or more cannot be solved using root
+motivational example: some polynomial equations of degree five or more cannot be solved using root
 expressions
 disclaimer: I won't get so far
 
