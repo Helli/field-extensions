@@ -24,7 +24,7 @@ subsection \<open>\<^const>\<open>ring.old_sr\<close>\<close>
 
 subsection \<open>\<^const>\<open>subring\<close>\<close>
 
-text \<open>This locale from \ uses the "set+superstructure"-approach, via \<^locale>\<open>subgroup\<close> and
+text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses the "set+superstructure"-approach, via \<^locale>\<open>subgroup\<close> and
   \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms only describe a technical
   relation to the superstructure, assumed to be a group. In other words, \<^prop>\<open>subgroup H G \<Longrightarrow>
   group (G\<lparr>carrier := H\<rparr>)\<close> does not hold without the additional assumption \<^prop>\<open>group G\<close>,
