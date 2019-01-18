@@ -26,10 +26,10 @@ subsection \<open>\<^const>\<open>subring\<close>\<close>
 
 text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses the "set+superstructure"-approach, via \<^locale>\<open>subgroup\<close> and
   \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms only describe a technical
-  relation to the superstructure, assumed to be a group. In other words, \<^prop>\<open>subgroup H G \<Longrightarrow>
-  group (G\<lparr>carrier := H\<rparr>)\<close> does not hold without the additional assumption \<^prop>\<open>group G\<close>,
-  equivalently for ring and monoid. It is only under these additional assumptions that these locales
-  coincide with the textbook definitions.\<close>
+  relation to the superstructure, assumed to be a group. In other words, \begin{center}
+ @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not hold without
+ the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and monoid. It is
+  only under these additional assumptions that these locales coincide with the textbook definitions.\<close>
 
 section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
 
