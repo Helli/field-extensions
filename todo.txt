@@ -6,8 +6,6 @@ koordinatenfunktional ~> projection
 -------
 Presentation:
 
-to keep track of subproofs, solve simple ones automatically
-
 better examples of vector spaces
 
 clarify contribution
