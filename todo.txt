@@ -6,7 +6,7 @@ koordinatenfunktional ~> projection
 -------
 Presentation:
 
-better examples of vector spaces
+better example of a vector space
 
 clarify contribution
 
