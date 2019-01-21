@@ -6,8 +6,6 @@ koordinatenfunktional ~> projection
 -------
 Presentation:
 
-better example of a vector space
-
 clarify contribution
 
 field extension:
@@ -37,7 +35,7 @@ Problems?
 subspace imports and argument order
 
 conclusion:
-Was it painfull?
+Was it painful?
 next steps
 personal opinion
 (What could be done better?)
