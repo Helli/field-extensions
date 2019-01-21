@@ -11,11 +11,6 @@ begin
 text \<open>We build on the finite product simplifications in FiniteProduct.thy and the analogous ones
 for finite sums (see "lemmas" in Ring.thy).\<close>
 
-text \<open>Use as an intro rule\<close>
-lemma (in comm_monoid) factors_equal:
-  "\<lbrakk>a=b; c=d\<rbrakk> \<Longrightarrow> a\<otimes>\<^bsub>G\<^esub>c =  b\<otimes>\<^bsub>G\<^esub>d"
-  by simp
-
 
 lemma (in comm_monoid) extend_prod:
   fixes a A S
@@ -103,7 +98,6 @@ lemmas (in comm_monoid) [simp] = finprod_one_eqI
 
 context abelian_monoid
 begin
-lemmas summands_equal = add.factors_equal
 lemmas extend_sum = add.extend_prod
 lemmas finsum_all0 = add.finprod_one_eqI
 end

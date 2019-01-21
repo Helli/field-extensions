@@ -5,8 +5,9 @@ https://devel.isa-afp.org/browser_info/current/AFP/Jordan_Normal_Form/Missing_Ve
 adjusted them to better use the new HOL-Algebra:
 
 - In RingModuleFacts.thy, I removed the now-superseded facts lmult_0 and rmult_0,
-   and the constant units_group, which duplicates Group.units_of
-- In MonoidSums, finprod_all1 is superseded by finprod_one_eqI
+   and the constant units_group, which duplicates Group.units_of.
+- In MonoidSums, finprod_all1 is superseded by finprod_one_eqI. The lemmas factors_equal/summands_equal are trivial and
+unused in the AFP.
 - In LinearCombinations, I replaced the definition "submodule" by "Module.submodule". Careful: The latter does not
 assume the superstructure to be a module. This may affect statements in descendant theories. Moreover, the argument
 order is swapped, which might be easier to fix in Module.thy. Furthermore, I removed some confusing junk from within the
