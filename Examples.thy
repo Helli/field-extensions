@@ -87,7 +87,7 @@ qed (fact examples(3))
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
 
-lemma subfield_Rats_complex_field: "subfield \<real> complex_field"
+lemma subfield_Reals_complex_field: "subfield \<real> complex_field"
   apply (rule ring.subfield_iff(1))
   apply (simp add: cring.axioms(1) examples(4) fieldE(1))
   unfolding complex_field_def by (auto simp: examples(3)[unfolded real_field_def])
@@ -97,7 +97,7 @@ proof -
   define P where "P = UP (standard_ring \<real> :: complex ring)"
   interpret UP_field_extension complex_field \<real> P \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
-    by (simp add: examples(4) field_extension_def subfield_Rats_complex_field)
+    by (simp add: examples(4) field_extension_def subfield_Reals_complex_field)
       (simp_all add: complex_field_def P_def)
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof goal_cases
@@ -122,7 +122,7 @@ corollary finitely_generated_field_extension_complex_over_real:
   "finitely_generated_field_extension complex_field \<real>"
   unfolding finitely_generated_field_extension_def using generate_field_\<i>_UNIV
   by (metis complex_field_def examples(4) field_extension_def finite.emptyI finite.insertI
-      insert_is_Un partial_object.select_convs(1) subfield_Rats_complex_field)
+      insert_is_Un partial_object.select_convs(1) subfield_Reals_complex_field)
 
 
 section \<open>Observations (*rm*)\<close>
