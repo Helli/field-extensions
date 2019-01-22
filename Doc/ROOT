@@ -4,3 +4,4 @@ session Doc = Field_Extensions +
     Doc
   document_files
     "root.tex"
+    "interpretation_error.png"

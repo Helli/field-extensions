@@ -47,6 +47,20 @@ subsubsection\<open>Side Notes\<close>
 
 (*to-do: move the observation section into these subsubsections*)
 
+section \<open>\isatt{Examples.thy}\<close>
+
+text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
+  errors:\<close>
+text\<open>
+\begin{figure}
+  \includegraphics[width=\linewidth]{"interpretation_error"}
+  \caption[jkioj]{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
+ proof works just as in the case of a lemma, but the fact generation fails.}
+\end{figure}
+\<close>
+text \<open>There is a workaround, but it complicated matters quite a bit, see
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
+
 (*<*)
 end
 (*>*)
