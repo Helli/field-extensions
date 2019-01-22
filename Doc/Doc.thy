@@ -50,8 +50,7 @@ subsubsection\<open>Side Notes\<close>
 section \<open>\isatt{Examples.thy}\<close>
 
 text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
-  errors:\<close>
-text\<open>
+  errors:
 \begin{figure}
   \includegraphics[width=\linewidth]{"interpretation_error"}
   \caption[jkioj]{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
