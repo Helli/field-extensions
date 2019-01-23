@@ -37,6 +37,8 @@ section \<open>Library Analysis\<close>
 
 subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>
 
+subsubsection\<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
+
 subsubsection\<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
@@ -57,7 +59,9 @@ text \<open>This theory cannot use the @{theory_text \<open>interpretation\<clos
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
 \<close>
-text \<open>There is a workaround, but it complicated matters quite a bit, see
+text \<open>The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but it
+ complicated matters quite a bit, see
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
 
 (*<*)
