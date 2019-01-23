@@ -33,6 +33,30 @@ text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses the "set
 
 section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
 
+section \<open>Main Results\<close>
+
+subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\<close>
+
+lemma "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
+  field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
+  by (fact degree_multiplicative)
+
+text \<open>The proof is covered by considering three cases:
+\<^enum> The lower field extension is infinite.
+\<^enum> The upper field extension is infinite.
+\<^enum> Both extension parts are finite.\<close>
+text\<open>Remember that an infinite field extension is encoded to have \<open>degree = 0\<close>.\<close>
+
+text \<open>Note that recently, the statement about combining finite extensions (case 3) has also been proven in
+  another development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This uses the inner
+ product instead of the outer, thus avoiding the vector space terminology as described in section \ref{sec:vs}.\<close>
+
+subsection \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
+
+text \<open>The motivation for this was Kemper's proof of the tower rule, which uses results about vector
+  spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the proof could be done more
+  directly\<^footnote>\<open>see, e.g. \<^url>\<open>https://en.wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>\<close>
+
 section \<open>Library Analysis\<close>
 
 subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>
