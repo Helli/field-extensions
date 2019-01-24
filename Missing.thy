@@ -417,8 +417,8 @@ text \<open>The following corresponds to theorem 11.7 of \<^url>\<open>http://ww
 lemma (in vectorspace) decompose_step:
   assumes fin_dim
   assumes "dim > 0"
-  shows "\<exists>h V'. linear_map K V (direct_sum (vs_of K) (vs V')) h
-    \<and> bij_betw h (carrier V) (carrier K \<times> V')
+  shows "\<exists>\<phi> V'. linear_map K V (direct_sum (vs_of K) (vs V')) \<phi>
+    \<and> bij_betw \<phi> (carrier V) (carrier K \<times> V')
     \<and> subspace K V' V
     \<and> vectorspace.dim K (vs V') = dim - 1"
 proof - \<comment> \<open>Possibly easier if the map definition were swapped as in Kemper's proof.\<close>
