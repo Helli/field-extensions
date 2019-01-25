@@ -585,7 +585,7 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
     by (simp add: \<open>p \<noteq> \<zero>\<close> \<open>q \<noteq> \<zero>\<close> assms)
 qed (simp_all add: assms)
 
-lemma ex1_monic_associated:
+lemma ex1_associated_monic:
   assumes "p \<in> carrier P - {\<zero>}" shows "\<exists>!q \<in> carrier P. q \<sim> p \<and> monic q"
 proof
   from assms have p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}"
@@ -707,10 +707,10 @@ lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
 lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
 proof -
   obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
-    using exists_gen ring.kernel_is_ideal ex1_monic_associated by metis
+    using exists_gen ring.kernel_is_ideal ex1_associated_monic by metis
   then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
-    using ex1_monic_associated by (smt Diff_iff P.associated_iff_same_ideal P.cgenideal_eq_genideal
-        P.genideal_zero a_kernel_nontrivial empty_iff insert_iff psubset_imp_ex_mem)
+    using ex1_associated_monic by (metis (no_types) DiffD1 DiffD2 associated_iff_same_ideal
+        cgenideal_eq_genideal genideal_zero UP_zero_closed a_kernel_nontrivial insertE insert_Diff psubset_imp_ex_mem)
   then have "Eval g = \<zero>\<^bsub>L\<^esub>"
     using P.cgenideal_self ring.kernel_zero by blast
   with g(1,2) have degree_le: "degree irr \<le> degree g"
@@ -729,7 +729,7 @@ lemma irr_unique:
   assumes "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g" shows "g = irr"
 proof -
   have irr_is_unique_gen: "p = irr" if "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval" for p
-    using that PIdl_irr_a_kernel_Eval associated_iff_same_ideal ex1_monic_associated
+    using that PIdl_irr_a_kernel_Eval associated_iff_same_ideal ex1_associated_monic
     by (metis UP_zero_closed insertE insert_Diff irr_in_P monic_irr)
   from assms have degree_g_le: "degree g \<le> degree irr"
     by (simp add: Eval_irr irr_in_P is_arg_min_linorder monic_irr)
