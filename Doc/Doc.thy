@@ -35,6 +35,29 @@ section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
 
 section \<open>Main Results\<close>
 
+subsection \<open>Classification of simple algebraic extensions\<close>
+
+text \<open>The results of Theorem Kemper 16.9b@{cite Algebra1} are distributed over to-do (with even
+ more fine-grained sublemma naming). All of them are on their own useful for a library, so splitting
+ up the theorem seemed more appropriate. Definition 16.10 is preponed to avoid confusing extra
+ variables like \<open>g'\<close> or \<open>p'\<close> in later proofs. This is done via the indefinite description that
+ @{const arg_min} provides:\<close>
+
+text_raw\<open>
+
+\isadelimdocument
+%
+\endisadelimdocument
+\isacommand{definition}\isamarkupfalse%
+\ irr\ \isakeyword{where}\ \isanewline
+\ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
+\isadelimdocument
+%
+\endisadelimdocument\<close>
+text\<open>\<^theory_text>\<open>definition (in UP_field_extension) irr where\<close>\\
+  @{prop "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"}
+\<close>
+
 subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\<close>
 
 lemma "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
@@ -60,8 +83,9 @@ text \<open>The motivation for this was Kemper's proof of the tower rule, which 
   spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more
  directly using indexed sums\<^footnote>\<open>see, e.g.
   \<^url>\<open>https://en.wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
-  but the material which Kemper used seemed to be of general usefulness. Moreover note that proofs
-  using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
+  but the material which Kemper uses seemed to be of general usefulness for a vector space library.
+ Moreover note that proofs using indexed sums tend to be very cumbersome in
+  \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
 
 subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
 
@@ -72,7 +96,7 @@ text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = 
 text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$\<close>
 
 text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
-  compared to \<^const>\<open>direct_sum\<close>, which could even combine modules of different \<^bold>\<open>type\<close> (over the
+  compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
 
 text \<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
@@ -82,13 +106,7 @@ subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<c
 
 text \<open>This uses the newly defined constant \<^const>\<open>ring.nspace\<close>:\<close>
 
-text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
-
-text \<open>where \<^const>\<open>ring.func_space\<close> is the usual ${to-do}$\<close>
-
-text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
-  compared to \<^const>\<open>direct_sum\<close>, which could even combine modules of different \<^bold>\<open>type\<close> (over the
-  same field).\<close>
+text "to-do"
 
 subsection \<open>@{thm[source] vectorspace.decompose_step}\<close>
 
@@ -109,7 +127,7 @@ text \<open>This is used in the proof of the tower rule's finite case, together 
   itself turned out to be misleading, see (section) to-do).\<close>
 
 text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
-  existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, because the witness
+  existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
 \<^item> is somewhat unhandy (see the proof)
 and, more importantly, it
 \<^item> depends on a choice of basis, and a choice of ordering on that basis.\<close>
