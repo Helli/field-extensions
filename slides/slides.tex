@@ -47,9 +47,10 @@
 \usetikzlibrary{shapes.geometric}
 
 
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\QQ}{\mathbb{Q}}
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\CC}{\mathbb{C}}
-\newcommand{\NN}{\mathbb{N}}
 \renewcommand{\epsilon}{\varepsilon}
 \renewcommand{\phi}{\varphi}
 \def\braces#1{[#1]}
@@ -228,9 +229,10 @@ A \emph{field} is a nontrivial commutative ring where every nonzero element has 
 
 A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ where $K$ is a subset of $L$ and $(\mkern-3mu\mid\mkern-6mu K,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ is again a field.
 \begin{itemize}
-\item If $K$ is a field, then $K/K$ is a field extension\pause
+\item If $K$ is a field, then $K/K$ is a field extension.\pause
 %problem for a formalisation: K is often identified with its carrier set
-\item $\mathbb{R}/\mathbb{Q}$ is a field extension
+\item $\RR/\QQ$ is a field extension.\pause
+\item $\QQ(\sqrt{3})/\QQ$ is a field extension.
 \end{itemize}
 \end{frame}
 
