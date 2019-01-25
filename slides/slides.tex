@@ -172,6 +172,30 @@ Isabelle enforces great precision, but also helps:
 \end{frame}
 
 \section{Results} % what I contributed
+
+\subsection{An explicit description of simple extensions}
+\begin{frame}{An explicit description of simple extensions} %at least *more* explicit, still using set comprehension
+%to-do: really interesting?
+\end{frame}
+
+\subsection{Classification of simple algebraic extensions}
+\subsubsection{Minimal Polynomial}
+\begin{frame}{Minimal Polynomial}%We are in a context where we have fixed L/K and some α∈L
+\textbf{definition} \textit{irr} \textbf{where}\\
+\hskip1em\textit{irr = (ARG-MIN degree p. p ∈ carrier P ∧ monic p ∧ Eval p = $\textbf{0}_L$)}\pause
+\\[4mm]
+\textbf{context}\\
+\hskip1em\textbf{assumes} \textit{algebraic}\\
+\textbf{begin}\\[4mm]\pause
+
+(...38 lines later)\\[4mm]
+\textbf{lemma} \textit{irr ∈ carrier P} \textbf{and} \textit{monic irr} \textbf{and} \textit{Eval irr = $\textbf{0}_L$}\\\pause
+\textbf{and} \textit{irr ≠ \textbf{0}}\\\pause
+\textbf{and} \textit{degree irr > 0}
+uniqueness+ex1_associated_monic+...
+%We keep that "algebraic assumption for a bit...
+4\end{frame}
+
 \subsection{Tower rule}
 \begin{frame}{Tower rule}
 If $M/L$ and $L/K$ are field extensions, then
