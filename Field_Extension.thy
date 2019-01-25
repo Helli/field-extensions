@@ -709,8 +709,8 @@ proof -
   obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal ex1_associated_monic by metis
   then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
-    using ex1_associated_monic by (metis (no_types) DiffD1 DiffD2 associated_iff_same_ideal
-        cgenideal_eq_genideal genideal_zero UP_zero_closed a_kernel_nontrivial insertE insert_Diff psubset_imp_ex_mem)
+    using ex1_associated_monic by (metis (no_types) DiffD1 DiffD2 associated_iff_same_ideal insertE
+      cgenideal_eq_genideal genideal_zero UP_zero_closed a_kernel_nontrivial insert_Diff psubset_imp_ex_mem)
   then have "Eval g = \<zero>\<^bsub>L\<^esub>"
     using P.cgenideal_self ring.kernel_zero by blast
   with g(1,2) have degree_le: "degree irr \<le> degree g"
