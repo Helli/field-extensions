@@ -1,3 +1,9 @@
+today:
+add fact names of theorem 16.9b
+generalize "monic ==> ~= 0"
+add code line statement for uniqueness
+check git stash
+
 
 move the subgoals as lemmas into a context 'assumes "basis B"'
 

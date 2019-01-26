@@ -331,6 +331,9 @@ proof -
     rewrites "carrier (M\<lparr>carrier:=K\<rparr>) = K"
     by (simp_all add: field_extension.vectorspace)
 
+  from \<open>K \<subseteq> L\<close> have funcset_intro: "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f A
+    using that by auto
+
   have "ring M" (* rm *)
     using assms(3) cring.axioms(1) domain_def field_def by blast
   consider
@@ -357,21 +360,17 @@ proof -
     interpret a: vectorspace ?L \<open>vs_of M\<close>
       rewrites "carrier (M\<lparr>carrier:=L\<rparr>) = L"
       by (simp_all add: assms(2-3) field_extension.vectorspace field_extension_def)
-    from M_over_L_infinite have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
-      using a.fin_dim_def assms(2) assms(3) field_extension.finite_def field_extension_def by auto
-    then have "\<And>B. finite B \<Longrightarrow> B \<subseteq> carrier M \<Longrightarrow> a.span B \<subset> carrier M"
-      using a.span_is_subset2 by auto
-    note 1 = this[unfolded a.span_def a.lincomb_def]
     have "\<not>M_over_K.fin_dim"
     proof
       assume M_over_K.fin_dim
-      then have "\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> M_over_K.span B = carrier M"
-        by (simp add: M_over_K.fin_dim_def)
-      note 2 = this[unfolded M_over_K.span_def M_over_K.lincomb_def]
-      from \<open>K \<subseteq> L\<close> have "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f and A::"'a set"
-        using that by auto
-      with 1 2 show False
-        by (smt mem_Collect_eq psubsetE subsetI)
+      then obtain B where B: "finite B" "B \<subseteq> carrier M" "M_over_K.span B = carrier M"
+        by (auto simp: M_over_K.fin_dim_def)
+      then have "a.span B \<supseteq> carrier M"
+        using M_over_K.finite_in_span funcset_intro by (fastforce simp: a.span_def)
+      moreover from M_over_L_infinite have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
+        using a.fin_dim_def assms(2) assms(3) field_extension.finite_def field_extension_def by auto
+      ultimately show False
+        by (metis B(1,2) a.span_is_subset2 equalityI partial_object.select_convs(1))
     qed
     then show ?thesis
       by (simp add: M_over_L_infinite \<open>field_extension M K\<close> assms(2,3) field_extension.degree_def
