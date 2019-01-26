@@ -1,6 +1,5 @@
-today:
-generalize "monic ==> ~= 0"
 add code line statement for uniqueness
+add code line statement for Missing.thy, Field_Extensions.thy (and Old_Field_Extensions.thy and Examples.thy?)
 
 
 move the subgoals as lemmas into a context 'assumes "basis B"'
@@ -37,7 +36,7 @@ conclusion:
 Was it painful?
 next steps
 personal opinion
-(What could be done better?)
+(What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
 comparison to other formalisations
 
 move technical stuff towards the end

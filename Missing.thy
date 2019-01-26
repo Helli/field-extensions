@@ -1000,6 +1000,9 @@ lemma (in UP_ring) lcoeff_Unit_nonzero:
   "carrier R \<noteq> {\<zero>} \<Longrightarrow> lcoeff p \<in> Units R \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   by (metis R.Units_r_inv_ex R.l_null R.one_zeroD coeff_zero)
 
+lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (monom P a n) = a"
+  by (cases "a = \<zero>") auto
+
 lemma (in UP_cring) Unit_scale_zero:
   "c \<in> Units R \<Longrightarrow> r \<in> carrier P \<Longrightarrow> c \<odot>\<^bsub>P\<^esub> r = \<zero>\<^bsub>P\<^esub> \<Longrightarrow> r = \<zero>\<^bsub>P\<^esub>"
   by (metis R.Units_closed R.Units_l_inv_ex UP_smult_one smult_assoc_simp smult_r_null)

@@ -475,9 +475,6 @@ definition (in UP_ring) "monic p \<longleftrightarrow> lcoeff p = \<one>"
 lemma (in UP_domain) monic_nonzero: "monic p \<Longrightarrow> p \<noteq> \<zero>\<^bsub>P\<^esub>"
   unfolding monic_def by auto
 
-lemma (in UP_ring) lcoeff_monom'[simp]: "a \<in> carrier R \<Longrightarrow> lcoeff (monom P a n) = a"
-  by (cases "a = \<zero>") auto
-
 context UP_field_extension begin
 lemmas coeff_smult = coeff_smult[simplified]
 lemmas monom_mult_smult = monom_mult_smult[simplified]
