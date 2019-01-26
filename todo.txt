@@ -1,5 +1,4 @@
 today:
-add fact names of theorem 16.9b
 generalize "monic ==> ~= 0"
 add code line statement for uniqueness
 

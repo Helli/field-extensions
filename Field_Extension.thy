@@ -681,7 +681,7 @@ proof -
     unfolding irr_def by (metis (mono_tags, lifting) is_arg_min_arg_min_nat)
 qed
 
-corollary irr_sane:
+corollary irr_exists:
   shows irr_in_P: "irr \<in> carrier P" and monic_irr: "monic irr" and Eval_irr: "Eval irr = \<zero>\<^bsub>L\<^esub>"
   and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y"
   using irr_is_arg_min[unfolded is_arg_min_linorder] by auto
