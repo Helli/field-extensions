@@ -616,7 +616,7 @@ proof
     using lcoeff_mult \<open>monic q\<close>[unfolded monic_def]
     by (simp add: P.Units_closed \<open>inv_c' \<in> Units P\<close> \<open>q = inv_c' \<otimes> p\<close> p(1))
   then have "\<one>\<^bsub>L\<^esub> = inv_c \<otimes>\<^bsub>L\<^esub> lcoeff p"
-    using lcoeff_monom' inv_c unfolding inv_c'_def by force
+    by (simp add: inv_c inv_c'_def)
   then have "inv_c = inv\<^bsub>L\<^esub> lcoeff p"
     by (simp add: L.inv_unique' inv_c p(1) sub_m_comm)
   then have "q = ?p"
