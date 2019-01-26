@@ -42,20 +42,12 @@ text \<open>The results of Theorem Kemper 16.9b@{cite Algebra1} are distributed 
  up the theorem seemed more appropriate. Definition 16.10 is preponed to avoid confusing extra
  variables like \<open>g'\<close> or \<open>p'\<close> in later proofs. This is done via the indefinite description that
  @{const arg_min} provides:\<close>
-
 text_raw\<open>
-
-\isadelimdocument
-%
-\endisadelimdocument
-\isacommand{definition}\isamarkupfalse%
-\ irr\ \isakeyword{where}\ \isanewline
-\ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
-\isadelimdocument
-%
-\endisadelimdocument\<close>
-text\<open>\<^theory_text>\<open>definition (in UP_field_extension) irr where\<close>\\
-  @{prop "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"}
+\isacommand{definition}\ {\isacharparenleft}\isakeyword{in}\ UP{\isacharunderscore}field{\isacharunderscore}extension{\isacharparenright}
+irr\ \isakeyword{where}\ \isanewline
+\ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\
+ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\
+ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
 \<close>
 
 subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\<close>
