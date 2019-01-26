@@ -36,16 +36,14 @@ section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
 section \<open>Main Results\<close>
 
 subsection \<open>Classification of simple algebraic extensions\<close>
-
+(*<*)context UP_field_extension begin(*>*)
 text \<open>The results of Theorem Kemper/16.9b@{cite Algebra1} are distributed over @{thm[source]
- UP_field_extension.irr_exists}, @{thm[source]
- UP_field_extension.irr_unique}, @{thm[source]
- UP_field_extension.irr_irreducible_polynomial} and @{thm[source]
- UP_field_extension.the_elem_ring_iso_Quot_irr_generate_field} (with even more fine-grained sublemma
- naming). All of them are on their own useful for a library, so splitting
+ irr_exists}, @{thm[source] irr_unique}, @{thm[source] irr_irreducible_polynomial} and @{thm[source]
+ the_elem_ring_iso_Quot_irr_generate_field} (all in \<^locale>\<open>UP_field_extension\<close>). All of them are on their own useful for a library, so splitting
  up the theorem seemed more appropriate. Definition 16.10 is preponed to avoid confusing extra
  variables like \<open>g'\<close> or \<open>p'\<close> in later proofs. This is done via the indefinite description that
  @{const arg_min} provides:\<close>
+(*<*)end(*>*)
 text_raw\<open>
 \isacommand{definition}\ {\isacharparenleft}\isakeyword{in}\ UP{\isacharunderscore}field{\isacharunderscore}extension{\isacharparenright}
 irr\ \isakeyword{where}\ \isanewline
