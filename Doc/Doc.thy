@@ -58,7 +58,7 @@ lemma "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\
   field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
   by (fact degree_multiplicative)
 
-text \<open>The proof is covered by considering three cases:
+text \<open>The proof is covered by considering three (partially overlapping) cases:
 \<^enum> The lower field extension is infinite.
 \<^enum> The upper field extension is infinite.
 \<^enum> Both extension parts are finite.\<close>
