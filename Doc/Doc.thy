@@ -62,7 +62,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 \<^enum> The lower field extension is infinite.
 \<^enum> The upper field extension is infinite.
 \<^enum> Both extension parts are finite.\<close>
-text\<open>Remember that an infinite field extension is encoded to have \<open>degree = 0\<close>.\<close>
+text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
 
 text \<open>Note that recently, the statement about combining finite extensions (case 3) has also been proven in
   another development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This uses the inner
