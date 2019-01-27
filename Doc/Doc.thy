@@ -117,7 +117,7 @@ text \<open>This is used in the proof of the tower rule's finite case, together 
  have achieved the same with
   less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
   be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
-  defined. Ultimately, no useful results turned out to exist for this constant (and the definition
+  defined. Ultimately, no useful results turned out to exist for this function (and the definition
   itself turned out to be misleading, see (section) to-do).\<close>
 
 text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second

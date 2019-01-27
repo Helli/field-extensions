@@ -44,7 +44,7 @@ qed
 
 text \<open>\<open>\<real>\<close> is a field extension of \<open>\<rat>\<close>:\<close>
 
-lemma of_real_of_rat_eq[simp]: "of_real (of_rat q) = of_rat q"
+lemma of_real_of_rat_eq[simp]: "of_real (real_of_rat q) = of_rat q"
 proof (cases q)
   case (Fract a b)
   obtain rr :: "real \<Rightarrow> rat" where
