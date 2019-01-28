@@ -331,7 +331,7 @@ proof -
     rewrites "carrier (M\<lparr>carrier:=K\<rparr>) = K"
     by (simp_all add: field_extension.vectorspace)
 
-  from \<open>K \<subseteq> L\<close> have funcset_intro: "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f A
+  from \<open>K \<subseteq> L\<close> have supfuncset_intro: "f \<in> A \<rightarrow> L" if "f \<in> A \<rightarrow> K" for f A
     using that by auto
 
   have "ring M" (* rm *)
@@ -366,7 +366,7 @@ proof -
       then obtain B where B: "finite B" "B \<subseteq> carrier M" "M_over_K.span B = carrier M"
         by (auto simp: M_over_K.fin_dim_def)
       then have "a.span B \<supseteq> carrier M"
-        using M_over_K.finite_in_span funcset_intro by (fastforce simp: a.span_def)
+        using M_over_K.finite_in_span supfuncset_intro by (fastforce simp: a.span_def)
       moreover from M_over_L_infinite have "\<not>(\<exists>B. finite B \<and> B \<subseteq> carrier M \<and> a.span B = carrier M)"
         using a.fin_dim_def assms(2) assms(3) field_extension.finite_def field_extension_def by auto
       ultimately show False
