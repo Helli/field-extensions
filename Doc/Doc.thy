@@ -1,4 +1,5 @@
 (*<*)
+(* Author: Fabian Hellauer, 2018-2019 *)
 theory Doc
   imports
     Field_Extensions.Examples
