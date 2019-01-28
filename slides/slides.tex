@@ -171,6 +171,18 @@ Isabelle enforces great precision, but also helps:
 \end{itemize}
 \end{frame}
 
+\subsection{to-do}
+\begin{frame}{Encoding of $\infty$}%relevant?
+Can we use type \emph{nat} for the degree of field extensions?\pause
+\begin{itemize}
+	\item The degree is a vector space dimension.\pause%these *can* be zero (iff zvs)
+	\item However, it is always $\ge 1$.\pause
+	\item Thus, this encoding strips no information:\\%It could be adapted easily to use extended natural numbers
+	\textbf{definition} \textit{degree} \textbf{where}\\
+	\hskip1em\textit{degree = (if finite then vs.dim else 0)}
+\end{itemize}
+\end{frame}
+
 \section{Results} % what I contributed
 
 \subsection{An explicit description of simple extensions}
@@ -204,17 +216,19 @@ If $M/L$ and $L/K$ are field extensions, then
 In particular, combining two finite field extensions yields a finite field extension. %(or combining finitely many)
 \end{frame}
 
-\section{to-do}
-\begin{frame}{Encoding of $\infty$}
-Can we use type \emph{nat} for the degree of field extensions?\pause
+\subsection{Vector Spaces}
+\begin{frame}{Vector Spaces}\pause
+A \emph{vector space} $V$ over a field $K$ is an Abelian group (like $(\RR\times\RR,+,(0,0)$) together with a \emph{scale} operator $\odot:K\times V \to V$ which follows some (well-known) axioms.\pause
 \begin{itemize}
-	\item The degree is a vector space dimension.\pause%these *can* be zero (iff zvs)
-	\item However, it is always $\ge 1$.\pause
-	\item Thus, this encoding strips no information:\\%It could be adapted easily to use extended natural numbers
-	\textbf{definition} \textit{degree} \textbf{where}\\
-	\hskip1em\textit{degree = (if finite then vs.dim else 0)}
+\item $\RR \times \RR$ is a vector space over $\RR$.\pause
+%these are coordinates in a 2d plane, we could also take 3d space
+\item If $K$ is a field, then $\{0\}$ is a vector space over $K$.\pause
+\item If $L/K$ is a field extension, then $L$ is a vector space over $K$.
 \end{itemize}
 \end{frame}
+
+subspace-dim
+nspace-iso
 
 \section{Contributions}
 \begin{frame}{Contributions}
@@ -226,22 +240,6 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 	\item to-do: Maintenance work in the "VectorSpace" library
 	\item Documentation: 300 lines (= 10 pages)
 	%everything counted once
-\end{itemize}
-\end{frame}
-
-\section{Vector Spaces}
-\begin{frame}
-\begin{center}
-\huge\high{Vector Spaces}
-\end{center}
-\end{frame}
-
-\begin{frame}
-A \emph{vector space} $V$ over a field $K$ is an Abelian group (like $(\RR\times\RR,+,(0,0)$) together with a \emph{scale} operator $\odot:K\times V \to V$ which follows some (well-known) axioms.
-\begin{itemize}
-\item $\RR \times \RR$ is a vector space over $\RR$\pause
-%these are coordinates in a 2d plane, we could also take 3d space
-\item If $K$ is a field, then $\{0\}$ is a vector space over $K$
 \end{itemize}
 \end{frame}
 
@@ -282,5 +280,9 @@ GaloisCVC by P.\ E.\ de Vilhena, M.\ Baillon and L.\ Paulson (ALEXANDRIA grant)
 %Are there questions now?
 \end{frame}
 
+\section{Reference}
+\begin{frame}{Reference}
+	G.\ Kemper. Algebra. German lecture notes, 2018. \url{http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/algebra\_nodates.pdf} 
+\end{frame}
 
 \end{document}

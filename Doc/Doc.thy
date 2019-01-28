@@ -36,7 +36,7 @@ section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
 
 section \<open>Main Results\<close>
 
-subsection \<open>Classification of simple algebraic extensions\<close>
+subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>The results of Theorem Kemper/16.9b@{cite Algebra1} are distributed over @{thm[source]
  irr_exists}, @{thm[source] irr_unique}, @{thm[source] irr_irreducible_polynomial} and @{thm[source]
