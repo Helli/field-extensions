@@ -7,18 +7,18 @@ abbreviation standard_ring
   where "standard_ring carr \<equiv> \<lparr>carrier = carr, monoid.mult = (*), one = 1, zero = 0, add = (+)\<rparr>"
 
 definition "Ints_ring = standard_ring \<int>"
-definition "rat_field = standard_ring \<rat>" (* rename to Rats_field etc? *)
-definition "real_field = standard_ring \<real>"
+definition "Rats_field = standard_ring \<rat>"
+definition "Reals_field = standard_ring \<real>"
 txt \<open>There seems to be no \<open>of_complex\<close> available. However, restricting the type is no problem here
   since it is the largest example anyway.\<close>
 definition complex_field :: "complex ring" where "complex_field = standard_ring UNIV"
 
 lemma examples:
   shows cring_Ints_ring: "cring Ints_ring"
-    and field_rat_field: "field rat_field"
-    and field_real_field: "field real_field"
+    and field_rat_field: "field Rats_field"
+    and field_real_field: "field Reals_field"
     and field_complex_field: "field complex_field"
-  unfolding Ints_ring_def rat_field_def real_field_def complex_field_def
+  unfolding Ints_ring_def Rats_field_def Reals_field_def complex_field_def
      apply unfold_locales
                       apply (auto intro: add.right_inverse right_inverse simp: Units_def algebra_simps)
      apply (metis (full_types) Ints_cases mult_of_int_commute)
@@ -30,15 +30,15 @@ lemma examples:
 
 text \<open>\<open>\<int>\<close> is a subdomain of \<open>\<rat>\<close>:\<close>
 
-lemma subdomain_example: "subdomain \<int> rat_field"
+lemma subdomain_example: "subdomain \<int> Rats_field"
 proof -
-  interpret field rat_field by (fact examples(2))
+  interpret field Rats_field by (fact examples(2))
   show ?thesis
     apply (rule subdomainI)
     apply (rule subcringI')
     apply (rule ring.ring_incl_imp_subring)
       apply (simp add: ring_axioms)
-    unfolding rat_field_def apply (simp add: Ints_subset_Rats)
+    unfolding Rats_field_def apply (simp add: Ints_subset_Rats)
     using examples(1)[unfolded Ints_ring_def] unfolding cring_def by auto
 qed
 
@@ -76,13 +76,13 @@ lemma Reals_of_rat[simp]: "of_rat z \<in> \<real>"
 lemma Rats_subset_Reals: "\<rat> \<subseteq> \<real>"
   using Rats_cases by force
 
-lemma "field_extension real_field \<rat>"
+lemma "field_extension Reals_field \<rat>"
 proof (auto simp add: field_extension_def)
-  show "subfield \<rat> real_field"
+  show "subfield \<rat> Reals_field"
     apply (rule ring.subfield_iff(1))
       apply (simp add: cring.axioms(1) examples(3) fieldE(1))
-     apply (metis examples(2) partial_object.update_convs(1) rat_field_def real_field_def)
-    by (simp add: Rats_subset_Reals real_field_def)
+     apply (metis examples(2) partial_object.update_convs(1) Rats_field_def Reals_field_def)
+    by (simp add: Rats_subset_Reals Reals_field_def)
 qed (fact examples(3))
 
 text \<open>\<open>\<complex>\<close> is a finitely generated field extension of \<open>\<real>\<close>:\<close>
@@ -90,7 +90,7 @@ text \<open>\<open>\<complex>\<close> is a finitely generated field extension of
 lemma subfield_Reals_complex_field: "subfield \<real> complex_field"
   apply (rule ring.subfield_iff(1))
   apply (simp add: cring.axioms(1) examples(4) fieldE(1))
-  unfolding complex_field_def by (auto simp: examples(3)[unfolded real_field_def])
+  unfolding complex_field_def by (auto simp: examples(3)[unfolded Reals_field_def])
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> \<real>) = UNIV"
 proof -
