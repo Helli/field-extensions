@@ -142,7 +142,7 @@ lemma (in vectorspace)
   assumes fin_dim shows "distinct B" "basis (set B)" unfolding B_def
   using assms by (metis (no_types, lifting) finite_basis_exists finite_distinct_list someI)+
 
-text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever populated:\<close>
+text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever extended:\<close>
 find_theorems name: "subspace."
 find_theorems name: "submodule."
 text \<open>Also, the different argument order is somewhat annoying.\<close>
