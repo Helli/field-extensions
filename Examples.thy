@@ -14,7 +14,7 @@ txt \<open>There seems to be no \<open>of_complex\<close> available. However, re
 definition complex_field :: "complex ring" where "complex_field = standard_ring UNIV"
 
 lemma examples:
-  shows cring_Ints_ring: "cring Ints_ring"
+  shows cring_Ints_ring: "cring Ints_ring" \<comment> \<open>not always a domain\<close>
     and field_rat_field: "field Rats_field"
     and field_real_field: "field Reals_field"
     and field_complex_field: "field complex_field"
