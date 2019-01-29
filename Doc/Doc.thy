@@ -40,7 +40,8 @@ subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>The results of Theorem Kemper/16.9b@{cite Algebra1} are distributed over @{thm[source]
  irr_exists}, @{thm[source] irr_unique}, @{thm[source] irr_irreducible_polynomial} and @{thm[source]
- the_elem_ring_iso_Quot_irr_generate_field} (all in \<^locale>\<open>UP_field_extension\<close>). All of them are on their own useful for a library, so splitting
+ the_elem_ring_iso_Quot_irr_generate_field} (all in \<^locale>\<open>UP_field_extension\<close>). All of them are
+ on their own useful for a library, so splitting
  up the theorem seemed more appropriate. Definition 16.10 is preponed to avoid confusing extra
  variables like \<open>g'\<close> or \<open>p'\<close> in later proofs. This is done via the indefinite description that
  @{const arg_min} provides:\<close>
@@ -135,7 +136,16 @@ section \<open>Library Analysis\<close>
 
 subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>
 
-subsubsection\<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
+subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
+
+text \<open>This function was added during my work. This meant that I had to do some porting (see
+  \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). One the other hand,
+  it leaves out the "lower bound" field found in @{cite Kemper}, which turned out to simplify
+  matters quite a bit. A note about the style: Just like in their locale definitions, the authors
+  use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and
+  \<^const>\<open>hull\<close>.\<close>
+
+subsubsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
 
 subsubsection\<open>Side Notes\<close>
 
