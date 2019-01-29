@@ -100,21 +100,19 @@ proof -
     by (simp add: examples(4) field_extension_def subfield_Reals_complex_field)
       (simp_all add: complex_field_def P_def)
   show ?thesis unfolding genfield_singleton_explicit apply auto
-  proof goal_cases
-    case (1 x)
+  proof (rule exI, rule exI)
+    fix x :: complex
+    let ?f = "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"
+    let ?g = "\<one>\<^bsub>P\<^esub>"
     have [simp]: "inv\<^bsub>complex_field\<^esub> 1 = 1"
       unfolding complex_field_def m_inv_def by simp
     have "x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)"
       unfolding complex_field_def apply (simp del: One_nat_def)
       using add.commute complex_eq mult.commute
       by (metis Eval_cx Reals_of_real complex_field_def monoid.simps(1))
-    show ?case
-      apply (rule exI[of _ "monom P (Im x) 1 \<oplus>\<^bsub>P\<^esub> monom P (Re x) 0"])
-      apply (rule exI[of _ "monom P 1 0"])
-      apply auto
-      unfolding complex_field_def apply auto apply (fold One_nat_def) using
-        \<open>x = Eval (monom P (complex_of_real (Im x)) 1) \<oplus>\<^bsub>complex_field\<^esub> complex_of_real (Re x)\<close>
-        complex_field_def ring.simps(2) by metis
+    then show "x = Eval ?f \<otimes>\<^bsub>complex_field\<^esub> inv\<^bsub>complex_field\<^esub> Eval ?g \<and> ?f \<in> carrier P \<and> ?g \<in> carrier
+ P \<and> Eval ?g \<noteq> \<zero>\<^bsub>complex_field\<^esub>"
+      by (auto, simp add: complex_field_def)
   qed
 qed
 

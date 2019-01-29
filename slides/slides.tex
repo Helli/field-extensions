@@ -138,7 +138,7 @@ Isabelle enforces great precision, but also helps:
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
 	\item record-based \pause%to-do: how to explain to Prof. K.?
-	\item verbose (subscripts, ...) \pause%to-do: do they even appear in an example?
+	\item verbose, e.g.\ need to annotate (almost) every $+$ \pause %also: cannot simply write α ∈ L
 	\item locale-based \pause%INTEG as example?
 	% reasons
 	\item explicit carrier sets \pause
@@ -262,6 +262,25 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \textbf{definition} \textit{degree} \textbf{where}\\
 \hskip1em\textit{degree = (if finite then vs.dim else 0)}
 \end{itemize}
+\end{frame}
+
+\section{Example Instantiations}
+\begin{frame}{Example Instantiations}%to-do: show lemma and Int_ring_def the slide before
+
+\textbf{lemma} generate\_field\_i\_UNIV:\\
+\hskip1em\textit{generate-field complex-field (insert 𝗂 $\RR$) = UNIV}\\
+\textbf{proof} -\\
+\hskip1em\textbf{interpret} \textit{UP-field-extension complex-field ℝ P 𝗂}\\
+\hskip2em(...)\\
+\hskip1em \textbf{fix} \textit{x :: complex}\\
+\hskip1em \textbf{let} \textit{?f = monom P (Im x) 1 $⊕_P$ monom P (Re x) 0}\\
+\hskip1em \textbf{let} \textit{?g = monom P 1 0}\\[1mm]%no creativity. the term is too large when written like this
+\hskip1em(...)\\[1mm]
+\hskip1em \textbf{have} \textit{x = Eval ?f $\oslash_\text{complex-field}$ Eval ?g ∧ ?f ∈ carrier P\\\hskip2em
+	∧ ?g ∈ carrier P ∧ Eval ?g ≠ $\textbf{0}_\text{complex-field}$}\\[1mm]
+\hskip1em(...)\\[1mm]
+\textbf{qed}% ~30 lines
+
 \end{frame}
 
 \section{Contributions}
