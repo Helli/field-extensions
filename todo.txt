@@ -9,7 +9,6 @@ clarify contribution
 
 What did I do?
 definitions
-nontrivial results
 (indexed product), afterwards problems (e.g. missing lemmas?)
 isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
 
@@ -25,10 +24,9 @@ lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
 using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
 Maybe mention HOL-Computational_Algebra
 
-mention Problems later
 Problems?
 "wir entscheiden uns für eine Basis" ~> fix B assume "basis B". Right?
-subspace imports and argument order
+(subspace imports and argument order)
 
 conclusion:
 Was it painful?
