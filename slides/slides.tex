@@ -138,8 +138,10 @@ Isabelle enforces great precision, but also helps:
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
 	%\item record-based \pause%to-do: how to explain to Prof. K.?
-	\item verbose, e.g.\ need to annotate (almost) every $+$ \pause %also: cannot simply write α ∈ L
-	\item locale-based \pause
+	\item locales:
+	\includegraphics[width=\linewidth]{"locale_monoid"}
+	\pause
+	\item verbose, e.g.\ need to annotate many $\oplus$, $\otimes$... \pause
 	\item explicit carrier sets: \textit{$\alpha \in$ carrier $L$} \pause
 	\item enables reasoning about substructures	%this is what we will do
 	% HOL-Computational_Algebra uses types --> this is not possible
@@ -169,8 +171,6 @@ Isabelle enforces great precision, but also helps:
 \end{frame}
 
 \begin{frame}
-A \emph{field} is a nontrivial commutative ring where every nonzero element has a multiplicative inverse.
-\pause %in addition to its additive inverse
 
 A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ where $K$ is a subset of $L$ and $(\mkern-3mu\mid\mkern-6mu K,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ is again a field.
 \begin{itemize}
@@ -224,7 +224,8 @@ Next up:\\\pause
 \begin{frame}{Tower rule}
 If $M/L$ and $L/K$ are field extensions, then
 \[[M : K] = [M : L] \cdot [L : K]\]\pause %ask M.: good idea to use non-HOL notation?
-In particular, combining two finite field extensions yields a finite field extension. %(or combining finitely many)
+In particular, combining two finite field extensions yields a finite field extension.\\[4mm] %(or combining finitely many)
+\includegraphics[width=1.1\linewidth]{tower_rule}
 \end{frame}
 
 \subsection{Vector Spaces}
