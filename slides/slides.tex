@@ -108,7 +108,7 @@ Reasons:
 	\item to obtain a basis for more useful results\pause
 	%as a computer scientist, I mainly think of algorithms and their correctness
 	\item to find mistakes\pause
-	\item meta: to prove that verification %of a handfull of pages
+	\item to prove that verification %of a handfull of pages
 	is feasible (when using modern tools)
 	%this could be motivation to do more math theories, because it removes the need for experts to get them accepted.
 \end{itemize}
@@ -137,7 +137,6 @@ Isabelle enforces great precision, but also helps:
 
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
-	%\item record-based \pause%to-do: how to explain to Prof. K.?
 	\item locales:
 	\includegraphics[width=\linewidth]{"locale_monoid"}
 	\pause
@@ -174,15 +173,44 @@ Isabelle enforces great precision, but also helps:
 
 A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ where $K$ is a subset of $L$ and $(\mkern-3mu\mid\mkern-6mu K,\otimes,1,\oplus,0\mkern-6mu\mid\mkern-3mu)$ is again a field.
 \begin{itemize}
-\item If $K$ is a field, then $K/K$ is a field extension.\pause
+\item $K/K$, $[K:K] = 1$\pause
 %problem for a formalisation: K is often identified with its carrier set
-\item $\RR/\QQ$ is a field extension.\pause
-\item $\QQ(\sqrt{3})/\QQ$ is a field extension. %Field extensions like these are interesting when doing Galois theory.
-%to-do: explain algebraic
+\item $\RR/\QQ$, $[\RR:\QQ]=\infty$\pause
+\item $\QQ(\sqrt{3})/\QQ$, $\QQ(\sqrt{3}):/\QQ]$ %Field extensions like these are interesting when doing Galois theory.
 \end{itemize}
 \end{frame}
 
 \section{Results} % what I contributed
+
+\subsection{Tower rule}
+\begin{frame}{Tower rule}
+\begin{theorem}
+	If $M/L$ and $L/K$ are field extensions, then
+	\[[M : K] = [M : L] \cdot [L : K]\]\pause
+\end{theorem}
+In particular, combining two finite field extensions yields a finite field extension.\\[4mm] %(or combining finitely many)
+In Isabelle:\\[2mm]
+\includegraphics[width=1.1\linewidth]{tower_rule}
+\end{frame}
+
+\subsection{Vector Spaces}
+\begin{frame}{Vector Spaces}\pause
+$U \subseteq V$ is a \emph{subspace} iff it is a vector space with $V$'s operations.
+%over the same field
+\begin{theorem}
+\upshape
+Let $U \subseteq V$ be a subspace. Then:
+\begin{itemize}
+	\item $dim_K(U) \le dim_K(V)$.
+	\item If $dim_K(U)=dim_K(V) < \infty$, then $U = V$.
+\end{itemize} %needed basis extension theorem. As you see, many lemmas I needed were missing.
+\end{theorem}\pause
+\begin{theorem}
+\upshape
+Let $n := dim_K(V) < \infty$. Then $V \cong K^n$.
+% Note that the map is not explicitely given.
+\end{theorem}
+\end{frame}
 
 \subsection{Classification of simple algebraic extensions}
 \subsubsection{Minimal Polynomial}
@@ -192,7 +220,7 @@ A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1
 \hskip2em\textit{p ∈ carrier P ∧ monic p ∧ Eval p = $\textbf{0}_L$)}\pause%isabelle does not help in determining "L"
 \\[4mm]
 \textbf{context}\\
-\hskip1em\textbf{assumes} \textit{algebraic}\\
+\hskip1em\textbf{assumes} \textit{algebraic}\\%explain algebraic
 \textbf{begin}\\[2mm]\pause
 
 (...38 lines later)\\[2mm]
@@ -220,50 +248,18 @@ Next up:\\\pause
 %There is actually quite a bit about such quotient structures
 \end{frame}
 
-\subsection{Tower rule}
-\begin{frame}{Tower rule}
-\begin{theorem}
-If $M/L$ and $L/K$ are field extensions, then
-\[[M : K] = [M : L] \cdot [L : K]\]\pause
-\end{theorem}
-In particular, combining two finite field extensions yields a finite field extension.\\[4mm] %(or combining finitely many)
-In Isabelle:\\[2mm]
-\includegraphics[width=1.1\linewidth]{tower_rule}
-\end{frame}
-
-\subsection{Vector Spaces}
-\begin{frame}{Vector Spaces}\pause
-$U \subseteq V$ is a \emph{subspace} iff it is a vector space with $V$'s operations.
-%over the same field
-\begin{theorem}
-	\upshape
-	Let $U \subseteq V$ be a subspace. Then:
-	\begin{itemize}
-		\item $dim_K(U) \le dim_K(V)$.
-		\item If $dim_K(U)=dim_K(V) < \infty$, then $U = V$.
-	\end{itemize} %needed basis extension theorem. As you see, many lemmas I needed were missing.
-\end{theorem}\pause
-\begin{theorem}
-	\upshape
-	Let $n := dim_K(V) < \infty$. Then $V \cong K^n$.
-	% Note that the map is not explicitely given.
-\end{theorem}
-\end{frame}
-
 \section{Problems}
-\begin{frame}{Problems}
+\begin{frame}{Problems}\pause
 \begin{itemize}
-	\item missing lemmas, missing definitions\pause %that's how we got here
+	\item missing lemmas, missing definitions\pause %that's how I got to do vectorspace proofs
 	\item Bases are sets.\\\pause
-	\bad{In the finite case, we often want them as lists. to-do: later? explain non-canonical}
-	\item Coefficients are functions.
-	\bad{need to prove membership in the correct function set at \emph{every} step.
-		% at least that's what it feels like
-		to-do: details /example?}
+	\bad{Sets do not have an ordering}
+	\item Coefficients are functions.\\\pause
+	\bad{need to prove membership in the correct function set at \emph{every} step.}
 \end{itemize}
 \end{frame}
 
-\subsection{to-do}
+\subsection{Encoding}
 \begin{frame}{Encoding of $\infty$}%relevant?
 Can we use type \emph{nat} for the degree of field extensions?\pause
 \begin{itemize}
@@ -286,7 +282,7 @@ An instance of this:\\
 \textbf{definition} \textit{complex-field = (carrier = (UNIV\hastype complex set), monoid.mult = (*), one = 1, zero = 0, add = (+))}
 \end{frame}
 
-\begin{frame}%to-do: show lemma and Int_ring_def the slide before
+\begin{frame}
 
 \textbf{lemma} generate\_field\_i\_UNIV:\\
 \hskip1em\textit{generate-field complex-field (insert 𝗂 $\RR$) = UNIV}\\
@@ -309,9 +305,9 @@ An instance of this:\\
 \begin{itemize}
 	\item Vector Spaces: 850 lines, 75 lines preliminaries\pause
 	\item Field Extensions: 820 lines, 100 lines preliminaries\pause%hard to distinguish
-	\item 400 lines in an old development %annoying, mostly about subrings, which were not even defined when I started
-	\item 120 lines example instantiations %to test definitions
-	\item to-do: Maintenance work in the "VectorSpace" library
+	\item 400 lines in an old development\pause %annoying, mostly about subrings, which were not even defined when I started
+	\item 120 lines example instantiations\pause %to test definitions
+	\item improvements to the "VectorSpace" library\pause
 	\item Documentation: 300 lines (= 10 pages)
 	%everything counted once. About 550 changesets.
 \end{itemize}
@@ -319,11 +315,11 @@ An instance of this:\\
 
 \section{Conclusion}
 \begin{frame}{Conclusion}
-%to-do: partly stolen from Manuel
+% partly stolen from Manuel
 \begin{itemize}
 \item Formalisation of textbook algebra is hard work when using Isabelle.\pause%but possible
 \item Proofs get long due to a variety of reasons.\pause
-\item Good libraries can help a lot.\pause\\[6mm] %to-do: as seen with the last result
+\item Good libraries can help a lot.\pause\\[6mm] % as seen with the last result
 %(If you don't like what you do, defer it to someone else)
 \end{itemize}
 Interesting project for HOL-Algebra:\\[2mm]
