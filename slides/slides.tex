@@ -180,10 +180,6 @@ A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1
 \end{frame}
 
 \section{Results} % what I contributed
-\subsection{An explicit description of simple extensions}
-\begin{frame}{An explicit description of simple extensions} %at least *more* explicit, still using set comprehension
-%to-do: really interesting?
-\end{frame}
 
 \subsection{Classification of simple algebraic extensions}
 \subsubsection{Minimal Polynomial}
@@ -243,8 +239,8 @@ A \emph{vector space} $V$ over a field $K$ is an Abelian group (like $(\RR\times
 \section{Problems}
 \begin{frame}{Problems}
 \begin{itemize}
-	\item missing lemmas, missing definitions %that's how we got here
-	\item Bases are sets.
+	\item missing lemmas, missing definitions\pause %that's how we got here
+	\item Bases are sets.\\\pause
 	\bad{In the finite case, we often want them as lists. to-do: later? explain non-canonical}
 	\item Coefficients are functions.
 	\bad{need to prove membership in the correct function set at \emph{every} step.
@@ -265,8 +261,15 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 \end{itemize}
 \end{frame}
 
-\section{Example Instantiations}
-\begin{frame}{Example Instantiations}%to-do: show lemma and Int_ring_def the slide before
+\section{Example Instantiation}
+
+\begin{frame}{Example Instantiation}%An easy lemma as example
+An explicit description of simple extensions: %at least *more* explicit, still using set comprehension
+%I have proven this, in fact also used it in the classification of .
+%to-do: really interesting?
+\end{frame}
+
+\begin{frame}%to-do: show lemma and Int_ring_def the slide before
 
 \textbf{lemma} generate\_field\_i\_UNIV:\\
 \hskip1em\textit{generate-field complex-field (insert 𝗂 $\RR$) = UNIV}\\
