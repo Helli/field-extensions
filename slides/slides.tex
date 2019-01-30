@@ -137,11 +137,10 @@ Isabelle enforces great precision, but also helps:
 
 \begin{frame}{HOL-Algebra}
 \begin{itemize}
-	\item record-based \pause%to-do: how to explain to Prof. K.?
+	%\item record-based \pause%to-do: how to explain to Prof. K.?
 	\item verbose, e.g.\ need to annotate (almost) every $+$ \pause %also: cannot simply write α ∈ L
-	\item locale-based \pause%INTEG as example?
-	% reasons
-	\item explicit carrier sets \pause
+	\item locale-based \pause
+	\item explicit carrier sets: \textit{$\alpha \in$ carrier $L$} \pause
 	\item enables reasoning about substructures	%this is what we will do
 	% HOL-Computational_Algebra uses types --> this is not possible
 \end{itemize}
@@ -155,7 +154,10 @@ Isabelle enforces great precision, but also helps:
 	\begin{theorem}
 		\upshape
 		The polynomial $x^5 − x − 1$ has no root described by an expression of integers, $n$th roots and basic arithmetic operations.
-	\end{theorem}\pause
+	\end{theorem}\pause% we are interested in the field of rationals + the roots
+	% type would depend on the constants. This is not possible in this logic.
+	% One could model one particular type (the supertype), for different constants one would have to start again.
+	% There is no quanitification over types
 	\bad{I won't get that far!}
 \end{frame}
 
@@ -176,6 +178,7 @@ A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1
 %problem for a formalisation: K is often identified with its carrier set
 \item $\RR/\QQ$ is a field extension.\pause
 \item $\QQ(\sqrt{3})/\QQ$ is a field extension. %Field extensions like these are interesting when doing Galois theory.
+%to-do: explain algebraic
 \end{itemize}
 \end{frame}
 
@@ -199,6 +202,22 @@ A \emph{field extension} $L/K$ is a field $(\mkern-3mu\mid\mkern-6mu L,\otimes,1
 \\[3mm]
 Uniqueness of the minimal polynomial takes another 180 lines. %But this is part of an actual proof, so this to be expected
 %We keep that "algebraic" assumption for a bit...
+\end{frame}
+
+\begin{frame}{Minimal Polynomial II}
+Next up:\\\pause
+\textbf{lemma} \textit{ring-irreducible irr}\\\pause
+\high{The library helps with the proof:}\hskip1em\pause :-)\\\pause%happened rarely
+\hskip1em\textit{Eval} is a homomorphism $P → L$.\\\pause
+\hskip1em$(irr)$ is the preimage of $\{\textbf{0}\}$ under $Eval$.\\\pause %The set of elements which Eval maps to zero
+%Do I need to explain (irr)?
+%other library facts tell us that (0) is a primeideal and ↓
+\hskip1em Thus, $(irr)$ is a prime ideal.\\[4mm]\pause % The claim follows
+(...)\\[4mm]\pause%Some other transformations
+\begin{theorem}
+	$P/(irr) \cong K(\alpha)$%If \alpha is algebraic
+\end{theorem}%overall close to 400 lines because I had to define algebraic first
+%There is actually quite a bit about such quotient structures
 \end{frame}
 
 \subsection{Tower rule}
