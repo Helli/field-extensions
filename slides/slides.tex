@@ -222,9 +222,12 @@ Next up:\\\pause
 
 \subsection{Tower rule}
 \begin{frame}{Tower rule}
+\begin{theorem}
 If $M/L$ and $L/K$ are field extensions, then
-\[[M : K] = [M : L] \cdot [L : K]\]\pause %ask M.: good idea to use non-HOL notation?
+\[[M : K] = [M : L] \cdot [L : K]\]\pause
+\end{theorem}
 In particular, combining two finite field extensions yields a finite field extension.\\[4mm] %(or combining finitely many)
+In Isabelle:\\[2mm]
 \includegraphics[width=1.1\linewidth]{tower_rule}
 \end{frame}
 
@@ -285,8 +288,11 @@ Can we use type \emph{nat} for the degree of field extensions?\pause
 
 \begin{frame}{Example Instantiation}%An easy lemma as example
 An explicit description of simple extensions: %at least *more* explicit, still using set comprehension
-%I have proven this, in fact also used it in the classification of .
-%to-do: really interesting?
+%I have proven this, in fact also used it in the previous proof at the end, just skipped over it.
+\[K(\alpha) = \{f(\alpha)/g(\alpha) | f,g \in P, g(\alpha) ≠ \textbf{$0_L$}\}\]\pause
+An instance of this:\\
+\[\RR(i) = \CC\]\pause
+\textbf{definition} \textit{complex-field = (carrier = (UNIV\hastype complex set), monoid.mult = (*), one = 1, zero = 0, add = (+))}
 \end{frame}
 
 \begin{frame}%to-do: show lemma and Int_ring_def the slide before
@@ -324,8 +330,8 @@ An explicit description of simple extensions: %at least *more* explicit, still u
 \begin{frame}{Conclusion}
 %to-do: partly stolen from Manuel
 \begin{itemize}
-\item Formalisation of textbook algebra is feasible with Isabelle.\pause
-\item Some proofs get ugly due to a variety of reasons.\pause
+\item Formalisation of textbook algebra is hard work when using Isabelle.\pause%but possible
+\item Proofs get long due to a variety of reasons.\pause
 \item Good libraries can help a lot.\pause\\[6mm] %to-do: as seen with the last result
 %(If you don't like what you do, defer it to someone else)
 \end{itemize}
