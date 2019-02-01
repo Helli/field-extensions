@@ -28,8 +28,6 @@ personal opinion
 (What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
 comparison to other formalisations
 
-move technical stuff towards the end
-
 --------------
 documentation:
 
