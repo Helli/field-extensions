@@ -10,8 +10,6 @@ definitions
 (indexed product), afterwards problems (e.g. missing lemmas?)
 isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
 
-mention how many lines were needed
-
 **What does it look like in HOL-Algebra?**
 
 HOL-Algebra:
@@ -25,7 +23,6 @@ Problems?
 (subspace imports and argument order)
 
 conclusion:
-Was it painful?
 next steps
 personal opinion
 (What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
