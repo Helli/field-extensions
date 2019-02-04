@@ -140,10 +140,10 @@ subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
 
 text \<open>This function was added during my work. This meant that I had to do some porting (see
   \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). One the other hand,
-  it leaves out the "lower bound" field found in @{cite Algebra1}, which turned out to simplify
-  matters quite a bit. A note about the style: Just like in their locale definitions, the authors
-  use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and
-  \<^const>\<open>hull\<close>.\<close>
+  it leaves out the "lower bound" field found in @{cite Algebra1}/definition 16.4, which turned out
+ to simplify matters quite a bit. A note about the style: Just like in their locale definitions, the
+ authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
+ \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
 subsubsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
 
