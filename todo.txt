@@ -10,8 +10,6 @@ definitions
 (indexed product), afterwards problems (e.g. missing lemmas?)
 isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
 
-**What does it look like in HOL-Algebra?**
-
 HOL-Algebra:
 What does it look like? Example (:?)
 lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
