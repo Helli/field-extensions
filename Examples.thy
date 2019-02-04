@@ -125,9 +125,6 @@ corollary finitely_generated_field_extension_complex_over_real:
 
 section \<open>Observations (*rm*)\<close>
 
-text \<open>@{locale subgroup} was the inspiration to just use sets for the substructure. However, that
-locale is somewhat odd in that it does not impose @{locale group} on neither \<open>G\<close> nor \<open>H\<close>.\<close>
-
 thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
 text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
 
