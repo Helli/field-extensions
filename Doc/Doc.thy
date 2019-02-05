@@ -4,6 +4,7 @@ theory Doc
   imports
     Field_Extensions.Examples
     Field_Extensions.Old_Field_Extension
+    "HOL-Algebra.IntRing"
 begin
 (*>*)
 
@@ -141,10 +142,27 @@ section \<open>Library Analysis\<close>
 
 subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>
 
+subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
+
+text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> differ not by \<^emph>\<open>c\<close>ommutativity, but
+  by whether they take a set or single element as argument. The latter should probably be renamed to
+  match its function symbol \<open>PIdl\<close> (principal ideal). It could also just abbreviate
+  \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In any case, both functions are easy to state as hull,
+  and using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs. In this scenario, the
+ current @{thm[source] cgenideal_def} would become a lemma, perhaps stated like @{thm[source]
+  cring.cgenideal_eq_rcos} to benefit from the huge \<^theory>\<open>HOL-Algebra.Coset\<close>.\<close>
+
+subsubsection \<open>Usage of Function Symbols\<close>
+
+text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
+but the precedence is badly chosen: , which also affects my main result @{thm[source]
+  UP_field_extension.simple_algebraic_extension}. Note that I also question some  FactGroup , so
+  there might be no motivation to use special syntax at all.\<close>
+
 subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
 
 text \<open>This function was added during my work. This meant that I had to do some porting (see
-  \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). One the other hand,
+  \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). On the other hand,
   it leaves out the "lower bound" field found in @{cite Algebra1}/definition 16.4, which turned out
  to simplify matters quite a bit. A note about the style: Just like in their locale definitions, the
  authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
@@ -180,6 +198,10 @@ text \<open>The problem traces back to \<^locale>\<open>subring\<close> importin
  \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but it
  complicated matters quite a bit, see
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
+
+subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
+
+text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...\<close>
 
 (*<*)
 end
