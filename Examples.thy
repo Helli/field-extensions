@@ -125,8 +125,6 @@ corollary finitely_generated_field_extension_complex_over_real:
 
 section \<open>Observations (*rm*)\<close>
 
-value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
-
 txt\<open>Idea:\<close>
 definition (in vectorspace) B where
   "B = (SOME B. distinct B \<and> basis (set B))"

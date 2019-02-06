@@ -4,7 +4,7 @@ theory Doc
   imports
     Field_Extensions.Examples
     Field_Extensions.Old_Field_Extension
-    "HOL-Algebra.IntRing"
+    "HOL-Algebra.Algebra"
 begin
 (*>*)
 
@@ -170,6 +170,23 @@ text \<open>This function was added during my work. This meant that I had to do 
 
 subsubsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
 
+subsubsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
+
+text \<open>
+Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
+ i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the usual
+ operations.
+Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>),
+
+This is also a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import.
+
+\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
+ AFP\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are to special: Since \<^const>\<open>UNIV\<close> is
+ already the largest set, they cannot be substructures. The ability to reason about substructures
+ is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place. Section \ref{sec:ethy}
+ follows a different approach using mostly abstract types.
+\<close>
+
 subsubsection\<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
@@ -184,7 +201,7 @@ subsubsection\<open>Side Notes\<close>
 
 (*to-do: move the observation section into these subsubsections*)
 
-section \<open>\isatt{Examples.thy}\<close>
+section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
 
 text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
   errors:
