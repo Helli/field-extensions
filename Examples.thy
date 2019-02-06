@@ -125,9 +125,6 @@ corollary finitely_generated_field_extension_complex_over_real:
 
 section \<open>Observations (*rm*)\<close>
 
-thm genideal_def cgenideal_def \<comment> \<open>This naming could be improved.\<close>
-text \<open>@{const Ideal.genideal} could be defined using @{const hull}...\<close>
-
 value INTEG value \<Z> \<comment> \<open>duplicate definition\<close>
 
 txt\<open>Idea:\<close>

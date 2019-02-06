@@ -156,7 +156,7 @@ subsubsection \<open>Usage of Function Symbols\<close>
 
 text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
 but the precedence is badly chosen: , which also affects my main result @{thm[source]
-  UP_field_extension.simple_algebraic_extension}. Note that I also question some  FactGroup , so
+  UP_field_extension.simple_algebraic_extension}. Note that I also question some to-do (FactGroup, ...) , so
   there might be no motivation to use special syntax at all.\<close>
 
 subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
