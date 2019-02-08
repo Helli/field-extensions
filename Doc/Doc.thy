@@ -211,8 +211,9 @@ subsubsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
-text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use\\
-  \<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\\ for the session graph, so that it is
+text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use\<close>
+text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\<close>
+text \<open>for the session graph, so that it is
   displayed wholly in the document.\<close>
 
 subsection \<open>\isatt{VectorSpace}\<close>
