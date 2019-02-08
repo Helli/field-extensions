@@ -177,17 +177,37 @@ Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Alge
  i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the usual
  operations.
 Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>),
+they also pollute the name space: For instance,\<close>
+find_theorems eval
+text\<open>yields 38 facts, 15 of which are about \<^const>\<open>INTEG\<close>. These are too special and therefore
+ useless when doing abstract algebra. Note that the import of \<^const>\<open>INTEG\<close> cannot be avoided when using
+ old-school\ref{sec:poly} polynomials, and that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts.
 
-This is also a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import.
+When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
+ \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
+To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
+ revisions of the library, the import of this ring should be optional.\<close>
 
-\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
+text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
  AFP\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are to special: Since \<^const>\<open>UNIV\<close> is
  already the largest set, they cannot be substructures. The ability to reason about substructures
  is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place. Section \ref{sec:ethy}
  follows a different approach using mostly abstract types.
 \<close>
 
-subsubsection\<open>Side Notes\<close>
+subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
+
+text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
+ not much effect on my development, but it means that
+  \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
+  identifiers for some entities.\<close>
+
+text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
+  \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency origins from
+  representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
+ two approaches is subject of ongoing development, refer to the developers for more information.\<close>
+
+subsubsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
