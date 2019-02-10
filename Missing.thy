@@ -700,9 +700,6 @@ qed
 
 subsubsection \<open>Canonical Unit Vectors, Standard Basis\<close>
 
-txt (in module) "\<^const>\<open>lincomb\<close>, \<^const>\<open>lin_dep\<close> etc are set-based."
-lemmas [iff del] = lessThan_iff
-
 context ring
 begin
 
@@ -779,7 +776,7 @@ proof
     have ind': "ind (cunit_vector n i) = i" if "i \<in> {..<n}" for i
       using that by (simp add: ind_def inj_cunit_vector the_inv_into_f_eq)
     note [simp] = nspace_simps(6)
-    define c where "c i = (\<lambda>uv. v (ind uv) \<otimes> uv i)" for i
+    define c where "c = (\<lambda>i uv. v (ind uv) \<otimes> uv i)"
     have a: "c i \<in> standard_basis n \<rightarrow> carrier R" if "i \<in> {..<n}" for i
       unfolding nspace_simps(1) c_def using v ind(1) that
       by (smt PiE_restrict Pi_I' coeff_in_ring cunit_vector_in_carrier ind(2) m_closed nspace_simps(1) restrict_PiE)
@@ -799,7 +796,7 @@ proof
       have "(\<Oplus>j\<in>{..<n}. v (ind (cunit_vector n j)) \<otimes> cunit_vector n j i)
       = (\<Oplus>j\<in>{..<n}. v j \<otimes> cunit_vector n j i)" if "i\<in>{..<n}" for i
         apply (intro finsum_not_depend')
-        using nspace_simps(1) that v apply fastforce
+        using that a c_def apply blast
         by (simp add: ind')
       also have "\<dots> i = (\<Oplus>j\<in>{..<n}. v j \<otimes> (if i=j then \<one> else \<zero>))" if "i\<in>{..<n}" for i
         unfolding cunit_vector_def
@@ -883,13 +880,11 @@ qed fastforce+
 end
 
 lemma (in field) basis_standard_basis: "nspace.basis n (standard_basis n)"
-  using genset_standard_basis lin_indpt_standard_basis by (simp add: image_subsetI nspace.basis_def)
+  using genset_standard_basis lin_indpt_standard_basis by (auto simp: nspace.basis_def)
 
 lemma (in field) nspace_dim[simp]: "nspace.fin_dim n" "nspace.dim n = n"
-  unfolding nspace.fin_dim_def using genset_standard_basis finite_standard_basis(1)
-  by (fast, simp add: nspace.dim_basis[OF _ basis_standard_basis])
-
-lemmas [iff] = lessThan_iff \<comment> \<open>reverse the declaration from above. to-do: use context?\<close>
+  using genset_standard_basis finite_standard_basis(1) nspace.fin_dim_def apply blast
+  by (simp add: nspace.dim_basis[OF _ basis_standard_basis])
 
 subsubsection \<open>Koordinatenfunktional\<close>
 
