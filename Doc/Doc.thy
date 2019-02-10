@@ -75,7 +75,7 @@ text\<open>Remember that infinite field extensions are encoded to have \<open>de
 text \<open>Note that recently, the statement about combining finite extensions (case 3) has also been proven in
   another development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This uses the inner
  product instead of the outer for the proof, thus avoiding the vector space terminology as described
-  in section \ref{sec:vs}.\<close>
+  in \<open>\<section>\<close>\ref{sec:vs}.\<close>
 
 section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
 
@@ -121,12 +121,12 @@ lemma "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K 
   by (fact vectorspace.decompose_step)
 
 text \<open>This is used in the proof of the tower rule's finite case, together with induction. It needs
-  to be compared to @{thm[source] vectorspace.nspace_iso}(see \ref{sec:nspace_iso}), which could
+  to be compared to @{thm[source] vectorspace.nspace_iso}(see \<open>\<section>\<close>\ref{sec:nspace_iso}), which could
  have achieved the same with
   less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
   be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
   defined. Ultimately, no useful results turned out to exist for this function (and the definition
-  itself turned out to be misleading, see (section) to-do).\<close>
+  itself turned out to be misleading, see \<open>\<section>\<close> to-do).\<close>
 
 text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
@@ -136,7 +136,23 @@ and, more importantly, it
 
 subsection \<open>@{thm[source] subspace.subspace_dim}\<close>
 
-text \<open>These are two other useful results: to-do\<close>
+text \<open>These are two other useful results:
+  \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
+ subspace is less than or equal to the dimension of the finite-dimensional superspace.
+  \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
+ its superspace, i.e. the inclusion is non-proper.
+
+These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
+
+For the proof, I needed the basis extension theorem
+ \<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
+at least for finite-dimensional vector spaces, and \<^prop>\<open>S = carrier V\<close>. This special case is
+ @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
+
+The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
+ \<^theory>\<open>Field_Extensions.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
+ when porting the basis extension theorem to allow for infinite dimensions.
+\<close>
 
 section \<open>Library Analysis\<close>
 
@@ -181,7 +197,7 @@ they also pollute the name space: For instance,\<close>
 find_theorems eval
 text\<open>yields 38 facts, 15 of which are about \<^const>\<open>INTEG\<close>. These are too special and therefore
  useless when doing abstract algebra. Note that the import of \<^const>\<open>INTEG\<close> cannot be avoided when using
- old-school\ref{sec:poly} polynomials, and that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts.
+ old-school (see \<open>\<section>\<close>\ref{sec:poly}) polynomials, and that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts.
 
 When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.

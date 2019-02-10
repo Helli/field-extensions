@@ -90,13 +90,13 @@ subsubsection \<open>Subspaces\<close>
 
 lemma (in vectorspace) lin_indpt_extends_to_basis:
   assumes fin_dim
-  assumes "S \<subseteq> carrier V" and "lin_indpt S"
-  shows "\<exists>B. S \<subseteq> B \<and> basis B"
+  assumes "A \<subseteq> carrier V" and "lin_indpt A"
+  shows "\<exists>B. A \<subseteq> B \<and> basis B"
 proof -
   from \<open>fin_dim\<close> have "finite M \<and> card M \<le> dim" if "M \<subseteq> carrier V" "lin_indpt M" for M
     using that by (simp add: li_le_dim)
   note useful = maximal_exists[OF this]
-  have "\<exists>B. finite B \<and> maximal B (\<lambda>M. S \<subseteq> M \<and> M \<subseteq> carrier V \<and> lin_indpt M)"
+  have "\<exists>B. finite B \<and> maximal B (\<lambda>M. A \<subseteq> M \<and> M \<subseteq> carrier V \<and> lin_indpt M)"
     by (rule useful) (use assms in auto)
   then show ?thesis
     by (smt dual_order.trans max_li_is_basis maximal_def)
@@ -122,17 +122,18 @@ proof -
     with \<open>S \<subseteq> carrier V\<close> show "finite S" "card S \<le> vectorspace.dim K V"
       by (simp_all add: assms V.li_le_dim)
   qed
-  from W.lin_indpt_empty obtain B where B: "finite B \<and> maximal B (\<lambda>B. B \<subseteq> W \<and> W.lin_indpt B)"
-    using maximal_exists[OF subset, of _ "{}"] by fastforce
+  from W.lin_indpt_empty obtain B where B: "finite B" "maximal B (\<lambda>B. B \<subseteq> W \<and> W.lin_indpt B)"
+    using maximal_exists[OF subset, of _ "{}"] by (metis (no_types, lifting) empty_subsetI)
   then have B_lin_indpt: "B \<subseteq> W \<and> W.lin_indpt B"
     by (simp add: maximal_def)
-  from B have B_spans_W: "W.span B = W"
+  from B(2) have B_spans_W: "W.span B = W"
     by (simp add: W.max_li_is_gen)
-  then show "W.fin_dim"
+  then show asdf: "W.fin_dim"
     using B B_lin_indpt W.fin_dim_def by auto
-  show "W.dim \<le> V.dim"
+  show asdfasa: "W.dim \<le> V.dim"
     using W.basis_def W.dim_basis W.finite_basis_exists \<open>W.fin_dim\<close> subset by auto
-  from B B_lin_indpt B_spans_W assms show "W.dim = V.dim \<Longrightarrow> W = carrier V"
+  from B(1) B_lin_indpt B_spans_W assms show "W = carrier V" if "W.dim = V.dim"
+    using that
     by (smt W.carrier_vs_is_self module.span_li_not_depend(1,2) V.submoduleE(1)
         partial_object.surjective partial_object.update_convs(1) submod subset_trans
         vectorspace.axioms(1) V.basis_def V.dim_li_is_basis W.gen_ge_dim vs)
