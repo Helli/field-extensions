@@ -140,7 +140,7 @@ text \<open>These are two other useful results:
   \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
  subspace is less than or equal to the dimension of the finite-dimensional superspace.
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
- its superspace, i.e. the inclusion is non-proper.
+ its superspace, i.e. the inclusion is improper.
 
 These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
 
