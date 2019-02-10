@@ -826,9 +826,6 @@ proof
   qed
 qed (meson cunit_vector_in_carrier image_subsetI module.span_is_subset2 nspace_is_module)
 
-text \<open>In @{locale field}, one could now use @{thm[source] linear_map.rank_nullity}, @{thm[source]
-  vectorspace.nspace_iso}, the projection (\<open>\<section>\<close>\ref{sec:proj}) and induction to show linear
- independence, but it already holds in @{locale cring}:\<close>
 lemma lin_indpt_standard_basis:
   "module.lin_indpt R (nspace n) (standard_basis n)"
 proof (rule module.finite_lin_indpt2[OF nspace_is_module])
@@ -859,15 +856,10 @@ proof (rule module.finite_lin_indpt2[OF nspace_is_module])
     also have "\<dots> i = (\<Oplus>j\<in>{..<n}. a (cunit_vector n j) \<otimes> (if j=i then \<one> else \<zero>))" if "i\<in>{..<n}" for i
       using that by (simp add: cunit_vector_def)
     also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) \<otimes> \<one> else a (cunit_vector n j) \<otimes> \<zero>)" for i
-    proof -
-      have "(\<forall>na. (a (cunit_vector n na) \<otimes> \<zero> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i = na) \<and> (a (cunit_vector n na) \<otimes> \<one> = a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>) \<or> i \<noteq> na)) \<or> (\<Oplus>na\<in>{..<n}. a (cunit_vector n na) \<otimes> (if na = i then \<one> else \<zero>)) = (\<Oplus>na\<in>{..<n}. if na = i then a (cunit_vector n na) \<otimes> \<one> else a (cunit_vector n na) \<otimes> \<zero>)"
-        by presburger
-      then show ?thesis
-        by (metis (no_types))
-    qed
+      by fastforce
     also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) else a (cunit_vector n j) \<otimes> \<zero>)" if "i\<in>{..<n}" for i
       using a_is_coefficient coeff_in_ring that by fastforce
-    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) else \<zero>)" if "i\<in>{..<n}" for i
+    also have "\<dots> i = (\<Oplus>j\<in>{..<n}. if j=i then a (cunit_vector n j) else \<zero>)" for i
       by (smt Pi_iff a_is_coefficient finsum_cong2 image_eqI r_null zero_closed)
     also have "\<dots> i = a (cunit_vector n i)" if "i\<in>{..<n}" for i
       using finsum_singleton'[OF that]
@@ -886,7 +878,7 @@ lemma (in field) nspace_dim[simp]: "nspace.fin_dim n" "nspace.dim n = n"
   using genset_standard_basis finite_standard_basis(1) nspace.fin_dim_def apply blast
   by (simp add: nspace.dim_basis[OF _ basis_standard_basis])
 
-subsubsection \<open>Projection\label{sec:proj}\<close>
+subsubsection \<open>Projection\<close>
 
 lemma (in cring)
   assumes "i<n" shows proj_mod_hom: "mod_hom R (nspace n) (module_of R) (\<lambda>v. v i)"
