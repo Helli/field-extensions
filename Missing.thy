@@ -826,9 +826,9 @@ proof
   qed
 qed (meson cunit_vector_in_carrier image_subsetI module.span_is_subset2 nspace_is_module)
 
-text \<open>In @{locale field}, one could now use @{thm linear_map.rank_nullity}, @{thm
-  vectorspace.nspace_iso}, the Koordinatenfunktional and induction to show linear independence, but
-  it also hold in @{locale cring}:\<close>
+text \<open>In @{locale field}, one could now use @{thm[source] linear_map.rank_nullity}, @{thm[source]
+  vectorspace.nspace_iso}, the projection (\<open>\<section>\<close>\ref{sec:proj}) and induction to show linear
+ independence, but it already holds in @{locale cring}:\<close>
 lemma lin_indpt_standard_basis:
   "module.lin_indpt R (nspace n) (standard_basis n)"
 proof (rule module.finite_lin_indpt2[OF nspace_is_module])
@@ -886,17 +886,17 @@ lemma (in field) nspace_dim[simp]: "nspace.fin_dim n" "nspace.dim n = n"
   using genset_standard_basis finite_standard_basis(1) nspace.fin_dim_def apply blast
   by (simp add: nspace.dim_basis[OF _ basis_standard_basis])
 
-subsubsection \<open>Koordinatenfunktional\<close>
+subsubsection \<open>Projection\label{sec:proj}\<close>
 
-lemma (in cring) \<comment> \<open>Kemper's \<^emph>\<open>Koordinatenfunktional\<close>. Need an English name...\<close>
-  assumes "i<n" shows coo_mod_hom: "mod_hom R (nspace n) (module_of R) (\<lambda>v. v i)"
+lemma (in cring)
+  assumes "i<n" shows proj_mod_hom: "mod_hom R (nspace n) (module_of R) (\<lambda>v. v i)"
   apply (simp add: mod_hom_def nspace_is_module self_module)
   unfolding mod_hom_axioms_def module_hom_def by (simp add: nspace_simps, use assms in blast)
 
 lemma (in cring) nspace_1_iso_self:
   "mod_hom R (nspace 1) (module_of R) (\<lambda>v. v 0)"
   "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
-proof (rule coo_mod_hom)
+proof (rule proj_mod_hom)
   have "{..< 1::nat} = {0}"
     by auto
   then show "bij_betw (\<lambda>v. v 0) (carrier (nspace 1)) (carrier R)"
@@ -904,7 +904,7 @@ proof (rule coo_mod_hom)
 qed simp
 
 lemma (in field) coo_linear_map: "i\<in>{..<n} \<Longrightarrow> linear_map R (nspace n) (vs_of R) (\<lambda>v. v i)"
-  unfolding linear_map_def by (auto simp: coo_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
+  unfolding linear_map_def by (auto simp: proj_mod_hom nspace_is_vs self_vs.vectorspace_axioms)
 
 lemma (in field) nspace_1_iso_self:
   "linear_map R (nspace 1) (vs_of R) (\<lambda>v. v 0)"
