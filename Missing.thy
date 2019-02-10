@@ -128,9 +128,9 @@ proof -
     by (simp add: maximal_def)
   from B(2) have B_spans_W: "W.span B = W"
     by (simp add: W.max_li_is_gen)
-  then show asdf: "W.fin_dim"
+  then show "W.fin_dim"
     using B B_lin_indpt W.fin_dim_def by auto
-  show asdfasa: "W.dim \<le> V.dim"
+  show "W.dim \<le> V.dim"
     using W.basis_def W.dim_basis W.finite_basis_exists \<open>W.fin_dim\<close> subset by auto
   from B(1) B_lin_indpt B_spans_W assms show "W = carrier V" if "W.dim = V.dim"
     using that
