@@ -154,6 +154,43 @@ The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = fa
  when porting the basis extension theorem to allow for infinite dimensions.
 \<close>
 
+section \<open>Problems\<close>
+
+subsection \<open>Non-Canonical Maps\<close>
+
+text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
+ defined a sets, we sometimes need a "first" element, or even more.\<close>
+
+text \<open>This means that we cannot translate the informal "We fix a basis B." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
+(*<*)notepad (in vectorspace) begin(*>*)
+  fix B
+  assume "basis B"
+(*<*)end(*>*)
+
+text \<open>Instead, one has to work with a distinct list as basis, and use a conversion function with
+ every \<open>\<in>\<close>, \<open>\<subseteq>\<close>, etc. If more such situations arise in the theory of vector spaces, one might consider
+  adding something like\<close>
+
+definition (in vectorspace) B where
+  "B = (SOME B. distinct B \<and> basis (set B))"
+lemma (in vectorspace)
+  assumes fin_dim shows "distinct B" and "basis (set B)" unfolding B_def
+  using assms by (metis (lifting) finite_basis_exists finite_distinct_list someI)+
+
+text \<open>to the library. This is just another way of stating the existence of a finite basis, but might
+ be more useful in proofs and lemma statements.\<close>
+
+text \<open>As is known, infinite vector spaces have bases, too, but proving this requires more work and
+  a different indexing scheme.\<close>
+
+subsection \<open>Missing lemmas\<close>
+
+text \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
+  proven within, e.g. the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
+  \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
+
+subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
+
 section \<open>Library Analysis\<close>
 
 subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>

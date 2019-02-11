@@ -17,7 +17,6 @@ using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by bla
 Maybe mention HOL-Computational_Algebra
 
 Problems?
-"wir entscheiden uns für eine Basis" ~> fix B assume "basis B". Right?
 (subspace imports and argument order)
 
 conclusion:

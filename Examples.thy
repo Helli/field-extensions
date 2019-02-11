@@ -125,13 +125,6 @@ corollary finitely_generated_field_extension_complex_over_real:
 
 section \<open>Observations (*rm*)\<close>
 
-txt\<open>Idea:\<close>
-definition (in vectorspace) B where
-  "B = (SOME B. distinct B \<and> basis (set B))"
-lemma (in vectorspace)
-  assumes fin_dim shows "distinct B" "basis (set B)" unfolding B_def
-  using assms by (metis (no_types, lifting) finite_basis_exists finite_distinct_list someI)+
-
 text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever extended:\<close>
 find_theorems name: "subspace."
 find_theorems name: "submodule."
