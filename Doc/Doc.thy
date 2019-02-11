@@ -184,8 +184,8 @@ text \<open>Instead, one has to work with a distinct list as basis, and use a co
 definition (in vectorspace) B where
   "B = (SOME B. distinct B \<and> basis (set B))"
 lemma (in vectorspace)
-  assumes fin_dim shows "distinct B" and "basis (set B)" unfolding B_def
-  using assms by (metis (lifting) finite_basis_exists finite_distinct_list someI)+
+  assumes fin_dim shows "distinct B" and "basis (set B)" (*<*) unfolding B_def
+  using assms by (metis (lifting) finite_basis_exists finite_distinct_list someI)+ (*>*)
 
 text \<open>to the library. This is just another way of stating the existence of a finite basis, but might
  be more useful in proofs and lemma statements.\<close>
