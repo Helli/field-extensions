@@ -22,10 +22,20 @@ text \<open>In Algebra, superstructures generally are defined to be just the inv
 
 subsection \<open>\<^const>\<open>ring.old_sr\<close>\<close>
 
-(* to-do: explain (G\<lparr>carrier := H\<rparr>) somewhere around here *)
+text \<open>This is my first try at formalising the notion of a subring (similarly \<^const>\<open>field.old_sf\<close>
+  for subfields): Both a ring R and its subring S are full ring records, the predicate
+ \<^const>\<open>ring.old_sr\<close> states where 
+ they have to equal. The problem is that even with these assumptions, there are two entities for
+ each operation, \<open>\<zero>\<close> and \<open>\<one>\<close>. In fact, I can show many facts not for any subring S, but only for
+ \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but
+  carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close> in where the operations map objects
+  from outside of the carrier set.\<close>
+
+text \<open>\<open>\<zero>\<close> and \<open>\<one>\<close> are the same for both substructures. This means that there is some degree of
+  freedom in stating lemmas (using one or the other).\<close>
 
 text \<open>To sum up, it seems advisable to fix all needed objects (sets or operations) only once within
-  a locale. For Algebra this means: A group/ring needs a full record, but for substructures we
+  a locale. For Algebra this means: A group or ring needs a full record, but for substructures we
   should only add a \<^emph>\<open>set\<close> to the fixed items.\<close>
 
 subsection \<open>\<^const>\<open>subring\<close>\<close>
