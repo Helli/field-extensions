@@ -140,9 +140,8 @@ text \<open>This is used in the proof of the tower rule's finite case, together 
 
 text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
-\<^item> is somewhat unhandy (see the proof)
-and, more importantly, it
-\<^item> depends on a choice of basis, and a choice of ordering on that basis.\<close>
+\<^item> is somewhat unhandy (see the proof) and,
+\<^item> more importantly, depends on a choice of basis, and a choice of ordering on that basis.\<close>
 
 subsection \<open>@{thm[source] subspace.subspace_dim}\<close>
 
