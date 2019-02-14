@@ -605,13 +605,12 @@ proof
   {
   fix q
   assume "q \<in> carrier P" "q \<sim> p" "monic q"
-  then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" and "inv_c' \<in> Units P"
+  then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" "inv_c' \<in> Units P"
     using ring_associated_iff p(1) by blast
   then obtain inv_c where inv_c'_def: "inv_c' = monom P inv_c 0" and inv_c: "inv_c \<in> K"
     using Units_poly by auto
   have "\<one>\<^bsub>L\<^esub> = lcoeff inv_c' \<otimes>\<^bsub>L\<^esub> lcoeff p"
-    using lcoeff_mult \<open>monic q\<close>[unfolded monic_def]
-    by (simp add: P.Units_closed \<open>inv_c' \<in> Units P\<close> \<open>q = inv_c' \<otimes> p\<close> p(1))
+    using lcoeff_mult \<open>monic q\<close>[unfolded monic_def] by (simp add: P.Units_closed inv_c' p(1))
   then have "\<one>\<^bsub>L\<^esub> = inv_c \<otimes>\<^bsub>L\<^esub> lcoeff p"
     by (simp add: inv_c inv_c'_def)
   then have "inv_c = inv\<^bsub>L\<^esub> lcoeff p"
