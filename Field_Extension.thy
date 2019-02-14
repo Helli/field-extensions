@@ -13,11 +13,11 @@ locale field_extension = K?: subfield K L + L?: field L for L K
 lemma (in field) trivial_extension: "field_extension R (carrier R)"
   by (simp add: field_extension.intro field_axioms subfield_iff(1))
 
-locale UP_field_extension = fe?: field_extension + fixes P and \<alpha>
-  defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
+locale UP_field_extension = fe?: field_extension + fixes \<alpha>
   assumes \<alpha>_in_L: "\<alpha> \<in> carrier L"
 begin
 
+definition "P = UP (L\<lparr>carrier:=K\<rparr>)"
 definition "Eval = eval (L\<lparr>carrier:=K\<rparr>) L id \<alpha>"  (*Do the same for P (there with notation)*)
 
 txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univariate polynomials over the field
@@ -25,7 +25,7 @@ txt \<open>The above commands define the ring \<^term>\<open>P\<close> of univar
 
 text \<open>Since @{thm \<alpha>_in_L}, \<^const>\<open>Eval\<close> is a homomorphism \<open>P \<rightarrow> L\<close>:\<close>
 
-sublocale pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id _ \<alpha> Eval
+sublocale pol?: UP_univ_prop \<open>L\<lparr>carrier := K\<rparr>\<close> L id P \<alpha> Eval
   rewrites "carrier (L\<lparr>carrier:=K\<rparr>) = K"
     and "id x = x"
 proof -
@@ -37,7 +37,7 @@ proof -
     by (simp add: \<alpha>_in_L)
 qed (simp_all add: P_def Eval_def)
 
-sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close>
+sublocale UP_domain \<open>L\<lparr>carrier:=K\<rparr>\<close> P
 proof (simp_all add: P_def UP_domain_def)
   show "domain (L\<lparr>carrier:=K\<rparr>)"
     using L.subdomain_iff subdomain_axioms by blast
@@ -72,7 +72,7 @@ lemma eval_monom_expr': \<comment> \<open>copied and relaxed. Could be further r
   shows "eval (L\<lparr>carrier:=K\<rparr>) L id a (monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P a 0) = \<zero>\<^bsub>L\<^esub>"
   (is "eval (L\<lparr>carrier:=K\<rparr>) L id a ?g = _")
 proof -
-  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id unfolding id_def by unfold_locales
+  interpret UP_pre_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> L id P unfolding id_def by unfold_locales
   have eval_ring_hom: "eval (L\<lparr>carrier:=K\<rparr>) L id a \<in> ring_hom P L"
     using eval_ring_hom a by (simp add: eval_ring_hom)
   interpret ring_hom_cring P L \<open>eval (L\<lparr>carrier:=K\<rparr>) L id a\<close> by unfold_locales (rule eval_ring_hom)
@@ -233,7 +233,7 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
       assume "f \<in> carrier P" "g \<in> carrier P"
       assume "Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
       have double_update: "L\<lparr>carrier := K\<rparr> = L\<lparr>carrier:=M, carrier:=K\<rparr>" by simp
-      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id _ \<alpha> Eval
+      interpret M_over_K: UP_univ_prop \<open>L\<lparr>carrier:=K\<rparr>\<close> \<open>L\<lparr>carrier:=M\<rparr>\<close> id P \<alpha> Eval
           apply (auto simp: P_def) \<comment> \<open>to-do: easier if I port \<open>old_fe.intermediate_field_2\<close> to the
           new setup?\<close>
         unfolding UP_univ_prop_def UP_pre_univ_prop_def apply auto
@@ -488,9 +488,8 @@ end
 lemma (in field_extension) example_16_8_3: \<comment> \<open>could be moved (see below), but kinda deserves its own spot\<close>
   assumes "\<alpha> \<in> K" shows "UP_field_extension.algebraic L K \<alpha>"
 proof -
-  define P where "P = UP (L\<lparr>carrier:=K\<rparr>)"
-  interpret \<alpha>?: UP_field_extension L K P
-    by unfold_locales (simp_all add: assms P_def)
+  interpret \<alpha>?: UP_field_extension L K
+    by unfold_locales (simp_all add: assms)
   let ?x_minus_\<alpha> = "monom P \<one>\<^bsub>L\<^esub> 1 \<ominus>\<^bsub>P\<^esub> monom P \<alpha> 0"
   have goal1: "\<alpha>.Eval ?x_minus_\<alpha> = \<zero>\<^bsub>L\<^esub>"
     unfolding \<alpha>.Eval_def using eval_monom_expr'[OF assms] by blast

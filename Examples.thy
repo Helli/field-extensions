@@ -94,11 +94,10 @@ lemma subfield_Reals_complex_field: "subfield \<real> complex_field"
 
 lemma generate_field_\<i>_UNIV: "generate_field complex_field (insert \<i> \<real>) = UNIV"
 proof -
-  define P where "P = UP (standard_ring \<real> :: complex ring)"
-  interpret UP_field_extension complex_field \<real> P \<i>
+  interpret UP_field_extension complex_field \<real> \<i>
     unfolding UP_field_extension_def UP_field_extension_axioms_def
     by (simp add: examples(4) field_extension_def subfield_Reals_complex_field)
-      (simp_all add: complex_field_def P_def)
+      (simp_all add: complex_field_def)
   show ?thesis unfolding genfield_singleton_explicit apply auto
   proof (rule exI, rule exI)
     fix x :: complex
