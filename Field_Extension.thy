@@ -13,7 +13,7 @@ locale field_extension = K?: subfield K L + L?: field L for L K
 lemma (in field) trivial_extension: "field_extension R (carrier R)"
   by (simp add: field_extension.intro field_axioms subfield_iff(1))
 
-locale UP_field_extension = fe?: field_extension + fixes P (structure) and \<alpha>
+locale UP_field_extension = fe?: field_extension + fixes P and \<alpha>
   defines "P \<equiv> UP (L\<lparr>carrier:=K\<rparr>)"
   assumes \<alpha>_in_L: "\<alpha> \<in> carrier L"
 begin
@@ -47,14 +47,14 @@ sublocale euclidean_domain P degree
 proof unfold_locales
   have "field (L\<lparr>carrier:=K\<rparr>)"
     by (simp add: L.subfield_iff(2) subfield_axioms)
-  fix f assume f: "f \<in> carrier P - {\<zero>}"
-  fix g assume g: "g \<in> carrier P - {\<zero>}"
+  fix f assume f: "f \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
+  fix g assume g: "g \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}"
   then have "lcoeff g \<in> Units (L\<lparr>carrier:=K\<rparr>)"
     unfolding field.field_Units[OF \<open>field (L\<lparr>carrier:=K\<rparr>)\<close>]
     using lcoeff_nonzero2 by auto
   from f g weak_long_div_theorem[OF _ _ this] show
-    "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes> q \<oplus> r \<and>
-      (r = \<zero> \<or> deg (L\<lparr>carrier := K\<rparr>) r < deg (L\<lparr>carrier := K\<rparr>) g)"
+    "\<exists>q r. q \<in> carrier P \<and> r \<in> carrier P \<and> f = g \<otimes>\<^bsub>P\<^esub> q \<oplus>\<^bsub>P\<^esub> r \<and>
+      (r = \<zero>\<^bsub>P\<^esub> \<or> deg (L\<lparr>carrier := K\<rparr>) r < deg (L\<lparr>carrier := K\<rparr>) g)"
     using R.carrier_one_not_zero by auto
 qed
 
@@ -190,8 +190,9 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
         apply auto
       proof goal_cases
         case (1 f1 f2 g1 g2)
-        show ?case apply (rule exI[where x = "f1\<otimes>f2"], rule exI[where x = "g1\<otimes>g2"]) using 1 apply
-            auto apply (smt L.comm_inv_char L.m_lcomm L.one_closed L.r_null L.r_one L.ring_axioms
+        show ?case apply (rule exI[where x = "f1\<otimes>\<^bsub>P\<^esub>f2"], rule exI[where x = "g1\<otimes>\<^bsub>P\<^esub>g2"])
+          using 1 apply auto
+           apply (smt L.comm_inv_char L.m_lcomm L.one_closed L.r_null L.r_one L.ring_axioms
               nonzero_inv_nonzero inv_of_fraction inverse_exists monoid.m_closed ring.hom_closed ring_def)
           using L.integral by blast
       qed
@@ -199,7 +200,7 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
         apply auto
       proof goal_cases
         case (1 f1 f2 g1 g2)
-        show ?case apply (rule exI[where x = "f1\<otimes>g2\<oplus>f2\<otimes>g1"], rule exI[where x = "g1\<otimes>g2"])
+        show ?case apply (rule exI[where x = "f1\<otimes>\<^bsub>P\<^esub>g2\<oplus>\<^bsub>P\<^esub>f2\<otimes>\<^bsub>P\<^esub>g1"], rule exI[where x = "g1\<otimes>\<^bsub>P\<^esub>g2"])
           by (simp add: 1 L.integral_iff sum_of_fractions)
       qed
     next
@@ -209,13 +210,13 @@ proof (simp add: generate_field_min_subfield2[of "insert \<alpha> K"] subset)
     qed force+
   next
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "monom P \<one>\<^bsub>L\<^esub> 1"], rule exI[where x = "\<one>\<^bsub>P\<^esub>"])
       by (auto simp del: One_nat_def)
   next
     fix \<alpha>
     assume "\<alpha> \<in> K"
     show "\<exists>f g. \<alpha> = Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g \<and> f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>"
-      apply (rule exI[where x = "monom P \<alpha> 0"], rule exI[where x = "\<one>"])
+      apply (rule exI[where x = "monom P \<alpha> 0"], rule exI[where x = "\<one>\<^bsub>P\<^esub>"])
       by (simp add: \<open>\<alpha> \<in> K\<close>)
   qed
   then have "?L' \<in> ?\<M>".
@@ -465,7 +466,7 @@ qed
 subsection \<open>Algebraic Field Extensions\<close>
 
 definition (in UP_field_extension) algebraic where
-  "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
+  "algebraic \<longleftrightarrow> (\<exists>p \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}. Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 definition (in field_extension) algebraic where
   "algebraic \<longleftrightarrow> (\<forall>\<alpha> \<in> carrier L. UP_field_extension.algebraic L K \<alpha>)"
@@ -515,9 +516,9 @@ proof
   show "Units P \<subseteq> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
   proof
     fix x assume "x \<in> Units P"
-    then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes> x = \<one>"
+    then obtain inv_x where inv_x: "inv_x \<in> Units P" "inv_x \<otimes>\<^bsub>P\<^esub> x = \<one>\<^bsub>P\<^esub>"
       using P.Units_l_inv by blast
-    then have "degree inv_x + degree x = degree \<one>"
+    then have "degree inv_x + degree x = degree \<one>\<^bsub>P\<^esub>"
       using deg_mult by (metis P.Units_closed P.Units_r_inv_ex P.l_null \<open>x \<in> Units P\<close> zero_not_one)
     then have "degree x = 0"
       unfolding deg_one by blast
@@ -533,7 +534,7 @@ next
     fix x assume "x \<in> {monom P u 0 |u. u \<in> K-{\<zero>\<^bsub>L\<^esub>}}"
     then obtain u where u: "x = monom P u 0" "u \<in> K-{\<zero>\<^bsub>L\<^esub>}"
       by blast
-    then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
+    then have "monom P (inv\<^bsub>L\<^esub> u) 0 \<otimes>\<^bsub>P\<^esub> monom P u 0 = monom P (inv\<^bsub>L\<^esub> u \<otimes>\<^bsub>L\<^esub> u) 0"
       using monom_mult_smult monom_mult_is_smult subfield_axioms L.subfield_m_inv(1) by auto
     also have "\<dots> = \<one>\<^bsub>P\<^esub>"
       using L.subfield_m_inv(3) u(2) subfield_axioms monom_one by auto
@@ -545,9 +546,9 @@ qed
 
 lemma lcoeff_mult:
   assumes "p \<in> carrier P" "q \<in> carrier P"
-  shows "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
-proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
-  assume "p \<noteq> \<zero>" "q \<noteq> \<zero>"
+  shows "lcoeff (p \<otimes>\<^bsub>P\<^esub> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+proof (cases "p \<noteq> \<zero>\<^bsub>P\<^esub>", cases "q \<noteq> \<zero>\<^bsub>P\<^esub>")
+  assume "p \<noteq> \<zero>\<^bsub>P\<^esub>" "q \<noteq> \<zero>\<^bsub>P\<^esub>"
   let ?coeff = "\<lambda>i. coeff P p i \<otimes>\<^bsub>L\<^esub> coeff P q (degree p + degree q - i)"
   have "?coeff i = \<zero>\<^bsub>L\<^esub>" if "i \<in> {degree p <.. degree p + degree q}" for i
   proof -
@@ -577,35 +578,35 @@ proof (cases "p \<noteq> \<zero>", cases "q \<noteq> \<zero>")
     using R.finsum_restrict[of _ "{.. degree p + degree q}"] assms by fastforce
   also have "\<dots> = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
     by (simp add: R.finsum_singleton' assms(1) assms(2))
-  finally show "lcoeff (p \<otimes> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
-    by (simp add: \<open>p \<noteq> \<zero>\<close> \<open>q \<noteq> \<zero>\<close> assms)
+  finally show "lcoeff (p \<otimes>\<^bsub>P\<^esub> q) = lcoeff p \<otimes>\<^bsub>L\<^esub> lcoeff q"
+    by (simp add: \<open>p \<noteq> \<zero>\<^bsub>P\<^esub>\<close> \<open>q \<noteq> \<zero>\<^bsub>P\<^esub>\<close> assms)
 qed (simp_all add: assms)
 
 lemma ex1_associated_monic:
-  assumes "p \<in> carrier P - {\<zero>}" shows "\<exists>!q \<in> carrier P. q \<sim> p \<and> monic q"
+  assumes "p \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}" shows "\<exists>!q \<in> carrier P. q \<sim>\<^bsub>P\<^esub> p \<and> monic q"
 proof
   from assms have p: "p \<in> carrier P" "lcoeff p \<in> K-{\<zero>\<^bsub>L\<^esub>}"
     using lcoeff_nonzero by auto
   then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K"
     using L.subfield_m_inv(1) subfield_axioms by auto
-  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
+  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot>\<^bsub>P\<^esub> p"
   have "?p \<in> carrier P"
     using inv_ok p(1) by auto
   moreover have "monic ?p" unfolding monic_def
     using L.subfield_m_inv(1) L.subfield_m_inv(3) p subfield_axioms by auto
-  moreover have "?p = monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> p"
+  moreover have "?p = monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes>\<^bsub>P\<^esub> p"
     using inv_ok monom_mult_is_smult p(1) by auto
-  moreover from p inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes> monom P (lcoeff p) 0 = \<one>"
+  moreover from p inv_ok have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<otimes>\<^bsub>P\<^esub> monom P (lcoeff p) 0 = \<one>\<^bsub>P\<^esub>"
     using L.subfield_m_inv(3)[OF subfield_axioms]
     by (metis Diff_iff Eval_constant R.one_closed monom_mult_smult monom_closed monom_mult_is_smult monom_one hom_one)
   then have "monom P (inv\<^bsub>L\<^esub> lcoeff p) 0 \<in> Units P"
     by (metis P.Units_one_closed P.unit_factor coeff_closed inv_ok monom_closed p(1))
-  ultimately show "?p \<in> carrier P \<and> ?p \<sim> p \<and> monic ?p"
+  ultimately show "?p \<in> carrier P \<and> ?p \<sim>\<^bsub>P\<^esub> p \<and> monic ?p"
     by (simp add: P.Units_closed P.associatedI2' UP_m_comm p(1))
   {
   fix q
-  assume "q \<in> carrier P" "q \<sim> p" "monic q"
-  then obtain inv_c' where inv_c': "q = inv_c' \<otimes> p" "inv_c' \<in> Units P"
+  assume "q \<in> carrier P" "q \<sim>\<^bsub>P\<^esub> p" "monic q"
+  then obtain inv_c' where inv_c': "q = inv_c' \<otimes>\<^bsub>P\<^esub> p" "inv_c' \<in> Units P"
     using ring_associated_iff p(1) by blast
   then obtain inv_c where inv_c'_def: "inv_c' = monom P inv_c 0" and inv_c: "inv_c \<in> K"
     using Units_poly by auto
@@ -619,29 +620,29 @@ proof
     unfolding inv_c' inv_c'_def using monom_mult_is_smult
     using inv_c p(1) by blast
   }
-  then show "\<And>q. q \<in> carrier P \<and> q \<sim> p \<and> monic q \<Longrightarrow> q = ?p"
+  then show "\<And>q. q \<in> carrier P \<and> q \<sim>\<^bsub>P\<^esub> p \<and> monic q \<Longrightarrow> q = ?p"
     by blast
 qed
 
-lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
+lemma nonzero_constant_is_Unit: "p \<in> carrier P-{\<zero>\<^bsub>P\<^esub>} \<Longrightarrow> degree p = 0 \<Longrightarrow> p \<in> Units P"
   using deg_zero_impl_monom[of p] Units_poly lcoeff_nonzero_nonzero by auto
 
 lemma degree_le_divides_associated:
-  assumes "p \<in> carrier P-{\<zero>}" "q \<in> carrier P"
-  and "degree p \<le> degree q" "q divides p"
-  shows "p \<sim> q"
-proof (cases "q = \<zero>")
+  assumes "p \<in> carrier P-{\<zero>\<^bsub>P\<^esub>}" "q \<in> carrier P"
+  and "degree p \<le> degree q" "q divides\<^bsub>P\<^esub> p"
+  shows "p \<sim>\<^bsub>P\<^esub> q"
+proof (cases "q = \<zero>\<^bsub>P\<^esub>")
   case False
   note assms(4)[unfolded factor_def]
-  then obtain c where c: "c \<in> carrier P" "p = q \<otimes> c" by auto
-  with assms(1) have "c \<noteq> \<zero>"
+  then obtain c where c: "c \<in> carrier P" "p = q \<otimes>\<^bsub>P\<^esub> c" by auto
+  with assms(1) have "c \<noteq> \<zero>\<^bsub>P\<^esub>"
     using P.r_null assms(2) by blast
   with assms(1-3) c have "degree p = degree q"
     by (simp add: False)
-  with \<open>c \<noteq> \<zero>\<close> c have "degree c = 0"
+  with \<open>c \<noteq> \<zero>\<^bsub>P\<^esub>\<close> c have "degree c = 0"
     by (simp add: False assms(2))
   then show ?thesis
-    by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<close> assms(2) c nonzero_constant_is_Unit)
+    by (simp add: P.associatedI2' \<open>c \<noteq> \<zero>\<^bsub>P\<^esub>\<close> assms(2) c nonzero_constant_is_Unit)
 qed (use assms(4) in auto)
 
 
@@ -663,7 +664,7 @@ proof -
     unfolding algebraic_def using lcoeff_nonzero2 by auto
   then have inv_ok: "inv\<^bsub>L\<^esub>(lcoeff p) \<in> K-{\<zero>\<^bsub>L\<^esub>}"
     using L.subfield_m_inv(1) subfield_axioms by auto
-  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot> p"
+  let ?p = "inv\<^bsub>L\<^esub>(lcoeff p) \<odot>\<^bsub>P\<^esub> p"
   from inv_ok have "Eval ?p = inv\<^bsub>L\<^esub>(lcoeff p) \<otimes>\<^bsub>L\<^esub> (Eval p)"
     using Eval_smult p(1) by auto
   also have "\<dots> = \<zero>\<^bsub>L\<^esub>"
@@ -682,7 +683,7 @@ corollary irr_exists:
   and is_minimal_irr: "\<forall>y. y \<in> carrier P \<and> monic y \<and> Eval y = \<zero>\<^bsub>L\<^esub> \<longrightarrow> degree irr \<le> degree y"
   using irr_is_arg_min[unfolded is_arg_min_linorder] by auto
 
-corollary irr_nonzero: "irr \<noteq> \<zero>"
+corollary irr_nonzero: "irr \<noteq> \<zero>\<^bsub>P\<^esub>"
   by (simp add: monic_irr monic_nonzero)
 
 corollary irr_nonconstant: "degree irr > 0"
@@ -696,14 +697,14 @@ qed
 
 subsubsection \<open>Uniqueness\<close>
 
-lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>}"
+lemma a_kernel_nontrivial: "a_kernel P L Eval \<supset> {\<zero>\<^bsub>P\<^esub>}"
   unfolding a_kernel_def' using \<open>algebraic\<close>[unfolded algebraic_def] by auto
 
-lemma PIdl_irr_a_kernel_Eval: "PIdl irr = a_kernel P L Eval"
+lemma PIdl_irr_a_kernel_Eval: "PIdl\<^bsub>P\<^esub> irr = a_kernel P L Eval"
 proof -
-  obtain g' where "g' \<in> carrier P" "PIdl g' = a_kernel P L Eval"
+  obtain g' where "g' \<in> carrier P" "PIdl\<^bsub>P\<^esub> g' = a_kernel P L Eval"
     using exists_gen ring.kernel_is_ideal ex1_associated_monic by metis
-  then obtain g where g: "g \<in> carrier P" "monic g" "PIdl g = a_kernel P L Eval"
+  then obtain g where g: "g \<in> carrier P" "monic g" "PIdl\<^bsub>P\<^esub> g = a_kernel P L Eval"
     using ex1_associated_monic by (metis (no_types) DiffD1 DiffD2 associated_iff_same_ideal insertE
       cgenideal_eq_genideal genideal_zero UP_zero_closed a_kernel_nontrivial insert_Diff psubset_imp_ex_mem)
   then have "Eval g = \<zero>\<^bsub>L\<^esub>"
@@ -712,27 +713,27 @@ proof -
     using is_minimal_irr by blast
   from Eval_irr have "irr \<in> a_kernel P L Eval"
     unfolding a_kernel_def' by (simp add: irr_in_P)
-  then have "g divides irr"
+  then have "g divides\<^bsub>P\<^esub> irr"
     by (simp add: P.in_PIdl_impl_divided g(1,3))
-  with degree_le g(1) irr_in_P have "g \<sim> irr"
+  with degree_le g(1) irr_in_P have "g \<sim>\<^bsub>P\<^esub> irr"
     by (simp add: P.associated_sym degree_le_divides_associated irr_nonzero)
-  with g(1,3) irr_in_P show "PIdl irr = a_kernel P L Eval"
+  with g(1,3) irr_in_P show "PIdl\<^bsub>P\<^esub> irr = a_kernel P L Eval"
     using P.associated_iff_same_ideal by auto
 qed
 
 lemma irr_unique:
   assumes "is_arg_min degree (\<lambda>p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>) g" shows "g = irr"
 proof -
-  have irr_is_unique_gen: "p = irr" if "p \<in> carrier P" "monic p" "PIdl p = a_kernel P L Eval" for p
+  have irr_is_unique_gen: "p = irr" if "p \<in> carrier P" "monic p" "PIdl\<^bsub>P\<^esub> p = a_kernel P L Eval" for p
     using that PIdl_irr_a_kernel_Eval associated_iff_same_ideal ex1_associated_monic
     by (metis UP_zero_closed insertE insert_Diff irr_in_P monic_irr)
   from assms have degree_g_le: "degree g \<le> degree irr"
     by (simp add: Eval_irr irr_in_P is_arg_min_linorder monic_irr)
   from assms have g: "g \<in> carrier P" "monic g" "Eval g = \<zero>\<^bsub>L\<^esub>"
     by (simp_all add: is_arg_min_linorder)
-  then have g': "g \<in> carrier P - {\<zero>}" "g \<in> a_kernel P L Eval"
+  then have g': "g \<in> carrier P - {\<zero>\<^bsub>P\<^esub>}" "g \<in> a_kernel P L Eval"
     unfolding a_kernel_def' by (simp_all add: monic_nonzero a_kernel_def)
-  with PIdl_irr_a_kernel_Eval have "irr divides g"
+  with PIdl_irr_a_kernel_Eval have "irr divides\<^bsub>P\<^esub> g"
     using P.in_PIdl_impl_divided irr_in_P by blast
   with irr_is_unique_gen degree_g_le g'(1) degree_le_divides_associated show ?thesis
     by (metis irr_in_P associated_iff_same_ideal PIdl_irr_a_kernel_Eval g(1,2))
@@ -741,14 +742,14 @@ qed
 subsubsection \<open>Irreducibility\<close>
 
 text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
-  Quot PIdl irr)\<close> anyway:\<close>
-lemma "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
+  Quot PIdl\<^bsub>P\<^esub> irr)\<close> anyway:\<close>
+lemma "domain (P Quot PIdl\<^bsub>P\<^esub> irr)" \<comment> \<open>unused\<close>
 proof -
   have domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
     by (simp add: ring.img_is_domain L.domain_axioms)
-  have ring: "ring (P Quot PIdl irr)"
+  have ring: "ring (P Quot PIdl\<^bsub>P\<^esub> irr)"
     by (simp add: P.cgenideal_ideal ideal.quotient_is_ring irr_in_P)
-  then obtain h where iso_h: "h \<in> ring_iso (L\<lparr>carrier := Eval ` carrier P\<rparr>) (P Quot PIdl irr)"
+  then obtain h where iso_h: "h \<in> ring_iso (L\<lparr>carrier := Eval ` carrier P\<rparr>) (P Quot PIdl\<^bsub>P\<^esub> irr)"
     using ring_iso_set_sym ring.FactRing_iso_set_aux PIdl_irr_a_kernel_Eval by auto
   note domain.ring_iso_imp_img_domain[OF domain_im_Eval this]
   then show ?thesis
@@ -756,10 +757,10 @@ proof -
 qed
 
 text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
-lemma irr_irreducible_polynomial: "ring_irreducible irr"
+lemma irr_irreducible_polynomial: "ring_irreducible\<^bsub>P\<^esub> irr"
 proof -
-  txt "As the zero ideal's preimage under evaluation \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
-  have "primeideal (PIdl irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
+  txt "As the zero ideal's preimage under evaluation \<^term>\<open>PIdl\<^bsub>P\<^esub> irr\<close> is again a prime ideal:"
+  have "primeideal (PIdl\<^bsub>P\<^esub> irr) P" unfolding PIdl_irr_a_kernel_Eval a_kernel_def'
     using pol.ring.primeideal_vimage[OF cring_axioms L.zeroprimeideal] by simp
   txt "This immediately gives the desired result, as \<^term>\<open>P\<close> is a principal ideal domain:"
   then show "ring_irreducible\<^bsub>P\<^esub> irr"
@@ -770,7 +771,7 @@ subsubsection \<open>Factoring out the Minimal Polynomial\<close>
 
 text \<open>Representative evaluation is a well-defined, injective homomorphism:\<close>
 lemma repr_Eval_wd_inj:
-  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
+  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl\<^bsub>P\<^esub> irr) (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
   using ring.FactRing_iso_set_aux by (simp add: o_def PIdl_irr_a_kernel_Eval)
 
 text \<open>Its image (= \<^const>\<open>Eval\<close>'s image) is \<open>K(\<alpha>)\<close>:\<close>
@@ -778,7 +779,7 @@ lemma img_Eval_is_generate_field: "Eval ` carrier P = generate_field L (insert \
 proof
   have "Eval ` carrier P = {Eval f | f. f \<in> carrier P}"
     by fast
-  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>}"
+  also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g = \<one>\<^bsub>P\<^esub>}"
     by force
   also have "\<dots> \<subseteq> {Eval f \<otimes>\<^bsub>L\<^esub> inv\<^bsub>L\<^esub> Eval g |f g. f \<in> carrier P \<and> g \<in> carrier P \<and> Eval g \<noteq> \<zero>\<^bsub>L\<^esub>}"
     by fastforce
@@ -788,11 +789,11 @@ proof
 next
   show "Eval ` carrier P \<supseteq> generate_field L (insert \<alpha> K)"
   proof (rule L.generate_field_min_subfield1)
-    from irreducible_imp_maximalideal interpret irr: maximalideal \<open>PIdl irr\<close> P
+    from irreducible_imp_maximalideal interpret irr: maximalideal \<open>PIdl\<^bsub>P\<^esub> irr\<close> P
       by (simp add: irr_in_P irr_irreducible_polynomial)
-    from irr.quotient_is_field interpret Quot: field \<open>P Quot PIdl irr\<close>
+    from irr.quotient_is_field interpret Quot: field \<open>P Quot PIdl\<^bsub>P\<^esub> irr\<close>
       by (simp add: P.cring)
-    from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl irr\<^esub> = \<zero>\<^bsub>L\<^esub>"
+    from repr_Eval_wd_inj have zero_ok: "(the_elem \<circ> (`) Eval) \<zero>\<^bsub>P Quot PIdl\<^bsub>P\<^esub> irr\<^esub> = \<zero>\<^bsub>L\<^esub>"
       using ring_hom_zero[OF _ irr.quotient_is_ring ring.img_is_ring] by (auto simp: ring_iso_def)
     from Quot.ring_iso_imp_img_field[OF repr_Eval_wd_inj] have "field (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
       using zero_ok by fastforce
@@ -819,11 +820,11 @@ qed
 text \<open>Theorem 16.9b of @{cite "Algebra1"}:\<close>
 
 theorem the_elem_ring_iso_Quot_irr_generate_field:
-  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
+  "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl\<^bsub>P\<^esub> irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
   by (fact repr_Eval_wd_inj[unfolded img_Eval_is_generate_field])
 
 corollary simple_algebraic_extension:
-  "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
+  "P Quot PIdl\<^bsub>P\<^esub> irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
   using the_elem_ring_iso_Quot_irr_generate_field is_ring_iso_def by blast
 
 end
