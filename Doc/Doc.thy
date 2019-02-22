@@ -200,9 +200,9 @@ text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_t
 
 subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
 
-text \<open>The \<^doc>\<open>locales\<close> manual @{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
+text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
  definitions are provided only for backward compatibility, but gives no reason for the deprecation.
- My problem with \<^theory_text>\<open>defines\<close> is that it causes some code duplication, e.g.\ @{thm[source]
+ My problem with \<^theory_text>\<open>defines\<close> is that it causes code duplication, e.g.\ @{thm[source]
  UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}. In my
  development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions instead.
  The only usage is in the definition of @{locale UP_field_extension}, where this seems to be the
