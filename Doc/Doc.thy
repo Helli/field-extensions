@@ -54,21 +54,28 @@ section \<open>Main Results\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
-text \<open>The results of Theorem Kemper/16.9b@{cite Algebra1} are distributed over @{thm[source]
- irr_exists}, @{thm[source] irr_unique}, @{thm[source] irr_irreducible_polynomial} and @{thm[source]
- the_elem_ring_iso_Quot_irr_generate_field} (all in \<^locale>\<open>UP_field_extension\<close>). All of them are
- on their own useful for a library, so splitting
- up the theorem seemed more appropriate. Definition 16.10 is preponed to avoid confusing extra
- variables like \<open>g'\<close> or \<open>p'\<close> in later proofs. This is done via the indefinite description that
- @{const arg_min} provides:\<close>
-(*<*)end(*>*)
-text_raw\<open>
-\isacommand{definition}\ {\isacharparenleft}\isakeyword{in}\ UP{\isacharunderscore}field{\isacharunderscore}extension{\isacharparenright}
-irr\ \isakeyword{where}\ \isanewline
+text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \<open>\<section>to-do\<close>. For an algebraic \<^term>\<open>\<alpha>\<close>,
+  I define the minimal polynomial:\<close>
+text_raw\<open>\isacommand{definition}\ irr\ \isakeyword{where}\ \isanewline
 \ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\
  degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\
  {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
 \<close>
+text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
+ irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
+  standard for textbooks.\<close>
+
+text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
+ \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
+  \<^item> @{thm[source] irr_exists}, the existence of a minimal polynomial
+  \<^item> @{thm[source] irr_unique}, the uniqueness of said \<^const>\<open>irr\<close>
+  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibily of \<^const>\<open>irr\<close> in the ring
+   \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
+  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphism of its residue class
+   ring with \<open>K(\<alpha>)\<close>
+
+All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
+(*<*)end(*>*)
 
 subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\<close>
 
