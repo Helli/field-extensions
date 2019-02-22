@@ -199,7 +199,7 @@ text \<open>to the library. This is just another way of stating the existence of
 text \<open>As is known, infinite vector spaces have bases, too, but proving this requires more work and
   a different indexing scheme.\<close>
 
-subsection \<open>Missing lemmas\<close> (*to-do: move up? (most important problem)*)
+subsection \<open>Missing Lemmas\<close> (*to-do: move up? (most important problem)*)
 
 text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
   proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
@@ -269,7 +269,7 @@ text\<open>yields 38 facts, 15 of which are about \<^const>\<open>INTEG\<close>.
 When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
- revisions of the library, the import of this ring should be optional.\<close>
+ revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
 
 text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
  AFP\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are to special: Since \<^const>\<open>UNIV\<close> is
