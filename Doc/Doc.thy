@@ -206,10 +206,10 @@ text \<open>The \<^doc>\<open>locales\<close> manual @{cite "isabelle-locale"} s
  UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}. In my
  development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions instead.
  The only usage is in the definition of @{locale UP_field_extension}, where this seems to be the
- only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is at @{url
- "https://github.com/Helli/field-extensions/tree/no_defines"}. This needs a lot more subscripts in
- subsequent statements and proofs, but removes the need to redefine \<open>P\<close> for interpretations of the
- locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.
+ only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is in the
+ \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>. This
+ needs a lot more subscripts in subsequent statements and proofs, but removes the need to redefine
+ \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.
 \<close>
 
 subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
