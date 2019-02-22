@@ -192,11 +192,25 @@ text \<open>to the library. This is just another way of stating the existence of
 text \<open>As is known, infinite vector spaces have bases, too, but proving this requires more work and
   a different indexing scheme.\<close>
 
-subsection \<open>Missing lemmas\<close>
+subsection \<open>Missing lemmas\<close> (*to-do: move up? (most important problem)*)
 
-text \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
-  proven within, e.g. the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
+text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
+  proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
   \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
+
+subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
+
+text \<open>The \<^doc>\<open>locales\<close> manual @{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
+ definitions are provided only for backward compatibility, but gives no reason for the deprecation.
+ My problem with \<^theory_text>\<open>defines\<close> is that it causes some code duplication, e.g.\ @{thm[source]
+ UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}. In my
+ development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions instead.
+ The only usage is in the definition of @{locale UP_field_extension}, where this seems to be the
+ only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is in the
+ \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>. This
+ needs a lot more subscripts in subsequent statements and proofs, but removes the need to redefine
+ \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.
+\<close>
 
 subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
 
