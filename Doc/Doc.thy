@@ -334,13 +334,12 @@ section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
 
 text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
   errors:
-\begin{figure}
+\begin{figure}[H]
   \includegraphics[width=\linewidth]{"interpretation_error"}
-  \caption{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
+  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
-\<close>
-text \<open>The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
+The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
  \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but it
  complicated matters quite a bit, see
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
