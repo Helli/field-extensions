@@ -125,8 +125,8 @@ subsection \<open>Motivation\<close>
 
 text \<open>The motivation for this was Kemper's proof of the tower rule, which uses results about vector
   spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more
- directly using indexed sums\<^footnote>\<open>see, e.g.
-  \<^url>\<open>https://en.wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
+ directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
+ \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in
   \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
@@ -181,13 +181,13 @@ text \<open>These are two other useful results:
   \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
  subspace is less than or equal to the dimension of the finite-dimensional superspace.
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
- its superspace, i.e. the inclusion is improper.
+ its superspace, i.e.\ the inclusion is improper.
 
 These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
 
-For the proof, I needed the basis extension theorem
- \<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
-at least for finite-dimensional vector spaces, and \<^prop>\<open>S = carrier V\<close>. This special case is
+For the proof, I needed the basis extension
+ theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
+at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
 The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
@@ -340,9 +340,9 @@ text \<open>This theory cannot use the @{theory_text \<open>interpretation\<clos
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
 The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but it
- complicated matters quite a bit, see
-  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
+  matters quite a bit.\<close>
 
 subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
 
