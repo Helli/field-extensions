@@ -336,7 +336,7 @@ text \<open>This theory cannot use the @{theory_text \<open>interpretation\<clos
   errors:
 \begin{figure}
   \includegraphics[width=\linewidth]{"interpretation_error"}
-  \caption[jkioj]{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
+  \caption{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
 \<close>
