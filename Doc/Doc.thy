@@ -90,7 +90,7 @@ text \<open>This uses an indefinite description (via @{const arg_min}) because t
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
-  \<^item> @{thm[source] irr_exists}, the existence of a minimal polynomial "\<^const>\<open>irr\<close>"
+  \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
   \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibily of \<^const>\<open>irr\<close> in the ring
    \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
