@@ -101,9 +101,11 @@ All of these are on their own useful for a library, so splitting up the theorem 
 
 subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\label{sec:tr}\<close>
 
-lemma "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
-  field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
-  by (fact degree_multiplicative)
+lemma degree_multiplicative:
+  "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
+  field_extension.degree M K =
+    field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
+  (*<*)by (fact degree_multiplicative)(*>*)
 
 text \<open>The proof is covered by considering three (partially overlapping) cases:
 \<^enum> The lower field extension is infinite.
@@ -111,10 +113,10 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 \<^enum> Both extension parts are finite.\<close>
 text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
 
-text \<open>Note that recently, the statement about combining \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
-  another development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This uses the inner
- product instead of the outer for the proof, thus avoiding the vector space terminology as described
-  in \<open>\<section>\<close>\ref{sec:vs}.\<close>
+text \<open>Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
+ another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This
+ uses the inner product instead of the outer for the proof, thus avoiding the vector space
+  terminology as described in \<open>\<section>\<close>\ref{sec:vs}.\<close>
 
 section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
 
