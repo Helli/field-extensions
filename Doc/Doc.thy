@@ -77,11 +77,12 @@ section \<open>Main Results\<close>
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \<open>\<section>to-do\<close>. For an algebraic \<^term>\<open>\<alpha>\<close>,
-  I define the minimal polynomial (called "\<^const>\<open>irr\<close>" due to its irreducibility):\<close>
-text_raw\<open>\isacommand{definition}\ irr\ \isakeyword{where}\ \isanewline
-\ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\
- degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\
- {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
+  I define the minimal polynomial:\<close>
+text_raw\<open>\isacommand{definition}
+\ irr\ %
+\isamarkupcmt{named after its \emph{irr}educibility (shown later)%
+}\ \isanewline
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
 \<close>
 text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
  irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
