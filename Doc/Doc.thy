@@ -48,14 +48,36 @@ text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses this "se
   only under these additional assumptions that these locales coincide with the typical textbook
   definitions.\<close>
 
-section \<open>The locale \<^locale>\<open>field_extension\<close>\<close>
+subsection \<open>\<^locale>\<open>field_extension\<close>\<close>
+
+subsubsection \<open>Interpretation as Vector Space\<close>
+(* combine these subsubsections? *)
+subsubsection \<open>Degree\<close>
+
+text \<open>In the \<open>VectorSpace\<close> theory, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
+ being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
+ representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
+ being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
+
+As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
+ consideration in mind, I therefore decided to define the infinite degree to be @{term_type "0::nat"}.
+ Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to have the same
+ absorbing properties in a multiplication.
+
+A more robust implementation would use an extended type of natural numbers, or even the full range
+ of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
+ Algebra1} views the degree as number in \<open>\<nat> \<union> {\<infinity>}\<close>.
+
+Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>: My theories only use
+ what is there. Due to there being no collision with the actual \<open>0\<close>, my material should be easily
+ adaptable to such a change.\<close>
 
 section \<open>Main Results\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \<open>\<section>to-do\<close>. For an algebraic \<^term>\<open>\<alpha>\<close>,
-  I define the minimal polynomial:\<close>
+  I define the minimal polynomial (called "\<^const>\<open>irr\<close>" due to its irreducibility):\<close>
 text_raw\<open>\isacommand{definition}\ irr\ \isakeyword{where}\ \isanewline
 \ \ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\
  degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\
@@ -67,8 +89,8 @@ text \<open>This uses an indefinite description (via @{const arg_min}) because t
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
-  \<^item> @{thm[source] irr_exists}, the existence of a minimal polynomial
-  \<^item> @{thm[source] irr_unique}, the uniqueness of said \<^const>\<open>irr\<close>
+  \<^item> @{thm[source] irr_exists}, the existence of a minimal polynomial "\<^const>\<open>irr\<close>"
+  \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
   \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibily of \<^const>\<open>irr\<close> in the ring
    \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
   \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphism of its residue class
@@ -77,7 +99,7 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
 All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
 (*<*)end(*>*)
 
-subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\<close>
+subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\label{sec:tr}\<close>
 
 lemma "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
   field_extension.degree M K = field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
@@ -89,7 +111,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 \<^enum> Both extension parts are finite.\<close>
 text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
 
-text \<open>Note that recently, the statement about combining finite extensions (case 3) has also been proven in
+text \<open>Note that recently, the statement about combining \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
   another development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This uses the inner
  product instead of the outer for the proof, thus avoiding the vector space terminology as described
   in \<open>\<section>\<close>\ref{sec:vs}.\<close>
@@ -221,9 +243,9 @@ text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} st
 
 subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
 
-section \<open>Library Analysis\<close>
+section \<open>Analysis of the Used Libraries\<close>
 
-subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close>
+subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close> (* to-do: Remove this distinction? *)
 
 subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
 
