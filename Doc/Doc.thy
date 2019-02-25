@@ -109,8 +109,8 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
 
 text \<open>Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
- another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This
- uses the inner product instead of the outer for the proof, thus avoiding the vector space
+ another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
+ It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \<open>\<section>\<close>\ref{sec:vs}.\<close>
 
 section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
