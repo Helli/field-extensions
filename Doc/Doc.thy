@@ -8,12 +8,6 @@ theory Doc
 begin
 (*>*)
 
-section \<open>Preface\<close>
-(* to-do: make this an actual preface? *)
-text\<open>This work is part of an interdisciplinary project between Mathematics and Computer Science,
-  supervised by Prof.\ Gregor Kemper and Manuel Eberl. The source files are hosted at
-  \<^url>\<open>https://github.com/helli/field-extensions\<close>.\<close>
-
 section \<open>Modelling of Substructures\<close>
 
 text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
@@ -90,12 +84,12 @@ text \<open>This uses an indefinite description (via @{const arg_min}) because t
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
-  \<^item> @{thm[source] irr_exists}, the existence of a minimal polynomial "\<^const>\<open>irr\<close>"
+  \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
-  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibily of \<^const>\<open>irr\<close> in the ring
+  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in the ring
    \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
-  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphism of its residue class
-   ring with \<open>K(\<alpha>)\<close>
+  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphy of \<^term>\<open>irr\<close>'s
+ residue class ring with \<open>K(\<alpha>)\<close>
 
 All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
 (*<*)end(*>*)
@@ -115,8 +109,8 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
 
 text \<open>Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
- another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>. This
- uses the inner product instead of the outer for the proof, thus avoiding the vector space
+ another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
+ It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \<open>\<section>\<close>\ref{sec:vs}.\<close>
 
 section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
@@ -125,8 +119,8 @@ subsection \<open>Motivation\<close>
 
 text \<open>The motivation for this was Kemper's proof of the tower rule, which uses results about vector
   spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more
- directly using indexed sums\<^footnote>\<open>see, e.g.
-  \<^url>\<open>https://en.wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
+ directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
+ \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in
   \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
@@ -143,7 +137,7 @@ text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<o
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
 
-text \<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
+text (*rm?*)\<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
   maybe be stated using \<^const>\<open>ring.func_space\<close> directly.\<close>
 
 subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
@@ -181,13 +175,13 @@ text \<open>These are two other useful results:
   \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
  subspace is less than or equal to the dimension of the finite-dimensional superspace.
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
- its superspace, i.e. the inclusion is improper.
+ its superspace, i.e.\ the inclusion is improper.
 
 These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
 
-For the proof, I needed the basis extension theorem
- \<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
-at least for finite-dimensional vector spaces, and \<^prop>\<open>S = carrier V\<close>. This special case is
+For the proof, I needed the basis extension
+ theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
+at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
 The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
@@ -284,23 +278,21 @@ text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
  i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the usual
  operations.
-Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>),
-they also pollute the name space: For instance,\<close>
-find_theorems eval
-text\<open>yields 38 facts, 15 of which are about \<^const>\<open>INTEG\<close>. These are too special and therefore
- useless when doing abstract algebra. Note that the import of \<^const>\<open>INTEG\<close> cannot be avoided when using
- old-school (see \<open>\<section>\<close>\ref{sec:poly}) polynomials, and that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts.
 
-When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
+Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>), they also
+ pollute the name space: For instance, \<^theory_text>\<open>find_theorems eval\<close> yields 35 facts, 15 of which
+ are about \<^const>\<open>INTEG\<close>. These are too special and therefore useless when doing abstract
+ algebra. Note that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts, hindering e.g.\ auto-completion.
+When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
  revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
 
-text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
- AFP\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are to special: Since \<^const>\<open>UNIV\<close> is
- already the largest set, they cannot be substructures. The ability to reason about substructures
- is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place. Section \ref{sec:ethy}
- follows a different approach using mostly abstract types.
+text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
+ Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
+ \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
+ about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
+ \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
 subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
@@ -311,7 +303,7 @@ text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[na
   identifiers for some entities.\<close>
 
 text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
-  \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency origins from
+  \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
  two approaches is subject of ongoing development, refer to the developers for more information.\<close>
 
@@ -334,16 +326,15 @@ section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
 
 text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
   errors:
-\begin{figure}
+\begin{figure}[H]
   \includegraphics[width=\linewidth]{"interpretation_error"}
-  \caption[jkioj]{@{thm[source] subfield_Reals_complex_field} when stated as an interpretation: The
+  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
-\<close>
-text \<open>The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but it
- complicated matters quite a bit, see
-  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>.\<close>
+The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
+  matters quite a bit.\<close>
 
 subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
 
