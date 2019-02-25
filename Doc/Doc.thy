@@ -8,12 +8,6 @@ theory Doc
 begin
 (*>*)
 
-section \<open>Preface\<close>
-(* to-do: make this an actual preface? *)
-text\<open>This work is part of an interdisciplinary project between Mathematics and Computer Science,
-  supervised by Manuel Eberl and Prof.\ Gregor Kemper. The source files are hosted at
-  \<^url>\<open>https://github.com/helli/field-extensions\<close>.\<close>
-
 section \<open>Modelling of Substructures\<close>
 
 text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
