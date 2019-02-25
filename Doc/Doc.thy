@@ -252,7 +252,7 @@ text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cge
   \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In any case, both functions are easy to state as hull,
   and using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs. In this scenario, the
  current @{thm[source] cgenideal_def} would become a lemma, perhaps stated like @{thm[source]
-  cring.cgenideal_eq_rcos} to benefit from the huge \<^theory>\<open>HOL-Algebra.Coset\<close>.\<close>
+  cring.cgenideal_eq_rcos} to benefit from the huge theory \<^theory>\<open>HOL-Algebra.Coset\<close>.\<close>
 
 subsubsection \<open>Usage of Function Symbols\<close>
 
