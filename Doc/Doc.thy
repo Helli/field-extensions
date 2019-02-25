@@ -88,7 +88,7 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
   \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in the ring
    \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
-  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphism of \<^term>\<open>irr\<close>'s
+  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphy of \<^term>\<open>irr\<close>'s
  residue class ring with \<open>K(\<alpha>)\<close>
 
 All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
