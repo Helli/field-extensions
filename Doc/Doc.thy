@@ -290,11 +290,11 @@ When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), le
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
  revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
 
-text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the
- AFP\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are to special: Since \<^const>\<open>UNIV\<close> is
- already the largest set, they cannot be substructures. The ability to reason about substructures
- is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place. Section \ref{sec:ethy}
- follows a different approach using mostly abstract types.
+text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
+ Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
+ \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
+ about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
+ Section \ref{sec:ethy} follows a different approach using mostly abstract types.
 \<close>
 
 subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
