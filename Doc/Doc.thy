@@ -137,7 +137,7 @@ text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<o
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
 
-text \<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
+text (*rm?*)\<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
   maybe be stated using \<^const>\<open>ring.func_space\<close> directly.\<close>
 
 subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
@@ -278,14 +278,12 @@ text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
  i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the usual
  operations.
-Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>),
-they also pollute the name space: For instance,\<close>
-find_theorems eval
-text\<open>yields 38 facts, 15 of which are about \<^const>\<open>INTEG\<close>. These are too special and therefore
- useless when doing abstract algebra. Note that the import of \<^const>\<open>INTEG\<close> cannot be avoided when using
- old-school (see \<open>\<section>\<close>\ref{sec:poly}) polynomials, and that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts.
 
-When going up in the locale hierarchy (e.g. \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
+Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>), they also
+ pollute the name space: For instance, \<^theory_text>\<open>find_theorems eval\<close> yields 35 facts, 15 of which
+ are about \<^const>\<open>INTEG\<close>. These are too special and therefore useless when doing abstract
+ algebra. Note that \<^theory_text>\<open>hide_const INTEG\<close> does not hide the facts, hindering e.g.\ auto-completion.
+When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
  revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
@@ -294,7 +292,7 @@ text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outs
  Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
  \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
  about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
- Section \ref{sec:ethy} follows a different approach using mostly abstract types.
+ \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
 subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
@@ -305,7 +303,7 @@ text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[na
   identifiers for some entities.\<close>
 
 text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
-  \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency origins from
+  \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
  two approaches is subject of ongoing development, refer to the developers for more information.\<close>
 
