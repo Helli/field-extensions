@@ -248,12 +248,17 @@ subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>
 
 text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
  differ not by \<^emph>\<open>c\<close>ommutativity, as their names suggest, but
-  by whether they take a set or single element as argument. The latter should probably be renamed to
-  match its function symbol \<open>PIdl\<close> (principal ideal). It could also just abbreviate
-  \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In any case, both functions are easy to state as hull,
-  and using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs. In this scenario, the
+  by whether they take a set or single element as argument.
+Confusingly enough, the locales \<^const>\<open>principalideal\<close> and \<^const>\<open>principal_domain\<close> are not
+ defined via the same notion of ideal. (They also do not use each other.)
+
+ \<^const>\<open>Ideal.cgenideal\<close> should probably be renamed to
+  match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
+  \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In this scenario, the
  current @{thm[source] cgenideal_def} would become a lemma, perhaps stated like @{thm[source]
-  cring.cgenideal_eq_rcos} to benefit from the huge theory \<^theory>\<open>HOL-Algebra.Coset\<close>.\<close>
+  cring.cgenideal_eq_rcos} to benefit from the huge theory \<^theory>\<open>HOL-Algebra.Coset\<close>.
+Moreover note that both functions are hull operations,
+  thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
 subsubsection \<open>Usage of Function Symbols\<close>
 
