@@ -246,7 +246,8 @@ subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close> (* to-do: Remove
 
 subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
 
-text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> differ not by \<^emph>\<open>c\<close>ommutativity, but
+text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
+ differ not by \<^emph>\<open>c\<close>ommutativity, as their names suggest, but
   by whether they take a set or single element as argument. The latter should probably be renamed to
   match its function symbol \<open>PIdl\<close> (principal ideal). It could also just abbreviate
   \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In any case, both functions are easy to state as hull,
