@@ -1,3 +1,6 @@
+vector space needs a second section
+move more observations out of Examples.thy?
+
 What did I do?
 definitions
 (indexed product), afterwards problems (e.g. missing lemmas?)
@@ -9,9 +12,6 @@ lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
 using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
 Maybe mention HOL-Computational_Algebra
 
-Problems?
-(subspace imports and argument order)
-
 conclusion:
 next steps
 personal opinion
@@ -20,7 +20,5 @@ personal opinion
 --------------
 documentation:
 
-no proofs, but definitions and theorems
 Why this way and not differently
 (maybe move the stuff from README.md here?)
-(maybe mention normalize_old_sr?)
