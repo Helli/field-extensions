@@ -224,6 +224,8 @@ text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_t
   proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
   \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
 
+text \<open>The argument order is different for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
+
 subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
 
 text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
