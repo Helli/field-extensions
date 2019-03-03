@@ -1,5 +1,3 @@
-vector space needs a second section
-
 What did I do?
 definitions
 (indexed product), afterwards problems (e.g. missing lemmas?)

@@ -244,9 +244,7 @@ subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
 
 section \<open>Analysis of the Used Libraries\<close>
 
-subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close> (* to-do: Remove this distinction? *)
-
-subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
+subsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
 
 text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
  differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
@@ -262,14 +260,14 @@ text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cge
 Moreover note that both functions are hull operations,
   thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
-subsubsection \<open>Usage of Function Symbols\<close>
+subsection \<open>Usage of Function Symbols\<close>
 
 text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
 but the precedence is badly chosen: , which also affects my main result @{thm[source]
   UP_field_extension.simple_algebraic_extension}. Note that I also question some to-do (FactGroup, ...) , so
   there might be no motivation to use special syntax at all.\<close>
 
-subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
+subsection \<open>\<^const>\<open>generate_field\<close>\<close>
 
 text \<open>This function was added during my work. This meant that I had to do some porting (see
   \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). On the other hand,
@@ -278,9 +276,9 @@ text \<open>This function was added during my work. This meant that I had to do 
  authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
  \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
-subsubsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
+subsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
 
-subsubsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
+subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
 
 text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
@@ -303,7 +301,7 @@ text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outs
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
-subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
+subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
 
 text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
  not much effect on my development, but it means that
@@ -315,7 +313,7 @@ text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polyno
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
  two approaches is subject of ongoing development, refer to the developers for more information.\<close>
 
-subsubsection \<open>Side Notes\<close>
+subsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
@@ -323,12 +321,6 @@ text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I su
 text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\<close>
 text \<open>for the session graph, so that it is
   displayed wholly in the document.\<close>
-
-subsection \<open>\isatt{VectorSpace}\<close>
-
-subsubsection\<open>Side Notes\<close>
-
-(*to-do: move the observation section into these subsubsections*)
 
 section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
 
