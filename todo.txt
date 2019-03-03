@@ -1,5 +1,4 @@
 vector space needs a second section
-move more observations out of Examples.thy?
 
 What did I do?
 definitions
