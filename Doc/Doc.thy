@@ -247,10 +247,10 @@ subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close> (* to-do: Remove
 subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
 
 text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
- differ not by \<^emph>\<open>c\<close>ommutativity, as their names suggest, but
-  by whether they take a set or single element as argument.
-Confusingly enough, the locales \<^const>\<open>principalideal\<close> and \<^const>\<open>principal_domain\<close> are not
- defined via the same notion of ideal. (They also do not use each other.)
+ differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
+ element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
+ \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
+ each other.)
 
  \<^const>\<open>Ideal.cgenideal\<close> should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
