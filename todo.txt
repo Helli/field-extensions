@@ -5,7 +5,6 @@ using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by bla
 
 conclusion:
 personal opinion
-(What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
 
 --------------
 documentation:
