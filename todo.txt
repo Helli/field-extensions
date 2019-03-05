@@ -1,4 +1,3 @@
-definitions
 (indexed product), afterwards problems (e.g. missing lemmas?)
 isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
 
