@@ -276,8 +276,6 @@ text \<open>This function was added during my work. This meant that I had to do 
  authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
  \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
-subsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
-
 subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
 
 text \<open>

@@ -2,7 +2,6 @@ HOL-Algebra:
 What does it look like? Example (:?)
 lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
 using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
-Maybe mention HOL-Computational_Algebra
 
 conclusion:
 next steps
