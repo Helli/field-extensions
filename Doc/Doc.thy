@@ -127,7 +127,7 @@ text \<open>The motivation for this was Kemper's proof of the tower rule, which 
 
 subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
 
-text \<open>This defines the $n$-fold coordinate space of a vector space.\<close>
+text \<open>This defines the $n$-fold coordinate space of a ring.\<close>
 
 text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
 
