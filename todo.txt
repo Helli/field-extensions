@@ -1,5 +1,3 @@
-isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
-
 HOL-Algebra:
 What does it look like? Example (:?)
 lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
