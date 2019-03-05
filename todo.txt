@@ -4,7 +4,6 @@ lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
 using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
 
 conclusion:
-next steps
 personal opinion
 (What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
 
