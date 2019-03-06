@@ -1,2 +1,3 @@
 documentation:
+remove empty sections
 (maybe move the stuff from README.md here?)

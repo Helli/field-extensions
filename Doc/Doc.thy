@@ -14,33 +14,32 @@ text \<open>In Algebra, superstructures generally are defined to be just the inv
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
-subsection \<open>\<^const>\<open>ring.old_sr\<close>\<close>
+subsection \<open>Subrings\<close>
 
-text \<open>This is my first try at formalising the notion of a subring (similarly \<^const>\<open>field.old_sf\<close>
-  for subfields): Both a ring R and its subring S are full ring records, the predicate
- \<^const>\<open>ring.old_sr\<close> states where 
- they have to equal. The problem is that even with these assumptions, there are two entities for
- each operation, \<open>\<zero>\<close> and \<open>\<one>\<close>. In fact, I can show many facts not for any subring S, but only for
- \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but
-  carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close> in where the operations map objects
-  from outside of the carrier set.\<close>
+text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
+ which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
+ properties for the subring \<open>S\<close>, and states where \<open>R\<close> and \<open>S\<close> have to equal.
 
-text \<open>\<open>\<zero>\<close> and \<open>\<one>\<close> are the same for both substructures. This means that there is some degree of
-  freedom in stating lemmas (using one or the other).\<close>
+A problem  with this approach is that there are two entities for \<open>\<otimes>\<close> and \<open>\<oplus>\<close> each: Many facts can be
+ shown not for any subring \<open>S\<close>, but only for \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with
+ \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close>
+  in where the operations map objects from outside of the carrier set.
 
-text \<open>To sum up, it seems advisable to fix all needed objects (sets or operations) only once within
-  a locale. For Algebra this means: A group or ring needs a full record, but for substructures we
-  should only add a \<^emph>\<open>set\<close> to the fixed items.\<close>
+ Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they equal between sub- and
+ superstructure, there is some degree of freedom in stating lemmas (using one or the other),
+ hindering fact uniformity.\<close>
 
-subsection \<open>\<^const>\<open>subring\<close>\<close>
+text\<open>To conclude, it seems advisable to fix all needed objects (sets or
+ operations) only once within a locale. For Algebra, this means: A group or ring needs a full
+record, but for \<^emph>\<open>sub\<close>structures we should only add a \<^emph>\<open>set\<close> to the fixed items.
 
-text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses this "set+superstructure"-approach, via \<^locale>\<open>subgroup\<close> and
-  \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms only describe a technical
-  relation to the superstructure, assumed to be a group. In other words, \begin{center}
- @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not hold without
- the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and monoid. It is
-  only under these additional assumptions that these locales coincide with the typical textbook
-  definitions.\<close>
+The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
+ \<^locale>\<open>subgroup\<close> and \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms
+ only describe a technical relation to the superstructure, assumed to be a group. In other words,
+ \begin{center} @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not
+ hold without the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and
+ monoid. It is only under these additional assumptions that these locales coincide with the typical
+ textbook definitions.\<close>
 
 subsection \<open>\<^locale>\<open>field_extension\<close>\<close>
 
