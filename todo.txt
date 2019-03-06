@@ -1,7 +1,3 @@
-conclusion:
-personal opinion
-
---------------
 documentation:
 
 Why this way and not differently
