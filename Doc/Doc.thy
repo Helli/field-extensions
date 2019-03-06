@@ -136,9 +136,6 @@ A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<cl
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
 
-text (*rm?*)\<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
-  maybe be stated using \<^const>\<open>ring.func_space\<close> directly.\<close>
-
 subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
 
 text \<open>This uses the newly defined constant \<^const>\<open>ring.nspace\<close>:\<close>
