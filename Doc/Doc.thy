@@ -130,9 +130,9 @@ text \<open>This defines the $n$-fold coordinate space of a ring.\<close>
 
 text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
 
-text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$\<close>
+text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$
 
-text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
+A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
 
@@ -161,9 +161,9 @@ text \<open>This is used in the proof of the tower rule's finite case, together 
   less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
   be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
   defined. Ultimately, no useful results turned out to exist for this function (and the definition
-  itself turned out to be misleading, see \<open>\<section>\<close> to-do).\<close>
+  itself turned out to be misleading, see \<open>\<section>\<close> to-do).
 
-text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
+Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
 \<^item> is somewhat unhandy (see the proof) and,
 \<^item> more importantly, depends on a choice of basis, and a choice of ordering on that basis.\<close>
@@ -193,9 +193,9 @@ section \<open>Problems\<close>
 subsection \<open>Non-Canonical Maps\<close>
 
 text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
- defined a sets, we sometimes need a "first" element, or even more.\<close>
+ defined a sets, we sometimes need a "first" element, or even more.
 
-text \<open>This means that we cannot translate the informal "We fix a basis B." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
+This means that we cannot translate the informal "We fix a basis \<open>B\<close>." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
 (*<*)notepad (in vectorspace) begin(*>*)
   fix B
   assume "basis B"
@@ -212,10 +212,10 @@ lemma (in vectorspace)
   using assms by (metis (lifting) finite_basis_exists finite_distinct_list someI)+ (*>*)
 
 text \<open>to the library. This is just another way of stating the existence of a finite basis, but might
- be more useful in proofs and lemma statements.\<close>
+ be more useful in proofs and lemma statements.
 
-text \<open>As is known, infinite vector spaces have bases, too, but proving this requires more work and
-  a different indexing scheme.\<close>
+As is known, infinite-dimensional vector spaces have bases, too, but proving this requires more work
+ and a different indexing scheme.\<close>
 
 subsection \<open>Missing Lemmas\<close> (*to-do: move up? (most important problem)*)
 
@@ -289,9 +289,9 @@ Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<c
 When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
- revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
+ revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.
 
-text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
+\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
  Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
  \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
  about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
@@ -303,9 +303,9 @@ subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\
 text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
  not much effect on my development, but it means that
   \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
-  identifiers for some entities.\<close>
+  identifiers for some entities.
 
-text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
+The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
   \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
  two approaches is subject of ongoing development, refer to the developers for more information.\<close>
@@ -336,6 +336,10 @@ The problem traces back to \<^locale>\<open>subring\<close> importing both \<^lo
 subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
 
 text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...\<close>
+
+section \<open>Additional Resources\<close>
+
+text \<open>Readme.MD. Diff to AFP/ is designed to be small.\<close>
 
 (*<*)
 end
