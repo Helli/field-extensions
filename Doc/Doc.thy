@@ -185,7 +185,7 @@ at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
 The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
- \<^theory>\<open>Field_Extensions.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
+ \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
  when porting the basis extension theorem to allow for infinite dimensions.
 \<close>
 
