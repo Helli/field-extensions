@@ -243,7 +243,7 @@ subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
 
 section \<open>Analysis of the Used Libraries\<close>
 
-subsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
+subsection \<open>Principal Ideal Definitions\<close>
 
 text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
  differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
