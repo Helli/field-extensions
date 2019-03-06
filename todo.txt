@@ -1,4 +1,2 @@
 documentation:
-
-Why this way and not differently
 (maybe move the stuff from README.md here?)
