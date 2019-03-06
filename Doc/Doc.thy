@@ -27,11 +27,11 @@ A problem  with this approach is that there are two entities for \<open>\<otimes
 
  Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they equal between sub- and
  superstructure, there is some degree of freedom in stating lemmas (using one or the other),
- hindering fact uniformity.\<close>
+ hindering fact uniformity.
 
-text\<open>To conclude, it seems advisable to fix all needed objects (sets or
- operations) only once within a locale. For Algebra, this means: A group or ring needs a full
-record, but for \<^emph>\<open>sub\<close>structures we should only add a \<^emph>\<open>set\<close> to the fixed items.
+To conclude, it seems advisable to fix all needed objects only once within a locale. For
+ Algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
+ add a \<^emph>\<open>set\<close> to the fixed items.
 
 The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
  \<^locale>\<open>subgroup\<close> and \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms
@@ -41,11 +41,13 @@ The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL
  monoid. It is only under these additional assumptions that these locales coincide with the typical
  textbook definitions.\<close>
 
-subsection \<open>\<^locale>\<open>field_extension\<close>\<close>
+subsection \<open>Subfields\<close>
+
+text \<open>\<close>
 
 subsection \<open>Infinite Dimension\<close>
 
-text \<open>In the \<open>VectorSpace\<close> theory, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
+text \<open>In \<open>VectorSpace.VectorSpace\<close>, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
  representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
  being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
