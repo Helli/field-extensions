@@ -43,9 +43,7 @@ The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL
 
 subsection \<open>\<^locale>\<open>field_extension\<close>\<close>
 
-subsubsection \<open>Interpretation as Vector Space\<close>
-(* combine these subsubsections? *)
-subsubsection \<open>Degree\<close>
+subsection \<open>Infinite Dimension\<close>
 
 text \<open>In the \<open>VectorSpace\<close> theory, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
@@ -53,9 +51,9 @@ text \<open>In the \<open>VectorSpace\<close> theory, the infinite dimension is 
  being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
 
 As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
- consideration in mind, I therefore decided to define the infinite degree to be @{term_type "0::nat"}.
- Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to have the same
- absorbing properties in a multiplication.
+ consideration in mind, I therefore decided to define the infinite degree to be @{term_type
+ "0::nat"}. Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to
+ have the same absorbing properties in a multiplication.
 
 A more robust implementation would use an extended type of natural numbers, or even the full range
  of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
