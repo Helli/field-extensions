@@ -291,7 +291,7 @@ A note about the style: Just like in their locale
  definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
   \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
-subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
+subsection \<open>Integer Ring Definitions\<close>
 
 text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
@@ -314,9 +314,9 @@ To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not 
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
-subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\<close>
+subsection \<open>Modelling of Polynomials\<close>
 
-text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
+text \<open>The clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
  not much effect on my development, but it means that
   \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
   identifiers for some entities.
@@ -335,9 +335,11 @@ text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_grap
 text \<open>for the session graph, so that it is
   displayed wholly in the document.\<close>
 
-section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
+section \<open>Example Instantiations\label{sec:ethy}\<close>
 
-text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
+text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
+ rings.
+ The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
   errors:
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{"interpretation_error"}
@@ -348,10 +350,6 @@ The problem traces back to \<^locale>\<open>subring\<close> importing both \<^lo
  \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
   matters quite a bit.\<close>
-
-subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
-
-text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...\<close>
 
 section \<open>Additional Resources\<close>
 
