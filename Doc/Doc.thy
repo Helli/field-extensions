@@ -74,9 +74,9 @@ Whatever the best formalisation is, the change should be made in \<open>VectorSp
  \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
  collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
 
-section \<open>Main Results on Field Extensions\<close>
+section \<open>Field Extensions\<close>
 
-subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\label{sec:tr}\<close>
+subsection \<open>Degree Multiplicativity (Tower Rule)\label{sec:tr}\<close>
 
 text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>. This case may occur
   in the following "tower rule":\<close>
@@ -94,7 +94,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
 Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
  another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
-  terminology as described in \autoref{sec:vs}.\<close>
+  terminology as described in \autoref{sec:mvs}.\<close>
 
 subsection \<open>The Minimal Polynomial\<close>
 (*<*)context UP_field_extension begin(*>*)
@@ -124,13 +124,13 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
 All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
 (*<*)end(*>*)
 
-section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
+section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
 
 subsection \<open>Motivation\<close>
 
-text \<open>The motivation for this was Kemper's proof of the tower rule, which uses vector space results
- unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more directly
- using indexed sums\<^footnote>\<open>cf.\ e.g.\
+text \<open>The motivation for working in this area was Kemper's proof of the field extension tower rule
+ (\<open>\<section>\<close>\ref{sec:tr}), which uses vector space results unavailable in \<^session>\<open>HOL-Algebra\<close>. Note
+ that the tower rule could be proven more directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
@@ -139,9 +139,9 @@ subsection \<open>Indexed Product\<close>
 
 text \<open>This defines the $n$-fold coordinate space of a ring:
 
-\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,
+\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
-where \<^term_type>\<open>ring.func_space\<close> is the usual module of functions from any set to a
+Here, \<^term_type>\<open>ring.func_space\<close> is the usual module of functions from any set to a
  ring carrier set, with pointwise addition and scalar multiplication.
 
 A limitation of this approach is that only sums of the same module can be described,
