@@ -8,7 +8,7 @@ theory Doc
 begin
 (*>*)
 
-section \<open>Modelling of Substructures\<close>
+section \<open>Modelling of Algebraic Structures\<close>
 
 text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
@@ -41,13 +41,22 @@ The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL
  monoid. It is only under these additional assumptions that these locales coincide with the typical
  textbook definitions.\<close>
 
-subsection \<open>Subfields\<close>
+subsection \<open>Subfields\label{sec:sf}\<close>
 
-text \<open>\<close>
+text \<open>The locale \<^locale>\<open>subfield\<close> extends \<^locale>\<open>subring\<close> with the appropriate additional
+ assumptions for the substructure. It was also added during my work.
+
+My locale \<^locale>\<open>field_extension\<close> combines \<^locale>\<open>subfield\<close> and \<open>field\<close>. It also renames the
+ variables to \<open>L\<close> for the field and \<open>K\<close> for the subfield set.
+
+The locale \<^locale>\<open>UP_field_extension\<close> additionally sets \<open>P\<close> to denote the ring of univariate
+  polynomials over \<open>K\<close>, fixes an \<open>\<alpha>\<close> in \<open>L\<close>, and defines \<open>Eval\<close> to be the map \<open>P \<rightarrow> L\<close> which
+  evaluates polynomials at \<open>\<alpha>\<close>. The homomorphism property of this map is proven in
+  \<^theory>\<open>HOL-Algebra.UnivPoly\<close>.\<close>
 
 subsection \<open>Infinite Dimension\<close>
 
-text \<open>In \<open>VectorSpace.VectorSpace\<close>, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
+text \<open>In \<open>VectorSpace.VectorSpace\<close>, the case of an infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
  representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
  being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
@@ -61,15 +70,15 @@ A more robust implementation would use an extended type of natural numbers, or e
  of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
  Algebra1} views the degree as number in \<open>\<nat> \<union> {\<infinity>}\<close>.
 
-Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>: My theories only use
- what is there. Due to there being no collision with the actual \<open>0\<close>, my material should be easily
- adaptable to such a change.\<close>
+Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>:
+ \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
+ collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
 
 section \<open>Main Results\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
-text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \<open>\<section>to-do\<close>. For an algebraic \<^term>\<open>\<alpha>\<close>,
+text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \autoref{sec:sf}. For an \<^emph>\<open>algebraic\<close> \<^term>\<open>\<alpha>\<close>,
   I define the minimal polynomial:\<close>
 text_raw\<open>\isacommand{definition}
 \ irr\ %
