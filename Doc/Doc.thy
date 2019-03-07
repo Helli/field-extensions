@@ -128,24 +128,25 @@ section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
 
 subsection \<open>Motivation\<close>
 
-text \<open>The motivation for this was Kemper's proof of the tower rule, which uses results about vector
-  spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more
- directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
+text \<open>The motivation for this was Kemper's proof of the tower rule, which uses vector space results
+ unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more directly
+ using indexed sums\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
 
-subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
+subsection \<open>Indexed Product\<close>
 
-text \<open>This defines the $n$-fold coordinate space of a ring.\<close>
+text \<open>This defines the $n$-fold coordinate space of a ring:
 
-text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
+\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,
 
-text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$
+where \<^term_type>\<open>ring.func_space\<close> is the usual module of functions from any set to a
+ ring carrier set, with pointwise addition and scalar multiplication.
 
-A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
-  compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
-  same field).\<close>
+A limitation of this approach is that only sums of the same module can be described,
+  compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different type (over the
+  same ring).\<close>
 
 subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
 
