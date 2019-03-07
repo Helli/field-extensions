@@ -14,7 +14,7 @@ text \<open>In Algebra, superstructures generally are defined to be just the inv
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
-subsection \<open>Subrings\<close>
+subsection \<open>Subrings\label{sec:sr}\<close>
 
 text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
  which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
@@ -182,11 +182,11 @@ text \<open>This variant is used in the proof of the tower rule's finite case, t
  Ultimately, no useful results turned out to exist for this function.
 
 Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
-  existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
+  existential quantifier, namely for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
 \<^item> is somewhat unhandy (see the proof) and,
 \<^item> more importantly, depends on a choice of basis, and a choice of ordering on that basis.\<close>
 
-subsection \<open>@{thm[source] subspace.subspace_dim}\<close>
+subsection \<open>Subspaces\<close>
 
 text \<open>These are two other useful results:
   \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
@@ -211,7 +211,7 @@ section \<open>Problems\<close>
 subsection \<open>Non-Canonical Maps\<close>
 
 text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
- defined a sets, we sometimes need a "first" element, or even more.
+ defined a sets, we sometimes need a "first" element, or even a full ordering.
 
 This means that we cannot translate the informal "We fix a basis \<open>B\<close>." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
 (*<*)notepad (in vectorspace) begin(*>*)
@@ -277,21 +277,14 @@ text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cge
 Moreover note that both functions are hull operations,
   thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
-subsection \<open>Usage of Function Symbols\<close>
+subsection \<open>Generated Fields\<close>
 
-text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
-but the precedence is badly chosen: , which also affects my main result @{thm[source]
-  UP_field_extension.simple_algebraic_extension}. Note that I also question some to-do (FactGroup, ...) , so
-  there might be no motivation to use special syntax at all.\<close>
-
-subsection \<open>\<^const>\<open>generate_field\<close>\<close>
-
-text \<open>This function was added during my work. This meant that I had to do some porting (see
-  \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). On the other hand,
-  it leaves out the "lower bound" field found in @{cite Algebra1}/definition 16.4, which turned out
- to simplify matters quite a bit. A note about the style: Just like in their locale definitions, the
- authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
- \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
+text \<open>The function \<^const>\<open>generate_field\<close> was added during my work. This meant that I had to do
+ some porting (see \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that).
+ However, it turned out to simplify matters overall because it leaves out the "lower bound" field
+ found in @{cite Algebra1}/definition 16.4. A note about the style: Just like in their locale
+ definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
+  \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
 subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
 
@@ -357,7 +350,7 @@ text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...
 
 section \<open>Additional Resources\<close>
 
-text \<open>Readme.MD. Diff to AFP/ is designed to be small. Generated Document of the main session
+text \<open>Readme.MD. Overall, the diff to a recent AFP commit like to-do is designed to be small, so that the changes can be easily reconstructed. Generated Document of the main session
   Field-Extension. In particular, its Contents section might make here-unmentioned lemmas
   easier to find.\<close>
 
