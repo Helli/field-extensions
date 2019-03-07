@@ -96,7 +96,7 @@ Recently, the proposition part about two \<^emph>\<open>finite\<close> extension
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \autoref{sec:vs}.\<close>
 
-subsection \<open>Classification of Simple Algebraic Extensions\<close>
+subsection \<open>The Minimal Polynomial\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \autoref{sec:sf}. For an \<^emph>\<open>algebraic\<close> \<^term>\<open>\<alpha>\<close>,
   I define the minimal polynomial:\<close>
@@ -109,6 +109,8 @@ text_raw\<open>\isacommand{definition}\isamarkupfalse%
 text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
  irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
   common in textbooks.\<close>
+
+subsection \<open>Classification of Simple Algebraic Extensions\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
@@ -131,8 +133,7 @@ text \<open>The motivation for this was Kemper's proof of the tower rule, which 
  directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
- Moreover note that proofs using indexed sums tend to be very cumbersome in
-  \<^session>\<open>HOL-Algebra\<close>.\<close>
+ Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
 
 subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
 
