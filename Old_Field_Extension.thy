@@ -1,4 +1,5 @@
 (* Author: Fabian Hellauer, 2018 *)
+section \<open>Old Development\<close>
 theory Old_Field_Extension
   imports "HOL-Algebra.Subrings"
 begin
@@ -277,8 +278,6 @@ lemma old_sf_altdef: \<open>old_sf (R\<lparr>carrier := S\<rparr>) \<longleftrig
 
 end
 
-
-section \<open>Field extensions\<close>
 
 locale old_fe = field L for L (structure) +
   fixes K :: "'a set" \<comment> \<open>I see no reason why not to inherit @{term \<zero>}, @{term \<one>} and the
