@@ -93,7 +93,7 @@ text\<open>Remember that infinite field extensions are encoded to have \<open>de
 text \<open>Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
  another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
-  terminology as described in \<open>\<section>\<close>\ref{sec:vs}.\<close>
+  terminology as described in \autoref{sec:vs}.\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
@@ -131,7 +131,7 @@ text \<open>The motivation for this was Kemper's proof of the tower rule, which 
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in
-  \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
+  \<^session>\<open>HOL-Algebra\<close>.\<close>
 
 subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
 
