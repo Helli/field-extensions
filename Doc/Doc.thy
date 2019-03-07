@@ -14,7 +14,7 @@ text \<open>In Algebra, superstructures generally are defined to be just the inv
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
-subsection \<open>Subrings\<close>
+subsection \<open>Subrings\label{sec:sr}\<close>
 
 text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
  which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
@@ -74,9 +74,29 @@ Whatever the best formalisation is, the change should be made in \<open>VectorSp
  \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
  collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
 
-section \<open>Main Results\<close>
+section \<open>Field Extensions\<close>
 
-subsection \<open>Classification of Simple Algebraic Extensions\<close>
+subsection \<open>Degree Multiplicativity (Tower Rule)\label{sec:tr}\<close>
+
+text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>. This case may occur
+  in the following "tower rule":\<close>
+
+proposition degree_multiplicative:
+  "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
+  field_extension.degree M K =
+    field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"(*<*)by(fact degree_multiplicative)(*>*)
+
+text \<open>The proof is covered by considering three (partially overlapping) cases:
+  \<^enum> The lower field extension is infinite.
+  \<^enum> The upper field extension is infinite.
+  \<^enum> Both extension parts are finite.
+
+Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
+ another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
+ It uses the inner product instead of the outer for the proof, thus avoiding the vector space
+  terminology as described in \autoref{sec:mvs}.\<close>
+
+subsection \<open>The Minimal Polynomial\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \autoref{sec:sf}. For an \<^emph>\<open>algebraic\<close> \<^term>\<open>\<alpha>\<close>,
   I define the minimal polynomial:\<close>
@@ -90,6 +110,8 @@ text \<open>This uses an indefinite description (via @{const arg_min}) because t
  irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
   common in textbooks.\<close>
 
+subsection \<open>Classification of Simple Algebraic Extensions\<close>
+
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
   \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
@@ -102,79 +124,69 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
 All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
 (*<*)end(*>*)
 
-subsection \<open>Degree Multiplicativity (Field Extension Tower Rule)\label{sec:tr}\<close>
-
-lemma degree_multiplicative:
-  "\<lbrakk>subfield K (M\<lparr>carrier:=L\<rparr>); subfield L M; field M\<rbrakk> \<Longrightarrow>
-  field_extension.degree M K =
-    field_extension.degree M L * field_extension.degree (M\<lparr>carrier:=L\<rparr>) K"
-  (*<*)by (fact degree_multiplicative)(*>*)
-
-text \<open>The proof is covered by considering three (partially overlapping) cases:
-\<^enum> The lower field extension is infinite.
-\<^enum> The upper field extension is infinite.
-\<^enum> Both extension parts are finite.\<close>
-text\<open>Remember that infinite field extensions are encoded to have \<open>degree = 0\<close>.\<close>
-
-text \<open>Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
- another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
- It uses the inner product instead of the outer for the proof, thus avoiding the vector space
-  terminology as described in \<open>\<section>\<close>\ref{sec:vs}.\<close>
-
-section \<open>Advancements in Formalising Vector Spaces\label{sec:vs}\<close>
+section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
 
 subsection \<open>Motivation\<close>
 
-text \<open>The motivation for this was Kemper's proof of the tower rule, which uses results about vector
-  spaces unavailable in \<^session>\<open>HOL-Algebra\<close>. Note that the tower rule could be proven more
- directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
+text \<open>The motivation for working in this area was Kemper's proof of the field extension tower rule
+ (\<open>\<section>\<close>\ref{sec:tr}), which uses vector space results unavailable in \<^session>\<open>HOL-Algebra\<close>. Note
+ that the tower rule could be proven more directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
- Moreover note that proofs using indexed sums tend to be very cumbersome in
-  \<^session>\<open>HOL-Algebra\<close>, as explained in following sections.\<close>
+ Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
 
-subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
+subsection \<open>Indexed Products\<close>
 
-text \<open>This defines the $n$-fold coordinate space of a ring.\<close>
+text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$:
 
-text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
+\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
-text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$
+Here, \<^term>\<open>ring.func_space\<close> is the well-known module of functions from any set to the ring
+ carrier set with pointwise addition and scalar multiplication.
 
-A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
-  compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
-  same field).\<close>
+A limitation of this approach is that only sums of the same module can be described, compared to
+ \<^const>\<open>direct_sum\<close> (see \<open>\<section>\<close>\ref{sec:ds}), which can even combine modules of different type (over the same
+ ring). An obvious advantage is however the variability of \<open>n\<close>.
 
-subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
+A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of finite dimension \<open>dim\<close> is that they are
+  isomorphic to $K^{dim}$:\<close>
 
-text \<open>This uses the newly defined constant \<^const>\<open>ring.nspace\<close>:\<close>
+theorem (in vectorspace) nspace_iso:
+  assumes fin_dim
+  shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
+    bij_betw \<phi> (carrier (nspace dim)) (carrier V)"(*<*)using assms by(fact nspace_iso)(*>*)
 
-text "to-do"
+text \<open>In the proof, some lemmas from \isatt{VectorSpace} turned out to be useful, e.g.\ about the
+  kernel of injective linear maps.\<close>
 
-subsection \<open>@{thm[source] vectorspace.decompose_step}\<close>
+subsection \<open>Direct Sums\label{sec:ds}\<close>
 
-lemma "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K V\<rbrakk> \<Longrightarrow>
-  \<exists>\<phi> V'.
+text \<open>In \<open>SumSpaces\<close>, one finds the definition \<^const>\<open>direct_sum\<close>. It is misleading in that it
+ also defines contents for the unused \<open>mult\<close> and \<open>one\<close> field of the module. I replaced these with
+ \<open>undefined\<close>.
+
+The notion gives rise to another view on the previous result:\<close>
+
+lemma decompose_step:
+  "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K V\<rbrakk>
+\<Longrightarrow> \<exists>\<phi> V'.
   linear_map K V (direct_sum (module_of K) (V\<lparr>carrier:=V'\<rparr>)) \<phi> \<and>
   bij_betw \<phi> (carrier V) (carrier K \<times> V') \<and>
   subspace K V' V \<and>
-  vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = vectorspace.dim K V - 1"
-  by (fact vectorspace.decompose_step)
+  vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = vectorspace.dim K V - 1"(*<*)by(fact vectorspace.decompose_step)(*>*)
 
-text \<open>This is used in the proof of the tower rule's finite case, together with induction. It needs
-  to be compared to @{thm[source] vectorspace.nspace_iso}(see \<open>\<section>\<close>\ref{sec:nspace_iso}), which could
- have achieved the same with
-  less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
-  be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
-  defined. Ultimately, no useful results turned out to exist for this function (and the definition
-  itself turned out to be misleading, see \<open>\<section>\<close> to-do).
+text \<open>This variant is used in the proof of the tower rule's finite case, together with induction. In
+ retrospect, @{thm[source] vectorspace.nspace_iso} probably could have achieved the same with
+ less work. The reason I used \<open>decompose_step\<close> is that I expected some
+ material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already defined.
+ Ultimately, no useful results turned out to exist for this function.
 
 Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
-  existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
+  existential quantifier, namely for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
 \<^item> is somewhat unhandy (see the proof) and,
 \<^item> more importantly, depends on a choice of basis, and a choice of ordering on that basis.\<close>
 
-subsection \<open>@{thm[source] subspace.subspace_dim}\<close>
+subsection \<open>Subspaces\<close>
 
 text \<open>These are two other useful results:
   \<^item> Subspaces of finite-dimensional vector spaces are again finite-dimensional: The dimension of the
@@ -196,10 +208,23 @@ The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = fa
 
 section \<open>Problems\<close>
 
+subsection \<open>Missing Substructure Theory\<close>
+
+text \<open>The most important problem can be identified easily: the lack of material about substructures.
+ A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
+  proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close> locales. The theories at
+ hand should mitigate this a bit.
+
+The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
+  more work in proving lemmas in it: It states its dependencies as assumptions, not as imports.
+  This leads to blown-up proofs because many facts need to be re-constructed e.g.\ via chaining.
+
+Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
+
 subsection \<open>Non-Canonical Maps\<close>
 
 text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
- defined a sets, we sometimes need a "first" element, or even more.
+ defined a sets, we sometimes need a "first" element, or even a full ordering.
 
 This means that we cannot translate the informal "We fix a basis \<open>B\<close>." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
 (*<*)notepad (in vectorspace) begin(*>*)
@@ -223,65 +248,52 @@ text \<open>to the library. This is just another way of stating the existence of
 As is known, infinite-dimensional vector spaces have bases, too, but proving this requires more work
  and a different indexing scheme.\<close>
 
-subsection \<open>Missing Lemmas\<close> (*to-do: move up? (most important problem)*)
-
-text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
-  proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
-  \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
-
-text \<open>The argument order is different for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
-
-subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
+subsection \<open>Old-School Context Elements\<close>
 
 text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
  definitions are provided only for backward compatibility, but gives no reason for the deprecation.
  My problem with \<^theory_text>\<open>defines\<close> is that it causes code duplication, e.g.\ @{thm[source]
- UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}. In my
- development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions instead.
- The only usage is in the definition of @{locale UP_field_extension}, where this seems to be the
- only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is in the
- \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>. This
- needs a lot more subscripts in subsequent statements and proofs, but removes the need to redefine
- \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.
-\<close>
+ UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}.
 
-subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
+In my development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions
+ instead. The only usage is in the definition of @{locale UP_field_extension}, where this seems to
+ be the only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is
+ in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>.
+ This needs a lot more subscripts in subsequent statements and proofs, but removes the need to
+  redefine \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source]
+  generate_field_\<i>_UNIV}.\<close>
 
 section \<open>Analysis of the Used Libraries\<close>
 
 subsection \<open>Principal Ideal Definitions\<close>
 
-text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
+text \<open>There are two definitions of ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>: \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They
  differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
  element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
  \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
  each other in their definitions.)
 
- \<^const>\<open>Ideal.cgenideal\<close> should probably be renamed to
+ @{const[names_long] Ideal.cgenideal} should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
   \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In this scenario, the
  current @{thm[source] cgenideal_def} would become a lemma, perhaps stated like @{thm[source]
   cring.cgenideal_eq_rcos} to benefit from the huge theory \<^theory>\<open>HOL-Algebra.Coset\<close>.
+
 Moreover note that both functions are hull operations,
   thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
-subsection \<open>Usage of Function Symbols\<close>
+subsection \<open>Generated Fields\<close>
 
-text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
-but the precedence is badly chosen: , which also affects my main result @{thm[source]
-  UP_field_extension.simple_algebraic_extension}. Note that I also question some to-do (FactGroup, ...) , so
-  there might be no motivation to use special syntax at all.\<close>
+text \<open>The function \<^const>\<open>generate_field\<close> was added during my work. This meant that I had to do
+ some porting (see \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that).
+ However, it turned out to simplify matters overall because it leaves out the "lower bound" field
+ found in @{cite Algebra1}/definition 16.4.
 
-subsection \<open>\<^const>\<open>generate_field\<close>\<close>
+A note about the style: Just like in their locale
+ definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
+  \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
-text \<open>This function was added during my work. This meant that I had to do some porting (see
-  \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). On the other hand,
-  it leaves out the "lower bound" field found in @{cite Algebra1}/definition 16.4, which turned out
- to simplify matters quite a bit. A note about the style: Just like in their locale definitions, the
- authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
- \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
-
-subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
+subsection \<open>Integer Ring Definitions\<close>
 
 text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
@@ -304,11 +316,11 @@ To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not 
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
-subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
+subsection \<open>Modelling of Polynomials\<close>
 
-text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
- not much effect on my development, but it means that
-  \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
+text \<open>There are both old-school @{type[names_long] up_ring}, and @{const[names_long] polynomial}.
+ This coexistence had not much effect on my development, but it means that
+ \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
   identifiers for some entities.
 
 The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
@@ -320,14 +332,18 @@ subsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
-text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use\<close>
-text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\<close>
-text \<open>for the session graph, so that it is
+text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use
+
+\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>
+
+for the session graph, so that it is
   displayed wholly in the document.\<close>
 
-section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
+section \<open>Example Instantiations\label{sec:ethy}\<close>
 
-text \<open>This theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
+text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
+ rings.
+ The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
   errors:
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{"interpretation_error"}
@@ -339,13 +355,15 @@ The problem traces back to \<^locale>\<open>subring\<close> importing both \<^lo
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
   matters quite a bit.\<close>
 
-subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
-
-text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...\<close>
-
 section \<open>Additional Resources\<close>
 
-text \<open>Readme.MD. Diff to AFP/ is designed to be small.\<close>
+text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
+ Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
+ modifications can be easily reconstructed with a normal diff-viewer.
+
+Another reference is the generated document of the repository's main session
+ \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make
+ here-unmentioned lemmas easier to find.\<close>
 
 (*<*)
 end
