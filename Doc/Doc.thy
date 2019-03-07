@@ -144,9 +144,9 @@ text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$
 Here, \<^term>\<open>ring.func_space\<close> is the well-known module of functions from any set to the ring
  carrier set with pointwise addition and scalar multiplication.
 
-A limitation of this approach is that only sums of the same module can be described,
-  compared to \<^const>\<open>direct_sum\<close> (see below), which can even combine modules of different type (over the
-  same ring).
+A limitation of this approach is that only sums of the same module can be described, compared to
+ \<^const>\<open>direct_sum\<close> (see \<open>\<section>\<close>\ref{sec:ds}), which can even combine modules of different type (over the same
+ ring). An obvious advantage is however the variability of \<open>n\<close>.
 
 A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of finite dimension \<open>dim\<close> is that they are
   isomorphic to $K^{dim}$:\<close>
@@ -159,9 +159,13 @@ theorem (in vectorspace) nspace_iso:
 text \<open>In the proof, some lemmas from \isatt{VectorSpace} turned out to be useful, e.g.\ about the
   kernel of injective linear maps.\<close>
 
-subsection \<open>Direct Sums\<close>
+subsection \<open>Direct Sums\label{sec:ds}\<close>
 
-text \<open>The notion gives rise to another view on the previous result:\<close>
+text \<open>In \<open>SumSpaces\<close>, one finds the definition \<^const>\<open>direct_sum\<close>. It is misleading in that it
+ also defines contents for the unused \<open>mult\<close> and \<open>one\<close> field of the module. I replaced these with
+ \<open>undefined\<close>.
+
+The notion gives rise to another view on the previous result:\<close>
 
 lemma decompose_step:
   "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K V\<rbrakk>
@@ -171,12 +175,11 @@ lemma decompose_step:
   subspace K V' V \<and>
   vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = vectorspace.dim K V - 1"(*<*)by(fact vectorspace.decompose_step)(*>*)
 
-text \<open>This is used in the proof of the tower rule's finite case, together with induction. In
+text \<open>This variant is used in the proof of the tower rule's finite case, together with induction. In
  retrospect, @{thm[source] vectorspace.nspace_iso} probably could have achieved the same with
- less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected some
+ less work. The reason I used \<open>decompose_step\<close> is that I expected some
  material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already defined.
- Ultimately, no useful results turned out to exist for this function (and the definition itself
- turned out to be misleading, see \<open>\<section>\<close> to-do).
+ Ultimately, no useful results turned out to exist for this function.
 
 Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
