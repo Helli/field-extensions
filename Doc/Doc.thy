@@ -137,22 +137,24 @@ text \<open>The motivation for working in this area was Kemper's proof of the fi
 
 subsection \<open>Indexed Product\<close>
 
-text \<open>This defines the $n$-fold coordinate space of a ring:
+text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$:
 
 \<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
-Here, \<^term_type>\<open>ring.func_space\<close> is the usual module of functions from any set to a
- ring carrier set, with pointwise addition and scalar multiplication.
+Here, \<^term>\<open>ring.func_space\<close> returns the well-known module of functions from any set to the ring
+ carrier set with pointwise addition and scalar multiplication.
 
 A limitation of this approach is that only sums of the same module can be described,
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different type (over the
-  same ring).\<close>
+  same ring).
 
-subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
+A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of finite dimension \<open>dim\<close> is that they are
+  isomorphic to $K^{dim}$:\<close>
 
-text \<open>This uses the newly defined constant \<^const>\<open>ring.nspace\<close>:\<close>
-
-text "to-do"
+lemma (in vectorspace) nspace_iso:
+  assumes fin_dim
+  shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
+    bij_betw \<phi> (carrier (nspace dim)) (carrier V)"(*<*)oops(*>*)
 
 subsection \<open>@{thm[source] vectorspace.decompose_step}\<close>
 
@@ -165,12 +167,11 @@ lemma "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K 
   by (fact vectorspace.decompose_step)
 
 text \<open>This is used in the proof of the tower rule's finite case, together with induction. It needs
-  to be compared to @{thm[source] vectorspace.nspace_iso}(see \<open>\<section>\<close>\ref{sec:nspace_iso}), which could
- have achieved the same with
-  less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
-  be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
-  defined. Ultimately, no useful results turned out to exist for this function (and the definition
-  itself turned out to be misleading, see \<open>\<section>\<close> to-do).
+ to be compared to @{thm[source] vectorspace.nspace_iso}, which could have achieved the same with
+ less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected some
+ material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already defined.
+ Ultimately, no useful results turned out to exist for this function (and the definition itself
+ turned out to be misleading, see \<open>\<section>\<close> to-do).
 
 Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
