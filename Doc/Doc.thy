@@ -318,9 +318,9 @@ To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not 
 
 subsection \<open>Modelling of Polynomials\<close>
 
-text \<open>The clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
- not much effect on my development, but it means that
-  \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
+text \<open>There are both old-school @{type[names_long] up_ring}, and @{const[names_long] polynomial}.
+ This coexistence had not much effect on my development, but it means that
+ \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
   identifiers for some entities.
 
 The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
@@ -332,9 +332,11 @@ subsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
-text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use\<close>
-text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\<close>
-text \<open>for the session graph, so that it is
+text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use
+
+\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>
+
+for the session graph, so that it is
   displayed wholly in the document.\<close>
 
 section \<open>Example Instantiations\label{sec:ethy}\<close>
@@ -355,9 +357,13 @@ The problem traces back to \<^locale>\<open>subring\<close> importing both \<^lo
 
 section \<open>Additional Resources\<close>
 
-text \<open>Readme.MD. Overall, the diff to a recent AFP commit like to-do is designed to be small, so that the changes can be easily reconstructed. Generated Document of the main session
-  Field-Extension. In particular, its Contents section might make here-unmentioned lemmas
-  easier to find.\<close>
+text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
+ Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
+ modifications can be easily reconstructed with a normal diff-viewer.
+
+Another reference is the generated document of the repository's main session
+ \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make
+ here-unmentioned lemmas easier to find.\<close>
 
 (*<*)
 end
