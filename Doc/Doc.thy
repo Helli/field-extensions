@@ -309,7 +309,7 @@ To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not 
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
-subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
+subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\<close>
 
 text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
  not much effect on my development, but it means that
