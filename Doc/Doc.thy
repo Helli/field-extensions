@@ -235,13 +235,18 @@ text \<open>to the library. This is just another way of stating the existence of
 As is known, infinite-dimensional vector spaces have bases, too, but proving this requires more work
  and a different indexing scheme.\<close>
 
-subsection \<open>Missing Lemmas\<close> (*to-do: move up? (most important problem)*)
+subsection \<open>Missing Substructure Theory\<close> (*to-do: move up? (most important problem)*)
 
-text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
-  proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
-  \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
+text \<open>The most important problem can be identified easily: the lack of material about substructures.
+ A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
+  proven within e.g.\ \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. The theories at hand should
+  mitigate this a bit.
 
-text \<open>The argument order is different for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
+The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
+  more work in proving lemmas about it: It states its dependencies as assumptions, not as imports.
+  This leads to blown up proofs because many facts need to be made available e.g.\ via chaining.
+
+Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
 
 subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
 
@@ -254,10 +259,7 @@ text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} st
  only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is in the
  \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>. This
  needs a lot more subscripts in subsequent statements and proofs, but removes the need to redefine
- \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.
-\<close>
-
-subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
+ \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source] generate_field_\<i>_UNIV}.\<close>
 
 section \<open>Analysis of the Used Libraries\<close>
 
