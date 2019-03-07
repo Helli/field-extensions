@@ -80,15 +80,15 @@ subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
 text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \autoref{sec:sf}. For an \<^emph>\<open>algebraic\<close> \<^term>\<open>\<alpha>\<close>,
   I define the minimal polynomial:\<close>
-text_raw\<open>\isacommand{definition}
+text_raw\<open>\isacommand{definition}\isamarkupfalse%
 \ irr\ %
 \isamarkupcmt{named after its \emph{irr}educibility (shown later)%
 }\ \isanewline
-\ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
-\<close>
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\isanewline
+\ \ \ \ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%\<close>
 text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
  irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
-  standard for textbooks.\<close>
+  common in textbooks.\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:

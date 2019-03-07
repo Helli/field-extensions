@@ -648,7 +648,8 @@ qed (use assms(4) in auto)
 subsection \<open>Minimal Polynomial\<close>
 
 definition irr \<comment> \<open>named after its \<^emph>\<open>irr\<close>educibility (shown later)\<close> (*move into algebraic context?*)
-  where "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+  where "irr =
+    (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 subsubsection \<open>Existence\<close>
 
