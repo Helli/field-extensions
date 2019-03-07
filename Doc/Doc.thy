@@ -135,7 +135,7 @@ text \<open>The motivation for working in this area was Kemper's proof of the fi
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
  Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
 
-subsection \<open>Indexed Product\<close>
+subsection \<open>Indexed Products\<close>
 
 text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$:
 
@@ -145,7 +145,7 @@ Here, \<^term>\<open>ring.func_space\<close> is the well-known module of functio
  carrier set with pointwise addition and scalar multiplication.
 
 A limitation of this approach is that only sums of the same module can be described,
-  compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different type (over the
+  compared to \<^const>\<open>direct_sum\<close> (see below), which can even combine modules of different type (over the
   same ring).
 
 A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of finite dimension \<open>dim\<close> is that they are
@@ -154,20 +154,25 @@ A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of fi
 theorem (in vectorspace) nspace_iso:
   assumes fin_dim
   shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
-    bij_betw \<phi> (carrier (nspace dim)) (carrier V)"(*<*)oops(*>*)
+    bij_betw \<phi> (carrier (nspace dim)) (carrier V)"(*<*)using assms by(fact nspace_iso)(*>*)
 
-subsection \<open>@{thm[source] vectorspace.decompose_step}\<close>
+text \<open>In the proof, some lemmas from \isatt{VectorSpace} turned out to be useful, e.g.\ about the
+  kernel of injective linear maps.\<close>
 
-lemma "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K V\<rbrakk> \<Longrightarrow>
-  \<exists>\<phi> V'.
+subsection \<open>Direct Sums\<close>
+
+text \<open>The notion gives rise to another view on the previous result:\<close>
+
+lemma decompose_step:
+  "\<lbrakk>vectorspace K V; vectorspace.fin_dim K V; 0 < vectorspace.dim K V\<rbrakk>
+\<Longrightarrow> \<exists>\<phi> V'.
   linear_map K V (direct_sum (module_of K) (V\<lparr>carrier:=V'\<rparr>)) \<phi> \<and>
   bij_betw \<phi> (carrier V) (carrier K \<times> V') \<and>
   subspace K V' V \<and>
-  vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = vectorspace.dim K V - 1"
-  by (fact vectorspace.decompose_step)
+  vectorspace.dim K (V\<lparr>carrier:=V'\<rparr>) = vectorspace.dim K V - 1"(*<*)by(fact vectorspace.decompose_step)(*>*)
 
-text \<open>This is used in the proof of the tower rule's finite case, together with induction. It needs
- to be compared to @{thm[source] vectorspace.nspace_iso}, which could have achieved the same with
+text \<open>This is used in the proof of the tower rule's finite case, together with induction. In
+ retrospect, @{thm[source] vectorspace.nspace_iso} probably could have achieved the same with
  less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected some
  material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already defined.
  Ultimately, no useful results turned out to exist for this function (and the definition itself
@@ -349,7 +354,9 @@ text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...
 
 section \<open>Additional Resources\<close>
 
-text \<open>Readme.MD. Diff to AFP/ is designed to be small.\<close>
+text \<open>Readme.MD. Diff to AFP/ is designed to be small. Generated Document of the main session
+  Field-Extension. In particular, its Contents section might make here-unmentioned lemmas
+  easier to find.\<close>
 
 (*<*)
 end
