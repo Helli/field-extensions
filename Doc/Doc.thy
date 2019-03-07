@@ -74,7 +74,7 @@ Whatever the best formalisation is, the change should be made in \<open>VectorSp
  \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
  collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
 
-section \<open>Main Results\<close>
+section \<open>Main Results on Field Extensions\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
