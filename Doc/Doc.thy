@@ -141,7 +141,7 @@ text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$
 
 \<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
-Here, \<^term>\<open>ring.func_space\<close> returns the well-known module of functions from any set to the ring
+Here, \<^term>\<open>ring.func_space\<close> is the well-known module of functions from any set to the ring
  carrier set with pointwise addition and scalar multiplication.
 
 A limitation of this approach is that only sums of the same module can be described,
@@ -151,7 +151,7 @@ A limitation of this approach is that only sums of the same module can be descri
 A well-known theorem about \<open>K\<close>-vector-spaces \<open>V\<close> of finite dimension \<open>dim\<close> is that they are
   isomorphic to $K^{dim}$:\<close>
 
-lemma (in vectorspace) nspace_iso:
+theorem (in vectorspace) nspace_iso:
   assumes fin_dim
   shows "\<exists>\<phi>. linear_map K (nspace dim) V \<phi> \<and>
     bij_betw \<phi> (carrier (nspace dim)) (carrier V)"(*<*)oops(*>*)
