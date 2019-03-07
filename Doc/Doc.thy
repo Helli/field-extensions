@@ -8,79 +8,87 @@ theory Doc
 begin
 (*>*)
 
-section \<open>Modelling of Substructures\<close>
+section \<open>Modelling of Algebraic Structures\<close>
 
 text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
-subsection \<open>\<^const>\<open>ring.old_sr\<close>\<close>
+subsection \<open>Subrings\<close>
 
-text \<open>This is my first try at formalising the notion of a subring (similarly \<^const>\<open>field.old_sf\<close>
-  for subfields): Both a ring R and its subring S are full ring records, the predicate
- \<^const>\<open>ring.old_sr\<close> states where 
- they have to equal. The problem is that even with these assumptions, there are two entities for
- each operation, \<open>\<zero>\<close> and \<open>\<one>\<close>. In fact, I can show many facts not for any subring S, but only for
- \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but
-  carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close> in where the operations map objects
-  from outside of the carrier set.\<close>
+text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
+ which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
+ properties for the subring \<open>S\<close>, and states where \<open>R\<close> and \<open>S\<close> have to equal.
 
-text \<open>\<open>\<zero>\<close> and \<open>\<one>\<close> are the same for both substructures. This means that there is some degree of
-  freedom in stating lemmas (using one or the other).\<close>
+A problem  with this approach is that there are two entities for \<open>\<otimes>\<close> and \<open>\<oplus>\<close> each: Many facts can be
+ shown not for any subring \<open>S\<close>, but only for \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with
+ \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close>
+  in where the operations map objects from outside of the carrier set.
 
-text \<open>To sum up, it seems advisable to fix all needed objects (sets or operations) only once within
-  a locale. For Algebra this means: A group or ring needs a full record, but for substructures we
-  should only add a \<^emph>\<open>set\<close> to the fixed items.\<close>
+ Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they equal between sub- and
+ superstructure, there is some degree of freedom in stating lemmas (using one or the other),
+ hindering fact uniformity.
 
-subsection \<open>\<^const>\<open>subring\<close>\<close>
+To conclude, it seems advisable to fix all needed objects only once within a locale. For
+ Algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
+ add a \<^emph>\<open>set\<close> to the fixed items.
 
-text \<open>This locale from \<^session>\<open>HOL-Algebra\<close> uses this "set+superstructure"-approach, via \<^locale>\<open>subgroup\<close> and
-  \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms only describe a technical
-  relation to the superstructure, assumed to be a group. In other words, \begin{center}
- @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not hold without
- the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and monoid. It is
-  only under these additional assumptions that these locales coincide with the typical textbook
-  definitions.\<close>
+The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
+ \<^locale>\<open>subgroup\<close> and \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms
+ only describe a technical relation to the superstructure, assumed to be a group. In other words,
+ \begin{center} @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not
+ hold without the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and
+ monoid. It is only under these additional assumptions that these locales coincide with the typical
+ textbook definitions.\<close>
 
-subsection \<open>\<^locale>\<open>field_extension\<close>\<close>
+subsection \<open>Subfields\label{sec:sf}\<close>
 
-subsubsection \<open>Interpretation as Vector Space\<close>
-(* combine these subsubsections? *)
-subsubsection \<open>Degree\<close>
+text \<open>The locale \<^locale>\<open>subfield\<close> extends \<^locale>\<open>subring\<close> with the appropriate additional
+ assumptions for the substructure. It was also added during my work.
 
-text \<open>In the \<open>VectorSpace\<close> theory, the infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
+My locale \<^locale>\<open>field_extension\<close> combines \<^locale>\<open>subfield\<close> and \<open>field\<close>. It also renames the
+ variables to \<open>L\<close> for the field and \<open>K\<close> for the subfield set.
+
+The locale \<^locale>\<open>UP_field_extension\<close> additionally sets \<open>P\<close> to denote the ring of univariate
+  polynomials over \<open>K\<close>, fixes an \<open>\<alpha>\<close> in \<open>L\<close>, and defines \<open>Eval\<close> to be the map \<open>P \<rightarrow> L\<close> which
+  evaluates polynomials at \<open>\<alpha>\<close>. The homomorphism property of this map is proven in
+  \<^theory>\<open>HOL-Algebra.UnivPoly\<close>.\<close>
+
+subsection \<open>Infinite Dimension\<close>
+
+text \<open>In \<open>VectorSpace.VectorSpace\<close>, the case of an infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
  representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
  being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
 
 As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
- consideration in mind, I therefore decided to define the infinite degree to be @{term_type "0::nat"}.
- Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to have the same
- absorbing properties in a multiplication.
+ consideration in mind, I therefore decided to define the infinite degree to be @{term_type
+ "0::nat"}. Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to
+ have the same absorbing properties in a multiplication.
 
 A more robust implementation would use an extended type of natural numbers, or even the full range
  of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
  Algebra1} views the degree as number in \<open>\<nat> \<union> {\<infinity>}\<close>.
 
-Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>: My theories only use
- what is there. Due to there being no collision with the actual \<open>0\<close>, my material should be easily
- adaptable to such a change.\<close>
+Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>:
+ \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
+ collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
 
 section \<open>Main Results\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 (*<*)context UP_field_extension begin(*>*)
-text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \<open>\<section>to-do\<close>. For an algebraic \<^term>\<open>\<alpha>\<close>,
+text \<open>Recall the context \<^locale>\<open>UP_field_extension\<close> from \autoref{sec:sf}. For an \<^emph>\<open>algebraic\<close> \<^term>\<open>\<alpha>\<close>,
   I define the minimal polynomial:\<close>
-text_raw\<open>\isacommand{definition}
+text_raw\<open>\isacommand{definition}\isamarkupfalse%
 \ irr\ %
 \isamarkupcmt{named after its \emph{irr}educibility (shown later)%
 }\ \isanewline
-\ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%
-\<close>
+\ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\isanewline
+\ \ \ \ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%\<close>
 text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
  irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
-  standard for textbooks.\<close>
+  common in textbooks.\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
  \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
@@ -127,18 +135,15 @@ text \<open>The motivation for this was Kemper's proof of the tower rule, which 
 
 subsection \<open>\<^const>\<open>ring.nspace\<close>\<close>
 
-text \<open>This defines the $n$-fold coordinate space of a vector space.\<close>
+text \<open>This defines the $n$-fold coordinate space of a ring.\<close>
 
 text \<open>\<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>,\<close>
 
-text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$\<close>
+text \<open>where \<^term_type>\<open>ring.func_space\<close> is the usual ${to-do}$
 
-text \<open>A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
+A disadvantage of this approach is that only sums of the \<^bold>\<open>same\<close> module can be described,
   compared to \<^const>\<open>direct_sum\<close>, which can even combine modules of different \<^bold>\<open>type\<close> (over the
   same field).\<close>
-
-text (*rm?*)\<open>Moreover, it has been suggested that the definition is too inflexible, and that lemmas should
-  maybe be stated using \<^const>\<open>ring.func_space\<close> directly.\<close>
 
 subsection \<open>@{thm[source] vectorspace.nspace_iso}\label{sec:nspace_iso}\<close>
 
@@ -162,9 +167,9 @@ text \<open>This is used in the proof of the tower rule's finite case, together 
   less work. The reason I used @{thm[source] vectorspace.decompose_step} is that I expected there to
   be some material about the direct sum to be available, as \<^const>\<open>direct_sum\<close> was already
   defined. Ultimately, no useful results turned out to exist for this function (and the definition
-  itself turned out to be misleading, see \<open>\<section>\<close> to-do).\<close>
+  itself turned out to be misleading, see \<open>\<section>\<close> to-do).
 
-text \<open>Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
+Some ugliness of @{thm[source] vectorspace.decompose_step} comes from the use of a second
   existential quantifier for \<open>V'\<close>. This cannot be avoided elegantly, as the witness
 \<^item> is somewhat unhandy (see the proof) and,
 \<^item> more importantly, depends on a choice of basis, and a choice of ordering on that basis.\<close>
@@ -185,7 +190,7 @@ at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
 The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
- \<^theory>\<open>Field_Extensions.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
+ \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
  when porting the basis extension theorem to allow for infinite dimensions.
 \<close>
 
@@ -194,9 +199,9 @@ section \<open>Problems\<close>
 subsection \<open>Non-Canonical Maps\<close>
 
 text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
- defined a sets, we sometimes need a "first" element, or even more.\<close>
+ defined a sets, we sometimes need a "first" element, or even more.
 
-text \<open>This means that we cannot translate the informal "We fix a basis B." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
+This means that we cannot translate the informal "We fix a basis \<open>B\<close>." to the \<^emph>\<open>Isar formal proof language\<close> like this:\<close>
 (*<*)notepad (in vectorspace) begin(*>*)
   fix B
   assume "basis B"
@@ -213,16 +218,18 @@ lemma (in vectorspace)
   using assms by (metis (lifting) finite_basis_exists finite_distinct_list someI)+ (*>*)
 
 text \<open>to the library. This is just another way of stating the existence of a finite basis, but might
- be more useful in proofs and lemma statements.\<close>
+ be more useful in proofs and lemma statements.
 
-text \<open>As is known, infinite vector spaces have bases, too, but proving this requires more work and
-  a different indexing scheme.\<close>
+As is known, infinite-dimensional vector spaces have bases, too, but proving this requires more work
+ and a different indexing scheme.\<close>
 
 subsection \<open>Missing Lemmas\<close> (*to-do: move up? (most important problem)*)
 
 text (* to-do: Missing sentence? *) \<open>A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
   proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. However, before working on
   \<^locale>\<open>subspace\<close> one should consider \<open>\<section>\<close>to-do.\<close>
+
+text \<open>The argument order is different for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
 
 subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
 
@@ -242,15 +249,13 @@ subsection \<open>No Imports in \<^locale>\<open>subspace\<close>\<close>
 
 section \<open>Analysis of the Used Libraries\<close>
 
-subsection \<open>\<^session>\<open>HOL-Algebra\<close>\<close> (* to-do: Remove this distinction? *)
-
-subsubsection \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>\<close>
+subsection \<open>Principal Ideal Definitions\<close>
 
 text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
- differ not by \<^emph>\<open>c\<close>ommutativity, as their names suggest, but
-  by whether they take a set or single element as argument.
-Confusingly enough, the locales \<^const>\<open>principalideal\<close> and \<^const>\<open>principal_domain\<close> are not
- defined via the same notion of ideal. (They also do not use each other.)
+ differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
+ element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
+ \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
+ each other in their definitions.)
 
  \<^const>\<open>Ideal.cgenideal\<close> should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
@@ -260,14 +265,14 @@ Confusingly enough, the locales \<^const>\<open>principalideal\<close> and \<^co
 Moreover note that both functions are hull operations,
   thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
-subsubsection \<open>Usage of Function Symbols\<close>
+subsection \<open>Usage of Function Symbols\<close>
 
 text \<open>plus: it can hide obvious arguments (via \<^theory_text>\<open>structure\<close> declarations)
 but the precedence is badly chosen: , which also affects my main result @{thm[source]
   UP_field_extension.simple_algebraic_extension}. Note that I also question some to-do (FactGroup, ...) , so
   there might be no motivation to use special syntax at all.\<close>
 
-subsubsection \<open>\<^const>\<open>generate_field\<close>\<close>
+subsection \<open>\<^const>\<open>generate_field\<close>\<close>
 
 text \<open>This function was added during my work. This meant that I had to do some porting (see
   \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that). On the other hand,
@@ -276,9 +281,7 @@ text \<open>This function was added during my work. This meant that I had to do 
  authors use a technical description with the \<^theory_text>\<open>inductive_set\<close> command, instead of using
  \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
-subsubsection \<open>Difference to \<^session>\<open>HOL-Computational_Algebra\<close>\<close>
-
-subsubsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
+subsection \<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close>\<close>
 
 text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
@@ -292,28 +295,28 @@ Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<c
 When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), lemmas about \<open>\<Z>\<close> come on board, too, if
  \<^theory>\<open>HOL-Algebra.IntRing\<close> is imported.
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
- revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.\<close>
+ revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.
 
-text\<open>\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
+\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
  Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
  \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
  about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
 \<close>
 
-subsubsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
+subsection \<open>\<^theory>\<open>HOL-Algebra.UnivPoly\<close> vs.\ \<^theory>\<open>HOL-Algebra.Polynomials\<close>\label{sec:poly}\<close>
 
 text \<open>This clash of old-school @{type[names_long] up_ring} with @{const[names_long] polynomial} had
  not much effect on my development, but it means that
   \<^theory>\<open>HOL-Algebra.Polynomials\<close> cannot be added to the imports without also switching to long
-  identifiers for some entities.\<close>
+  identifiers for some entities.
 
-text \<open>The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
+The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
   \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
  two approaches is subject of ongoing development, refer to the developers for more information.\<close>
 
-subsubsection \<open>Side Notes\<close>
+subsection \<open>Side Notes\<close>
 
 text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
 
@@ -321,12 +324,6 @@ text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I su
 text \<open>\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\<close>
 text \<open>for the session graph, so that it is
   displayed wholly in the document.\<close>
-
-subsection \<open>\isatt{VectorSpace}\<close>
-
-subsubsection\<open>Side Notes\<close>
-
-(*to-do: move the observation section into these subsubsections*)
 
 section \<open>\isatt{Examples.thy}\label{sec:ethy}\<close>
 
@@ -345,6 +342,10 @@ The problem traces back to \<^locale>\<open>subring\<close> importing both \<^lo
 subsection \<open>Implicit properties of \<^term>\<open>\<int>\<close> etc.\<close>
 
 text \<open>Note that \<^prop>\<open>domain Ints_ring\<close> does not hold: ...\<close>
+
+section \<open>Additional Resources\<close>
+
+text \<open>Readme.MD. Diff to AFP/ is designed to be small.\<close>
 
 (*<*)
 end

@@ -122,12 +122,4 @@ corollary finitely_generated_field_extension_complex_over_real:
       insert_is_Un partial_object.select_convs(1) subfield_Reals_complex_field)
 
 
-section \<open>Observations (*rm*)\<close>
-
-text \<open>Neither @{locale VectorSpace.subspace} nor @{locale Module.submodule} were ever extended:\<close>
-find_theorems name: "subspace."
-find_theorems name: "submodule."
-text \<open>Also, the different argument order is somewhat annoying.\<close>
-
-
 end

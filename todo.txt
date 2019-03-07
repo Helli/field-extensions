@@ -1,24 +1,3 @@
-vector space needs a second section
-move more observations out of Examples.thy?
-
-What did I do?
-definitions
-(indexed product), afterwards problems (e.g. missing lemmas?)
-isomorphism of adjoined root(, to this end: polynomials over a field form a euclidean domain)
-
-HOL-Algebra:
-What does it look like? Example (:?)
-lemma (in cring) subring_cring: "subring S R ⟹ cring (R⦇carrier:=S⦈)"
-using cring.subcringI' is_cring ring_axioms ring.subcring_iff subringE(1) by blast
-Maybe mention HOL-Computational_Algebra
-
-conclusion:
-next steps
-personal opinion
-(What could be done better?) Quickcheck setup: some examples of rings which are not domains etc...
-
---------------
 documentation:
-
-Why this way and not differently
+remove empty sections
 (maybe move the stuff from README.md here?)
