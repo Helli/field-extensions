@@ -208,6 +208,19 @@ The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = fa
 
 section \<open>Problems\<close>
 
+subsection \<open>Missing Substructure Theory\<close>
+
+text \<open>The most important problem can be identified easily: the lack of material about substructures.
+ A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
+  proven within e.g.\ the \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close> locales. The theories at
+ hand should mitigate this a bit.
+
+The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
+  more work in proving lemmas in it: It states its dependencies as assumptions, not as imports.
+  This leads to blown-up proofs because many facts need to be re-constructed e.g.\ via chaining.
+
+Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
+
 subsection \<open>Non-Canonical Maps\<close>
 
 text \<open>Some results about vector spaces and linear maps depend on a choice of basis. While bases are
@@ -235,20 +248,7 @@ text \<open>to the library. This is just another way of stating the existence of
 As is known, infinite-dimensional vector spaces have bases, too, but proving this requires more work
  and a different indexing scheme.\<close>
 
-subsection \<open>Missing Substructure Theory\<close> (*to-do: move up? (most important problem)*)
-
-text \<open>The most important problem can be identified easily: the lack of material about substructures.
- A simple \<^theory_text>\<open>find_theorems\<close> invocation for instance reveals that not a single lemma had been
-  proven within e.g.\ \<^locale>\<open>subspace\<close> or \<^locale>\<open>submodule\<close>. The theories at hand should
-  mitigate this a bit.
-
-The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
-  more work in proving lemmas about it: It states its dependencies as assumptions, not as imports.
-  This leads to blown up proofs because many facts need to be made available e.g.\ via chaining.
-
-Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
-
-subsection \<open>Old-School Context Elements\<close> (* to-do: move? *)
+subsection \<open>Old-School Context Elements\<close>
 
 text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
  definitions are provided only for backward compatibility, but gives no reason for the deprecation.
@@ -265,17 +265,18 @@ section \<open>Analysis of the Used Libraries\<close>
 
 subsection \<open>Principal Ideal Definitions\<close>
 
-text \<open>\<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close> are two definitions of ideals. They
+text \<open>There are two definitions of ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>: \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They
  differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
  element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
  \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
  each other in their definitions.)
 
- \<^const>\<open>Ideal.cgenideal\<close> should probably be renamed to
+ @{const[names_long] Ideal.cgenideal} should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
   \<^const>\<open>genideal\<close> with \<^prop>\<open>S = {a}\<close>. In this scenario, the
  current @{thm[source] cgenideal_def} would become a lemma, perhaps stated like @{thm[source]
   cring.cgenideal_eq_rcos} to benefit from the huge theory \<^theory>\<open>HOL-Algebra.Coset\<close>.
+
 Moreover note that both functions are hull operations,
   thus using the material from \<^theory>\<open>HOL.Hull\<close> might shorten some proofs.\<close>
 
@@ -284,7 +285,9 @@ subsection \<open>Generated Fields\<close>
 text \<open>The function \<^const>\<open>generate_field\<close> was added during my work. This meant that I had to do
  some porting (see \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that).
  However, it turned out to simplify matters overall because it leaves out the "lower bound" field
- found in @{cite Algebra1}/definition 16.4. A note about the style: Just like in their locale
+ found in @{cite Algebra1}/definition 16.4.
+
+A note about the style: Just like in their locale
  definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
   \<^theory_text>\<open>inductive_set\<close> command, instead of using \<^theory_text>\<open>definition\<close> and \<^const>\<open>hull\<close>.\<close>
 
