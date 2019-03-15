@@ -23,19 +23,25 @@ The work was carried out separately from the development repositories of Isabell
 
 section \<open>Modelling of Algebraic Structures\<close>
 
-text \<open>In algebra, superstructures generally are defined to be just the inverse of substructures, as
-  is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
-  (which is just another term for superfield).\<close>
+subsection \<open>Background\<close>
 
 text \<open>\<^emph>\<open>Isabelle/HOL\<close> provides the \<^theory_text>\<open>record\<close> package for defining structure types with named fields.
   \<^session>\<open>HOL-Algebra\<close> uses that for its \<^type>\<open>ring\<close> type. The field names are
-  \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.\<close>
+  \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.
+
+In algebra, superstructures generally are defined to be just the inverse of substructures, as
+  is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
+  (which is just another term for superfield).
+
+During my work, other Isabelle developers added definitions for both \<^locale>\<open>subring\<close> and
+ \<^locale>\<open>subfield\<close> to \<^session>\<open>HOL-Algebra\<close>; these are described below. For compatibility, I
+ ported my material to use these library definitions.\<close>
 
 subsection \<open>Subrings\label{sec:sr}\<close>
 
 text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
  which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
- properties for the subring \<open>S\<close>, and that, if restricted to operate on \<open>S\<close>'s carrier set, both
+ properties for the subring \<open>S\<close>, and that, if restricted to \<open>S\<close>'s carrier set, both
  structure's \<open>\<otimes>\<close> resp.\ \<open>\<oplus>\<close> have to equal.
 
 A problem  with this approach is that there are two entities for \<open>\<otimes>\<close> and \<open>\<oplus>\<close> each: Many facts can be
@@ -62,8 +68,7 @@ The locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<cl
 subsection \<open>Subfields\label{sec:sf}\<close>
 
 text \<open>The locale \<^locale>\<open>subfield\<close> extends \<^locale>\<open>subring\<close> with the appropriate additional
- assumptions for the substructure. Other Isabelle developers defined both \<^locale>\<open>subring\<close> and
- \<^locale>\<open>subfield\<close>. They have since been added to \<^session>\<open>HOL-Algebra\<close>.
+ assumptions for the substructure.
 
 My locale \<^locale>\<open>field_extension\<close> combines \<^locale>\<open>subfield\<close> and \<open>field\<close>. It also renames the
  variables to \<open>L\<close> for the field and \<open>K\<close> for the subfield set.
