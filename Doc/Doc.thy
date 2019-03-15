@@ -12,7 +12,7 @@ text \<open>Higher-order logic (HOL) is a widely used instance of the theorem pr
  goal of the project at hand was to extend \<^emph>\<open>Isabelle/HOL\<close>'s library of abstract algebra by
  formalising field extension theory from chapter~16 of Gregor Kemper's lecture notes in
  algebra~@{cite Algebra1}. As preliminary, some theory about vector spaces was added to the
- formalisation goal. The result amounts to a handful of formalised textbook pages in both areas.
+ formalisation goal.
 
 Apart from Isabelle's own \<^session>\<open>HOL-Algebra\<close> library, the entry \isatt{VectorSpace} from the
  \<^emph>\<open>Archive of Formal Proofs\<close>~(AFP)~\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close> was used as a basis.
@@ -377,6 +377,10 @@ text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpac
 Another reference is the generated document of the repository's main session
  \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make
  here-unmentioned lemmas easier to find.\<close>
+
+section \<open>Conclusion\<close>
+
+text \<open>The result amounts to a handful of formalised textbook pages in both areas.\<close>
 
 (*<*)
 end
