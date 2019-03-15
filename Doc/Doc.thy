@@ -1,16 +1,18 @@
-(*<*)
 (* Author: Fabian Hellauer, 2018-2019 *)
-theory Doc
+(*<*) theory Doc
   imports
     Field_Extensions.Examples
     Field_Extensions.Old_Field_Extension
     "HOL-Algebra.Algebra"
-begin
-(*>*)
+begin (*>*)
+
+section \<open>Project Scope\<close>
+
+text \<open>\<close>
 
 section \<open>Modelling of Algebraic Structures\<close>
 
-text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
+text \<open>In algebra, superstructures generally are defined to be just the inverse of substructures, as
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
@@ -30,7 +32,7 @@ A problem  with this approach is that there are two entities for \<open>\<otimes
  hindering fact uniformity.
 
 To conclude, it seems advisable to fix all needed objects only once within a locale. For
- Algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
+ algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
  add a \<^emph>\<open>set\<close> to the fixed items.
 
 The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
