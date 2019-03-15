@@ -1,7 +1,7 @@
 # field-extensions
 Field Extensions in Isabelle/HOL – an interdisciplinary verification project based on isabelle-dev.
 
-The theories in _VectorSpace_by_HoldenLee/_ stem from https://devel.isa-afp.org/entries/VectorSpace.html and
+The theories in _VectorSpace_by_HoldenLee/_ stem from the *Archive of Formal Proofs* (AFP), cf. https://devel.isa-afp.org/entries/VectorSpace.html and
 https://devel.isa-afp.org/browser_info/current/AFP/Jordan_Normal_Form/Missing_VectorSpace.html.
 I have slightly adjusted them to better use the new HOL-Algebra:
 
