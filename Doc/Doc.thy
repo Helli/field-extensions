@@ -27,28 +27,33 @@ text \<open>In algebra, superstructures generally are defined to be just the inv
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).\<close>
 
+text \<open>\<^emph>\<open>Isabelle/HOL\<close> provides the \<^theory_text>\<open>record\<close> package for defining structure types with named fields.
+  \<^session>\<open>HOL-Algebra\<close> uses that for its \<^type>\<open>ring\<close> type. The field names are
+  \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.\<close>
+
 subsection \<open>Subrings\label{sec:sr}\<close>
 
 text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
  which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
- properties for the subring \<open>S\<close>, and states where \<open>R\<close> and \<open>S\<close> have to equal.
+ properties for the subring \<open>S\<close>, and that, if restricted to operate on \<open>S\<close>'s carrier set, both
+ structure's \<open>\<otimes>\<close> resp.\ \<open>\<oplus>\<close> have to equal.
 
 A problem  with this approach is that there are two entities for \<open>\<otimes>\<close> and \<open>\<oplus>\<close> each: Many facts can be
  shown not for any subring \<open>S\<close>, but only for \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with
  \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close>
-  in where the operations map objects from outside of the carrier set.
+  in where the operations map objects from outside the carrier set.
 
- Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they equal between sub- and
- superstructure, there is some degree of freedom in stating lemmas (using one or the other),
+Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they are equal in sub- and superstructure,
+ there is some degree of freedom in stating lemmas (using one or the other),
  hindering fact uniformity.
 
 To conclude, it seems advisable to fix all needed objects only once within a locale. For
  algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
  add a \<^emph>\<open>set\<close> to the fixed items.
 
-The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
+The locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
  \<^locale>\<open>subgroup\<close> and \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms
- only describe a technical relation to the superstructure, assumed to be a group. In other words,
+ only describe the relation to the superstructure, assumed to be a group:
  \begin{center} @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not
  hold without the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and
  monoid. It is only under these additional assumptions that these locales coincide with the typical
@@ -57,7 +62,8 @@ The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL
 subsection \<open>Subfields\label{sec:sf}\<close>
 
 text \<open>The locale \<^locale>\<open>subfield\<close> extends \<^locale>\<open>subring\<close> with the appropriate additional
- assumptions for the substructure. It was also added during my work.
+ assumptions for the substructure. Other Isabelle developers defined both \<^locale>\<open>subring\<close> and
+ \<^locale>\<open>subfield\<close>. They have since been added to \<^session>\<open>HOL-Algebra\<close>.
 
 My locale \<^locale>\<open>field_extension\<close> combines \<^locale>\<open>subfield\<close> and \<open>field\<close>. It also renames the
  variables to \<open>L\<close> for the field and \<open>K\<close> for the subfield set.
