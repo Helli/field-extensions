@@ -11,14 +11,14 @@ section \<open>Project Scope\<close>
 text \<open>Higher-order logic (HOL) is a widely used instance of the theorem prover Isabelle. The
  goal of the project at hand was to extend \<^emph>\<open>Isabelle/HOL\<close>'s library of abstract algebra by
  formalising field extension theory from chapter~16 of Gregor Kemper's lecture notes in
- algebra~@{cite Algebra1}. As preliminary, some theory about vector spaces was added to the
+ algebra~@{cite Algebra1}. As requirement, some theory about vector spaces was added to the
  formalisation goal.
 
 Apart from Isabelle's own \<^session>\<open>HOL-Algebra\<close> library, the entry \isatt{VectorSpace} from the
  \<^emph>\<open>Archive of Formal Proofs\<close>~(AFP)~\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close> was used as a basis.
 
-The formalisation is provided separate from the development repositories of Isabelle and AFP to
- avoid obstructing the integrity of their pull/push areas with experiments.
+The work was carried out separately from the development repositories of Isabelle and AFP to
+ avoid obstructing the integrity of their pull/push areas with formalisation experiments.
 \<close>
 
 section \<open>Modelling of Algebraic Structures\<close>
