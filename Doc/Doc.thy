@@ -8,7 +8,18 @@ begin (*>*)
 
 section \<open>Project Scope\<close>
 
-text \<open>\<close>
+text \<open>Higher-order logic (HOL) is a widely used instance of the theorem prover Isabelle. The
+ goal of the project at hand was to extend \<^emph>\<open>Isabelle/HOL\<close>'s library of abstract algebra by
+ formalising field extension theory from chapter~16 of Gregor Kemper's lecture notes in
+ algebra~@{cite Algebra1}. As preliminary, some theory about vector spaces was added to the
+ formalisation goal. The result amounts to a handful of formalised textbook pages in both areas.
+
+Apart from Isabelle's own \<^session>\<open>HOL-Algebra\<close> library, the entry \isatt{VectorSpace} from the
+ \<^emph>\<open>Archive of Formal Proofs\<close>~(AFP)~\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close> was used as a basis.
+
+The formalisation is provided separate from the development repositories of Isabelle and AFP to
+ avoid obstructing the integrity of their pull/push areas with experiments.
+\<close>
 
 section \<open>Modelling of Algebraic Structures\<close>
 
@@ -311,8 +322,8 @@ When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), l
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
  revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.
 
-\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
- Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
+\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the AFP.
+ A reason may be that they are too special: Since
  \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
  about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
