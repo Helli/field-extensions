@@ -388,7 +388,7 @@ Another reference is the generated document of the repository's main session
 
 section \<open>Conclusion\<close>
 
-text \<open>Contrary to Isabelle/HOL itself, its libraries \<^session>\<open>HOL-Algebra\<close> and
+text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
  \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
  based upon them proved hard both in the field extension and vector space areas:
  The result of a few months' work amounts to not even a handful of formalised textbook pages.
