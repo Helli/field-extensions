@@ -158,7 +158,7 @@ text \<open>The motivation for working in this area was Kemper's proof of the fi
 
 subsection \<open>Indexed Products\<close>
 
-text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$:
+text \<open>For a ring \<open>R\<close>, the following defines the coordinate space $R^n$:
 
 \<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
