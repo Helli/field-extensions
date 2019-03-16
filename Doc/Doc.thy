@@ -388,7 +388,14 @@ Another reference is the generated document of the repository's main session
 
 section \<open>Conclusion\<close>
 
-text \<open>The result amounts to a handful of formalised textbook pages in both areas.\<close>
+text \<open>Contrary to Isabelle/HOL itself, its libraries \<^session>\<open>HOL-Algebra\<close> and
+ \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
+ based upon them proved hard both in the field extension and vector space areas:
+ The result of a few months' work amounts to not even a handful of formalised textbook pages.
+
+Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
+ this fine prove assistant.
+\<close>
 
 (*<*)
 end
