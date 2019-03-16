@@ -215,8 +215,6 @@ text \<open>These are two other useful results:
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
  its superspace, i.e.\ the inclusion is improper.
 
-These facts seem trivial, but they do need a proof even in the template~@{cite Algebra1}.
-
 For the proof, I needed the basis extension
  theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
 at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
