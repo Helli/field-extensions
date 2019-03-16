@@ -278,8 +278,8 @@ text \<open>The \<^doc>\<open>locales\<close> manual~@{cite "isabelle-locale"} s
 In my development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions
  instead. The only usage is in the definition of @{locale UP_field_extension}, where this seems to
  be the only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is
- in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>.
- This needs a lot more subscripts in subsequent statements and proofs, but removes the need to
+ in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>;
+ it needs a lot more subscripts in subsequent statements and proofs, but removes the need to
   redefine \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source]
   generate_field_\<i>_UNIV}.\<close>
 
@@ -287,11 +287,11 @@ section \<open>Analysis of the Used Libraries\<close>
 
 subsection \<open>Principal Ideal Definitions\<close>
 
-text \<open>There are two definitions of ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>: \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They
- differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
- element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
- \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
- each other in their definitions.)
+text \<open>There are two definitions of generated ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>:
+ \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They differ not in \<^emph>\<open>c\<close>ommutativity, as
+ their names suggest, but in whether they take a set or single element as argument. Confusingly
+ enough, the locales \<^const>\<open>principalideal\<close> and \<^const>\<open>principal_domain\<close> are not defined via
+ the same notion of ideal. (They also do not use each other in their definitions.)
 
  @{const[names_long] Ideal.cgenideal} should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
