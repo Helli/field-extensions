@@ -819,13 +819,13 @@ qed
 
 text \<open>Theorem 16.9b of @{cite "Algebra1"}:\<close>
 
-theorem the_elem_ring_iso_Quot_irr_generate_field:
+theorem the_elem_ring_iso_Quot_generate_field:
   "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
   by (fact repr_Eval_wd_inj[unfolded img_Eval_is_generate_field])
 
 corollary simple_algebraic_extension:
   "P Quot PIdl irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
-  using the_elem_ring_iso_Quot_irr_generate_field is_ring_iso_def by blast
+  using the_elem_ring_iso_Quot_generate_field is_ring_iso_def by blast
 
 end
 

@@ -131,22 +131,18 @@ text_raw\<open>\isacommand{definition}\isamarkupfalse%
 }\ \isanewline
 \ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\isanewline
 \ \ \ \ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%\<close>
-text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
- irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
-  common in textbooks.\<close>
+text \<open>This uses an indefinite description (via @{const arg_min}) because a priori, there could be
+ multiple such polynomials. This formulation is also common in textbooks.\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
- \<^term>\<open>\<alpha>\<close>, Kemper/theorem~16.9b~@{cite Algebra1} applies. Its results are distributed:
+ \<^term>\<open>\<alpha>\<close>, Kemper/theorem~16.9b~@{cite Algebra1} applies. Its results are:
   \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
-  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in the ring
-   \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
-  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphy of \<^term>\<open>irr\<close>'s
- residue class ring with \<open>K(\<alpha>)\<close>
-
-All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
+  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in \<^term>\<open>P\<close>
+  \<^item> @{thm[source] the_elem_ring_iso_Quot_generate_field}, an isomorphism $P/(irr)~\to~K(\alpha)$
+\<close>
 (*<*)end(*>*)
 
 section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
