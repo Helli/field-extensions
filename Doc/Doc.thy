@@ -148,8 +148,8 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
 subsection \<open>Example Instantiations\label{sec:ethy}\<close>
 
 text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
- rings.
- The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
+ rings and fields.
+ The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
   errors:
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{"interpretation_error"}
