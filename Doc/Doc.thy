@@ -236,7 +236,8 @@ text \<open>The most important problem can be identified easily: the lack of mat
 
 The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
   more work in proving lemmas in it: It states its dependencies as assumptions, not as imports.
-  This leads to blown-up proofs because many facts need to be re-constructed e.g.\ via chaining.
+  This leads to blown-up proofs because many facts need to be re-constructed before usage, i.e.\ the
+ assumptions are not discharged by the locale system.
 
 Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
 
