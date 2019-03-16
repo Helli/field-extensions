@@ -346,7 +346,8 @@ text \<open>There are both old-school @{type[names_long] up_ring}, and @{const[n
 The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
   \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
- two approaches is subject of ongoing development, refer to the developers for more information.\<close>
+ two approaches is subject of ongoing development. I refer the reader to the Isabelle developers for
+  more information.\<close>
 
 subsection \<open>Side Notes\<close>
 
@@ -382,8 +383,8 @@ text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpac
  modifications can be easily reconstructed with a normal diff-viewer.
 
 Another reference is the generated document of the repository's main session
- \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make
- here-unmentioned lemmas easier to find.\<close>
+ \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make lemmas that
+  were not mentioned here easier to find.\<close>
 
 section \<open>Conclusion\<close>
 
