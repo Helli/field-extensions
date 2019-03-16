@@ -33,7 +33,7 @@ In algebra, superstructures generally are defined to be just the inverse of subs
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).
 
-During my work, Isabelle developers added definitions for both \<^locale>\<open>subring\<close> and
+During my work, Isabelle developers added definitions for \<^locale>\<open>subring\<close> and
  \<^locale>\<open>subfield\<close> to \<^session>\<open>HOL-Algebra\<close>; these are described below. For compatibility, I
  ported my material to use these library definitions.\<close>
 
@@ -82,8 +82,9 @@ subsection \<open>Infinite Dimension\<close>
 
 text \<open>In \<open>VectorSpace.VectorSpace\<close>, the case of an infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
- representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
- being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
+ representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the finite
+ dimension cannot be expressed as equality of the dimension to a number; these statements
+ additionally need the predicate \<^const>\<open>vectorspace.fin_dim\<close> to be meaningful, counterintuitively.
 
 As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
  consideration in mind, I therefore decided to define the infinite degree to be @{term_type
@@ -91,7 +92,7 @@ As the zero vector space is no field, the degree of a field extension is never \
  have the same absorbing properties in a multiplication.
 
 A more robust implementation would use an extended type of natural numbers, or even the full range
- of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
+ of cardinal numbers. For field extensions, only one additional number is needed: My template~@{cite
  Algebra1} views the degree as number in \<open>\<nat> \<union> {\<infinity>}\<close>.
 
 Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>:
@@ -137,7 +138,7 @@ text \<open>This uses an indefinite description (via @{const arg_min}) because t
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
- \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
+ \<^term>\<open>\<alpha>\<close>, Kemper/theorem~16.9b~@{cite Algebra1} applies. Its results are distributed:
   \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
   \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in the ring
@@ -218,7 +219,7 @@ text \<open>These are two other useful results:
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
  its superspace, i.e.\ the inclusion is improper.
 
-These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
+These facts seem trivial, but they do need a proof even in the template~@{cite Algebra1}.
 
 For the proof, I needed the basis extension
  theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
@@ -274,7 +275,7 @@ As is known, infinite-dimensional vector spaces have bases, too, but proving thi
 
 subsection \<open>Old-School Context Elements\<close>
 
-text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
+text \<open>The \<^doc>\<open>locales\<close> manual~@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
  definitions are provided only for backward compatibility, but gives no reason for the deprecation.
  My problem with \<^theory_text>\<open>defines\<close> is that it causes code duplication, e.g.\ @{thm[source]
  UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}.
@@ -311,7 +312,7 @@ subsection \<open>Generated Fields\<close>
 text \<open>The function \<^const>\<open>generate_field\<close> was added during my work. This meant that I had to do
  some porting (see \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that).
  However, it turned out to simplify matters overall because it leaves out the "lower bound" field
- found in @{cite Algebra1}/definition 16.4.
+ found in Kemper/definition~16.4~@{cite Algebra1}.
 
 A note about the style: Just like in their locale
  definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
