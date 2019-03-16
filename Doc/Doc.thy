@@ -25,15 +25,15 @@ section \<open>Modelling of Algebraic Structures\<close>
 
 subsection \<open>Background\<close>
 
-text \<open>\<^emph>\<open>Isabelle/HOL\<close> provides the \<^theory_text>\<open>record\<close> package for defining structure types with named fields.
-  \<^session>\<open>HOL-Algebra\<close> uses that for its \<^type>\<open>ring\<close> type. The field names are
-  \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.
+text \<open>\<^emph>\<open>Isabelle/HOL\<close> provides the \<^theory_text>\<open>record\<close> package for defining structure types with named data
+ fields. \<^session>\<open>HOL-Algebra\<close> uses that to define the type \<^type>\<open>ring\<close> with data fields
+ \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.
 
 In algebra, superstructures generally are defined to be just the inverse of substructures, as
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
   (which is just another term for superfield).
 
-During my work, other Isabelle developers added definitions for both \<^locale>\<open>subring\<close> and
+During my work, Isabelle developers added definitions for both \<^locale>\<open>subring\<close> and
  \<^locale>\<open>subfield\<close> to \<^session>\<open>HOL-Algebra\<close>; these are described below. For compatibility, I
  ported my material to use these library definitions.\<close>
 
