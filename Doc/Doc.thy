@@ -145,6 +145,22 @@ text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-men
 \<close>
 (*<*)end(*>*)
 
+subsection \<open>Example Instantiations\label{sec:ethy}\<close>
+
+text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
+ rings.
+ The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
+  errors:
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{"interpretation_error"}
+  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
+ proof works just as in the case of a lemma, but the fact generation fails.}
+\end{figure}
+The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
+  matters quite a bit.\<close>
+
 section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
 
 subsection \<open>Motivation\<close>
@@ -360,32 +376,6 @@ text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I su
 for the session graph, so that it is
   displayed wholly in the document.\<close>
 
-section \<open>Example Instantiations\label{sec:ethy}\<close>
-
-text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
- rings.
- The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
-  errors:
-\begin{figure}[H]
-  \includegraphics[width=\linewidth]{"interpretation_error"}
-  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
- proof works just as in the case of a lemma, but the fact generation fails.}
-\end{figure}
-The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
-  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
-  matters quite a bit.\<close>
-
-section \<open>Additional Resources\<close>
-
-text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
- Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
- modifications can be easily reconstructed with a normal diff-viewer.
-
-Another reference is the generated document of the repository's main session
- \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make lemmas that
-  were not mentioned here easier to find.\<close>
-
 section \<open>Conclusion\<close>
 
 text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
@@ -396,6 +386,16 @@ text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL
 Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
  this fine prove assistant.
 \<close>
+
+section \<open>Additional Resources\<close>
+
+text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
+ Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
+ modifications can be easily reconstructed with a normal diff-viewer.
+
+Another reference is the generated document of the repository's main session
+ \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make lemmas that
+  were not mentioned here easier to find.\<close>
 
 (*<*)
 end
