@@ -220,9 +220,9 @@ For the proof, I needed the basis extension
 at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
-The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
- \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
- when porting the basis extension theorem to allow for infinite dimensions.
+As a side note, the notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false]
+ maximal_def}, is introduced in \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may
+ be relevant when porting the basis extension theorem to allow for infinite dimensions.
 \<close>
 
 section \<open>Problems\<close>
