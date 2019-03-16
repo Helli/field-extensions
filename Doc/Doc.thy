@@ -116,7 +116,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
   \<^enum> The upper field extension is infinite.
   \<^enum> Both extension parts are finite.
 
-Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
+Recently, case~3 has also been proven in
  another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \autoref{sec:mvs}.\<close>
