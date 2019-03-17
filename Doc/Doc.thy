@@ -367,12 +367,10 @@ The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close
 
 subsection \<open>Side Notes\<close>
 
-text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
+text \<open>The file \<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is quite outdated.\<close>
 
 text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use
-
-\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>
-
+\begin{quote}\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\end{quote}
 for the session graph, so that it is
   displayed wholly in the document.\<close>
 
@@ -380,7 +378,7 @@ section \<open>Conclusion\<close>
 
 text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
  \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
- based upon them proved hard both in the field extension and vector space areas:
+ based upon them proved hard in the areas of both field extension and vector space:
  The result of a few months' work amounts to not even a handful of formalised textbook pages.
 
 Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
