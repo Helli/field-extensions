@@ -378,7 +378,7 @@ section \<open>Conclusion\<close>
 
 text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
  \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
- based upon them proved hard in the areas of both field extension and vector space:
+ based upon them proved hard in the areas of both field extensions and vector spaces:
  The result of a few months' work amounts to not even a handful of formalised textbook pages.
 
 Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
