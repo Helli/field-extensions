@@ -379,7 +379,7 @@ section \<open>Conclusion\<close>
 text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
  \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
  based upon them proved hard in the areas of both field extensions and vector spaces:
- The result of a few months' work amounts to not even a handful of formalised textbook pages.
+ The result of a few months' work barely amounts to a handful of formalised textbook pages.
 
 Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
  this fine prove assistant.
@@ -388,7 +388,7 @@ Hopefully, my development can be part of the effort to provide the basics of abs
 section \<open>Additional Resources\<close>
 
 text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
- Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
+ Overall, the diff to a recent AFP commit like \isatt{ef212a8} is designed to be small, so that the
  modifications can be easily reconstructed with a normal diff-viewer.
 
 Another reference is the generated document of the repository's main session
