@@ -157,7 +157,7 @@ text \<open>\isatt{Examples.thy} provides instantiations for some of the locales
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
 The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>cf.\
   \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
   matters quite a bit.\<close>
 
