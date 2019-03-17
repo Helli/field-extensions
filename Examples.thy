@@ -1,6 +1,7 @@
 (* Author: Fabian Hellauer, 2018 *)
-subsection \<open>Example instantiations\<close>
-theory Examples imports Field_Extension
+subsection \<open>Example Instantiations\<close>
+theory Examples
+  imports Field_Extension
 begin
 
 abbreviation standard_ring

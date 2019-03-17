@@ -648,8 +648,7 @@ qed (use assms(4) in auto)
 subsection \<open>Minimal Polynomial\<close>
 
 definition irr \<comment> \<open>named after its \<^emph>\<open>irr\<close>educibility (shown later)\<close> (*move into algebraic context?*)
-  where "irr =
-    (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
+  where "irr = (ARG_MIN degree p. p \<in> carrier P \<and> monic p \<and> Eval p = \<zero>\<^bsub>L\<^esub>)"
 
 subsubsection \<open>Existence\<close>
 
@@ -741,8 +740,8 @@ qed
 
 subsubsection \<open>Irreducibility\<close>
 
-text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
-  Quot PIdl\<^bsub>P\<^esub> irr)\<close> anyway:\<close>
+text \<open>Kemper shows the following here, but it is a bit pointless since we will soon know
+ \<^prop>\<open>field (P Quot PIdl\<^bsub>P\<^esub> irr)\<close> anyway:\<close>
 lemma "domain (P Quot PIdl\<^bsub>P\<^esub> irr)" \<comment> \<open>unused\<close>
 proof -
   have domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
@@ -756,7 +755,8 @@ proof -
     using iso_h[unfolded ring_iso_def] ring_hom_zero[OF _ ring.img_is_ring ring] by fastforce
 qed
 
-text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
+text \<open>Instead, usage of some lemmas from \<^theory>\<open>HOL-Algebra.QuotRing\<close> makes for a shorter proof of
+  \<^const>\<open>irr\<close>'s irreducibility:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible\<^bsub>P\<^esub> irr"
 proof -
   txt "As the zero ideal's preimage under evaluation \<^term>\<open>PIdl\<^bsub>P\<^esub> irr\<close> is again a prime ideal:"
@@ -767,7 +767,7 @@ proof -
     using irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by auto
 qed
 
-subsubsection \<open>Factoring out the Minimal Polynomial\<close>
+subsubsection \<open>Quotient Forming\<close>
 
 text \<open>Representative evaluation is a well-defined, injective homomorphism:\<close>
 lemma repr_Eval_wd_inj:
@@ -819,13 +819,13 @@ qed
 
 text \<open>Theorem 16.9b of @{cite "Algebra1"}:\<close>
 
-theorem the_elem_ring_iso_Quot_irr_generate_field:
+theorem the_elem_ring_iso_Quot_generate_field:
   "the_elem \<circ> (`) Eval \<in> ring_iso (P Quot PIdl\<^bsub>P\<^esub> irr) (L\<lparr>carrier:=generate_field L (insert \<alpha> K)\<rparr>)"
   by (fact repr_Eval_wd_inj[unfolded img_Eval_is_generate_field])
 
 corollary simple_algebraic_extension:
   "P Quot PIdl\<^bsub>P\<^esub> irr \<simeq> L\<lparr>carrier := generate_field L (insert \<alpha> K)\<rparr>"
-  using the_elem_ring_iso_Quot_irr_generate_field is_ring_iso_def by blast
+  using the_elem_ring_iso_Quot_generate_field is_ring_iso_def by blast
 
 end
 

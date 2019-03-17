@@ -1,41 +1,65 @@
-(*<*)
 (* Author: Fabian Hellauer, 2018-2019 *)
-theory Doc
+(*<*) theory Doc
   imports
     Field_Extensions.Examples
     Field_Extensions.Old_Field_Extension
     "HOL-Algebra.Algebra"
-begin
-(*>*)
+begin (*>*)
+
+section \<open>Project Scope\<close>
+
+text \<open>Higher-order logic (HOL) is a widely used instance of the theorem prover Isabelle. The
+ goal of the project at hand was to extend \<^emph>\<open>Isabelle/HOL\<close>'s library of abstract algebra by
+ formalising field extension theory from chapter~16 of Gregor Kemper's lecture notes in
+ algebra~@{cite Algebra1}. As requirement, some theory about vector spaces was added to the
+ formalisation goal.
+
+Apart from Isabelle's own \<^session>\<open>HOL-Algebra\<close> library, the entry \isatt{VectorSpace} from the
+ \<^emph>\<open>Archive of Formal Proofs\<close>~(AFP)~\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close> was used as a basis.
+
+The work was carried out separately from the development repositories of Isabelle and AFP to
+ avoid obstructing the integrity of their pull/push areas with formalisation experiments.
+\<close>
 
 section \<open>Modelling of Algebraic Structures\<close>
 
-text \<open>In Algebra, superstructures generally are defined to be just the inverse of substructures, as
+subsection \<open>Background\<close>
+
+text \<open>\<^emph>\<open>Isabelle/HOL\<close> provides the \<^theory_text>\<open>record\<close> package for defining structure types with named data
+ fields. \<^session>\<open>HOL-Algebra\<close> uses that to define the type \<^type>\<open>ring\<close> with data fields
+ \<^const>\<open>carrier\<close>, \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<one>\<close> and \<open>\<zero>\<close>.
+
+In algebra, superstructures generally are defined to be just the inverse of substructures, as
   is the cases for fields. Thus, modelling the notion of subfield also defines field extensions
-  (which is just another term for superfield).\<close>
+  (which is just another term for superfield).
+
+During my work, Isabelle developers added definitions for \<^locale>\<open>subring\<close> and
+ \<^locale>\<open>subfield\<close> to \<^session>\<open>HOL-Algebra\<close>; these are described below. For compatibility, I
+ ported my material to use these library definitions.\<close>
 
 subsection \<open>Subrings\label{sec:sr}\<close>
 
 text \<open>A first try at formalising the notion of a subring is \<^const>\<open>ring.old_sr\<close>: A predicate
  which operates on two full \<^type>\<open>ring\<close> records \<open>R\<close> and \<open>S\<close>. It enforces the well-known
- properties for the subring \<open>S\<close>, and states where \<open>R\<close> and \<open>S\<close> have to equal.
+ properties for the subring \<open>S\<close>, and that, if restricted to \<open>S\<close>'s carrier set, both
+ structure's \<open>\<otimes>\<close> resp.\ \<open>\<oplus>\<close> have to equal.
 
 A problem  with this approach is that there are two entities for \<open>\<otimes>\<close> and \<open>\<oplus>\<close> each: Many facts can be
  shown not for any subring \<open>S\<close>, but only for \<^term>\<open>(R\<lparr>carrier := carrier S\<rparr>)\<close> (the structure with
  \<open>\<otimes>\<close>, \<open>\<oplus>\<close>, \<open>\<zero>\<close> and \<open>\<one>\<close> from \<open>R\<close>, but carrier set from the subring \<open>S\<close>). This may differ from \<open>S\<close>
-  in where the operations map objects from outside of the carrier set.
+  in where the operations map objects from outside the carrier set.
 
- Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they equal between sub- and
- superstructure, there is some degree of freedom in stating lemmas (using one or the other),
+Similarly, \<open>\<zero>\<close> and \<open>\<one>\<close> are fixed twice each. Since they are equal in sub- and superstructure,
+ there is some degree of freedom in stating lemmas (using one or the other),
  hindering fact uniformity.
 
 To conclude, it seems advisable to fix all needed objects only once within a locale. For
- Algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
+ algebra, this means: A group or ring needs a full record, but for \<^emph>\<open>sub\<close>structures we should only
  add a \<^emph>\<open>set\<close> to the fixed items.
 
-The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
+The locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL-Algebra\<close> uses this approach, via
  \<^locale>\<open>subgroup\<close> and \<^locale>\<open>submonoid\<close>. Note however, that \<^locale>\<open>subgroup\<close>'s axioms
- only describe a technical relation to the superstructure, assumed to be a group. In other words,
+ only describe the relation to the superstructure, assumed to be a group:
  \begin{center} @{prop[names_short] \<open>subgroup H G \<Longrightarrow> group (G\<lparr>carrier := H\<rparr>)\<close>} \end{center} does not
  hold without the additional assumption @{prop[names_short] \<open>group G\<close>}, equivalently for ring and
  monoid. It is only under these additional assumptions that these locales coincide with the typical
@@ -44,7 +68,7 @@ The newly-added locale \<^locale>\<open>subring\<close> in \<^session>\<open>HOL
 subsection \<open>Subfields\label{sec:sf}\<close>
 
 text \<open>The locale \<^locale>\<open>subfield\<close> extends \<^locale>\<open>subring\<close> with the appropriate additional
- assumptions for the substructure. It was also added during my work.
+ assumptions for the substructure.
 
 My locale \<^locale>\<open>field_extension\<close> combines \<^locale>\<open>subfield\<close> and \<open>field\<close>. It also renames the
  variables to \<open>L\<close> for the field and \<open>K\<close> for the subfield set.
@@ -58,8 +82,9 @@ subsection \<open>Infinite Dimension\<close>
 
 text \<open>In \<open>VectorSpace.VectorSpace\<close>, the case of an infinite dimension is modelled by \<^const>\<open>vector_space.dim\<close>
  being an unspecified \<^typ>\<open>nat\<close>. My impression from reading that theory is that distinct
- representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the dimension
- being finite does not imply @{const vectorspace.fin_dim}, counterintuitively.
+ representations would improve the formalisation: For instance, in \<open>VectorSpace\<close>, the finite
+ dimension cannot be expressed as equality of the dimension to a number; these statements
+ additionally need the predicate \<^const>\<open>vectorspace.fin_dim\<close> to be meaningful, counterintuitively.
 
 As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
  consideration in mind, I therefore decided to define the infinite degree to be @{term_type
@@ -67,7 +92,7 @@ As the zero vector space is no field, the degree of a field extension is never \
  have the same absorbing properties in a multiplication.
 
 A more robust implementation would use an extended type of natural numbers, or even the full range
- of cardinal numbers. For field extensions, only one additional number is needed: My template@{cite
+ of cardinal numbers. For field extensions, only one additional number is needed: My template~@{cite
  Algebra1} views the degree as number in \<open>\<nat> \<union> {\<infinity>}\<close>.
 
 Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>:
@@ -91,7 +116,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
   \<^enum> The upper field extension is infinite.
   \<^enum> Both extension parts are finite.
 
-Recently, the proposition part about two \<^emph>\<open>finite\<close> extensions (case 3) has also been proven in
+Recently, case~3 has also been proven in
  another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \autoref{sec:mvs}.\<close>
@@ -106,23 +131,35 @@ text_raw\<open>\isacommand{definition}\isamarkupfalse%
 }\ \isanewline
 \ \ \isakeyword{where}\ {\isachardoublequoteopen}irr\ {\isacharequal}\isanewline
 \ \ \ \ {\isacharparenleft}ARG{\isacharunderscore}MIN\ degree\ p{\isachardot}\ p\ {\isasymin}\ carrier\ P\ {\isasymand}\ monic\ p\ {\isasymand}\ Eval\ p\ {\isacharequal}\ {\isasymzero}\isactrlbsub L\isactrlesub {\isacharparenright}{\isachardoublequoteclose}%\<close>
-text \<open>This uses an indefinite description (via @{const arg_min}) because the construction of @{const
- irr} depends on the choice of polynomial for which \<open>\<alpha>\<close> is a root. This formulation is also
-  common in textbooks.\<close>
+text \<open>This uses an indefinite description (via @{const arg_min}) because a priori, there could be
+ multiple such polynomials. This formulation is also common in textbooks.\<close>
 
 subsection \<open>Classification of Simple Algebraic Extensions\<close>
 
 text \<open>In \<^locale>\<open>UP_field_extension\<close>, within the above-mentioned context of an algebraic
- \<^term>\<open>\<alpha>\<close>, Theorem Kemper/16.9b@{cite Algebra1} applies. Its results are distributed:
+ \<^term>\<open>\<alpha>\<close>, Kemper/theorem~16.9b~@{cite Algebra1} applies. Its results are:
   \<^item> @{thm[source] irr_exists}, the existence of \<^term>\<open>\<alpha>\<close>'s minimal polynomial "\<^const>\<open>irr\<close>"
   \<^item> @{thm[source] irr_unique}, the uniqueness of \<^const>\<open>irr\<close>
-  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in the ring
-   \<^term>\<open>P\<close> of polynomials over \<^term>\<open>K\<close>
-  \<^item> @{thm[source] the_elem_ring_iso_Quot_irr_generate_field}, the isomorphy of \<^term>\<open>irr\<close>'s
- residue class ring with \<open>K(\<alpha>)\<close>
-
-All of these are on their own useful for a library, so splitting up the theorem seemed appropriate.\<close>
+  \<^item> @{thm[source] irr_irreducible_polynomial}, the irreducibility of \<^const>\<open>irr\<close> in \<^term>\<open>P\<close>
+  \<^item> @{thm[source] the_elem_ring_iso_Quot_generate_field}, an isomorphism $P/(irr)~\to~K(\alpha)$
+\<close>
 (*<*)end(*>*)
+
+subsection \<open>Example Instantiations\label{sec:ethy}\<close>
+
+text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
+ rings and fields.
+ The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some library
+  errors:
+\begin{figure}[H]
+  \includegraphics[width=\linewidth]{"interpretation_error"}
+  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
+ proof works just as in the case of a lemma, but the fact generation fails.}
+\end{figure}
+The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>cf.\
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
+  matters quite a bit.\<close>
 
 section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
 
@@ -137,7 +174,7 @@ text \<open>The motivation for working in this area was Kemper's proof of the fi
 
 subsection \<open>Indexed Products\<close>
 
-text \<open>For a ring \<open>R\<close>, this defines the coordinate space $R^n$:
+text \<open>For a ring \<open>R\<close>, the following defines the coordinate space $R^n$:
 
 \<^theory_text>\<open>definition (in ring) nspace where "nspace n = func_space {..<n::nat}"\<close>
 
@@ -194,16 +231,14 @@ text \<open>These are two other useful results:
   \<^item> If a subspace of a finite-dimensional vector space has the "full" dimension, then it is the same as
  its superspace, i.e.\ the inclusion is improper.
 
-These facts seem trivial, but they do need a proof even in the template @{cite Algebra1}.
-
 For the proof, I needed the basis extension
  theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
 at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
-The notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false] maximal_def}, is introduced in
- \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may be relevant
- when porting the basis extension theorem to allow for infinite dimensions.
+As a side note, the notion \<^const>\<open>maximal\<close>, where @{thm[show_question_marks = false]
+ maximal_def}, is introduced in \<open>VectorSpace.VectorSpace\<close> and not in \<^theory>\<open>HOL.Zorn\<close>. This may
+ be relevant when porting the basis extension theorem to allow for infinite dimensions.
 \<close>
 
 section \<open>Problems\<close>
@@ -217,7 +252,8 @@ text \<open>The most important problem can be identified easily: the lack of mat
 
 The \<^locale>\<open>subspace\<close> locale has a definition quirk which should be re-evaluated before putting
   more work in proving lemmas in it: It states its dependencies as assumptions, not as imports.
-  This leads to blown-up proofs because many facts need to be re-constructed e.g.\ via chaining.
+  This leads to blown-up proofs because many facts need to be re-constructed before usage, i.e.\ the
+ assumptions are not discharged by the locale system.
 
 Another nuisance is the different argument order for \<^const>\<open>VectorSpace.subspace\<close> and @{const[names_long] submodule}.\<close>
 
@@ -250,7 +286,7 @@ As is known, infinite-dimensional vector spaces have bases, too, but proving thi
 
 subsection \<open>Old-School Context Elements\<close>
 
-text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
+text \<open>The \<^doc>\<open>locales\<close> manual~@{cite "isabelle-locale"} states that \<^theory_text>\<open>defines\<close> clauses in locale
  definitions are provided only for backward compatibility, but gives no reason for the deprecation.
  My problem with \<^theory_text>\<open>defines\<close> is that it causes code duplication, e.g.\ @{thm[source]
  UP_field_extension.Eval_def} cannot be derived from @{thm[source] UP_univ_prop.Eval_def}.
@@ -258,8 +294,8 @@ text \<open>The \<^doc>\<open>locales\<close> manual@{cite "isabelle-locale"} st
 In my development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions
  instead. The only usage is in the definition of @{locale UP_field_extension}, where this seems to
  be the only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is
- in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>.
- This needs a lot more subscripts in subsequent statements and proofs, but removes the need to
+ in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>;
+ it needs a lot more subscripts in subsequent statements and proofs, but removes the need to
   redefine \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source]
   generate_field_\<i>_UNIV}.\<close>
 
@@ -267,11 +303,11 @@ section \<open>Analysis of the Used Libraries\<close>
 
 subsection \<open>Principal Ideal Definitions\<close>
 
-text \<open>There are two definitions of ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>: \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They
- differ not in \<^emph>\<open>c\<close>ommutativity, as their names suggest, but in whether they take a set or single
- element as argument. Confusingly enough, the locales \<^const>\<open>principalideal\<close> and
- \<^const>\<open>principal_domain\<close> are not defined via the same notion of ideal. (They also do not use
- each other in their definitions.)
+text \<open>There are two definitions of generated ideals in \<^theory>\<open>HOL-Algebra.Ideal\<close>:
+ \<^const>\<open>Ideal.genideal\<close> and \<^const>\<open>Ideal.cgenideal\<close>. They differ not in \<^emph>\<open>c\<close>ommutativity, as
+ their names suggest, but in whether they take a set or single element as argument. Confusingly
+ enough, the locales \<^const>\<open>principalideal\<close> and \<^const>\<open>principal_domain\<close> are not defined via
+ the same notion of ideal. (They also do not use each other in their definitions.)
 
  @{const[names_long] Ideal.cgenideal} should probably be renamed to
   match its function symbol "\<open>PIdl\<close>" (principal ideal). It could also just abbreviate
@@ -287,7 +323,7 @@ subsection \<open>Generated Fields\<close>
 text \<open>The function \<^const>\<open>generate_field\<close> was added during my work. This meant that I had to do
  some porting (see \<^theory>\<open>Field_Extensions.Old_Field_Extension\<close> for the state before that).
  However, it turned out to simplify matters overall because it leaves out the "lower bound" field
- found in @{cite Algebra1}/definition 16.4.
+ found in Kemper/definition~16.4~@{cite Algebra1}.
 
 A note about the style: Just like in their locale
  definitions (see \<open>\<section>\<close>\ref{sec:sr}), the authors use a technical description with the
@@ -309,8 +345,8 @@ When going up in the locale hierarchy (e.g.\ \<^locale>\<open>monoid\<close>), l
 To me, this is a reason why \<^theory>\<open>HOL-Algebra.Algebra\<close> is not attractive as an import. In future
  revisions of the library, the import of both \<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> should be optional.
 
-\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the \<^emph>\<open>Archive of Formal
- Proofs\<close>\<^footnote>\<open>\<^url>\<open>https://www.isa-afp.org\<close>\<close>. A reason may be that they are too special: Since
+\<^const>\<open>INTEG\<close> and \<open>\<Z>\<close> are unused outside of their theories, also in the AFP.
+ A reason may be that they are too special: Since
  \<^const>\<open>UNIV\<close> is already the largest set, they cannot be substructures. The ability to reason
  about substructures is however a common reason to use \<^session>\<open>HOL-Algebra\<close> in the first place.
  \hyperref[sec:ethy]{Section~\ref*{sec:ethy}} follows a different approach using mostly abstract types.
@@ -326,44 +362,38 @@ text \<open>There are both old-school @{type[names_long] up_ring}, and @{const[n
 The original motivation to avoid \<^theory>\<open>HOL-Algebra.Polynomials\<close> was the requirement of
   \<^const>\<open>ring.normalize\<close> in definitions, lemmas and proofs. This deficiency stems from
   representing the polynomials as coefficient lists, thereby losing uniqueness. A unification of the
- two approaches is subject of ongoing development, refer to the developers for more information.\<close>
+ two approaches is subject of ongoing development. I refer the reader to the Isabelle developers for
+  more information.\<close>
 
 subsection \<open>Side Notes\<close>
 
-text \<open>\<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is completely outdated.\<close>
+text \<open>The file \<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is quite outdated.\<close>
 
 text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use
-
-\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>
-
+\begin{quote}\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\end{quote}
 for the session graph, so that it is
   displayed wholly in the document.\<close>
 
-section \<open>Example Instantiations\label{sec:ethy}\<close>
+section \<open>Conclusion\<close>
 
-text \<open>\isatt{Examples.thy} provides instantiations for some of the locales, using commonly known
- rings.
- The theory cannot use the @{theory_text \<open>interpretation\<close>} command due to some more library
-  errors:
-\begin{figure}[H]
-  \includegraphics[width=\linewidth]{"interpretation_error"}
-  \caption{@{thm[source] subfield_Reals_complex_field}, if stated as an interpretation: The
- proof works just as in the case of a lemma, but the fact generation fails.}
-\end{figure}
-The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>see
-  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
-  matters quite a bit.\<close>
+text \<open>Contrary to Isabelle/HOL itself, the libraries \<^session>\<open>HOL-Algebra\<close> and
+ \isatt{VectorSpace} leave much to be desired in terms of usability and uniformity. Formalising
+ based upon them proved hard in the areas of both field extensions and vector spaces:
+ The result of a few months' work barely amounts to a handful of formalised textbook pages.
+
+Hopefully, my development can be part of the effort to provide the basics of abstract algebra within
+ this fine prove assistant.
+\<close>
 
 section \<open>Additional Resources\<close>
 
 text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
- Overall, the diff to a recent AFP commit like \isatt{16e89cd} is designed to be small, so that the
+ Overall, the diff to a recent AFP commit like \isatt{ef212a8} is designed to be small, so that the
  modifications can be easily reconstructed with a normal diff-viewer.
 
 Another reference is the generated document of the repository's main session
- \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make
- here-unmentioned lemmas easier to find.\<close>
+ \<^session>\<open>Field_Extensions\<close>. In particular its detailed contents section may make lemmas that
+  were not mentioned here easier to find.\<close>
 
 (*<*)
 end

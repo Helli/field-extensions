@@ -4,6 +4,8 @@ theory Old_Field_Extension
   imports "HOL-Algebra.Subrings"
 begin
 
+subsection \<open>Generated Groups\<close>
+
 lemma (in abelian_group) contains_trivial:
   "a1\<in>carrier G \<Longrightarrow> a2\<in>carrier G \<Longrightarrow> \<ominus>a1 \<oplus> a2 \<in> carrier G"
     by simp
@@ -323,7 +325,7 @@ lemma (in field) old_fe_iff_old_sf: "old_fe R K \<longleftrightarrow> old_sf (R\
     field_axioms by blast
 
 
-subsection \<open>Intersections of intermediate fields\<close>
+subsection \<open>Intersections of Intermediate Fields\<close>
 
 context old_fe
 begin
