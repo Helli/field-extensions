@@ -740,8 +740,8 @@ qed
 
 subsubsection \<open>Irreducibility\<close>
 
-text \<open>Kemper shows this here, but it is a bit pointless since we will soon know \<^prop>\<open>field (P
-  Quot PIdl irr)\<close> anyway:\<close>
+text \<open>Kemper shows the following here, but it is a bit pointless since we will soon know
+ \<^prop>\<open>field (P Quot PIdl irr)\<close> anyway:\<close>
 lemma "domain (P Quot PIdl irr)" \<comment> \<open>unused\<close>
 proof -
   have domain_im_Eval: "domain (L\<lparr>carrier := Eval ` carrier P\<rparr>)"
@@ -755,7 +755,8 @@ proof -
     using iso_h[unfolded ring_iso_def] ring_hom_zero[OF _ ring.img_is_ring ring] by fastforce
 qed
 
-text \<open>Instead, the excellent library in \<^theory>\<open>HOL-Algebra.QuotRing\<close> gives a shorter proof:\<close>
+text \<open>Instead, usage of some lemmas from \<^theory>\<open>HOL-Algebra.QuotRing\<close> makes for a shorter proof of
+  \<^const>\<open>irr\<close>'s irreducibility:\<close>
 lemma irr_irreducible_polynomial: "ring_irreducible irr"
 proof -
   txt "As the zero ideal's preimage under evaluation \<^term>\<open>PIdl irr\<close> is again a prime ideal:"
@@ -766,7 +767,7 @@ proof -
     using irr_in_P irr_nonzero primeideal_iff_prime primeness_condition by auto
 qed
 
-subsubsection \<open>Factoring out the Minimal Polynomial\<close>
+subsubsection \<open>Quotient Forming\<close>
 
 text \<open>Representative evaluation is a well-defined, injective homomorphism:\<close>
 lemma repr_Eval_wd_inj:
