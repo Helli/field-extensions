@@ -388,7 +388,7 @@ Hopefully, my development can be part of the effort to provide the basics of abs
 section \<open>Additional Resources\<close>
 
 text \<open>In \isatt{README.md}, the changes to the AFP entry \isatt{VectorSpace} are documented.
- Overall, the diff to a recent AFP commit like \isatt{ef212a8} is designed to be small, so that the
+ Overall, the diff to a recent AFP commit like \isatt{89dada6} is designed to be small, so that the
  modifications can be easily reconstructed with a normal diff-viewer.
 
 Another reference is the generated document of the repository's main session
