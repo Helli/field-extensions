@@ -169,8 +169,7 @@ text \<open>The motivation for working in this area was Kemper's proof of the fi
  (\<open>\<section>\<close>\ref{sec:tr}), which uses vector space results unavailable in \<^session>\<open>HOL-Algebra\<close>. Note
  that the tower rule could be proven more directly using indexed sums~\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
-  but the material which Kemper uses seemed to be of general usefulness for a vector space library.
- Moreover, proofs that use indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
+  but the material which Kemper uses seemed to be of general usefulness for a vector space library.\<close>
 
 subsection \<open>Indexed Products\<close>
 
