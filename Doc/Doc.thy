@@ -86,10 +86,10 @@ text \<open>In \<open>VectorSpace.VectorSpace\<close>, the case of an infinite d
  dimension cannot be expressed as equality of the dimension to a number; these statements
  additionally need the predicate \<^const>\<open>vectorspace.fin_dim\<close> to be meaningful, counterintuitively.
 
-As the zero vector space is no field, the degree of a field extension is never \<open>0\<close>. With the above
+As the zero vector space is no field, the degree of a field extension is never zero. With the above
  consideration in mind, I therefore decided to define the infinite degree to be @{term_type
- "0::nat"}. Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), \<open>0\<close> and \<open>\<infinity>\<close> happen to
- have the same absorbing properties in a multiplication.
+ "0::nat"}. Incidentally, for the purpose of the tower rule (\<open>\<section>\<close>\ref{sec:tr}), zero and infinity
+ happen to have the same absorbing properties in a multiplication.
 
 A more robust implementation would use an extended type of natural numbers, or even the full range
  of cardinal numbers. For field extensions, only one additional number is needed: My template~@{cite
@@ -97,7 +97,7 @@ A more robust implementation would use an extended type of natural numbers, or e
 
 Whatever the best formalisation is, the change should be made in \<open>VectorSpace\<close>:
  \<^theory>\<open>Field_Extensions.Field_Extension\<close> only uses what is there. Due to there being no
- collision with the actual \<open>0\<close>, my material should be easily adaptable to such a change.\<close>
+ collision with the actual zero, my material should be easily adaptable to such a change.\<close>
 
 section \<open>Field Extensions\<close>
 
@@ -117,7 +117,7 @@ text \<open>The proof is covered by considering three (partially overlapping) ca
   \<^enum> Both extension parts are finite.
 
 Recently, case~3 has also been proven in
- another \<^session>\<open>HOL-Algebra\<close> development\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
+ another \<^session>\<open>HOL-Algebra\<close> development~\<^footnote>\<open>\<^url>\<open>https://github.com/DeVilhena-Paulo/GaloisCVC4\<close>\<close>.
  It uses the inner product instead of the outer for the proof, thus avoiding the vector space
   terminology as described in \autoref{sec:mvs}.\<close>
 
@@ -157,9 +157,9 @@ text \<open>\isatt{Examples.thy} provides instantiations for some of the locales
  proof works just as in the case of a lemma, but the fact generation fails.}
 \end{figure}
 The problem traces back to \<^locale>\<open>subring\<close> importing both \<^locale>\<open>submonoid\<close> and
- \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known\<^footnote>\<open>cf.\
-  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>, but complicates
-  matters quite a bit.\<close>
+ \<^locale>\<open>subgroup\<close>, which both have an axiom named \<open>subset\<close>. A workaround is known, but complicates
+  matters quite a bit~\<^footnote>\<open>cf.\
+  \<^url>\<open>https://lists.cam.ac.uk/pipermail/cl-isabelle-users/2018-June/msg00033.html\<close>\<close>.\<close>
 
 section \<open>Modules and Vector Spaces\label{sec:mvs}\<close>
 
@@ -167,10 +167,10 @@ subsection \<open>Motivation\<close>
 
 text \<open>The motivation for working in this area was Kemper's proof of the field extension tower rule
  (\<open>\<section>\<close>\ref{sec:tr}), which uses vector space results unavailable in \<^session>\<open>HOL-Algebra\<close>. Note
- that the tower rule could be proven more directly using indexed sums\<^footnote>\<open>cf.\ e.g.\
+ that the tower rule could be proven more directly using indexed sums~\<^footnote>\<open>cf.\ e.g.\
  \<^url>\<open>https://wikipedia.org/wiki/Degree_of_a_field_extension\#The_multiplicativity_formula_for_degrees\<close>\<close>,
   but the material which Kemper uses seemed to be of general usefulness for a vector space library.
- Moreover note that proofs using indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
+ Moreover, proofs that use indexed sums tend to be very cumbersome in \<^session>\<open>HOL-Algebra\<close>.\<close>
 
 subsection \<open>Indexed Products\<close>
 
@@ -232,7 +232,7 @@ text \<open>These are two other useful results:
  its superspace, i.e.\ the inclusion is improper.
 
 For the proof, I needed the basis extension
- theorem\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
+ theorem~\<^footnote>\<open>\<^url>\<open>http://www-m11.ma.tum.de/fileadmin/w00bnb/www/people/kemper/lectureNotes/LADS.pdf\#section.0.10\<close>\<close>,
 at least for finite-dimensional vector spaces and \<^prop>\<open>S = carrier V\<close>. This special case is
  @{thm[source] vectorspace.lin_indpt_extends_to_basis}.
 
@@ -294,7 +294,7 @@ text \<open>The \<^doc>\<open>locales\<close> manual~@{cite "isabelle-locale"} s
 In my development, I tried to avoid \<^theory_text>\<open>defines\<close> for this reason, and used regular definitions
  instead. The only usage is in the definition of @{locale UP_field_extension}, where this seems to
  be the only way to make a \<^theory_text>\<open>(structure)\<close> declaration. An alternative with no \<^theory_text>\<open>defines\<close> at all is
- in the \isatt{no\_defines} branch\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>;
+ in the \isatt{no\_defines} branch~\<^footnote>\<open>\<^url>\<open>https://github.com/helli/field-extensions/tree/no\_defines\<close>\<close>;
  it needs a lot more subscripts in subsequent statements and proofs, but removes the need to
   redefine \<open>P\<close> for interpretations of the locale, see the proof of @{thm[source]
   generate_field_\<i>_UNIV}.\<close>
@@ -333,7 +333,7 @@ subsection \<open>Integer Ring Definitions\<close>
 
 text \<open>
 Both \<^theory>\<open>HOL-Algebra.UnivPoly\<close> and \<^theory>\<open>HOL-Algebra.IntRing\<close> define an integer ring,
- i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the usual
+ i.e.\ a ring with the \<^term>\<open>UNIV\<close> of type \<^typ>\<open>int set\<close> as carrier set and the obvious
  operations.
 
 Apart from the usual problems of duplicate definitions (\<^const>\<open>INTEG\<close> vs.\ \<open>\<Z>\<close>), they also
@@ -370,7 +370,7 @@ subsection \<open>Side Notes\<close>
 text \<open>The file \<^file>\<open>~~/src/HOL/Algebra/README.html\<close> is quite outdated.\<close>
 
 text \<open>In \<^file>\<open>~~/src/HOL/Algebra/document/root.tex\<close>, I suggest to use
-\begin{quote}\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\end{quote}
+\\\<^verbatim>\<open>\includegraphics[height=\textheight]{session_graph}\<close>\\
 for the session graph, so that it is
   displayed wholly in the document.\<close>
 
