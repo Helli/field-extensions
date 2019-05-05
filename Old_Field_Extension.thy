@@ -365,9 +365,7 @@ proof goal_cases
     unfolding to_old_sf additive_subgroup_def apply safe
     apply (unfold add_monoid_update)
      apply (rule "subgroup.\<Inter>_is_supergroup") apply auto
-    apply (simp add: additive_subgroup.a_subgroup old_fe.K_subgroup(1)
-        old_fe_axioms)
-    using add.is_group apply blast
+    apply (simp add: additive_subgroup.a_subgroup old_fe.K_subgroup(1) old_fe_axioms)
     using additive_subgroup.a_subgroup old_fe.K_subgroup(1) apply blast
   proof goal_cases
     case 1

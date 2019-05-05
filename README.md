@@ -1,5 +1,5 @@
 # field-extensions
-Field Extensions in HOL-Algebra – an interdisciplinary verification project based on Isabelle2019-RC0.
+Field Extensions in HOL-Algebra – an interdisciplinary verification project based on Isabelle2019-RC1.
 
 The theories in _VectorSpace_by_HoldenLee/_ stem from the *Archive of Formal Proofs* (AFP), cf. https://devel.isa-afp.org/entries/VectorSpace.html and
 https://devel.isa-afp.org/browser_info/current/AFP/Jordan_Normal_Form/Missing_VectorSpace.html.
